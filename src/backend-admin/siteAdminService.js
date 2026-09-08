@@ -48,6 +48,11 @@ export async function saveAdminSocial(accessToken, social) {
   return { ...emptySocialLinks(), ...(payload.social || {}) };
 }
 
+export async function loadAdminMedia(accessToken) {
+  const payload = await parseResponse(await fetch('/api/admin/site?resource=media', { headers: headers(accessToken) }));
+  return Array.isArray(payload.media) ? payload.media : [];
+}
+
 export async function uploadBlogImage(accessToken, file) {
   if (!file) throw new Error('Choose an image first');
   if (file.size > 2 * 1024 * 1024) throw new Error('Image must be 2 MB or smaller');
