@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Image, Plus, Save, Trash2 } from 'lucide-react';
+import { Check, ExternalLink, Image, Plus, Save, Trash2 } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from './AdminAuthContext';
 import { BLOG_STATUS, createEmptyPost, deleteAdminBlogPost, loadAdminBlogPosts, saveAdminBlogPost, slugify } from './blogStore';
-import { uploadBlogImage } from './siteAdminService';
+import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
 
 function toTags(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
@@ -17,12 +17,15 @@ export default function BlogAdmin() {
   const isAdmin = Boolean(user?.isAdmin) || adminEmails.includes(String(user?.email || '').toLowerCase());
   const editing = Boolean(id);
   const [posts, setPosts] = useState([]);
+  const [media, setMedia] = useState([]);
   const [draft, setDraft] = useState(() => createEmptyPost());
   const [q, setQ] = useState('');
+  const [mediaQ, setMediaQ] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [mediaBusy, setMediaBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const sorted = useMemo(() => [...posts].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)), [posts]);
@@ -33,6 +36,11 @@ export default function BlogAdmin() {
     return matchesStatus && matchesTerm;
   }), [sorted, q, statusFilter]);
 
+  const filteredMedia = useMemo(() => {
+    const term = mediaQ.trim().toLowerCase();
+    return !term ? media : media.filter(item => `${item.name || ''} ${item.url || ''}`.toLowerCase().includes(term));
+  }, [media, mediaQ]);
+
   const refresh = async () => {
     if (!accessToken) return [];
     const rows = await loadAdminBlogPosts(accessToken);
@@ -40,11 +48,28 @@ export default function BlogAdmin() {
     return rows;
   };
 
+  const refreshMedia = async () => {
+    if (!accessToken) return [];
+    setMediaBusy(true);
+    try {
+      const rows = await loadAdminMedia(accessToken);
+      setMedia(rows);
+      return rows;
+    } finally {
+      setMediaBusy(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAdmin || !accessToken) return;
     setBusy(true); setError('');
     refresh().catch(err => setError(err.message)).finally(() => setBusy(false));
   }, [isAdmin, accessToken]);
+
+  useEffect(() => {
+    if (!isAdmin || !accessToken || !editing) return;
+    refreshMedia().catch(err => setError(err.message));
+  }, [isAdmin, accessToken, editing]);
 
   useEffect(() => {
     if (!editing) return;
@@ -91,10 +116,19 @@ export default function BlogAdmin() {
     setUploading(true); setError(''); setMessage('');
     try {
       const url = await uploadBlogImage(accessToken, file);
+      if (!url) throw new Error('Supabase did not return an image URL.');
       update('featuredImage', url);
-      setMessage('Image uploaded. Save the article to keep it attached to this post.');
+      await refreshMedia();
+      setMessage('Image uploaded to Supabase Media and selected for this article. Save the article to keep it attached.');
     } catch (err) { setError(err.message); }
     finally { setUploading(false); event.target.value = ''; }
+  };
+
+  const chooseMedia = item => {
+    if (!item?.url) return;
+    update('featuredImage', item.url);
+    setMessage('Supabase Media image selected. Save the article to keep this change.');
+    setError('');
   };
 
   if (editing) return <>
@@ -111,10 +145,40 @@ export default function BlogAdmin() {
         <label className="wide">Excerpt<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)} placeholder="Short summary used on the blog card."/></label>
         <label>Category<input value={draft.category} onChange={event => update('category', event.target.value)}/></label>
         <label>Tags<input value={(draft.tags || []).join(', ')} onChange={event => update('tags', toTags(event.target.value))} placeholder="Shopify, POS, consignors"/></label>
+
         <div className="site-admin-upload wide">
           <div className="site-admin-image-preview">{draft.featuredImage ? <img src={draft.featuredImage} alt="Featured preview"/> : <><Image size={24}/><span>No featured image</span></>}</div>
-          <div><strong>Featured image</strong><p>Upload a JPG, PNG, WebP, or GIF up to 2 MB. It goes into the shared blog image storage automatically.</p><label className="site-admin-btn secondary upload-button">{uploading ? 'Uploading…' : 'Choose Image'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={upload} disabled={uploading}/></label>{draft.featuredImage && <button className="site-admin-text-button" type="button" onClick={() => update('featuredImage', '')}>Remove image</button>}</div>
+          <div>
+            <strong>Featured image</strong>
+            <p>Upload a new image to Supabase Storage or choose one already in the shared Media Library. New posts start with no image selected.</p>
+            <div className="site-admin-actions">
+              <label className="site-admin-btn secondary upload-button">{uploading ? 'Uploading to Supabase…' : 'Upload New'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={upload} disabled={uploading}/></label>
+              {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => { update('featuredImage', ''); setMessage('Featured image removed. Save the article to keep this change.'); }}>Remove Image</button>}
+            </div>
+          </div>
         </div>
+
+        <div className="wide">
+          <div className="site-admin-toolbar">
+            <label className="site-admin-search"><input value={mediaQ} onChange={event => setMediaQ(event.target.value)} placeholder="Search Supabase Media"/></label>
+            <button className="site-admin-btn secondary small" type="button" onClick={() => refreshMedia().catch(err => setError(err.message))} disabled={mediaBusy}>{mediaBusy ? 'Loading…' : 'Refresh Media'}</button>
+          </div>
+          <div className="site-admin-media-grid">
+            {mediaBusy && !media.length ? <div className="site-admin-card site-admin-empty"><Image size={24}/><p>Loading Supabase Media…</p></div> : filteredMedia.map(item => {
+              const selected = draft.featuredImage === item.url;
+              return <div className="site-admin-card site-admin-media-card" key={item.path || item.url}>
+                <div className="site-admin-media-image"><img src={item.url} alt={item.name || 'Supabase media'}/></div>
+                <div className="site-admin-media-copy">
+                  <strong title={item.name}>{item.name || 'Image'}</strong>
+                  <small>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Supabase Storage'}</small>
+                  <button className={`site-admin-btn ${selected ? '' : 'secondary'} small`} type="button" onClick={() => chooseMedia(item)}>{selected ? <><Check size={13}/> Selected</> : 'Use Image'}</button>
+                </div>
+              </div>;
+            })}
+            {!mediaBusy && !filteredMedia.length && <div className="site-admin-card site-admin-empty"><Image size={24}/><p>No Supabase images found.</p></div>}
+          </div>
+        </div>
+
         <label className="wide">SEO title<input value={draft.seoTitle} onChange={event => update('seoTitle', event.target.value)} placeholder="Leave blank to use the article title"/></label>
         <label className="wide">Meta description<textarea rows="3" value={draft.seoDescription} onChange={event => update('seoDescription', event.target.value)}/></label>
         <label className="wide">Article body<textarea rows="20" value={draft.body} onChange={event => update('body', event.target.value)} placeholder="Write the article here. Separate paragraphs with a blank line."/></label>
