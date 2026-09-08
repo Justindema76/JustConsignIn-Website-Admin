@@ -39,6 +39,10 @@ function socialValue(body = {}) {
   }]));
 }
 
+function publicMediaUrl(name) {
+  return `${supabaseUrl()}/storage/v1/object/public/blog-images/${String(name || '').split('/').map(encodeURIComponent).join('/')}`;
+}
+
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const user = await requireWebsiteOwner(req, res);
@@ -59,6 +63,25 @@ export default async function handler(req, res) {
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load social links');
       return res.status(200).json({ social: data?.[0]?.value || socialValue({}) });
+    }
+
+    if (req.method === 'GET' && resource === 'media') {
+      const response = await supabaseUserStorage(user.accessToken, 'object/list/blog-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefix: '', limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.message || data?.error || 'Unable to load media');
+      const media = (Array.isArray(data) ? data : []).filter(item => item?.name && item.name !== '.emptyFolderPlaceholder').map(item => ({
+        name: item.name,
+        path: item.name,
+        url: publicMediaUrl(item.name),
+        createdAt: item.created_at || item.updated_at || '',
+        updatedAt: item.updated_at || '',
+        metadata: item.metadata || {},
+      }));
+      return res.status(200).json({ media });
     }
 
     if (req.method === 'DELETE' && resource === 'videos') {
@@ -116,7 +139,7 @@ export default async function handler(req, res) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.message || data?.error || 'Unable to upload image');
       }
-      const publicUrl = `${supabaseUrl()}/storage/v1/object/public/blog-images/${encodeURIComponent(objectName)}`;
+      const publicUrl = publicMediaUrl(objectName);
       return res.status(200).json({ url: publicUrl, path: objectName });
     }
 
