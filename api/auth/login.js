@@ -75,7 +75,10 @@ export default async function handler(req, res) {
       if (!customerAppEnabled() && safeCallback(req.query?.callback) !== '/admin-login') {
         return res.status(404).json({ error: 'Not found' });
       }
-      const appUrl = String(process.env.APP_URL || 'https://www.justconsignin.com').replace(/\/$/, '');
+      const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+      const protocol = forwardedProto || (String(req.headers.host || '').startsWith('localhost') ? 'http' : 'https');
+      const requestOrigin = req.headers.host ? `${protocol}://${req.headers.host}` : '';
+      const appUrl = String(process.env.APP_URL || requestOrigin).replace(/\/$/, '');
       const redirectTo = `${appUrl}${safeCallback(req.query?.callback)}`;
       const googleScopes = [
         'openid',

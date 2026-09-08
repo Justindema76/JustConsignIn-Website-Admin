@@ -48,5 +48,5 @@ export async function requireWebsiteOwner(req, res) {
     return null;
   }
 
-  return user;
+  return { ...user, accessToken: token };
 }

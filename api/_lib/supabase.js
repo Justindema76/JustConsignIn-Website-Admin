@@ -4,9 +4,9 @@ const required = (name) => {
   return value;
 };
 
-export const supabaseUrl = () => required('SUPABASE_URL');
+export const supabaseUrl = () => process.env.SUPABASE_URL || 'https://nowsajdmbpxvlvrhopjg.supabase.co';
 export const supabaseSecret = () => required('SUPABASE_SECRET_KEY');
-export const supabaseAnon = () => required('SUPABASE_ANON_KEY');
+export const supabaseAnon = () => process.env.SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w';
 
 export function customerAppEnabled() {
   return process.env.CUSTOMER_APP_ENABLED === 'true';
@@ -34,6 +34,25 @@ export async function supabaseAdmin(path, options = {}) {
 
 export async function supabaseRest(path, options = {}) {
   return supabaseAdmin(`/rest/v1/${path}`, options);
+}
+
+export async function supabaseUserRest(token, path, options = {}) {
+  return fetch(`${supabaseUrl()}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: supabaseAnon(),
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+}
+
+export async function supabaseUserStorage(token, path, options = {}) {
+  return fetch(`${supabaseUrl()}/storage/v1/${path}`, {
+    ...options,
+    headers: { apikey: supabaseAnon(), Authorization: `Bearer ${token}`, ...(options.headers || {}) },
+  });
 }
 
 export async function getUserFromToken(token) {

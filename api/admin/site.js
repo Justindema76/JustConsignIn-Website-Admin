@@ -1,4 +1,4 @@
-import { supabaseAdmin, supabaseRest, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 function youtubeId(value = '') {
@@ -48,14 +48,14 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET' && resource === 'videos') {
-      const response = await supabaseRest('site_videos?select=*&order=placement.asc,sort_order.asc,created_at.asc', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, 'site_videos?select=*&order=placement.asc,sort_order.asc,created_at.asc', { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load videos');
       return res.status(200).json({ videos: data });
     }
 
     if (req.method === 'GET' && resource === 'social') {
-      const response = await supabaseRest('site_settings?key=eq.social_links&select=key,value,updated_at&limit=1', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?key=eq.social_links&select=key,value,updated_at&limit=1', { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load social links');
       return res.status(200).json({ social: data?.[0]?.value || socialValue({}) });
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE' && resource === 'videos') {
       const id = String(req.query?.id || '').trim();
       if (!id) return res.status(400).json({ error: 'Missing video id' });
-      const response = await supabaseRest(`site_videos?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+      const response = await supabaseUserRest(user.accessToken, `site_videos?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
       if (!response.ok) throw new Error('Unable to delete video');
       return res.status(200).json({ ok: true });
     }
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       if (!payload.youtube_url || !payload.youtube_id) return res.status(400).json({ error: 'Enter a valid YouTube URL' });
       const id = String(req.body?.id || '').trim();
       const path = id ? `site_videos?id=eq.${encodeURIComponent(id)}` : 'site_videos';
-      const response = await supabaseRest(path, {
+      const response = await supabaseUserRest(user.accessToken, path, {
         method: id ? 'PATCH' : 'POST',
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify(payload),
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST' && resource === 'social') {
       const value = socialValue(req.body || {});
-      const response = await supabaseRest('site_settings?on_conflict=key', {
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify({ key: 'social_links', value, updated_at: new Date().toISOString() }),
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       if (!buffer.length || buffer.length > 2 * 1024 * 1024) return res.status(400).json({ error: 'Image must be 2 MB or smaller' });
       const original = String(req.body?.filename || 'image').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'image';
       const objectName = `${Date.now()}-${original}`;
-      const response = await supabaseAdmin(`/storage/v1/object/blog-images/${encodeURIComponent(objectName)}`, {
+      const response = await supabaseUserStorage(user.accessToken, `object/blog-images/${encodeURIComponent(objectName)}`, {
         method: 'POST',
         headers: { 'Content-Type': mimeType, 'x-upsert': 'false' },
         body: buffer,

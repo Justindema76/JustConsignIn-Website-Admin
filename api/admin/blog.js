@@ -1,4 +1,4 @@
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const fields = 'id,slug,title,excerpt,seo_title,seo_description,category,tags,featured_image,body,status,author_name,published_at,created_at,updated_at';
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const response = await supabaseRest(`blog_posts?select=${fields}&order=updated_at.desc`, { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, `blog_posts?select=${fields}&order=updated_at.desc`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load blog posts');
       return res.status(200).json({ posts: data });
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       const id = String(req.query?.id || '').trim();
       if (!id) return res.status(400).json({ error: 'Missing post id' });
-      const response = await supabaseRest(`blog_posts?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+      const response = await supabaseUserRest(user.accessToken, `blog_posts?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.message || 'Unable to delete blog post');
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     if (!payload.slug) return res.status(400).json({ error: 'Slug is required' });
     const id = String(req.body?.id || '').trim();
     const path = id ? `blog_posts?id=eq.${encodeURIComponent(id)}` : 'blog_posts';
-    const response = await supabaseRest(path, {
+    const response = await supabaseUserRest(user.accessToken, path, {
       method: id ? 'PATCH' : 'POST',
       headers: { Prefer: 'return=representation' },
       body: JSON.stringify(payload),
