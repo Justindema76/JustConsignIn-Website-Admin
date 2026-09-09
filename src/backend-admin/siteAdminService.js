@@ -7,6 +7,7 @@ const SOCIAL_AUDIO_BUCKET = 'social-audio';
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const TIKTOK_IMAGE_TYPES = new Set(['image/jpeg', 'image/webp']);
 const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
 
 async function parseResponse(response) {
@@ -62,6 +63,36 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
   return publicMediaUrl(bucket, objectName);
 }
 
+async function imageBlobToJpeg(blob, filename = 'social-image.jpg') {
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = objectUrl;
+    await image.decode();
+
+    const width = image.naturalWidth || image.width;
+    const height = image.naturalHeight || image.height;
+    if (!width || !height) throw new Error('Unable to read that image.');
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Your browser could not prepare the image.');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+    if (!jpeg) throw new Error('Unable to convert the image to JPEG.');
+    const base = safeFilename(filename).replace(/\.[^.]+$/, '') || 'social-image';
+    return new File([jpeg], `${base}.jpg`, { type: 'image/jpeg' });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 export async function loadAdminVideos(accessToken) {
   const payload = await parseResponse(await fetch('/api/admin/site?resource=videos', { headers: headers(accessToken) }));
   return Array.isArray(payload.videos) ? payload.videos.map(normalizeVideo) : [];
@@ -109,6 +140,28 @@ export async function uploadBlogImage(accessToken, file) {
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
   });
+}
+
+export async function uploadSocialImage(accessToken, file) {
+  if (!file) throw new Error('Choose an image first.');
+  const type = String(file.type || '').toLowerCase();
+  const compatible = TIKTOK_IMAGE_TYPES.has(type) ? file : await imageBlobToJpeg(file, file.name || 'social-image.jpg');
+  return uploadBlogImage(accessToken, compatible);
+}
+
+export async function ensureTikTokCompatibleImage(accessToken, url) {
+  const source = String(url || '').trim();
+  if (!source) return '';
+
+  const response = await fetch(source, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Unable to prepare the selected image for TikTok (${response.status}).`);
+  const blob = await response.blob();
+  const type = String(blob.type || response.headers.get('content-type') || '').split(';')[0].toLowerCase();
+  if (TIKTOK_IMAGE_TYPES.has(type)) return source;
+  if (!type.startsWith('image/')) throw new Error('TikTok requires a JPEG or WebP image.');
+
+  const converted = await imageBlobToJpeg(blob, 'tiktok-social-image.jpg');
+  return uploadBlogImage(accessToken, converted);
 }
 
 export async function uploadSocialAudio(accessToken, file) {
