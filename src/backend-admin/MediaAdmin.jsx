@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Upload } from 'lucide-react';
+import { Image, Upload, WandSparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from './AdminAuthContext';
 import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
 
@@ -39,8 +40,8 @@ export default function MediaAdmin() {
 
   return <>
     <div className="site-admin-page-head">
-      <div><p className="site-admin-eyebrow">Assets</p><h1>Media</h1><p>Every blog image uploaded through the backend lives here in the shared Supabase media library and can be reused on future articles.</p></div>
-      <label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Images'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={upload} disabled={uploading}/></label>
+      <div><p className="site-admin-eyebrow">Assets</p><h1>Media</h1><p>Shared Supabase media for blog articles and social campaigns. Create properly sized social versions in Image Studio.</p></div>
+      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to="/admin/social-image"><WandSparkles size={15}/> Image Studio</Link><label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Images'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={upload} disabled={uploading}/></label></div>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     <div className="site-admin-toolbar"><label className="site-admin-search"><input value={q} onChange={event => setQ(event.target.value)} placeholder="Search media"/></label></div>
