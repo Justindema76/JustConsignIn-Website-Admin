@@ -12,55 +12,73 @@ export async function getSocialAiStatus(accessToken) {
   return parseResponse(await fetch('/api/admin/social-ai', { headers: { Authorization: `Bearer ${accessToken}` } }));
 }
 
-export async function generateSocialImage(accessToken, { prompt, ratio }) {
-  return parseResponse(await fetch('/api/admin/social-ai', {
-    method: 'POST',
-    headers: headers(accessToken),
-    body: JSON.stringify({ action: 'image', prompt, ratio }),
-  }));
+function waitFor(target, event, errorEvent = 'error') {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      target.removeEventListener(event, onDone);
+      if (errorEvent) target.removeEventListener(errorEvent, onError);
+    };
+    const onDone = () => { cleanup(); resolve(); };
+    const onError = () => { cleanup(); reject(new Error('Unable to read the selected video.')); };
+    target.addEventListener(event, onDone, { once: true });
+    if (errorEvent) target.addEventListener(errorEvent, onError, { once: true });
+  });
 }
 
-export async function generateSocialCopy(accessToken, { title, direction, platforms }) {
-  return parseResponse(await fetch('/api/admin/social-ai', {
-    method: 'POST',
-    headers: headers(accessToken),
-    body: JSON.stringify({ action: 'copy', title, direction, platforms }),
-  }));
-}
+async function videoFrames(videoUrl, count = 4) {
+  const video = document.createElement('video');
+  video.crossOrigin = 'anonymous';
+  video.preload = 'auto';
+  video.muted = true;
+  video.playsInline = true;
+  video.src = videoUrl;
+  video.load();
 
-export async function imageBase64ToFile(base64, ratio = '4:5') {
-  const source = new Image();
-  source.decoding = 'async';
-  source.src = `data:image/jpeg;base64,${base64}`;
-  await source.decode();
-
-  const targets = {
-    '1:1': [1080, 1080],
-    '4:5': [1080, 1350],
-    '9:16': [1080, 1920],
-  };
-  const [width, height] = targets[ratio] || targets['4:5'];
-  const targetRatio = width / height;
-  const sourceRatio = source.naturalWidth / source.naturalHeight;
-  let sx = 0, sy = 0, sw = source.naturalWidth, sh = source.naturalHeight;
-
-  if (sourceRatio > targetRatio) {
-    sw = source.naturalHeight * targetRatio;
-    sx = (source.naturalWidth - sw) / 2;
-  } else if (sourceRatio < targetRatio) {
-    sh = source.naturalWidth / targetRatio;
-    sy = (source.naturalHeight - sh) / 2;
-  }
-
+  if (video.readyState < 1) await waitFor(video, 'loadedmetadata');
+  const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 1;
+  const sourceWidth = video.videoWidth || 720;
+  const sourceHeight = video.videoHeight || 1280;
+  const maxWidth = 720;
+  const scale = Math.min(1, maxWidth / sourceWidth);
+  const width = Math.max(2, Math.round(sourceWidth * scale));
+  const height = Math.max(2, Math.round(sourceHeight * scale));
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(source, sx, sy, sw, sh, 0, 0, width, height);
+  if (!ctx) throw new Error('Unable to analyze video frames on this device.');
 
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-  if (!blob) throw new Error('Unable to prepare generated image for upload.');
-  return new File([blob], `justconsignin-ai-${ratio.replace(':', 'x')}-${Date.now()}.jpg`, { type: 'image/jpeg' });
+  const percentages = count <= 1 ? [0.5] : Array.from({ length: count }, (_, i) => 0.08 + (i * 0.84 / (count - 1)));
+  const frames = [];
+  for (const percent of percentages) {
+    const target = Math.max(0, Math.min(duration - 0.05, duration * percent));
+    if (Math.abs(video.currentTime - target) > 0.02) {
+      const seeked = waitFor(video, 'seeked');
+      video.currentTime = target;
+      await seeked;
+    }
+    ctx.drawImage(video, 0, 0, width, height);
+    frames.push(canvas.toDataURL('image/jpeg', 0.72));
+  }
+
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  return frames;
+}
+
+export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'image', platforms = [], direction = '' }) {
+  if (!mediaUrl) throw new Error('Choose or upload an image or video first.');
+  if (!platforms.length) throw new Error('Choose at least one social network to push to.');
+
+  let frames = [];
+  if (mediaType === 'video') {
+    frames = await videoFrames(mediaUrl, 4);
+  }
+
+  return parseResponse(await fetch('/api/admin/social-ai', {
+    method: 'POST',
+    headers: headers(accessToken),
+    body: JSON.stringify({ action: 'analyze', mediaUrl, mediaType, platforms, direction, frames }),
+  }));
 }
