@@ -48,3 +48,19 @@ export async function sendCampaignToMetricool(accessToken, id) {
     method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'send', id }),
   }));
 }
+
+export async function getSocialAiStatus(accessToken) {
+  return parseResponse(await fetch('/api/admin/social-ai', { headers: { Authorization: `Bearer ${accessToken}` } }));
+}
+
+export async function generateSocialImage(accessToken, { prompt, ratio = '4:5', quality = 'medium' } = {}) {
+  return parseResponse(await fetch('/api/admin/social-ai', {
+    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'image', prompt, ratio, quality }),
+  }));
+}
+
+export async function generateSocialCopy(accessToken, { title, direction = '', platforms = [] } = {}) {
+  return parseResponse(await fetch('/api/admin/social-ai', {
+    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'copy', title, direction, platforms }),
+  }));
+}
