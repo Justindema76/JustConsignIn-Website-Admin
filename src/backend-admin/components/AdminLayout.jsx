@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, ExternalLink, Home, Image, Link2, LogOut, Video } from 'lucide-react';
+import { BookOpen, ExternalLink, Home, Image, Link2, LogOut, Sparkles, Video } from 'lucide-react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AdminAuthContext';
 import { SOCIAL_NETWORKS, emptySocialLinks } from '../siteContent';
@@ -11,6 +11,7 @@ const nav = [
   { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
   { to: '/admin/social', label: 'Social Links', icon: Link2 },
   { to: '/admin/media', label: 'Media', icon: Image },
+  { to: '/admin/social-automation', label: 'Social Automation', icon: Sparkles },
 ];
 
 export default function AdminLayout() {
