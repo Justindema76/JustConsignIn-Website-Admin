@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ImagePlus, Loader2, Music2, Sparkles, Trash2, Upload } from 'lucide-react';
-import { uploadBlogImage, uploadSocialAudio } from './siteAdminService';
+import { Film, ImagePlus, Loader2, Music2, Play, Sparkles, Trash2, Upload } from 'lucide-react';
+import { uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from './siteAdminService';
 import { generateSocialCopy, generateSocialImage, getSocialAiStatus, imageBase64ToFile } from './socialAiService';
+import { createImageMusicReel } from './socialReelService';
 import './socialAiPanel.css';
 
 const RATIOS = [
@@ -9,6 +10,8 @@ const RATIOS = [
   { value: '4:5', label: 'Instagram Feed', detail: '1080 × 1350' },
   { value: '9:16', label: 'Reel / TikTok', detail: '1080 × 1920' },
 ];
+
+const REEL_DURATIONS = [5, 8, 10, 15];
 
 export default function SocialAiPanel({ accessToken, campaign, setCampaign, setMessage, setError, onMediaRefresh }) {
   const [configured, setConfigured] = useState(null);
@@ -18,6 +21,8 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
   const [imageBusy, setImageBusy] = useState(false);
   const [copyBusy, setCopyBusy] = useState(false);
   const [audioBusy, setAudioBusy] = useState(false);
+  const [reelBusy, setReelBusy] = useState(false);
+  const [reelDuration, setReelDuration] = useState(10);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -81,6 +86,20 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
     finally { setAudioBusy(false); event.target.value = ''; }
   };
 
+  const createReel = async () => {
+    if (!campaign.mediaUrl) { setError('Choose or create an image first.'); return; }
+    if (!campaign.audioUrl) { setError('Upload music first.'); return; }
+    if (campaign.mediaType === 'video') { setError('This campaign already has a video selected. Choose an image first if you want to rebuild the Reel.'); return; }
+    setReelBusy(true); setError(''); setMessage('Creating the MP4 on this device… keep this page open.');
+    try {
+      const file = await createImageMusicReel({ imageUrl: campaign.mediaUrl, audioUrl: campaign.audioUrl, durationSeconds: reelDuration });
+      const url = await uploadSocialVideo(accessToken, file);
+      patch({ mediaUrl: url, mediaType: 'video', aspectRatio: '9:16' });
+      setMessage(`Reel created: ${reelDuration} seconds, 9:16 MP4 with your uploaded music. It is now the selected campaign media.`);
+    } catch (err) { setError(err.message); setMessage(''); }
+    finally { setReelBusy(false); }
+  };
+
   const clearAudio = () => patch({ audioUrl: '', audioName: '', audioMode: 'none' });
 
   return <div className="social-ai-block">
@@ -106,7 +125,7 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
     </div>
 
     <section className="social-audio-card">
-      <div className="social-ai-title"><Music2 size={17}/><div><strong>Music</strong><small>Upload your own track now, or mark the campaign to add music later in Instagram/TikTok.</small></div></div>
+      <div className="social-ai-title"><Music2 size={17}/><div><strong>Music</strong><small>Upload your own MP3/M4A/WAV. It stays attached to this campaign.</small></div></div>
       {campaign.audioUrl ? <div className="social-audio-attached">
         <div><strong>{campaign.audioName || 'Uploaded music'}</strong><audio controls preload="metadata" src={campaign.audioUrl}/></div>
         <button className="site-admin-btn danger small" type="button" onClick={clearAudio}><Trash2 size={13}/> Remove</button>
@@ -114,7 +133,17 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
         <label className="site-admin-btn secondary upload-button"><Upload size={14}/> {audioBusy ? 'Uploading…' : 'Upload Music'}<input type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" onChange={uploadAudio} disabled={audioBusy}/></label>
         <button type="button" className={`site-admin-btn secondary ${campaign.audioMode === 'add-later' ? 'selected-mode' : ''}`} onClick={() => patch({ audioMode: campaign.audioMode === 'add-later' ? 'none' : 'add-later' })}><Music2 size={14}/> {campaign.audioMode === 'add-later' ? 'Music Later ✓' : 'Add Music Later'}</button>
       </div>}
-      <p className="social-audio-note"><b>Music behavior:</b> your uploaded track is saved with the campaign. A normal static Instagram/Facebook image cannot have an arbitrary audio file attached through Metricool. Keep the track here for a Reel/video version, or choose “Add Music Later” and finish the native music step in Instagram/TikTok.</p>
+    </section>
+
+    <section className="social-reel-card">
+      <div className="social-ai-title"><Film size={18}/><div><strong>Create Reel With Music</strong><small>Combines the selected image and uploaded music into a real 9:16 MP4 for Instagram Reels/TikTok.</small></div></div>
+      <div className="social-reel-summary">
+        <span className={campaign.mediaUrl && campaign.mediaType === 'image' ? 'ready' : ''}>{campaign.mediaType === 'image' && campaign.mediaUrl ? '✓ Image ready' : campaign.mediaType === 'video' ? 'Video currently selected' : 'Image needed'}</span>
+        <span className={campaign.audioUrl ? 'ready' : ''}>{campaign.audioUrl ? '✓ Music ready' : 'Music needed'}</span>
+      </div>
+      <div className="social-reel-duration"><strong>Length</strong><div>{REEL_DURATIONS.map(seconds => <button type="button" key={seconds} className={reelDuration === seconds ? 'selected' : ''} onClick={() => setReelDuration(seconds)}>{seconds}s</button>)}</div></div>
+      <button className="site-admin-btn social-reel-create" type="button" onClick={createReel} disabled={reelBusy || !campaign.mediaUrl || !campaign.audioUrl || campaign.mediaType === 'video'}>{reelBusy ? <Loader2 className="spin" size={15}/> : <Play size={15}/>} {reelBusy ? `Creating ${reelDuration}s MP4…` : 'Create Reel With Music'}</button>
+      <p className="social-audio-note">This renders on your phone/browser, then uploads the finished MP4 to Supabase. Keep the page open while it creates the Reel. After it finishes, the live preview switches to the video and Metricool receives the MP4 instead of the static image.</p>
     </section>
   </div>;
 }
