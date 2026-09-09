@@ -115,8 +115,8 @@ function networkInfo(campaign, network) {
     publicationDate: { dateTime: torontoLocal(campaign.scheduled_at), timezone: 'America/Toronto' },
     shortener: false, smartLinkData: { ids: [] },
   };
-  if (network === 'instagram') return { ...base, text: campaign.instagram_caption, instagramData: { type: 'POST', collaborators: [], showReelOnFeed: true, isAiGenerated: false } };
-  if (network === 'facebook') return { ...base, text: campaign.facebook_caption || campaign.instagram_caption, facebookData: { type: 'POST', title: '' } };
+  if (network === 'instagram') return { ...base, text: campaign.instagram_caption, instagramData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', collaborators: [], showReelOnFeed: true, isAiGenerated: false } };
+  if (network === 'facebook') return { ...base, text: campaign.facebook_caption || campaign.instagram_caption, facebookData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', title: '' } };
   if (network === 'tiktok') return { ...base, text: campaign.tiktok_caption, tiktokData: { disableComment: false, disableDuet: false, disableStitch: false, privacyOption: 'PUBLIC_TO_EVERYONE', commercialContentThirdParty: false, commercialContentOwnBrand: true, title: campaign.title, autoAddMusic: false, photoCoverIndex: 0, isAigc: false } };
   if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: 'short', privacy: 'public', tags: ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
   return base;
