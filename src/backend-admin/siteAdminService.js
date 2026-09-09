@@ -65,6 +65,31 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
   return publicMediaUrl(bucket, objectName);
 }
 
+async function imageToJpegFile(source, filename = 'social-image.jpg') {
+  let blob;
+  if (source instanceof Blob) blob = source;
+  else {
+    const response = await fetch(source, { mode: 'cors' });
+    if (!response.ok) throw new Error(`Unable to load image for conversion (${response.status}).`);
+    blob = await response.blob();
+  }
+
+  const bitmap = await createImageBitmap(blob);
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) throw new Error('Unable to prepare image conversion.');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bitmap, 0, 0);
+  bitmap.close?.();
+
+  const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+  if (!jpeg) throw new Error('Unable to convert image to JPEG.');
+  return new File([jpeg], filename.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+}
+
 export async function loadAdminVideos(accessToken) {
   const payload = await parseResponse(await fetch('/api/admin/site?resource=videos', { headers: headers(accessToken) }));
   return Array.isArray(payload.videos) ? payload.videos.map(normalizeVideo) : [];
@@ -112,6 +137,21 @@ export async function uploadBlogImage(accessToken, file) {
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
   });
+}
+
+export async function uploadSocialImage(accessToken, file) {
+  if (!file) throw new Error('Choose an image first.');
+  const type = String(file.type || '').toLowerCase();
+  if (!ALLOWED_IMAGE_TYPES.has(type)) throw new Error('Use a JPG, PNG, WebP, or GIF image.');
+  const prepared = type === 'image/jpeg' ? file : await imageToJpegFile(file, file.name || 'social-image.jpg');
+  return uploadBlogImage(accessToken, prepared);
+}
+
+export async function ensureTikTokCompatibleImage(accessToken, url) {
+  const clean = String(url || '').split('?')[0].toLowerCase();
+  if (/\.jpe?g$/.test(clean)) return url;
+  const file = await imageToJpegFile(url, `tiktok-${Date.now()}.jpg`);
+  return uploadBlogImage(accessToken, file);
 }
 
 export async function uploadSocialAudio(accessToken, file) {
