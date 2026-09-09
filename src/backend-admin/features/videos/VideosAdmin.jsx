@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Plus, Save, Trash2, Video } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from './AdminAuthContext';
-import { deleteAdminVideo, loadAdminVideos, saveAdminVideo } from './siteAdminService';
+import { useAuth } from '../../auth/AdminAuthContext';
+import { deleteAdminVideo, loadAdminVideos, saveAdminVideo } from '../../services/siteAdminService';
 
 const emptyVideo = { id: '', title: '', youtubeUrl: '', description: '', placement: 'homepage', sortOrder: 1, status: 'active' };
 

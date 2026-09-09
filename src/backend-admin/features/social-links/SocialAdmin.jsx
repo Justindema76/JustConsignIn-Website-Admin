@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
-import { useAuth } from './AdminAuthContext';
-import { SOCIAL_NETWORKS, emptySocialLinks } from './siteContent';
-import { loadAdminSocial, saveAdminSocial } from './siteAdminService';
+import { useAuth } from '../../auth/AdminAuthContext';
+import { SOCIAL_NETWORKS, emptySocialLinks } from '../../config/siteContent';
+import { loadAdminSocial, saveAdminSocial } from '../../services/siteAdminService';
 
 export default function SocialAdmin() {
   const { accessToken } = useAuth();

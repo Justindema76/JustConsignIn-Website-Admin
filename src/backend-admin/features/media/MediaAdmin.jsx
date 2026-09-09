@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Image, Upload, WandSparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from './AdminAuthContext';
-import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
+import { useAuth } from '../../auth/AdminAuthContext';
+import { loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
 
 export default function MediaAdmin() {
   const { accessToken } = useAuth();
