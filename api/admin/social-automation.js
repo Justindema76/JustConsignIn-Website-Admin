@@ -17,7 +17,7 @@ function normalizeCampaign(row = {}) {
   return {
     id: row.id || '', title: row.title || '', status: row.status || 'draft',
     platforms: Array.isArray(row.platforms) ? row.platforms : [],
-    instagramCaption: row.instagram_caption || '', tiktokCaption: row.tiktok_caption || '',
+    instagramCaption: row.instagram_caption || '', facebookCaption: row.facebook_caption || '', tiktokCaption: row.tiktok_caption || '',
     youtubeTitle: row.youtube_title || '', youtubeDescription: row.youtube_description || '',
     mediaUrl: row.media_url || '', mediaType: row.media_type || 'image', aspectRatio: row.aspect_ratio || '1:1',
     scheduledAt: row.scheduled_at || '', autoPublish: Boolean(row.auto_publish),
@@ -35,6 +35,7 @@ function cleanCampaign(input = {}) {
     status: ALLOWED_STATUS.has(input.status) ? input.status : 'draft',
     platforms,
     instagram_caption: String(input.instagramCaption || ''),
+    facebook_caption: String(input.facebookCaption || ''),
     tiktok_caption: String(input.tiktokCaption || ''),
     youtube_title: String(input.youtubeTitle || ''),
     youtube_description: String(input.youtubeDescription || ''),
@@ -107,9 +108,9 @@ function networkInfo(campaign, network) {
     shortener: false, smartLinkData: { ids: [] },
   };
   if (network === 'instagram') return { ...base, text: campaign.instagram_caption, instagramData: { type: 'POST', collaborators: [], showReelOnFeed: true, isAiGenerated: false } };
+  if (network === 'facebook') return { ...base, text: campaign.facebook_caption || campaign.instagram_caption, facebookData: { type: 'POST', title: '' } };
   if (network === 'tiktok') return { ...base, text: campaign.tiktok_caption, tiktokData: { disableComment: false, disableDuet: false, disableStitch: false, privacyOption: 'PUBLIC_TO_EVERYONE', commercialContentThirdParty: false, commercialContentOwnBrand: true, title: campaign.title, autoAddMusic: false, photoCoverIndex: 0, isAigc: false } };
   if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: 'short', privacy: 'public', tags: ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
-  if (network === 'facebook') return { ...base, text: campaign.instagram_caption || campaign.tiktok_caption, facebookData: { type: 'POST', title: '' } };
   return base;
 }
 
@@ -117,6 +118,7 @@ function validateForNetwork(campaign, network) {
   if (['instagram', 'tiktok'].includes(network) && !campaign.media_url) throw new Error(`${network} requires an image or video`);
   if (network === 'youtube' && campaign.media_type !== 'video') throw new Error('YouTube publishing requires a video');
   if (network === 'instagram' && !campaign.instagram_caption) throw new Error('Instagram caption is empty');
+  if (network === 'facebook' && !(campaign.facebook_caption || campaign.instagram_caption)) throw new Error('Facebook caption is empty');
   if (network === 'tiktok' && !campaign.tiktok_caption) throw new Error('TikTok caption is empty');
 }
 
