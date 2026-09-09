@@ -10,13 +10,14 @@ import {
 import './socialAutomation.css';
 
 const EMPTY = {
-  id: '', title: '', status: 'draft', platforms: ['instagram', 'tiktok'], instagramCaption: '', tiktokCaption: '',
+  id: '', title: '', status: 'draft', platforms: ['instagram', 'tiktok'], instagramCaption: '', facebookCaption: '', tiktokCaption: '',
   youtubeTitle: '', youtubeDescription: '', mediaUrl: '', mediaType: 'image', aspectRatio: '1:1', scheduledAt: '',
   autoPublish: false, metricoolPosts: [], lastError: '', createdAt: '', updatedAt: '',
 };
 
 const NETWORKS = [
   { key: 'instagram', label: 'Instagram' },
+  { key: 'facebook', label: 'Facebook' },
   { key: 'tiktok', label: 'TikTok' },
   { key: 'youtube', label: 'YouTube' },
 ];
@@ -43,6 +44,7 @@ function starterCopy(title) {
   const topic = title || 'Manage consignment inventory with Shopify';
   return {
     instagram: `${topic} with JustConsignIn.\n\nKeep consignors, inventory, Shopify products, POS sales and payouts connected in one workflow — without duplicate entry or spreadsheets.\n\nSee the live demo and start a 14-day free trial at justconsignin.com\n\n#Shopify #ShopifyPOS #Consignment #ConsignmentSoftware #RetailTech`,
+    facebook: `${topic} with JustConsignIn.\n\nManage consignors, inventory, Shopify products, POS sales and payouts in one connected workflow. No duplicate entry. No spreadsheet juggling.\n\nSee the live demo and start a 14-day free trial at justconsignin.com`,
     tiktok: `${topic}. JustConsignIn keeps the consignment workflow connected to Shopify from intake to payout. Live demo + 14-day free trial at justconsignin.com. #Shopify #Consignment #ShopifyPOS #RetailTech`,
     youtubeTitle: `${topic} | JustConsignIn`,
     youtubeDescription: `${topic} with JustConsignIn.\n\nManage consignors, inventory, Shopify POS sales and payouts in one workflow.\n\nLive demo: https://www.justconsignin.com\n14-day free trial available.`,
@@ -185,7 +187,7 @@ export default function SocialAutomation() {
     </div>
 
     <div className="site-admin-card social-campaign-list">
-      <div className="social-list-head"><strong>Campaigns</strong><span>Instagram · TikTok · YouTube</span></div>
+      <div className="social-list-head"><strong>Campaigns</strong><span>Instagram · Facebook · TikTok · YouTube</span></div>
       {loading && !campaigns.length ? <div className="site-admin-empty">Loading campaigns…</div> : campaigns.map(item => <div className="social-campaign-row" key={item.id}>
         <div className="social-campaign-thumb">{item.mediaUrl ? <img src={item.mediaUrl} alt=""/> : <Image size={22}/>}</div>
         <div className="social-campaign-copy"><strong>{item.title}</strong><small>{item.platforms.join(' · ') || 'No networks'}{item.scheduledAt ? ` · ${new Date(item.scheduledAt).toLocaleString()}` : ''}</small>{item.lastError && <small className="error-copy">{item.lastError}</small>}</div>
@@ -196,7 +198,7 @@ export default function SocialAutomation() {
     </div>
   </>;
 
-  const previewText = activePreview === 'instagram' ? campaign.instagramCaption : activePreview === 'tiktok' ? campaign.tiktokCaption : campaign.youtubeDescription;
+  const previewText = activePreview === 'instagram' ? campaign.instagramCaption : activePreview === 'facebook' ? campaign.facebookCaption : activePreview === 'tiktok' ? campaign.tiktokCaption : campaign.youtubeDescription;
   return <>
     <div className="site-admin-page-head">
       <div><p className="site-admin-eyebrow">Social Automation</p><h1>{campaign.id ? 'Edit Campaign' : 'Create Campaign'}</h1><p>Build the content once, then tailor each network before it goes to Metricool.</p></div>
@@ -220,11 +222,12 @@ export default function SocialAutomation() {
           </div>
         </div>
 
-        <div className="social-copy-head"><div><strong>Platform copy</strong><small>Edit each network separately.</small></div><button className="site-admin-btn secondary small" type="button" onClick={() => { const copy = starterCopy(campaign.title); setCampaign(current => ({ ...current, instagramCaption: copy.instagram, tiktokCaption: copy.tiktok, youtubeTitle: copy.youtubeTitle, youtubeDescription: copy.youtubeDescription })); }}><WandSparkles size={13}/> Generate starter copy</button></div>
+        <div className="social-copy-head"><div><strong>Platform copy</strong><small>Edit each network separately.</small></div><button className="site-admin-btn secondary small" type="button" onClick={() => { const copy = starterCopy(campaign.title); setCampaign(current => ({ ...current, instagramCaption: copy.instagram, facebookCaption: copy.facebook, tiktokCaption: copy.tiktok, youtubeTitle: copy.youtubeTitle, youtubeDescription: copy.youtubeDescription })); }}><WandSparkles size={13}/> Generate starter copy</button></div>
         <div className="social-tabs">{NETWORKS.map(network => <button type="button" key={network.key} className={activePreview === network.key ? 'active' : ''} onClick={() => setActivePreview(network.key)}>{network.label}</button>)}</div>
         {activePreview === 'instagram' && <label className="social-field"><span>Instagram caption</span><textarea rows="9" value={campaign.instagramCaption} onChange={e => set('instagramCaption', e.target.value)}/></label>}
+        {activePreview === 'facebook' && <><label className="social-field"><span>Facebook caption</span><textarea rows="8" value={campaign.facebookCaption} onChange={e => set('facebookCaption', e.target.value)}/></label><div className="site-admin-note">Facebook is available for campaign drafting now. Until the Facebook Page is connected in Metricool, Facebook publishing will return a network-specific warning while the other selected networks can still be sent.</div></>}
         {activePreview === 'tiktok' && <label className="social-field"><span>TikTok caption</span><textarea rows="7" value={campaign.tiktokCaption} onChange={e => set('tiktokCaption', e.target.value)}/></label>}
-        {activePreview === 'youtube' && <><label className="social-field"><span>YouTube title</span><input value={campaign.youtubeTitle} onChange={e => set('youtubeTitle', e.target.value)}/></label><label className="social-field"><span>YouTube description</span><textarea rows="8" value={campaign.youtubeDescription} onChange={e => set('youtubeDescription', e.target.value)}/></label><div className="site-admin-note">YouTube publishing requires a video. Image campaigns can still be saved for Instagram and TikTok.</div></>}
+        {activePreview === 'youtube' && <><label className="social-field"><span>YouTube title</span><input value={campaign.youtubeTitle} onChange={e => set('youtubeTitle', e.target.value)}/></label><label className="social-field"><span>YouTube description</span><textarea rows="8" value={campaign.youtubeDescription} onChange={e => set('youtubeDescription', e.target.value)}/></label><div className="site-admin-note">YouTube publishing requires a video. Image campaigns can still be saved for Instagram, Facebook and TikTok.</div></>}
 
         <div className="social-schedule-grid"><label className="social-field"><span>Toronto date & time</span><input type="datetime-local" value={dateTimeLocal(campaign.scheduledAt)} onChange={e => set('scheduledAt', torontoIso(e.target.value))}/></label><label className="social-checkbox"><input type="checkbox" checked={campaign.autoPublish} onChange={e => set('autoPublish', e.target.checked)}/><span><strong>Auto publish</strong><small>Off = send to Metricool as a draft for review.</small></span></label></div>
         <div className="social-editor-actions"><button className="site-admin-btn secondary" onClick={() => save()} disabled={busy}>{busy ? <Loader2 className="spin" size={14}/> : null} Save Draft</button><button className="site-admin-btn" onClick={send} disabled={busy}><Send size={14}/> Send to Metricool</button></div>
