@@ -1,66 +1,37 @@
-async function parseResponse(response) {
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || payload.message || 'Social automation request failed');
-  return payload;
-}
+import { adminFetch, parseJsonResponse } from './apiClient';
 
-function headers(accessToken) {
-  return { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
-}
+const parseResponse = response => parseJsonResponse(response, 'Social automation request failed');
+const json = body => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+});
 
 export async function loadSocialAutomation(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-automation', { headers: { Authorization: `Bearer ${accessToken}` } }));
+  return parseResponse(await adminFetch('/api/admin/social-automation', {}, accessToken));
 }
 
 export async function saveSocialCampaign(accessToken, campaign) {
-  const payload = await parseResponse(await fetch('/api/admin/social-automation', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'save', campaign }),
-  }));
+  const payload = await parseResponse(await adminFetch('/api/admin/social-automation', json({ action: 'save', campaign }), accessToken));
   return payload.campaign;
 }
 
 export async function deleteSocialCampaign(accessToken, id) {
-  return parseResponse(await fetch(`/api/admin/social-automation?id=${encodeURIComponent(id)}`, {
-    method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` },
-  }));
+  return parseResponse(await adminFetch(`/api/admin/social-automation?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken));
 }
 
 export async function startMetricoolConnection(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-automation', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'metricool-start' }),
-  }));
+  return parseResponse(await adminFetch('/api/admin/social-automation', json({ action: 'metricool-start' }), accessToken));
 }
 
 export async function disconnectMetricool(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-automation', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'metricool-disconnect' }),
-  }));
+  return parseResponse(await adminFetch('/api/admin/social-automation', json({ action: 'metricool-disconnect' }), accessToken));
 }
 
 export async function testMetricoolConnection(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-automation', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'metricool-test' }),
-  }));
+  return parseResponse(await adminFetch('/api/admin/social-automation', json({ action: 'metricool-test' }), accessToken));
 }
 
 export async function sendCampaignToMetricool(accessToken, id) {
-  return parseResponse(await fetch('/api/admin/social-automation', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'send', id }),
-  }));
-}
-
-export async function getSocialAiStatus(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-ai', { headers: { Authorization: `Bearer ${accessToken}` } }));
-}
-
-export async function generateSocialImage(accessToken, { prompt, ratio = '4:5', quality = 'medium' } = {}) {
-  return parseResponse(await fetch('/api/admin/social-ai', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'image', prompt, ratio, quality }),
-  }));
-}
-
-export async function generateSocialCopy(accessToken, { title, direction = '', platforms = [] } = {}) {
-  return parseResponse(await fetch('/api/admin/social-ai', {
-    method: 'POST', headers: headers(accessToken), body: JSON.stringify({ action: 'copy', title, direction, platforms }),
-  }));
+  return parseResponse(await adminFetch('/api/admin/social-automation', json({ action: 'send', id }), accessToken));
 }

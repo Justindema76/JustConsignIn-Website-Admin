@@ -1,4 +1,5 @@
-import { emptySocialLinks, normalizeVideo } from './siteContent';
+import { emptySocialLinks, normalizeVideo } from '../config/siteContent';
+import { adminFetch, currentAccessToken, parseJsonResponse, refreshAdminAccessToken } from './apiClient';
 
 const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL || 'https://nowsajdmbpxvlvrhopjg.supabase.co').replace(/\/$/, '');
 const SUPABASE_PUBLISHABLE_KEY = String(import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w');
@@ -11,69 +12,8 @@ const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
 const ALLOWED_VIDEO_TYPES = new Set(['video/mp4']);
-const SESSION_KEY = 'justconsignin-website-admin-session-v1';
-const TOKEN_KEY = 'justconsignin-website-admin-access-token-v1';
-const REFRESH_KEY = 'justconsignin-website-admin-refresh-token-v1';
 
-async function parseResponse(response) {
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || payload.message || 'Website admin request failed');
-  return payload;
-}
-
-function currentAccessToken(fallback = '') {
-  if (typeof window === 'undefined') return fallback;
-  return localStorage.getItem(TOKEN_KEY) || fallback;
-}
-
-function persistRefreshedSession(payload = {}) {
-  if (typeof window === 'undefined') return;
-  if (payload.accessToken) localStorage.setItem(TOKEN_KEY, payload.accessToken);
-  if (payload.refreshToken) localStorage.setItem(REFRESH_KEY, payload.refreshToken);
-  if (payload.user) localStorage.setItem(SESSION_KEY, JSON.stringify(payload.user));
-  window.dispatchEvent(new CustomEvent('jci-admin-session-refreshed', { detail: payload }));
-}
-
-async function refreshAdminAccessToken() {
-  if (typeof window === 'undefined') return '';
-  const refreshToken = localStorage.getItem(REFRESH_KEY) || '';
-  if (!refreshToken) return '';
-
-  const response = await fetch('/api/auth/refresh?admin=1', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok || !payload.accessToken) return '';
-  persistRefreshedSession(payload);
-  return payload.accessToken;
-}
-
-function headers(accessToken, json = false) {
-  return {
-    Authorization: `Bearer ${currentAccessToken(accessToken)}`,
-    ...(json ? { 'Content-Type': 'application/json' } : {}),
-  };
-}
-
-async function adminFetch(url, options = {}, accessToken = '') {
-  const makeRequest = token => fetch(url, {
-    ...options,
-    headers: {
-      ...(options.headers || {}),
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  let token = currentAccessToken(accessToken);
-  let response = await makeRequest(token);
-  if (response.status !== 401) return response;
-
-  const refreshed = await refreshAdminAccessToken();
-  if (!refreshed) return response;
-  return makeRequest(refreshed);
-}
+const parseResponse = response => parseJsonResponse(response, 'Website admin request failed');
 
 function safeFilename(filename = 'file') {
   return String(filename || 'file').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'file';
@@ -114,8 +54,7 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
 
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
-    const detail = payload.message || payload.error || `Supabase upload failed (${response.status})`;
-    throw new Error(detail);
+    throw new Error(payload.message || payload.error || `Supabase upload failed (${response.status})`);
   }
 
   return publicMediaUrl(bucket, objectName);
@@ -161,9 +100,7 @@ export async function saveAdminVideo(accessToken, video) {
 }
 
 export async function deleteAdminVideo(accessToken, id) {
-  await parseResponse(await adminFetch(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-  }, accessToken));
+  await parseResponse(await adminFetch(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken));
 }
 
 export async function loadAdminSocial(accessToken) {

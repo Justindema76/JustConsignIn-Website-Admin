@@ -1,15 +1,9 @@
-async function parseResponse(response) {
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || payload.message || 'Social AI request failed');
-  return payload;
-}
+import { adminFetch, parseJsonResponse } from './apiClient';
 
-function headers(accessToken) {
-  return { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
-}
+const parseResponse = response => parseJsonResponse(response, 'Social AI request failed');
 
 export async function getSocialAiStatus(accessToken) {
-  return parseResponse(await fetch('/api/admin/social-ai', { headers: { Authorization: `Bearer ${accessToken}` } }));
+  return parseResponse(await adminFetch('/api/admin/social-ai', {}, accessToken));
 }
 
 function waitFor(target, event, errorEvent = 'error') {
@@ -38,8 +32,7 @@ async function videoFrames(videoUrl, count = 4) {
   const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 1;
   const sourceWidth = video.videoWidth || 720;
   const sourceHeight = video.videoHeight || 1280;
-  const maxWidth = 720;
-  const scale = Math.min(1, maxWidth / sourceWidth);
+  const scale = Math.min(1, 720 / sourceWidth);
   const width = Math.max(2, Math.round(sourceWidth * scale));
   const height = Math.max(2, Math.round(sourceHeight * scale));
   const canvas = document.createElement('canvas');
@@ -70,15 +63,11 @@ async function videoFrames(videoUrl, count = 4) {
 export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'image', platforms = [], direction = '' }) {
   if (!mediaUrl) throw new Error('Choose or upload an image or video first.');
   if (!platforms.length) throw new Error('Choose at least one social network to push to.');
+  const frames = mediaType === 'video' ? await videoFrames(mediaUrl, 4) : [];
 
-  let frames = [];
-  if (mediaType === 'video') {
-    frames = await videoFrames(mediaUrl, 4);
-  }
-
-  return parseResponse(await fetch('/api/admin/social-ai', {
+  return parseResponse(await adminFetch('/api/admin/social-ai', {
     method: 'POST',
-    headers: headers(accessToken),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'analyze', mediaUrl, mediaType, platforms, direction, frames }),
-  }));
+  }, accessToken));
 }
