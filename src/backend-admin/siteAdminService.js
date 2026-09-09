@@ -3,8 +3,11 @@ import { emptySocialLinks, normalizeVideo } from './siteContent';
 const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL || 'https://nowsajdmbpxvlvrhopjg.supabase.co').replace(/\/$/, '');
 const SUPABASE_PUBLISHABLE_KEY = String(import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w');
 const BLOG_IMAGE_BUCKET = 'blog-images';
+const SOCIAL_AUDIO_BUCKET = 'social-audio';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
 
 async function parseResponse(response) {
   const payload = await response.json().catch(() => ({}));
@@ -19,13 +22,44 @@ function headers(accessToken, json = false) {
   };
 }
 
-function safeFilename(filename = 'image') {
-  return String(filename || 'image').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'image';
+function safeFilename(filename = 'file') {
+  return String(filename || 'file').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'file';
 }
 
-function publicMediaUrl(name) {
+function publicMediaUrl(bucket, name) {
   const encoded = String(name || '').split('/').map(encodeURIComponent).join('/');
-  return `${SUPABASE_URL}/storage/v1/object/public/${BLOG_IMAGE_BUCKET}/${encoded}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${encoded}`;
+}
+
+async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxBytes, invalidTypeMessage }) {
+  if (!accessToken) throw new Error('Your admin session expired. Sign in again.');
+  if (!file) throw new Error('Choose a file first.');
+  const type = String(file.type || '').toLowerCase();
+  if (!allowedTypes.has(type)) throw new Error(invalidTypeMessage);
+  if (!file.size) throw new Error('The selected file is empty.');
+  if (file.size > maxBytes) throw new Error(`File must be ${Math.round(maxBytes / 1024 / 1024)} MB or smaller.`);
+
+  const objectName = `${Date.now()}-${safeFilename(file.name)}`;
+  const encodedName = objectName.split('/').map(encodeURIComponent).join('/');
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${encodedName}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': type,
+      'x-upsert': 'false',
+      'Cache-Control': '3600',
+    },
+    body: file,
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    const detail = payload.message || payload.error || `Supabase upload failed (${response.status})`;
+    throw new Error(detail);
+  }
+
+  return publicMediaUrl(bucket, objectName);
 }
 
 export async function loadAdminVideos(accessToken) {
@@ -69,31 +103,19 @@ export async function loadAdminMedia(accessToken) {
 }
 
 export async function uploadBlogImage(accessToken, file) {
-  if (!accessToken) throw new Error('Your admin session expired. Sign in again.');
-  if (!file) throw new Error('Choose an image first.');
-  if (!ALLOWED_IMAGE_TYPES.has(String(file.type || '').toLowerCase())) throw new Error('Use a JPG, PNG, WebP, or GIF image.');
-  if (!file.size) throw new Error('The selected image is empty.');
-  if (file.size > MAX_IMAGE_BYTES) throw new Error('Image must be 5 MB or smaller.');
-
-  const objectName = `${Date.now()}-${safeFilename(file.name)}`;
-  const encodedName = objectName.split('/').map(encodeURIComponent).join('/');
-  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${BLOG_IMAGE_BUCKET}/${encodedName}`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': file.type,
-      'x-upsert': 'false',
-      'Cache-Control': '3600',
-    },
-    body: file,
+  return uploadPublicAsset(accessToken, file, {
+    bucket: BLOG_IMAGE_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
   });
+}
 
-  if (!response.ok) {
-    const payload = await response.json().catch(() => ({}));
-    const detail = payload.message || payload.error || `Supabase upload failed (${response.status})`;
-    throw new Error(detail);
-  }
-
-  return publicMediaUrl(objectName);
+export async function uploadSocialAudio(accessToken, file) {
+  return uploadPublicAsset(accessToken, file, {
+    bucket: SOCIAL_AUDIO_BUCKET,
+    allowedTypes: ALLOWED_AUDIO_TYPES,
+    maxBytes: MAX_AUDIO_BYTES,
+    invalidTypeMessage: 'Use an MP3, M4A/MP4 audio, WAV, AAC, or OGG file.',
+  });
 }
