@@ -7,11 +7,13 @@ import {
   deleteSocialCampaign, disconnectMetricool, loadSocialAutomation, saveSocialCampaign,
   sendCampaignToMetricool, startMetricoolConnection, testMetricoolConnection,
 } from './socialAutomationService';
+import SocialAiPanel from './SocialAiPanel';
 import './socialAutomation.css';
 
 const EMPTY = {
   id: '', title: '', status: 'draft', platforms: ['instagram', 'tiktok'], instagramCaption: '', facebookCaption: '', tiktokCaption: '',
-  youtubeTitle: '', youtubeDescription: '', mediaUrl: '', mediaType: 'image', aspectRatio: '1:1', scheduledAt: '',
+  youtubeTitle: '', youtubeDescription: '', mediaUrl: '', mediaType: 'image', aspectRatio: '1:1',
+  audioUrl: '', audioName: '', audioMode: 'none', aiImagePrompt: '', scheduledAt: '',
   autoPublish: false, metricoolPosts: [], lastError: '', createdAt: '', updatedAt: '',
 };
 
@@ -81,6 +83,11 @@ export default function SocialAutomation() {
       }
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
+  };
+
+  const refreshMedia = async () => {
+    if (!accessToken) return;
+    setMedia(await loadAdminMedia(accessToken));
   };
 
   useEffect(() => { refresh(); }, [accessToken, id]);
@@ -222,7 +229,9 @@ export default function SocialAutomation() {
           </div>
         </div>
 
-        <div className="social-copy-head"><div><strong>Platform copy</strong><small>Edit each network separately.</small></div><button className="site-admin-btn secondary small" type="button" onClick={() => { const copy = starterCopy(campaign.title); setCampaign(current => ({ ...current, instagramCaption: copy.instagram, facebookCaption: copy.facebook, tiktokCaption: copy.tiktok, youtubeTitle: copy.youtubeTitle, youtubeDescription: copy.youtubeDescription })); }}><WandSparkles size={13}/> Generate starter copy</button></div>
+        <SocialAiPanel accessToken={accessToken} campaign={campaign} setCampaign={setCampaign} setMessage={setMessage} setError={setError} onMediaRefresh={refreshMedia}/>
+
+        <div className="social-copy-head"><div><strong>Platform copy</strong><small>Edit each network separately.</small></div><button className="site-admin-btn secondary small" type="button" onClick={() => { const copy = starterCopy(campaign.title); setCampaign(current => ({ ...current, instagramCaption: copy.instagram, facebookCaption: copy.facebook, tiktokCaption: copy.tiktok, youtubeTitle: copy.youtubeTitle, youtubeDescription: copy.youtubeDescription })); }}><WandSparkles size={13}/> Starter Copy</button></div>
         <div className="social-tabs">{NETWORKS.map(network => <button type="button" key={network.key} className={activePreview === network.key ? 'active' : ''} onClick={() => setActivePreview(network.key)}>{network.label}</button>)}</div>
         {activePreview === 'instagram' && <label className="social-field"><span>Instagram caption</span><textarea rows="9" value={campaign.instagramCaption} onChange={e => set('instagramCaption', e.target.value)}/></label>}
         {activePreview === 'facebook' && <><label className="social-field"><span>Facebook caption</span><textarea rows="8" value={campaign.facebookCaption} onChange={e => set('facebookCaption', e.target.value)}/></label><div className="site-admin-note">Facebook is available for campaign drafting now. Until the Facebook Page is connected in Metricool, Facebook publishing will return a network-specific warning while the other selected networks can still be sent.</div></>}
@@ -234,7 +243,7 @@ export default function SocialAutomation() {
       </section>
 
       <aside className="social-editor-side">
-        <div className="site-admin-card social-live-card"><h2>Live preview</h2><div className="social-phone-preview"><div className="social-phone-head"><span>J</span><div><strong>JustConsignIn</strong><small>{activePreview}</small></div></div><div className={`social-phone-media ratio-${campaign.aspectRatio.replace(':','')}`}>{campaign.mediaUrl ? <img src={campaign.mediaUrl} alt=""/> : <Image size={28}/>}</div><div className="social-phone-copy"><strong>JustConsignIn</strong> {previewText || 'Your caption will appear here.'}</div></div></div>
+        <div className="site-admin-card social-live-card"><h2>Live preview</h2><div className="social-phone-preview"><div className="social-phone-head"><span>J</span><div><strong>JustConsignIn</strong><small>{activePreview}</small></div></div><div className={`social-phone-media ratio-${campaign.aspectRatio.replace(':','')}`}>{campaign.mediaUrl ? <img src={campaign.mediaUrl} alt=""/> : <Image size={28}/>}</div><div className="social-phone-copy"><strong>JustConsignIn</strong> {previewText || 'Your caption will appear here.'}</div></div>{campaign.audioUrl && <div className="site-admin-note" style={{marginTop:10}}>Music attached: <b>{campaign.audioName || 'Uploaded audio'}</b></div>}</div>
         <div className="site-admin-card social-live-card"><h2>Metricool</h2>{integration?.connected ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>Brand {integration.brandId} · America/Toronto</p><button className="site-admin-btn secondary small" onClick={testMetricool}>Test connection</button></> : <><p>The admin needs its own OAuth connection to Metricool. Your ChatGPT connection remains separate.</p><button className="site-admin-btn small" onClick={connectMetricool}>Connect Metricool</button></>}</div>
       </aside>
     </div>
