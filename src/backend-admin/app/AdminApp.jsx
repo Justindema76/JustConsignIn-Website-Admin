@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import AdminLogin from './AdminLogin';
-import Dashboard from './Dashboard';
-import BlogAdmin from './BlogAdmin';
-import VideosAdmin from './VideosAdmin';
-import SocialAdmin from './SocialAdmin';
-import MediaAdmin from './MediaAdmin';
-import SocialAutomation from './SocialAutomation';
-import SocialImageStudio from './SocialImageStudio';
-import AdminLayout from './components/AdminLayout';
-import RequireAdmin from './components/RequireAdmin';
+import AdminLogin from '../auth/AdminLogin';
+import RequireAdmin from '../auth/RequireAdmin';
+import AdminLayout from '../components/layout/AdminLayout';
+import BlogAdmin from '../features/blog/BlogAdmin';
+import Dashboard from '../features/dashboard/Dashboard';
+import MediaAdmin from '../features/media/MediaAdmin';
+import SocialImageStudio from '../features/media/SocialImageStudio';
+import SocialAdmin from '../features/social-links/SocialAdmin';
+import SocialAutomation from '../features/social-automation/SocialAutomation';
+import VideosAdmin from '../features/videos/VideosAdmin';
 
 export default function AdminApp() {
   return <Routes>
