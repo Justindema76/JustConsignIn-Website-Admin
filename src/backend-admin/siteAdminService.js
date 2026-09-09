@@ -11,6 +11,9 @@ const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
 const ALLOWED_VIDEO_TYPES = new Set(['video/mp4']);
+const SESSION_KEY = 'justconsignin-website-admin-session-v1';
+const TOKEN_KEY = 'justconsignin-website-admin-access-token-v1';
+const REFRESH_KEY = 'justconsignin-website-admin-refresh-token-v1';
 
 async function parseResponse(response) {
   const payload = await response.json().catch(() => ({}));
@@ -18,11 +21,58 @@ async function parseResponse(response) {
   return payload;
 }
 
+function currentAccessToken(fallback = '') {
+  if (typeof window === 'undefined') return fallback;
+  return localStorage.getItem(TOKEN_KEY) || fallback;
+}
+
+function persistRefreshedSession(payload = {}) {
+  if (typeof window === 'undefined') return;
+  if (payload.accessToken) localStorage.setItem(TOKEN_KEY, payload.accessToken);
+  if (payload.refreshToken) localStorage.setItem(REFRESH_KEY, payload.refreshToken);
+  if (payload.user) localStorage.setItem(SESSION_KEY, JSON.stringify(payload.user));
+  window.dispatchEvent(new CustomEvent('jci-admin-session-refreshed', { detail: payload }));
+}
+
+async function refreshAdminAccessToken() {
+  if (typeof window === 'undefined') return '';
+  const refreshToken = localStorage.getItem(REFRESH_KEY) || '';
+  if (!refreshToken) return '';
+
+  const response = await fetch('/api/auth/refresh?admin=1', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.accessToken) return '';
+  persistRefreshedSession(payload);
+  return payload.accessToken;
+}
+
 function headers(accessToken, json = false) {
   return {
-    Authorization: `Bearer ${accessToken}`,
+    Authorization: `Bearer ${currentAccessToken(accessToken)}`,
     ...(json ? { 'Content-Type': 'application/json' } : {}),
   };
+}
+
+async function adminFetch(url, options = {}, accessToken = '') {
+  const makeRequest = token => fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  let token = currentAccessToken(accessToken);
+  let response = await makeRequest(token);
+  if (response.status !== 401) return response;
+
+  const refreshed = await refreshAdminAccessToken();
+  if (!refreshed) return response;
+  return makeRequest(refreshed);
 }
 
 function safeFilename(filename = 'file') {
@@ -35,7 +85,7 @@ function publicMediaUrl(bucket, name) {
 }
 
 async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxBytes, invalidTypeMessage }) {
-  if (!accessToken) throw new Error('Your admin session expired. Sign in again.');
+  if (!accessToken && !currentAccessToken()) throw new Error('Your admin session expired. Sign in again.');
   if (!file) throw new Error('Choose a file first.');
   const type = String(file.type || '').toLowerCase();
   if (!allowedTypes.has(type)) throw new Error(invalidTypeMessage);
@@ -44,17 +94,23 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
 
   const objectName = `${Date.now()}-${safeFilename(file.name)}`;
   const encodedName = objectName.split('/').map(encodeURIComponent).join('/');
-  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${encodedName}`, {
+  const upload = token => fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${encodedName}`, {
     method: 'POST',
     headers: {
       apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': type,
       'x-upsert': 'false',
       'Cache-Control': '3600',
     },
     body: file,
   });
+
+  let response = await upload(currentAccessToken(accessToken));
+  if (response.status === 401) {
+    const refreshed = await refreshAdminAccessToken();
+    if (refreshed) response = await upload(refreshed);
+  }
 
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
@@ -91,42 +147,41 @@ async function imageToJpegFile(source, filename = 'social-image.jpg') {
 }
 
 export async function loadAdminVideos(accessToken) {
-  const payload = await parseResponse(await fetch('/api/admin/site?resource=videos', { headers: headers(accessToken) }));
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=videos', {}, accessToken));
   return Array.isArray(payload.videos) ? payload.videos.map(normalizeVideo) : [];
 }
 
 export async function saveAdminVideo(accessToken, video) {
-  const payload = await parseResponse(await fetch('/api/admin/site?resource=videos', {
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=videos', {
     method: 'POST',
-    headers: headers(accessToken, true),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(video),
-  }));
+  }, accessToken));
   return normalizeVideo(payload.video || {});
 }
 
 export async function deleteAdminVideo(accessToken, id) {
-  await parseResponse(await fetch(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`, {
+  await parseResponse(await adminFetch(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`, {
     method: 'DELETE',
-    headers: headers(accessToken),
-  }));
+  }, accessToken));
 }
 
 export async function loadAdminSocial(accessToken) {
-  const payload = await parseResponse(await fetch('/api/admin/site?resource=social', { headers: headers(accessToken) }));
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=social', {}, accessToken));
   return { ...emptySocialLinks(), ...(payload.social || {}) };
 }
 
 export async function saveAdminSocial(accessToken, social) {
-  const payload = await parseResponse(await fetch('/api/admin/site?resource=social', {
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=social', {
     method: 'POST',
-    headers: headers(accessToken, true),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ social }),
-  }));
+  }, accessToken));
   return { ...emptySocialLinks(), ...(payload.social || {}) };
 }
 
 export async function loadAdminMedia(accessToken) {
-  const payload = await parseResponse(await fetch('/api/admin/site?resource=media', { headers: headers(accessToken) }));
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=media', {}, accessToken));
   return Array.isArray(payload.media) ? payload.media : [];
 }
 
