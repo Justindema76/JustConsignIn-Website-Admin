@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, ExternalLink, Image, Plus, Save, Trash2 } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from './AdminAuthContext';
+import { useAuth } from '../../auth/AdminAuthContext';
 import { BLOG_STATUS, createEmptyPost, deleteAdminBlogPost, loadAdminBlogPosts, saveAdminBlogPost, slugify } from './blogStore';
-import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
+import { loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
 
 function toTags(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
