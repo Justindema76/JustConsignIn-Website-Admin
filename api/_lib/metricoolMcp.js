@@ -1,1 +1,1 @@
-export * from './metricoolMcpClient.js';
+export * from './metricoolMcpCompat.js';
