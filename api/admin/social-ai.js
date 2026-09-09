@@ -1,9 +1,10 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const OPENAI_BASE = 'https://api.openai.com/v1';
-const IMAGE_MODEL = 'gpt-image-2';
-const COPY_MODEL = 'gpt-5.6-terra';
+const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2.5-flare';
+const COPY_MODEL = process.env.OPENAI_TEXT_MODEL || 'gpt-5.6-terra';
 const VALID_RATIOS = new Set(['1:1', '4:5', '9:16']);
+const VALID_QUALITY = new Set(['low', 'medium', 'high']);
 
 function apiKey() {
   return String(process.env.OPENAI_API_KEY || '').trim();
@@ -31,7 +32,9 @@ async function openai(path, options = {}) {
 }
 
 function imageSize(ratio) {
-  return ratio === '1:1' ? '1024x1024' : '1024x1536';
+  if (ratio === '1:1') return '1024x1024';
+  if (ratio === '9:16') return '1008x1792';
+  return '1024x1280';
 }
 
 function cleanPrompt(value) {
@@ -40,12 +43,12 @@ function cleanPrompt(value) {
 
 function outputText(response = {}) {
   if (typeof response.output_text === 'string' && response.output_text.trim()) return response.output_text.trim();
-  for (const item of Array.isArray(response.output) ? response.output : []) {
-    for (const content of Array.isArray(item?.content) ? item.content : []) {
-      if (content?.type === 'output_text' && content.text) return String(content.text).trim();
-    }
-  }
-  return '';
+  return (Array.isArray(response.output) ? response.output : [])
+    .flatMap(item => Array.isArray(item?.content) ? item.content : [])
+    .map(content => content?.text || '')
+    .filter(Boolean)
+    .join('\n')
+    .trim();
 }
 
 function parseJsonText(text) {
@@ -64,11 +67,13 @@ function normalizeCopy(value = {}) {
     tiktok: String(value.tiktok || '').trim(),
     youtubeTitle: String(value.youtubeTitle || '').trim(),
     youtubeDescription: String(value.youtubeDescription || '').trim(),
+    imagePrompt: String(value.imagePrompt || '').trim(),
   };
 }
 
 async function generateImage(body = {}) {
   const ratio = VALID_RATIOS.has(body.ratio) ? body.ratio : '4:5';
+  const quality = VALID_QUALITY.has(body.quality) ? body.quality : 'medium';
   const prompt = cleanPrompt(body.prompt);
   if (!prompt) throw new Error('Enter an image prompt first.');
 
@@ -78,7 +83,7 @@ async function generateImage(body = {}) {
     'Brand direction: modern, clean, practical retail software, professional and credible, not stock-photo generic.',
     'Do not invent app screenshots, interface labels, statistics, customer logos or claims that were not requested.',
     'If text is included, keep it short and legible. Prefer a strong visual composition over lots of text.',
-    `The user selected ${ratio} social aspect ratio.`,
+    `Compose specifically for a ${ratio} social image and keep important content inside safe margins.`,
     `User request: ${prompt}`,
   ].join('\n');
 
@@ -88,8 +93,9 @@ async function generateImage(body = {}) {
       model: IMAGE_MODEL,
       prompt: brandContext,
       size: imageSize(ratio),
-      quality: 'medium',
+      quality,
       output_format: 'jpeg',
+      output_compression: 90,
       n: 1,
     }),
   });
@@ -108,6 +114,8 @@ async function generateImage(body = {}) {
     mimeType: 'image/jpeg',
     model: IMAGE_MODEL,
     ratio,
+    size: imageSize(ratio),
+    quality,
     revisedPrompt: item.revised_prompt || '',
   };
 }
@@ -117,14 +125,14 @@ async function generateCopy(body = {}) {
   const direction = cleanPrompt(body.direction || '');
   const platforms = Array.isArray(body.platforms) ? body.platforms.map(String).filter(Boolean) : [];
 
-  const prompt = `You write social marketing copy for JustConsignIn, a Shopify consignment management app.\n\nFacts you may use:\n- Create and manage consignors.\n- Track consignment inventory from intake through sale and payout.\n- Create Shopify products from the app, including from a phone.\n- Works with Shopify POS workflows.\n- Tracks sales, commissions and payouts.\n- 14-day free trial.\n- Website: https://www.justconsignin.com\n\nCampaign topic: ${title}\nSelected networks: ${platforms.join(', ') || 'Instagram, Facebook, TikTok'}\nAdditional direction: ${direction || 'Sell the benefit clearly without hype.'}\n\nCreate platform-specific copy. Do not use the exact same wording for every platform. Do not claim features outside the facts above. Keep TikTok concise. Instagram may use a short group of relevant hashtags. Facebook should read naturally and not be hashtag-heavy. YouTube should include a useful title and description.\n\nReturn ONLY valid JSON with exactly these keys:\n{\n  "instagram": "...",\n  "facebook": "...",\n  "tiktok": "...",\n  "youtubeTitle": "...",\n  "youtubeDescription": "..."\n}`;
+  const prompt = `You write social marketing copy for JustConsignIn, a Shopify consignment management app.\n\nFacts you may use:\n- Create and manage consignors.\n- Track consignment inventory from intake through sale and payout.\n- Create Shopify products from the app, including from a phone.\n- Works with Shopify POS workflows.\n- Tracks sales, commissions and payouts.\n- 14-day free trial.\n- Website: https://www.justconsignin.com\n\nCampaign topic: ${title}\nSelected networks: ${platforms.join(', ') || 'Instagram, Facebook, TikTok'}\nAdditional direction: ${direction || 'Sell the benefit clearly without hype.'}\n\nCreate platform-specific copy. Do not use the exact same wording for every platform. Do not claim features outside the facts above. Keep TikTok concise. Instagram may use a short group of relevant hashtags. Facebook should read naturally and not be hashtag-heavy. YouTube should include a useful title and description. Also create one concise image-generation prompt for a matching promotional image.\n\nReturn ONLY valid JSON with exactly these keys:\n{\n  "instagram": "...",\n  "facebook": "...",\n  "tiktok": "...",\n  "youtubeTitle": "...",\n  "youtubeDescription": "...",\n  "imagePrompt": "..."\n}`;
 
   const data = await openai('/responses', {
     method: 'POST',
     body: JSON.stringify({
       model: COPY_MODEL,
+      reasoning: { effort: 'low' },
       input: prompt,
-      temperature: 0.5,
       store: false,
     }),
   });
