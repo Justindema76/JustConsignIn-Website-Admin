@@ -11,6 +11,7 @@ import {
 const ALLOWED_STATUS = new Set(['draft', 'ready', 'scheduled', 'published', 'failed']);
 const ALLOWED_PLATFORMS = new Set(['instagram', 'tiktok', 'youtube', 'facebook']);
 const ALLOWED_RATIO = new Set(['1:1', '4:5', '9:16', 'original']);
+const ALLOWED_AUDIO_MODE = new Set(['none', 'uploaded', 'add-later']);
 const CALLBACK_COOKIE = 'jci_metricool_callback_session';
 
 function normalizeCampaign(row = {}) {
@@ -20,6 +21,8 @@ function normalizeCampaign(row = {}) {
     instagramCaption: row.instagram_caption || '', facebookCaption: row.facebook_caption || '', tiktokCaption: row.tiktok_caption || '',
     youtubeTitle: row.youtube_title || '', youtubeDescription: row.youtube_description || '',
     mediaUrl: row.media_url || '', mediaType: row.media_type || 'image', aspectRatio: row.aspect_ratio || '1:1',
+    audioUrl: row.audio_url || '', audioName: row.audio_name || '', audioMode: row.audio_mode || 'none',
+    aiImagePrompt: row.ai_image_prompt || '',
     scheduledAt: row.scheduled_at || '', autoPublish: Boolean(row.auto_publish),
     metricoolPosts: Array.isArray(row.metricool_posts) ? row.metricool_posts : [], lastError: row.last_error || '',
     createdAt: row.created_at || '', updatedAt: row.updated_at || '',
@@ -42,6 +45,10 @@ function cleanCampaign(input = {}) {
     media_url: String(input.mediaUrl || '').trim(),
     media_type: mediaType,
     aspect_ratio: ALLOWED_RATIO.has(input.aspectRatio) ? input.aspectRatio : '1:1',
+    audio_url: String(input.audioUrl || '').trim(),
+    audio_name: String(input.audioName || '').trim().slice(0, 255),
+    audio_mode: ALLOWED_AUDIO_MODE.has(input.audioMode) ? input.audioMode : 'none',
+    ai_image_prompt: String(input.aiImagePrompt || '').trim().slice(0, 5000),
     scheduled_at: scheduled && !Number.isNaN(scheduled.getTime()) ? scheduled.toISOString() : null,
     auto_publish: Boolean(input.autoPublish),
     updated_at: new Date().toISOString(),
@@ -91,10 +98,11 @@ function torontoLocal(iso) {
 
 function toolName(tools = []) {
   const names = tools.map(tool => tool?.name).filter(Boolean);
-  return names.find(name => name === 'create_scheduled_post')
+  return names.find(name => name === 'createScheduledPost')
+    || names.find(name => name === 'create_scheduled_post')
     || names.find(name => name === 'post_schedule_post')
-    || names.find(name => /create.*scheduled.*post/i.test(name))
-    || names.find(name => /schedule.*post/i.test(name));
+    || names.find(name => /create.*scheduled.*post/i.test(name) && !/review/i.test(name))
+    || names.find(name => /schedule.*post/i.test(name) && !/review/i.test(name));
 }
 
 function networkInfo(campaign, network) {
