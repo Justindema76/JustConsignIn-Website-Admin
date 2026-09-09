@@ -54,14 +54,17 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
         platforms: campaign.platforms,
       });
       const copy = result.copy || {};
+      const nextImagePrompt = copy.imagePrompt || campaign.aiImagePrompt || prompt;
       patch({
         instagramCaption: copy.instagram || campaign.instagramCaption,
         facebookCaption: copy.facebook || campaign.facebookCaption,
         tiktokCaption: copy.tiktok || campaign.tiktokCaption,
         youtubeTitle: copy.youtubeTitle || campaign.youtubeTitle,
         youtubeDescription: copy.youtubeDescription || campaign.youtubeDescription,
+        aiImagePrompt: nextImagePrompt,
       });
-      setMessage('AI created platform-specific copy for this campaign.');
+      if (copy.imagePrompt) setPrompt(copy.imagePrompt);
+      setMessage('AI created platform-specific copy and prepared a matching image prompt.');
     } catch (err) { setError(err.message); }
     finally { setCopyBusy(false); }
   };
@@ -88,14 +91,15 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
 
     <div className="social-ai-grid">
       <section className="social-ai-card">
-        <div className="social-ai-title"><ImagePlus size={17}/><div><strong>Create an image</strong><small>Generated with GPT-Image-2 and saved into your existing Media Library.</small></div></div>
+        <div className="social-ai-title"><ImagePlus size={17}/><div><strong>Create an image</strong><small>Generated with GPT-Image-2, resized to the exact social format, and saved into your existing Media Library.</small></div></div>
         <label className="social-field"><span>Image prompt</span><textarea rows="4" value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Example: Create a clean JustConsignIn promo showing how a consignment store can create Shopify products from a phone. Modern retail software style. 14-day free trial."/></label>
         <div className="social-ai-ratios">{RATIOS.map(item => <button type="button" key={item.value} className={ratio === item.value ? 'selected' : ''} onClick={() => setRatio(item.value)}><strong>{item.value} · {item.label}</strong><small>{item.detail}</small></button>)}</div>
         <button className="site-admin-btn social-ai-primary" type="button" onClick={createImage} disabled={imageBusy || configured === false}>{imageBusy ? <Loader2 className="spin" size={15}/> : <Sparkles size={15}/>} {imageBusy ? 'Creating image…' : 'Generate Image'}</button>
+        {configured === false && <p className="social-audio-note"><b>Setup needed:</b> add <code>OPENAI_API_KEY</code> to the Website Admin Vercel environment. The key stays server-side.</p>}
       </section>
 
       <section className="social-ai-card">
-        <div className="social-ai-title"><Sparkles size={17}/><div><strong>Write the post</strong><small>Creates different copy for Instagram, Facebook, TikTok and YouTube.</small></div></div>
+        <div className="social-ai-title"><Sparkles size={17}/><div><strong>Write the post</strong><small>Creates different copy for Instagram, Facebook, TikTok and YouTube, plus a matching image prompt.</small></div></div>
         <label className="social-field"><span>Optional direction</span><textarea rows="4" value={direction} onChange={e => setDirection(e.target.value)} placeholder="Example: Focus on creating Shopify products from your phone. Make it sales-focused but not cheesy."/></label>
         <button className="site-admin-btn social-ai-primary" type="button" onClick={createCopy} disabled={copyBusy || configured === false}>{copyBusy ? <Loader2 className="spin" size={15}/> : <Sparkles size={15}/>} {copyBusy ? 'Writing copy…' : 'Generate All Captions'}</button>
       </section>
@@ -110,7 +114,7 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
         <label className="site-admin-btn secondary upload-button"><Upload size={14}/> {audioBusy ? 'Uploading…' : 'Upload Music'}<input type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" onChange={uploadAudio} disabled={audioBusy}/></label>
         <button type="button" className={`site-admin-btn secondary ${campaign.audioMode === 'add-later' ? 'selected-mode' : ''}`} onClick={() => patch({ audioMode: campaign.audioMode === 'add-later' ? 'none' : 'add-later' })}><Music2 size={14}/> {campaign.audioMode === 'add-later' ? 'Music Later ✓' : 'Add Music Later'}</button>
       </div>}
-      <p className="social-audio-note"><b>Important:</b> the uploaded track is saved with the campaign. Instagram/TikTok cannot attach an arbitrary audio file to a normal static feed image through Metricool. We keep the music here so it is ready when you make the post a Reel/video; “Add Music Later” means finish the native music step in Instagram or TikTok.</p>
+      <p className="social-audio-note"><b>Music behavior:</b> your uploaded track is saved with the campaign. A normal static Instagram/Facebook image cannot have an arbitrary audio file attached through Metricool. Keep the track here for a Reel/video version, or choose “Add Music Later” and finish the native music step in Instagram/TikTok.</p>
     </section>
   </div>;
 }
