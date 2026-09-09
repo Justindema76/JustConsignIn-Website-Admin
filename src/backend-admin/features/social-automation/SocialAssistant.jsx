@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Film, Loader2, Music2, Play, Sparkles, Trash2, Upload, Video } from 'lucide-react';
-import { uploadSocialAudio, uploadSocialVideo } from './siteAdminService';
-import { analyzeSocialMedia, getSocialAiStatus } from './socialAiService';
-import { createImageMusicReel } from './socialReelService';
-import './socialAiPanel.css';
+import { SOCIAL_PLATFORM_LABELS } from '../../config/socialPlatforms';
+import { uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
+import { analyzeSocialMedia, getSocialAiStatus } from '../../services/socialAiService';
+import { createImageMusicReel } from '../../services/socialReelService';
 
 const REEL_DURATIONS = [5, 8, 10, 15];
-const NETWORK_LABELS = { instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok', youtube: 'YouTube' };
 
-export default function SocialAiPanel({ accessToken, campaign, setCampaign, setMessage, setError }) {
+export default function SocialAssistant({ accessToken, campaign, setCampaign, setMessage, setError }) {
   const [configured, setConfigured] = useState(null);
   const [direction, setDirection] = useState('');
   const [analyzeBusy, setAnalyzeBusy] = useState(false);
@@ -44,7 +43,7 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
         youtubeTitle: campaign.platforms.includes('youtube') ? (analysis.youtubeTitle || campaign.youtubeTitle) : campaign.youtubeTitle,
         youtubeDescription: campaign.platforms.includes('youtube') ? (analysis.youtubeDescription || campaign.youtubeDescription) : campaign.youtubeDescription,
       });
-      const networks = campaign.platforms.map(key => NETWORK_LABELS[key] || key).join(', ');
+      const networks = campaign.platforms.map(key => SOCIAL_PLATFORM_LABELS[key] || key).join(', ');
       setMessage(`Media analyzed and posts created for ${networks}.${result.warning ? ` ${result.warning}` : ''}`);
     } catch (err) { setError(err.message); setMessage(''); }
     finally { setAnalyzeBusy(false); }
@@ -89,7 +88,7 @@ export default function SocialAiPanel({ accessToken, campaign, setCampaign, setM
   };
 
   const clearAudio = () => patch({ audioUrl: '', audioName: '', audioMode: 'none' });
-  const selectedNetworks = (campaign.platforms || []).map(key => NETWORK_LABELS[key] || key);
+  const selectedNetworks = (campaign.platforms || []).map(key => SOCIAL_PLATFORM_LABELS[key] || key);
 
   return <div className="social-ai-block">
     <div className="social-ai-head">

@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Image, Loader2, Save, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from './AdminAuthContext';
-import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
-import './socialImageStudio.css';
+import { useAuth } from '../../auth/AdminAuthContext';
+import { loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
 
 const SIZES = {
   '1:1': { width: 1080, height: 1080, label: 'Square · 1080 × 1080' },
