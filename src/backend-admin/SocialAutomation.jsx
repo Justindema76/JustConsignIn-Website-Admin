@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, CheckCircle2, ExternalLink, Image, Link2, Loader2, Plus, RefreshCw, Send, Trash2, Upload, WandSparkles, X } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from './AdminAuthContext';
-import { loadAdminMedia, uploadBlogImage } from './siteAdminService';
+import { ensureTikTokCompatibleImage, loadAdminMedia, uploadSocialImage } from './siteAdminService';
 import {
   deleteSocialCampaign, disconnectMetricool, loadSocialAutomation, saveSocialCampaign,
   sendCampaignToMetricool, startMetricoolConnection, testMetricoolConnection,
@@ -119,12 +119,27 @@ export default function SocialAutomation() {
   };
 
   const send = async () => {
-    const saved = await save('ready');
-    if (!saved) return;
     setBusy(true); setError(''); setMessage('');
     try {
+      let prepared = {
+        ...campaign,
+        status: 'ready',
+        scheduledAt: campaign.scheduledAt || new Date(Date.now() + 86400000).toISOString(),
+      };
+
+      if (prepared.platforms.includes('tiktok') && prepared.mediaType === 'image' && prepared.mediaUrl) {
+        setMessage('Preparing a TikTok-compatible JPEG…');
+        const mediaUrl = await ensureTikTokCompatibleImage(accessToken, prepared.mediaUrl);
+        prepared = { ...prepared, mediaUrl };
+      }
+
+      const saved = await saveSocialCampaign(accessToken, prepared);
+      setCampaign(saved);
+      if (id === 'new') navigate(`/admin/social-automation/${saved.id}`, { replace: true });
+
       const result = await sendCampaignToMetricool(accessToken, saved.id);
-      setCampaign(result.campaign); setMessage(result.errors?.length ? `Sent with warnings: ${result.errors.map(x => x.error).join(' | ')}` : 'Campaign sent to Metricool.');
+      setCampaign(result.campaign);
+      setMessage(result.errors?.length ? `Sent with warnings: ${result.errors.map(x => x.error).join(' | ')}` : 'Campaign sent to Metricool.');
       await refresh();
     } catch (err) { setError(err.message); }
     finally { setBusy(false); }
@@ -158,8 +173,12 @@ export default function SocialAutomation() {
     const file = event.target.files?.[0];
     if (!file) return;
     setBusy(true); setError('');
-    try { const url = await uploadBlogImage(accessToken, file); set('mediaUrl', url); set('mediaType', 'image'); setMessage('Image uploaded to Supabase and selected.'); setMedia(await loadAdminMedia(accessToken)); }
-    catch (err) { setError(err.message); }
+    try {
+      const url = await uploadSocialImage(accessToken, file);
+      set('mediaUrl', url); set('mediaType', 'image');
+      setMessage(String(file.type || '').toLowerCase() === 'image/png' ? 'PNG converted to JPEG, uploaded to Supabase, and selected.' : 'Image uploaded to Supabase and selected.');
+      setMedia(await loadAdminMedia(accessToken));
+    } catch (err) { setError(err.message); }
     finally { setBusy(false); event.target.value = ''; }
   };
 
@@ -224,7 +243,7 @@ export default function SocialAutomation() {
             <div className={`social-media-preview ratio-${campaign.aspectRatio.replace(':','')}`}>{campaign.mediaUrl ? <img src={campaign.mediaUrl} alt="Selected social media"/> : <><Image size={28}/><small>No image selected</small></>}</div>
             <div><div className="site-admin-actions"><button className="site-admin-btn secondary small" type="button" onClick={() => setMediaOpen(true)}>Choose Media</button><label className="site-admin-btn secondary small upload-button"><Upload size={13}/> Upload<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={upload}/></label></div>
               <div className="social-ratios">{['1:1','4:5','9:16','original'].map(ratio => <button key={ratio} type="button" className={campaign.aspectRatio === ratio ? 'selected' : ''} onClick={() => set('aspectRatio', ratio)}>{ratio}</button>)}</div>
-              <small>Images are stored in the same Supabase media library used by your blog.</small>
+              <small>Images are stored in the same Supabase media library used by your blog. PNG/GIF images are automatically converted to JPEG when needed for TikTok.</small>
             </div>
           </div>
         </div>
