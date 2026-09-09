@@ -3,8 +3,6 @@ import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 import {
   beginMetricoolOAuth,
   callMetricoolTool,
-  decryptSecret,
-  encryptSecret,
   getMetricoolTools,
   metricoolToolText,
   refreshMetricoolOAuth,
@@ -13,6 +11,7 @@ import {
 const ALLOWED_STATUS = new Set(['draft', 'ready', 'scheduled', 'published', 'failed']);
 const ALLOWED_PLATFORMS = new Set(['instagram', 'tiktok', 'youtube', 'facebook']);
 const ALLOWED_RATIO = new Set(['1:1', '4:5', '9:16', 'original']);
+const CALLBACK_COOKIE = 'jci_metricool_callback_session';
 
 function normalizeCampaign(row = {}) {
   return {
@@ -122,14 +121,18 @@ function validateForNetwork(campaign, network) {
 }
 
 async function saveCredentials(userToken, row, credentials) {
-  const encrypted = encryptSecret(JSON.stringify(credentials));
   return writeIntegration(userToken, {
     provider: 'metricool', connected: true,
     account_label: row?.account_label || 'JustConsignIn', external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
-    ...encrypted,
+    credentials,
+    secret_ciphertext: '', secret_iv: '', secret_tag: '',
     metadata: { ...(row?.metadata || {}), timezone: 'America/Toronto', mcp_url: 'https://ai.metricool.com/mcp', oauth: true },
     connected_at: row?.connected_at || new Date().toISOString(), updated_at: new Date().toISOString(),
   });
+}
+
+function callbackCookie(token, secure) {
+  return `${CALLBACK_COOKIE}=${encodeURIComponent(token)}; Max-Age=1200; Path=/api/admin/metricool-callback; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`;
 }
 
 export default async function handler(req, res) {
@@ -178,14 +181,15 @@ export default async function handler(req, res) {
       const callbackUrl = `${proto}://${host}/api/admin/metricool-callback`;
       const { authUrl, transaction } = await beginMetricoolOAuth({ callbackUrl });
       const row = await readIntegration(user.accessToken);
-      const encrypted = encryptSecret(JSON.stringify({ oauthTransaction: transaction }));
       await writeIntegration(user.accessToken, {
         provider: 'metricool', connected: false,
         account_label: row?.account_label || 'JustConsignIn', external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
-        ...encrypted,
+        credentials: { oauthTransaction: transaction },
+        secret_ciphertext: '', secret_iv: '', secret_tag: '',
         metadata: { ...(row?.metadata || {}), timezone: 'America/Toronto', mcp_url: 'https://ai.metricool.com/mcp', oauth_state: transaction.state },
         connected_at: null, updated_at: new Date().toISOString(),
       });
+      res.setHeader('Set-Cookie', callbackCookie(user.accessToken, proto === 'https'));
       return res.status(200).json({ authUrl });
     }
 
@@ -194,7 +198,7 @@ export default async function handler(req, res) {
       const saved = await writeIntegration(user.accessToken, {
         provider: 'metricool', connected: false, account_label: row?.account_label || 'JustConsignIn',
         external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
-        secret_ciphertext: '', secret_iv: '', secret_tag: '',
+        credentials: {}, secret_ciphertext: '', secret_iv: '', secret_tag: '',
         metadata: { ...(row?.metadata || {}), oauth_state: null }, connected_at: null, updated_at: new Date().toISOString(),
       });
       return res.status(200).json({ integration: publicIntegration(saved) });
@@ -203,7 +207,8 @@ export default async function handler(req, res) {
     if (action === 'metricool-test') {
       const row = await readIntegration(user.accessToken);
       if (!row?.connected) return res.status(400).json({ error: 'Metricool is not connected to this admin yet' });
-      let credentials = JSON.parse(decryptSecret(row));
+      let credentials = row.credentials || {};
+      if (!credentials.accessToken) return res.status(400).json({ error: 'Metricool authorization is incomplete. Reconnect Metricool.' });
       if (credentials.expiresAt && credentials.expiresAt < Date.now() + 60000 && credentials.refreshToken) {
         credentials = await refreshMetricoolOAuth(credentials);
         await saveCredentials(user.accessToken, row, credentials);
@@ -220,7 +225,8 @@ export default async function handler(req, res) {
       if (!campaign.platforms?.length) return res.status(400).json({ error: 'Choose at least one social network' });
       if (!campaign.scheduled_at) return res.status(400).json({ error: 'Choose a schedule date and time' });
 
-      let credentials = JSON.parse(decryptSecret(row));
+      let credentials = row.credentials || {};
+      if (!credentials.accessToken) return res.status(400).json({ error: 'Metricool authorization is incomplete. Reconnect Metricool.' });
       if (credentials.expiresAt && credentials.expiresAt < Date.now() + 60000 && credentials.refreshToken) {
         credentials = await refreshMetricoolOAuth(credentials);
         await saveCredentials(user.accessToken, row, credentials);
