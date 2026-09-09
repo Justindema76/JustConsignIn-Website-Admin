@@ -1,7 +1,7 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const OPENAI_BASE = 'https://api.openai.com/v1';
-const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2.5-flare';
+const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
 const COPY_MODEL = process.env.OPENAI_TEXT_MODEL || 'gpt-5.6-terra';
 const VALID_RATIOS = new Set(['1:1', '4:5', '9:16']);
 const VALID_QUALITY = new Set(['low', 'medium', 'high']);
@@ -32,9 +32,7 @@ async function openai(path, options = {}) {
 }
 
 function imageSize(ratio) {
-  if (ratio === '1:1') return '1024x1024';
-  if (ratio === '9:16') return '1008x1792';
-  return '1024x1280';
+  return ratio === '1:1' ? '1024x1024' : '1024x1536';
 }
 
 function cleanPrompt(value) {
@@ -83,7 +81,7 @@ async function generateImage(body = {}) {
     'Brand direction: modern, clean, practical retail software, professional and credible, not stock-photo generic.',
     'Do not invent app screenshots, interface labels, statistics, customer logos or claims that were not requested.',
     'If text is included, keep it short and legible. Prefer a strong visual composition over lots of text.',
-    `Compose specifically for a ${ratio} social image and keep important content inside safe margins.`,
+    `Compose for a ${ratio} social image with generous safe margins. The app will crop the generated portrait to the exact final social ratio.`,
     `User request: ${prompt}`,
   ].join('\n');
 
