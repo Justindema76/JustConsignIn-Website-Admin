@@ -53,6 +53,12 @@ function starterCopy(title) {
   };
 }
 
+function CampaignMedia({ campaign, className = '' }) {
+  if (!campaign.mediaUrl) return <Image size={28}/>;
+  if (campaign.mediaType === 'video') return <video className={className} src={campaign.mediaUrl} controls playsInline preload="metadata"/>;
+  return <img className={className} src={campaign.mediaUrl} alt="Selected social media"/>;
+}
+
 export default function SocialAutomation() {
   const { accessToken } = useAuth();
   const { id } = useParams();
@@ -215,7 +221,7 @@ export default function SocialAutomation() {
     <div className="site-admin-card social-campaign-list">
       <div className="social-list-head"><strong>Campaigns</strong><span>Instagram · Facebook · TikTok · YouTube</span></div>
       {loading && !campaigns.length ? <div className="site-admin-empty">Loading campaigns…</div> : campaigns.map(item => <div className="social-campaign-row" key={item.id}>
-        <div className="social-campaign-thumb">{item.mediaUrl ? <img src={item.mediaUrl} alt=""/> : <Image size={22}/>}</div>
+        <div className="social-campaign-thumb">{item.mediaUrl ? (item.mediaType === 'video' ? <video src={item.mediaUrl} muted playsInline preload="metadata"/> : <img src={item.mediaUrl} alt=""/>) : <Image size={22}/>}</div>
         <div className="social-campaign-copy"><strong>{item.title}</strong><small>{item.platforms.join(' · ') || 'No networks'}{item.scheduledAt ? ` · ${new Date(item.scheduledAt).toLocaleString()}` : ''}</small>{item.lastError && <small className="error-copy">{item.lastError}</small>}</div>
         <span className={`site-admin-status ${item.status}`}>{item.status}</span>
         <div className="site-admin-actions right"><button className="site-admin-btn secondary small" onClick={() => navigate(`/admin/social-automation/${item.id}`)}>Edit</button>{item.metricoolPosts?.[0]?.response?.plannerUrl && <a className="site-admin-btn secondary small" href={item.metricoolPosts[0].response.plannerUrl} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}<button className="site-admin-btn danger small" onClick={() => remove(item)}><Trash2 size={13}/></button></div>
@@ -240,10 +246,10 @@ export default function SocialAutomation() {
 
         <div className="social-field"><span>Media</span>
           <div className="social-media-editor">
-            <div className={`social-media-preview ratio-${campaign.aspectRatio.replace(':','')}`}>{campaign.mediaUrl ? <img src={campaign.mediaUrl} alt="Selected social media"/> : <><Image size={28}/><small>No image selected</small></>}</div>
+            <div className={`social-media-preview ratio-${campaign.aspectRatio.replace(':','')}`}><CampaignMedia campaign={campaign}/></div>
             <div><div className="site-admin-actions"><button className="site-admin-btn secondary small" type="button" onClick={() => setMediaOpen(true)}>Choose Media</button><label className="site-admin-btn secondary small upload-button"><Upload size={13}/> Upload<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={upload}/></label></div>
               <div className="social-ratios">{['1:1','4:5','9:16','original'].map(ratio => <button key={ratio} type="button" className={campaign.aspectRatio === ratio ? 'selected' : ''} onClick={() => set('aspectRatio', ratio)}>{ratio}</button>)}</div>
-              <small>Images are stored in the same Supabase media library used by your blog. PNG/GIF images are automatically converted to JPEG when needed for TikTok.</small>
+              <small>{campaign.mediaType === 'video' ? 'MP4 Reel selected. The video already contains the attached music.' : 'Images are stored in the same Supabase media library used by your blog. PNG/GIF images are automatically converted to JPEG when needed for TikTok.'}</small>
             </div>
           </div>
         </div>
@@ -262,7 +268,7 @@ export default function SocialAutomation() {
       </section>
 
       <aside className="social-editor-side">
-        <div className="site-admin-card social-live-card"><h2>Live preview</h2><div className="social-phone-preview"><div className="social-phone-head"><span>J</span><div><strong>JustConsignIn</strong><small>{activePreview}</small></div></div><div className={`social-phone-media ratio-${campaign.aspectRatio.replace(':','')}`}>{campaign.mediaUrl ? <img src={campaign.mediaUrl} alt=""/> : <Image size={28}/>}</div><div className="social-phone-copy"><strong>JustConsignIn</strong> {previewText || 'Your caption will appear here.'}</div></div>{campaign.audioUrl && <div className="site-admin-note" style={{marginTop:10}}>Music attached: <b>{campaign.audioName || 'Uploaded audio'}</b></div>}</div>
+        <div className="site-admin-card social-live-card"><h2>Live preview</h2><div className="social-phone-preview"><div className="social-phone-head"><span>J</span><div><strong>JustConsignIn</strong><small>{activePreview}</small></div></div><div className={`social-phone-media ratio-${campaign.aspectRatio.replace(':','')}`}><CampaignMedia campaign={campaign}/></div><div className="social-phone-copy"><strong>JustConsignIn</strong> {previewText || 'Your caption will appear here.'}</div></div>{campaign.audioUrl && <div className="site-admin-note" style={{marginTop:10}}>Music attached: <b>{campaign.audioName || 'Uploaded audio'}</b>{campaign.mediaType === 'video' ? ' · embedded in Reel' : ''}</div>}</div>
         <div className="site-admin-card social-live-card"><h2>Metricool</h2>{integration?.connected ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>Brand {integration.brandId} · America/Toronto</p><button className="site-admin-btn secondary small" onClick={testMetricool}>Test connection</button></> : <><p>The admin needs its own OAuth connection to Metricool. Your ChatGPT connection remains separate.</p><button className="site-admin-btn small" onClick={connectMetricool}>Connect Metricool</button></>}</div>
       </aside>
     </div>
