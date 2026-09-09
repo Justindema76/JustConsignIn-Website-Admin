@@ -42,6 +42,15 @@ export function AdminAuthProvider({ children }) {
   };
 
   useEffect(() => {
+    const syncRefreshedSession = event => {
+      const payload = event?.detail || {};
+      if (payload.accessToken) persist(payload);
+    };
+    window.addEventListener('jci-admin-session-refreshed', syncRefreshedSession);
+    return () => window.removeEventListener('jci-admin-session-refreshed', syncRefreshedSession);
+  }, []);
+
+  useEffect(() => {
     let active = true;
 
     const validateStoredSession = async () => {
