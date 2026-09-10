@@ -2,7 +2,7 @@ import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 import { supabaseUserRest } from '../_lib/supabase.js';
 
 const STATUSES = new Set(['new', 'contacted', 'scheduled', 'completed', 'archived']);
-const SELECT = 'id,created_at,updated_at,first_name,last_name,business_name,email,phone,shopify_status,interest,message,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,status,admin_notes,contacted_at,scheduled_at,metadata';
+const SELECT = 'id,created_at,updated_at,first_name,last_name,business_name,email,phone,shopify_status,interest,message,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,status,admin_notes,contacted_at,scheduled_at,scheduled_duration_minutes,scheduled_timezone,scheduled_location,scheduled_notes,metadata';
 
 function readBody(req) {
   if (!req.body) return {};
