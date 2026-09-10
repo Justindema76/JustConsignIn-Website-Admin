@@ -1,5 +1,5 @@
 -- Demo Request communication history and permanent delete support.
--- Email bodies are stored so the Website Admin keeps a record of what was sent.
+-- Email bodies are stored so Website Admin keeps a record of what was sent.
 
 create table if not exists public.demo_request_emails (
   id uuid primary key default gen_random_uuid(),
@@ -22,17 +22,16 @@ create index if not exists demo_request_emails_request_created_idx
   on public.demo_request_emails (demo_request_id, created_at desc);
 
 alter table public.demo_request_emails enable row level security;
-
 revoke all on public.demo_request_emails from anon, authenticated;
 grant select on public.demo_request_emails to authenticated;
 
--- Owner-only email-history access. Keep this aligned with Website Admin owner auth.
+-- Owner-only history access. Public users never read outgoing email history.
 drop policy if exists website_owner_can_read_demo_request_emails on public.demo_request_emails;
 create policy website_owner_can_read_demo_request_emails
   on public.demo_request_emails
   for select
   to authenticated
-  using (auth.uid() = 'acfd4d60-fd52-43e3-9313-927645953cb8'::uuid);
+  using (lower(coalesce(auth.jwt() ->> 'email', '')) = 'justindema76@gmail.com');
 
 -- Permanent delete is owner-only. Child email history is removed by ON DELETE CASCADE.
 grant delete on public.demo_requests to authenticated;
@@ -41,4 +40,4 @@ create policy website_owner_can_delete_demo_requests
   on public.demo_requests
   for delete
   to authenticated
-  using (auth.uid() = 'acfd4d60-fd52-43e3-9313-927645953cb8'::uuid);
+  using (lower(coalesce(auth.jwt() ->> 'email', '')) = 'justindema76@gmail.com');

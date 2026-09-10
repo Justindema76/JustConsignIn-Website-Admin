@@ -92,6 +92,33 @@ export default async function handler(req, res) {
     }
   }
 
-  res.setHeader('Allow', 'GET, PATCH');
+  if (req.method === 'DELETE') {
+    const body = readBody(req);
+    const id = clean(body.id, 80);
+    if (!validUuid(id)) return res.status(400).json({ error: 'A valid request ID is required.' });
+
+    try {
+      const response = await supabaseUserRest(
+        owner.accessToken,
+        `demo_requests?id=eq.${encodeURIComponent(id)}&select=id`,
+        {
+          method: 'DELETE',
+          headers: { Prefer: 'return=representation' },
+        },
+      );
+      if (!response.ok) {
+        console.error('Unable to delete demo request', response.status, await response.text().catch(() => ''));
+        return res.status(500).json({ error: 'Unable to delete demo request.' });
+      }
+      const rows = await response.json();
+      if (!rows?.[0]) return res.status(404).json({ error: 'Demo request not found.' });
+      return res.status(200).json({ ok: true, id: rows[0].id });
+    } catch (error) {
+      console.error('Demo request admin DELETE failed', error);
+      return res.status(500).json({ error: 'Unable to delete demo request.' });
+    }
+  }
+
+  res.setHeader('Allow', 'GET, PATCH, DELETE');
   return res.status(405).json({ error: 'Method not allowed.' });
 }
