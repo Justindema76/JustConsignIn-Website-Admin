@@ -38,7 +38,7 @@ async function loadSettings() {
   if (error) throw new Error(`Unable to load email settings: ${error.message}`);
   const settings = Array.isArray(data) ? data[0] : data;
   if (!settings?.enabled) throw new Error('Email notifications are disabled in Website Admin.');
-  for (const key of ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from_email', 'notification_email', 'smtp_password']) {
+  for (const key of ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from_email', 'smtp_password']) {
     if (!settings[key]) throw new Error(`Email setting ${key} is not configured.`);
   }
   return settings;
@@ -51,6 +51,33 @@ function transportFor(settings: any) {
     secure: Boolean(settings.smtp_secure),
     auth: { user: settings.smtp_username, pass: settings.smtp_password },
   });
+}
+
+function recipientsFor(settings: any, eventKey: string) {
+  const routes = Array.isArray(settings.notification_routes) ? settings.notification_routes : [];
+  const selected = routes.filter((route: any) => {
+    const routeEvent = clean(route?.eventKey, 60).toLowerCase();
+    return route?.enabled !== false && (routeEvent === eventKey || routeEvent === 'all') && clean(route?.email, 320);
+  });
+
+  const unique = (type: string) => [...new Set(selected
+    .filter((route: any) => clean(route?.recipientType, 10).toLowerCase() === type)
+    .map((route: any) => clean(route?.email, 320).toLowerCase()))];
+
+  let to = unique('to');
+  const cc = unique('cc').filter(email => !to.includes(email));
+  const bcc = unique('bcc').filter(email => !to.includes(email) && !cc.includes(email));
+
+  if (!to.length && clean(settings.notification_email, 320)) to = [clean(settings.notification_email, 320).toLowerCase()];
+  if (!to.length) throw new Error(`No To recipient is configured for ${eventKey}.`);
+
+  return { to, cc, bcc };
+}
+
+function fromAddress(settings: any) {
+  return settings.smtp_from_name
+    ? `"${clean(settings.smtp_from_name, 120).replace(/["\r\n]/g, '')}" <${settings.smtp_from_email}>`
+    : settings.smtp_from_email;
 }
 
 function demoMessage(record: any, settings: any) {
@@ -73,8 +100,8 @@ function demoMessage(record: any, settings: any) {
   const html = `<div style="font-family:Arial,sans-serif;background:#f5f6f8;padding:24px;color:#202223"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #dfe3e8;border-radius:14px;overflow:hidden"><div style="background:#1f67b2;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85">JustConsignIn</div><h1 style="margin:5px 0 0;font-size:24px">New Demo Request</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', fullName)}${row('Business', business)}${row('Email', record.email)}${row('Phone', record.phone)}${row('Shopify', record.shopify_status)}${row('Interested in', record.interest)}${row('Source page', source)}${row('Campaign', campaign)}</table><div style="margin:16px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">Message</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#6d7175;font-size:13px">Reply to this email to respond directly to ${escapeHtml(fullName)}. The request is also saved in Website Admin → Demo Requests.</p></div></div></div>`;
 
   return {
-    from: settings.smtp_from_name ? `"${clean(settings.smtp_from_name, 120).replace(/["\r\n]/g, '')}" <${settings.smtp_from_email}>` : settings.smtp_from_email,
-    to: settings.notification_email,
+    from: fromAddress(settings),
+    ...recipientsFor(settings, 'demo_request'),
     replyTo: record.email,
     subject: `New Demo Request — ${business} — ${fullName}`,
     text,
@@ -125,11 +152,11 @@ async function sendTest(req: Request) {
     const transport = transportFor(settings);
     await transport.verify();
     await transport.sendMail({
-      from: settings.smtp_from_name ? `"${clean(settings.smtp_from_name, 120).replace(/["\r\n]/g, '')}" <${settings.smtp_from_email}>` : settings.smtp_from_email,
-      to: settings.notification_email,
+      from: fromAddress(settings),
+      ...recipientsFor(settings, 'demo_request'),
       subject: 'JustConsignIn Email Settings Test',
-      text: 'Your Website Admin SMTP settings are working. Demo request notifications can be delivered through this mailbox.',
-      html: '<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="margin:0 0 12px">Email settings are working</h2><p>Your JustConsignIn Website Admin successfully connected to the configured SMTP server and sent this test message.</p></div>',
+      text: 'Your Website Admin SMTP settings and Demo Requests routing are working.',
+      html: '<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="margin:0 0 12px">Email settings are working</h2><p>Your JustConsignIn Website Admin successfully connected to the configured SMTP server and sent this message using the saved Demo Requests routing.</p></div>',
     });
     return Response.json({ ok: true, sent: true });
   } catch (error) {
