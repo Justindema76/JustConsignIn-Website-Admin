@@ -33,6 +33,24 @@ function validUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
+function validEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizeEmailList(value: unknown) {
+  const input = Array.isArray(value) ? value : String(value || '').split(',');
+  return [...new Set(input.map(item => clean(item, 320).toLowerCase()).filter(Boolean))].slice(0, 10);
+}
+
+async function requireOwner(req: Request) {
+  const auth = req.headers.get('authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!token) return null;
+  const { data, error } = await anon.auth.getUser(token);
+  if (error || !data?.user || clean(data.user.email, 254).toLowerCase() !== OWNER_EMAIL) return null;
+  return data.user;
+}
+
 async function loadSettings() {
   const { data, error } = await admin.rpc('service_get_email_settings');
   if (error) throw new Error(`Unable to load email settings: ${error.message}`);
@@ -138,14 +156,106 @@ async function sendDemo(body: any) {
   }
 }
 
-async function sendTest(req: Request) {
-  const auth = req.headers.get('authorization') || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+async function sendReply(req: Request, body: any) {
+  const owner = await requireOwner(req);
+  if (!owner) return Response.json({ error: 'Not found' }, { status: 404 });
 
-  const { data: userData, error: userError } = await anon.auth.getUser(token);
-  const user = userData?.user;
-  if (userError || !user || clean(user.email, 254).toLowerCase() !== OWNER_EMAIL) return Response.json({ error: 'Not found' }, { status: 404 });
+  const requestId = clean(body.requestId, 80);
+  const subject = clean(body.subject, 240);
+  const message = clean(body.message, 12000);
+  const cc = normalizeEmailList(body.ccEmails);
+  const bcc = normalizeEmailList(body.bccEmails);
+
+  if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
+  if (!subject) return Response.json({ error: 'Subject is required.' }, { status: 400 });
+  if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
+  if ([...cc, ...bcc].some(email => !validEmail(email))) return Response.json({ error: 'CC and BCC must contain valid email addresses.' }, { status: 400 });
+
+  const { data: record, error: requestError } = await admin
+    .from('demo_requests')
+    .select('id,first_name,last_name,business_name,email,status,contacted_at')
+    .eq('id', requestId)
+    .maybeSingle();
+  if (requestError || !record) return Response.json({ error: 'Demo request not found.' }, { status: 404 });
+
+  const to = clean(record.email, 320).toLowerCase();
+  if (!validEmail(to)) return Response.json({ error: 'The demo request does not have a valid email address.' }, { status: 400 });
+
+  const settings = await loadSettings();
+  const fromEmail = clean(settings.smtp_from_email, 320).toLowerCase();
+  const sentAt = new Date().toISOString();
+  const htmlBody = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223;white-space:normal">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
+
+  try {
+    const info = await transportFor(settings).sendMail({
+      from: fromAddress(settings),
+      to,
+      cc,
+      bcc,
+      subject,
+      text: message,
+      html: htmlBody,
+    });
+
+    const { data: history, error: historyError } = await admin
+      .from('demo_request_emails')
+      .insert({
+        demo_request_id: requestId,
+        sent_at: sentAt,
+        to_email: to,
+        cc_emails: cc,
+        bcc_emails: bcc,
+        from_email: fromEmail,
+        subject,
+        body_text: message,
+        delivery_status: 'sent',
+        provider_message_id: clean(info?.messageId, 1000) || null,
+        created_by: owner.id,
+      })
+      .select('id,demo_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id')
+      .single();
+
+    if (historyError) console.error('Email sent but history save failed', historyError.message);
+
+    const patch: Record<string, unknown> = { updated_at: sentAt };
+    if (record.status === 'new') patch.status = 'contacted';
+    if (!record.contacted_at) patch.contacted_at = sentAt;
+    const { data: updatedRequest } = await admin
+      .from('demo_requests')
+      .update(patch)
+      .eq('id', requestId)
+      .select('id,status,contacted_at,updated_at')
+      .maybeSingle();
+
+    return Response.json({
+      ok: true,
+      sent: true,
+      email: history || null,
+      request: updatedRequest || null,
+      historySaved: !historyError,
+    });
+  } catch (error) {
+    const errorMessage = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await admin.from('demo_request_emails').insert({
+      demo_request_id: requestId,
+      to_email: to,
+      cc_emails: cc,
+      bcc_emails: bcc,
+      from_email: fromEmail,
+      subject,
+      body_text: message,
+      delivery_status: 'failed',
+      delivery_error: errorMessage,
+      created_by: owner.id,
+    }).catch(() => null);
+    console.error('Demo request reply failed', errorMessage);
+    return Response.json({ error: errorMessage }, { status: 502 });
+  }
+}
+
+async function sendTest(req: Request) {
+  const owner = await requireOwner(req);
+  if (!owner) return Response.json({ error: 'Not found' }, { status: 404 });
 
   try {
     const settings = await loadSettings();
@@ -171,6 +281,7 @@ Deno.serve(async (req: Request) => {
   let body: any = {};
   try { body = await req.json(); } catch { return Response.json({ error: 'Invalid request' }, { status: 400 }); }
   if (body.action === 'demo') return sendDemo(body);
+  if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'test') return sendTest(req);
   return Response.json({ error: 'Invalid action' }, { status: 400 });
 });
