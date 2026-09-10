@@ -60,7 +60,7 @@ async function videoFrames(videoUrl, count = 4) {
   return frames;
 }
 
-export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'image', platforms = [], direction = '' }) {
+export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'image', platforms = [], youtubeFormat = 'video', direction = '' }) {
   if (!mediaUrl) throw new Error('Choose or upload an image or video first.');
   if (!platforms.length) throw new Error('Choose at least one social network to push to.');
   const frames = mediaType === 'video' ? await videoFrames(mediaUrl, 4) : [];
@@ -68,6 +68,6 @@ export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'i
   return parseResponse(await adminFetch('/api/admin/social-ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'analyze', mediaUrl, mediaType, platforms, direction, frames }),
+    body: JSON.stringify({ action: 'analyze', mediaUrl, mediaType, platforms, youtubeFormat, direction, frames }),
   }, accessToken));
 }
