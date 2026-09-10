@@ -22,6 +22,13 @@ function youtubeId(value = '') {
   return /^[A-Za-z0-9_-]{6,}$/.test(raw) ? raw : '';
 }
 
+function youtubeContentType(value = '', requested = '') {
+  const explicit = String(requested || '').trim().toLowerCase();
+  if (explicit === 'short') return 'short';
+  if (explicit === 'video') return 'video';
+  return /youtube\.com\/shorts\//i.test(String(value || '')) ? 'short' : 'video';
+}
+
 function cleanVideo(body = {}) {
   const url = String(body.youtubeUrl || body.youtube_url || '').trim();
   return {
@@ -32,6 +39,8 @@ function cleanVideo(body = {}) {
     placement: String(body.placement || 'homepage').trim().toLowerCase() || 'homepage',
     sort_order: Number.isFinite(Number(body.sortOrder ?? body.sort_order)) ? Number(body.sortOrder ?? body.sort_order) : 0,
     status: body.status === 'hidden' ? 'hidden' : 'active',
+    content_type: youtubeContentType(url, body.contentType ?? body.content_type),
+    playlist_name: String(body.playlistName ?? body.playlist_name ?? 'JustConsignIn').trim().slice(0, 160) || 'JustConsignIn',
     updated_at: new Date().toISOString(),
   };
 }
@@ -80,7 +89,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET' && resource === 'videos') {
-      const response = await supabaseUserRest(user.accessToken, 'site_videos?select=*&order=placement.asc,sort_order.asc,created_at.asc', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, 'site_videos?select=*&order=placement.asc,playlist_name.asc,content_type.asc,sort_order.asc,created_at.asc', { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load videos');
       return res.status(200).json({ videos: data });
