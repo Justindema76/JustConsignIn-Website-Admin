@@ -1,6 +1,12 @@
 import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
+const MEDIA_BUCKETS = [
+  { bucket: 'blog-images', mediaType: 'image' },
+  { bucket: 'social-videos', mediaType: 'video' },
+  { bucket: 'social-audio', mediaType: 'audio' },
+];
+
 function youtubeId(value = '') {
   const raw = String(value || '').trim();
   if (!raw) return '';
@@ -39,8 +45,30 @@ function socialValue(body = {}) {
   }]));
 }
 
-function publicMediaUrl(name) {
-  return `${supabaseUrl()}/storage/v1/object/public/blog-images/${String(name || '').split('/').map(encodeURIComponent).join('/')}`;
+function publicMediaUrl(bucket, name) {
+  return `${supabaseUrl()}/storage/v1/object/public/${bucket}/${String(name || '').split('/').map(encodeURIComponent).join('/')}`;
+}
+
+async function listMediaBucket(accessToken, { bucket, mediaType }) {
+  const response = await supabaseUserStorage(accessToken, `object/list/${bucket}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: '', limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.message || data?.error || `Unable to load ${mediaType} media`);
+  return (Array.isArray(data) ? data : [])
+    .filter(item => item?.name && item.name !== '.emptyFolderPlaceholder')
+    .map(item => ({
+      name: item.name,
+      path: item.name,
+      bucket,
+      mediaType,
+      url: publicMediaUrl(bucket, item.name),
+      createdAt: item.created_at || item.updated_at || '',
+      updatedAt: item.updated_at || '',
+      metadata: item.metadata || {},
+    }));
 }
 
 export default async function handler(req, res) {
@@ -66,21 +94,12 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET' && resource === 'media') {
-      const response = await supabaseUserStorage(user.accessToken, 'object/list/blog-images', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prefix: '', limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
+      const groups = await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config)));
+      const media = groups.flat().sort((a, b) => {
+        const left = new Date(a.createdAt || 0).getTime() || 0;
+        const right = new Date(b.createdAt || 0).getTime() || 0;
+        return right - left;
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.message || data?.error || 'Unable to load media');
-      const media = (Array.isArray(data) ? data : []).filter(item => item?.name && item.name !== '.emptyFolderPlaceholder').map(item => ({
-        name: item.name,
-        path: item.name,
-        url: publicMediaUrl(item.name),
-        createdAt: item.created_at || item.updated_at || '',
-        updatedAt: item.updated_at || '',
-        metadata: item.metadata || {},
-      }));
       return res.status(200).json({ media });
     }
 
@@ -139,7 +158,7 @@ export default async function handler(req, res) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.message || data?.error || 'Unable to upload image');
       }
-      const publicUrl = publicMediaUrl(objectName);
+      const publicUrl = publicMediaUrl('blog-images', objectName);
       return res.status(200).json({ url: publicUrl, path: objectName });
     }
 
