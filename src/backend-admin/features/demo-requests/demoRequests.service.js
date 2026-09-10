@@ -37,3 +37,11 @@ export async function sendDemoRequestEmail(accessToken, email) {
     body: JSON.stringify(email),
   }, accessToken));
 }
+
+export async function scheduleDemoRequest(accessToken, schedule) {
+  return parseResponse(await adminFetch('/api/admin/demo-request-schedule', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(schedule),
+  }, accessToken));
+}

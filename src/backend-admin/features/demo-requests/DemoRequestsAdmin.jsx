@@ -3,6 +3,7 @@ import { CalendarClock, Inbox, Mail, Phone, RefreshCw, Search, Trash2 } from 'lu
 import { useAuth } from '../../auth/AdminAuthContext';
 import DemoRequestEmailComposer from './components/DemoRequestEmailComposer';
 import DemoRequestEmailHistory from './components/DemoRequestEmailHistory';
+import DemoRequestScheduler from './components/DemoRequestScheduler';
 import {
   deleteDemoRequest,
   loadDemoRequestEmails,
@@ -24,14 +25,6 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
 }
 
-function localDateTimeValue(value) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-}
-
 function statusLabel(status) {
   return STATUS_OPTIONS.find(([key]) => key === status)?.[1] || status || 'New';
 }
@@ -49,8 +42,8 @@ export default function DemoRequestsAdmin() {
   const [success, setSuccess] = useState('');
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
-  const [draftScheduledAt, setDraftScheduledAt] = useState('');
   const [emailOpen, setEmailOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   const [emails, setEmails] = useState([]);
   const [emailsLoading, setEmailsLoading] = useState(false);
 
@@ -92,10 +85,10 @@ export default function DemoRequestsAdmin() {
     setSelectedId(selected.id);
     setDraftStatus(selected.status || 'new');
     setDraftNotes(selected.admin_notes || '');
-    setDraftScheduledAt(localDateTimeValue(selected.scheduled_at));
     setSuccess('');
     setEmailOpen(false);
-  }, [selected?.id, selected?.status, selected?.admin_notes, selected?.scheduled_at]);
+    setScheduleOpen(false);
+  }, [selected?.id, selected?.status, selected?.admin_notes]);
 
   const refreshEmails = useCallback(async requestId => {
     if (!accessToken || !requestId) {
@@ -135,7 +128,6 @@ export default function DemoRequestsAdmin() {
         id: selected.id,
         status: draftStatus,
         adminNotes: draftNotes,
-        scheduledAt: draftScheduledAt ? new Date(draftScheduledAt).toISOString() : null,
       });
       setRequests(rows => rows.map(row => row.id === updated.id ? updated : row));
       setSuccess('Demo request updated.');
@@ -156,6 +148,22 @@ export default function DemoRequestsAdmin() {
     setSuccess(`Email sent to ${selected?.email || 'customer'}.`);
   };
 
+  const handleScheduled = payload => {
+    if (payload?.request && selected) {
+      setRequests(rows => rows.map(row => row.id === selected.id ? { ...row, ...payload.request } : row));
+      setDraftStatus(payload.request.status || 'scheduled');
+    }
+    if (payload?.email) setEmails(current => [payload.email, ...current.filter(item => item.id !== payload.email.id)]);
+    setScheduleOpen(false);
+    if (payload?.emailSent === false) {
+      setSuccess('Demo schedule saved.');
+      setError(payload.warning || 'The schedule was saved, but the confirmation email could not be sent.');
+    } else {
+      setError('');
+      setSuccess(`Demo scheduled and calendar invite sent to ${selected?.email || 'customer'}.`);
+    }
+  };
+
   const remove = async () => {
     if (!selected || !accessToken || deleting) return;
     const label = selected.business_name || `${selected.first_name || ''} ${selected.last_name || ''}`.trim() || 'this request';
@@ -172,6 +180,7 @@ export default function DemoRequestsAdmin() {
       setSelectedId(remaining[0]?.id || '');
       setEmails([]);
       setEmailOpen(false);
+      setScheduleOpen(false);
       setSuccess('Demo request deleted.');
     } catch (err) {
       setError(err?.message || 'Unable to delete demo request.');
@@ -232,12 +241,22 @@ export default function DemoRequestsAdmin() {
           </div>
 
           <div className="demo-request-contact-actions">
-            <button className="site-admin-btn" type="button" onClick={() => setEmailOpen(open => !open)}><Mail size={14}/> {emailOpen ? 'Close Email' : `Email ${selected.first_name || 'Customer'}`}</button>
+            <button className="site-admin-btn" type="button" onClick={() => { setEmailOpen(open => !open); setScheduleOpen(false); }}><Mail size={14}/> {emailOpen ? 'Close Email' : `Email ${selected.first_name || 'Customer'}`}</button>
+            <button className="site-admin-btn secondary" type="button" onClick={() => { setScheduleOpen(open => !open); setEmailOpen(false); }}><CalendarClock size={14}/> {scheduleOpen ? 'Close Schedule' : selected.scheduled_at ? 'Reschedule Demo' : 'Schedule Demo'}</button>
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call</a>}
             <button className="site-admin-btn danger demo-request-delete" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete'}</button>
           </div>
 
           {emailOpen && <DemoRequestEmailComposer request={selected} accessToken={accessToken} onCancel={() => setEmailOpen(false)} onSent={handleEmailSent} />}
+          {scheduleOpen && <DemoRequestScheduler request={selected} accessToken={accessToken} onCancel={() => setScheduleOpen(false)} onScheduled={handleScheduled} />}
+
+          {selected.scheduled_at && <div className="demo-request-schedule-summary">
+            <strong><CalendarClock size={14}/> Scheduled demo</strong>
+            <span>{formatDate(selected.scheduled_at)} · {selected.scheduled_duration_minutes || 30} minutes</span>
+            <span>Timezone: {selected.scheduled_timezone || 'America/Toronto'}</span>
+            {selected.scheduled_location && <span>Meeting: {/^(https?:\/\/)/i.test(selected.scheduled_location) ? <a href={selected.scheduled_location} target="_blank" rel="noreferrer">{selected.scheduled_location}</a> : selected.scheduled_location}</span>}
+            {selected.scheduled_notes && <span>Customer note: {selected.scheduled_notes}</span>}
+          </div>}
 
           <dl className="demo-request-details">
             <div><dt>Email</dt><dd>{selected.email}</dd></div>
@@ -252,7 +271,6 @@ export default function DemoRequestsAdmin() {
 
           <div className="demo-request-workflow">
             <label>Status<select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label><span><CalendarClock size={14}/> Scheduled time</span><input type="datetime-local" value={draftScheduledAt} onChange={event => setDraftScheduledAt(event.target.value)} /></label>
             <label className="wide">Admin notes<textarea rows="5" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Follow-up notes, demo details, next steps…" /></label>
             <div className="wide demo-request-save"><button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button></div>
           </div>
