@@ -7,6 +7,26 @@ import { createImageMusicReel } from '../../services/socialReelService';
 
 const REEL_DURATIONS = [5, 8, 10, 15];
 
+async function videoOrientation(file) {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.muted = true;
+  video.playsInline = true;
+  video.src = url;
+  try {
+    await new Promise((resolve, reject) => {
+      video.onloadedmetadata = resolve;
+      video.onerror = () => reject(new Error('Unable to read video dimensions.'));
+    });
+    return video.videoHeight > video.videoWidth ? 'vertical' : 'landscape';
+  } finally {
+    video.removeAttribute('src');
+    video.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
 export default function SocialAssistant({ accessToken, campaign, setCampaign, setMessage, setError }) {
   const [configured, setConfigured] = useState(null);
   const [direction, setDirection] = useState('');
@@ -32,6 +52,7 @@ export default function SocialAssistant({ accessToken, campaign, setCampaign, se
         mediaUrl: campaign.mediaUrl,
         mediaType: campaign.mediaType,
         platforms: campaign.platforms,
+        youtubeFormat: campaign.youtubeFormat || 'video',
         direction,
       });
       const analysis = result.analysis || {};
@@ -54,9 +75,12 @@ export default function SocialAssistant({ accessToken, campaign, setCampaign, se
     if (!file) return;
     setVideoBusy(true); setError(''); setMessage('');
     try {
+      let orientation = 'landscape';
+      try { orientation = await videoOrientation(file); } catch {}
       const url = await uploadSocialVideo(accessToken, file);
-      patch({ mediaUrl: url, mediaType: 'video', aspectRatio: 'original' });
-      setMessage('Video uploaded and selected. Choose the networks above, then Analyze Media & Build Posts.');
+      const youtubeFormat = orientation === 'vertical' ? 'short' : 'video';
+      patch({ mediaUrl: url, mediaType: 'video', aspectRatio: 'original', youtubeFormat });
+      setMessage(`Video uploaded and selected. ${orientation === 'vertical' ? 'Vertical video defaults to YouTube Short.' : 'Landscape video defaults to YouTube Video.'} You can change the YouTube type before analyzing.`);
     } catch (err) { setError(err.message); }
     finally { setVideoBusy(false); event.target.value = ''; }
   };
@@ -81,7 +105,7 @@ export default function SocialAssistant({ accessToken, campaign, setCampaign, se
     try {
       const file = await createImageMusicReel({ imageUrl: campaign.mediaUrl, audioUrl: campaign.audioUrl, durationSeconds: reelDuration });
       const url = await uploadSocialVideo(accessToken, file);
-      patch({ mediaUrl: url, mediaType: 'video', aspectRatio: '9:16' });
+      patch({ mediaUrl: url, mediaType: 'video', aspectRatio: '9:16', youtubeFormat: 'short' });
       setMessage(`Reel created: ${reelDuration} seconds, 9:16 MP4 with your uploaded music. You can now analyze it or send it.`);
     } catch (err) { setError(err.message); setMessage(''); }
     finally { setReelBusy(false); }
@@ -106,6 +130,14 @@ export default function SocialAssistant({ accessToken, campaign, setCampaign, se
         <div className="site-admin-actions" style={{ marginBottom: 12 }}>
           <label className="site-admin-btn secondary upload-button"><Video size={14}/> {videoBusy ? 'Uploading video…' : 'Upload Video'}<input type="file" accept="video/mp4,.mp4" onChange={uploadVideo} disabled={videoBusy}/></label>
         </div>
+        {campaign.platforms?.includes('youtube') && <div className="social-reel-duration" style={{ marginBottom: 14 }}>
+          <strong>YouTube type</strong>
+          <div>
+            <button type="button" className={(campaign.youtubeFormat || 'video') === 'video' ? 'selected' : ''} onClick={() => patch({ youtubeFormat: 'video' })}>Video</button>
+            <button type="button" className={campaign.youtubeFormat === 'short' ? 'selected' : ''} onClick={() => patch({ youtubeFormat: 'short' })}>Short</button>
+          </div>
+          <p className="social-audio-note" style={{ margin: '8px 0 0' }}>Video creates a standard YouTube upload with a full title and description. Short creates short-form YouTube copy and publishes through Metricool as a Short.</p>
+        </div>}
         <label className="social-field"><span>Optional direction</span><textarea rows="3" value={direction} onChange={e => setDirection(e.target.value)} placeholder="Optional. Example: Focus on how quickly a store can create the Shopify product from a phone."/></label>
         <button className="site-admin-btn social-ai-primary" type="button" onClick={analyzeMedia} disabled={analyzeBusy || configured === false || !campaign.mediaUrl || !selectedNetworks.length}>{analyzeBusy ? <Loader2 className="spin" size={15}/> : <Sparkles size={15}/>} {analyzeBusy ? 'Analyzing media…' : 'Analyze Media & Build Posts'}</button>
         <p className="social-audio-note">For an image, AI reads the image itself. For a video, it samples frames across the clip and also transcribes the spoken audio when the file size allows it.</p>
