@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, ExternalLink, Home, Image, Link2, LogOut, Sparkles, Video } from 'lucide-react';
+import { BookOpen, ExternalLink, Home, Image, Inbox, Link2, LogOut, Sparkles, Video } from 'lucide-react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { SOCIAL_NETWORKS, emptySocialLinks } from '../../config/siteContent';
@@ -7,6 +7,7 @@ import { loadAdminSocial } from '../../services/siteAdminService';
 
 const nav = [
   { to: '/admin', label: 'Dashboard', icon: Home, end: true },
+  { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox },
   { to: '/admin/blog', label: 'Blog Posts', icon: BookOpen },
   { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
   { to: '/admin/social', label: 'Social Links', icon: Link2 },

@@ -52,7 +52,7 @@
   .site-admin-page-head > .site-admin-actions,
   .site-admin-page-head > .site-admin-actions .site-admin-btn { width: 100%; }
 
-  /* Six always-visible admin destinations on phone. */
+  /* Seven always-visible admin destinations on phone. */
   .site-admin-sidebar {
     position: fixed;
     z-index: 100;
@@ -74,7 +74,7 @@
   .site-admin-sidebar-social { display: none !important; }
   .site-admin-nav {
     display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 2px;
     width: 100%;
     height: 100%;
