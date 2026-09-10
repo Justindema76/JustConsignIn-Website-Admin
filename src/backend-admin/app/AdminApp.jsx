@@ -7,6 +7,7 @@ import Dashboard from '../features/dashboard/Dashboard';
 import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
 import SocialImageStudio from '../features/media/SocialImageStudio';
+import SettingsAdmin from '../features/settings/SettingsAdmin';
 import SocialAdmin from '../features/social-links/SocialAdmin';
 import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
@@ -27,6 +28,7 @@ export default function AdminApp() {
         <Route path="/admin/social-image" element={<SocialImageStudio />} />
         <Route path="/admin/social-automation" element={<SocialAutomation />} />
         <Route path="/admin/social-automation/:id" element={<SocialAutomation />} />
+        <Route path="/admin/settings" element={<SettingsAdmin />} />
       </Route>
     </Route>
     <Route path="*" element={<Navigate to="/admin" replace />} />

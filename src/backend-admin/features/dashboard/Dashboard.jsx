@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BookOpen, Image, Inbox, Link2, Sparkles, Video } from 'lucide-react';
+import { BookOpen, Image, Inbox, Link2, Settings, Sparkles, Video } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './dashboard.css';
 
@@ -72,5 +72,16 @@ export default function Dashboard() {
         </article>
       ))}
     </div>
+
+    <section className="site-admin-card dashboard-settings-card">
+      <div className="dashboard-settings-card-copy">
+        <span className="site-admin-module-icon"><Settings size={21}/></span>
+        <div>
+          <h2>Website Settings</h2>
+          <p>Configure reusable services such as outgoing email without changing code or Vercel environment variables.</p>
+        </div>
+      </div>
+      <Link className="site-admin-btn secondary" to="/admin/settings">Open Settings</Link>
+    </section>
   </>;
 }
