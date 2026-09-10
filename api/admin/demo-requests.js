@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 
 const STATUSES = new Set(['new', 'contacted', 'scheduled', 'completed', 'archived']);
 const SELECT = 'id,created_at,updated_at,first_name,last_name,business_name,email,phone,shopify_status,interest,message,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,status,admin_notes,contacted_at,scheduled_at,metadata';
@@ -27,7 +27,11 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const response = await supabaseRest(`demo_requests?select=${encodeURIComponent(SELECT)}&order=created_at.desc&limit=500`, { method: 'GET' });
+      const response = await supabaseUserRest(
+        owner.accessToken,
+        `demo_requests?select=${encodeURIComponent(SELECT)}&order=created_at.desc&limit=500`,
+        { method: 'GET' },
+      );
       if (!response.ok) {
         console.error('Unable to load demo requests', response.status, await response.text().catch(() => ''));
         return res.status(500).json({ error: 'Unable to load demo requests.' });
@@ -50,6 +54,7 @@ export default async function handler(req, res) {
       const status = clean(body.status, 30).toLowerCase();
       if (!STATUSES.has(status)) return res.status(400).json({ error: 'Invalid request status.' });
       patch.status = status;
+      if (status === 'contacted' && !body.contactedAt) patch.contacted_at = new Date().toISOString();
     }
     if (Object.prototype.hasOwnProperty.call(body, 'adminNotes')) patch.admin_notes = clean(body.adminNotes, 8000) || null;
     if (Object.prototype.hasOwnProperty.call(body, 'scheduledAt')) {
@@ -65,11 +70,15 @@ export default async function handler(req, res) {
     if (!Object.keys(patch).length) return res.status(400).json({ error: 'Nothing to update.' });
 
     try {
-      const response = await supabaseRest(`demo_requests?id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(SELECT)}`, {
-        method: 'PATCH',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(patch),
-      });
+      const response = await supabaseUserRest(
+        owner.accessToken,
+        `demo_requests?id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(SELECT)}`,
+        {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(patch),
+        },
+      );
       if (!response.ok) {
         console.error('Unable to update demo request', response.status, await response.text().catch(() => ''));
         return res.status(500).json({ error: 'Unable to update demo request.' });
