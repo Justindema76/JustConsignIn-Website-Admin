@@ -8,6 +8,7 @@ export const EMPTY_CAMPAIGN = {
   tiktokCaption: '',
   youtubeTitle: '',
   youtubeDescription: '',
+  youtubeFormat: 'video',
   mediaUrl: '',
   mediaType: 'image',
   aspectRatio: '1:1',
