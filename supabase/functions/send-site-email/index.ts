@@ -77,7 +77,6 @@ function recipientsFor(settings: any, eventKey: string) {
     const routeEvent = clean(route?.eventKey, 60).toLowerCase();
     return route?.enabled !== false && (routeEvent === eventKey || routeEvent === 'all') && clean(route?.email, 320);
   });
-
   const unique = (type: string) => [...new Set(selected
     .filter((route: any) => clean(route?.recipientType, 10).toLowerCase() === type)
     .map((route: any) => clean(route?.email, 320).toLowerCase()))];
@@ -85,10 +84,8 @@ function recipientsFor(settings: any, eventKey: string) {
   let to = unique('to');
   const cc = unique('cc').filter(email => !to.includes(email));
   const bcc = unique('bcc').filter(email => !to.includes(email) && !cc.includes(email));
-
   if (!to.length && clean(settings.notification_email, 320)) to = [clean(settings.notification_email, 320).toLowerCase()];
   if (!to.length) throw new Error(`No To recipient is configured for ${eventKey}.`);
-
   return { to, cc, bcc };
 }
 
@@ -117,14 +114,7 @@ function demoMessage(record: any, settings: any) {
 
   const html = `<div style="font-family:Arial,sans-serif;background:#f5f6f8;padding:24px;color:#202223"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #dfe3e8;border-radius:14px;overflow:hidden"><div style="background:#1f67b2;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85">JustConsignIn</div><h1 style="margin:5px 0 0;font-size:24px">New Demo Request</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', fullName)}${row('Business', business)}${row('Email', record.email)}${row('Phone', record.phone)}${row('Shopify', record.shopify_status)}${row('Interested in', record.interest)}${row('Source page', source)}${row('Campaign', campaign)}</table><div style="margin:16px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">Message</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#6d7175;font-size:13px">Reply to this email to respond directly to ${escapeHtml(fullName)}. The request is also saved in Website Admin → Demo Requests.</p></div></div></div>`;
 
-  return {
-    from: fromAddress(settings),
-    ...recipientsFor(settings, 'demo_request'),
-    replyTo: record.email,
-    subject: `New Demo Request — ${business} — ${fullName}`,
-    text,
-    html,
-  };
+  return { from: fromAddress(settings), ...recipientsFor(settings, 'demo_request'), replyTo: record.email, subject: `New Demo Request — ${business} — ${fullName}`, text, html };
 }
 
 async function sendDemo(body: any) {
@@ -137,12 +127,10 @@ async function sendDemo(body: any) {
     .select('id,first_name,last_name,business_name,email,phone,shopify_status,interest,message,source_path,utm_source,utm_medium,utm_campaign,notification_token,email_notified_at')
     .eq('id', requestId)
     .maybeSingle();
-
   if (error || !record || String(record.notification_token) !== notificationToken) return Response.json({ error: 'Not found' }, { status: 404 });
   if (record.email_notified_at) return Response.json({ ok: true, alreadySent: true });
 
   await admin.from('demo_requests').update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
-
   try {
     const settings = await loadSettings();
     await transportFor(settings).sendMail(demoMessage(record, settings));
@@ -165,7 +153,6 @@ async function sendReply(req: Request, body: any) {
   const message = clean(body.message, 12000);
   const cc = normalizeEmailList(body.ccEmails);
   const bcc = normalizeEmailList(body.bccEmails);
-
   if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
   if (!subject) return Response.json({ error: 'Subject is required.' }, { status: 400 });
   if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
@@ -184,19 +171,10 @@ async function sendReply(req: Request, body: any) {
   const settings = await loadSettings();
   const fromEmail = clean(settings.smtp_from_email, 320).toLowerCase();
   const sentAt = new Date().toISOString();
-  const htmlBody = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223;white-space:normal">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
+  const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
 
   try {
-    const info = await transportFor(settings).sendMail({
-      from: fromAddress(settings),
-      to,
-      cc,
-      bcc,
-      subject,
-      text: message,
-      html: htmlBody,
-    });
-
+    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html });
     const { data: history, error: historyError } = await admin
       .from('demo_request_emails')
       .insert({
@@ -214,29 +192,17 @@ async function sendReply(req: Request, body: any) {
       })
       .select('id,demo_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id')
       .single();
-
     if (historyError) console.error('Email sent but history save failed', historyError.message);
 
     const patch: Record<string, unknown> = { updated_at: sentAt };
     if (record.status === 'new') patch.status = 'contacted';
     if (!record.contacted_at) patch.contacted_at = sentAt;
-    const { data: updatedRequest } = await admin
-      .from('demo_requests')
-      .update(patch)
-      .eq('id', requestId)
-      .select('id,status,contacted_at,updated_at')
-      .maybeSingle();
+    const { data: updatedRequest } = await admin.from('demo_requests').update(patch).eq('id', requestId).select('id,status,contacted_at,updated_at').maybeSingle();
 
-    return Response.json({
-      ok: true,
-      sent: true,
-      email: history || null,
-      request: updatedRequest || null,
-      historySaved: !historyError,
-    });
+    return Response.json({ ok: true, sent: true, email: history || null, request: updatedRequest || null, historySaved: !historyError });
   } catch (error) {
     const errorMessage = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
-    await admin.from('demo_request_emails').insert({
+    const { error: logError } = await admin.from('demo_request_emails').insert({
       demo_request_id: requestId,
       to_email: to,
       cc_emails: cc,
@@ -247,7 +213,8 @@ async function sendReply(req: Request, body: any) {
       delivery_status: 'failed',
       delivery_error: errorMessage,
       created_by: owner.id,
-    }).catch(() => null);
+    });
+    if (logError) console.error('Unable to record failed email attempt', logError.message);
     console.error('Demo request reply failed', errorMessage);
     return Response.json({ error: errorMessage }, { status: 502 });
   }
@@ -256,7 +223,6 @@ async function sendReply(req: Request, body: any) {
 async function sendTest(req: Request) {
   const owner = await requireOwner(req);
   if (!owner) return Response.json({ error: 'Not found' }, { status: 404 });
-
   try {
     const settings = await loadSettings();
     const transport = transportFor(settings);
