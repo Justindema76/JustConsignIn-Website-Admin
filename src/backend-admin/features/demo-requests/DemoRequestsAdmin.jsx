@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CalendarClock, Inbox, Mail, Phone, RefreshCw, Search } from 'lucide-react';
+import { CalendarClock, Inbox, Mail, Phone, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadDemoRequests, updateDemoRequest } from './demoRequests.service';
+import DemoRequestEmailComposer from './components/DemoRequestEmailComposer';
+import DemoRequestEmailHistory from './components/DemoRequestEmailHistory';
+import {
+  deleteDemoRequest,
+  loadDemoRequestEmails,
+  loadDemoRequests,
+  updateDemoRequest,
+} from './demoRequests.service';
 
 const STATUS_OPTIONS = [
   ['new', 'New'],
@@ -37,11 +44,15 @@ export default function DemoRequestsAdmin() {
   const [statusFilter, setStatusFilter] = useState('active');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
   const [draftScheduledAt, setDraftScheduledAt] = useState('');
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emails, setEmails] = useState([]);
+  const [emailsLoading, setEmailsLoading] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!accessToken) return;
@@ -74,13 +85,38 @@ export default function DemoRequestsAdmin() {
   const selected = requests.find(request => request.id === selectedId) || filtered[0] || null;
 
   useEffect(() => {
-    if (!selected) return;
+    if (!selected) {
+      setEmails([]);
+      return;
+    }
     setSelectedId(selected.id);
     setDraftStatus(selected.status || 'new');
     setDraftNotes(selected.admin_notes || '');
     setDraftScheduledAt(localDateTimeValue(selected.scheduled_at));
     setSuccess('');
+    setEmailOpen(false);
   }, [selected?.id, selected?.status, selected?.admin_notes, selected?.scheduled_at]);
+
+  const refreshEmails = useCallback(async requestId => {
+    if (!accessToken || !requestId) {
+      setEmails([]);
+      return;
+    }
+    setEmailsLoading(true);
+    try {
+      const rows = await loadDemoRequestEmails(accessToken, requestId);
+      setEmails(rows);
+    } catch (err) {
+      setError(err?.message || 'Unable to load email history.');
+    } finally {
+      setEmailsLoading(false);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (selected?.id) refreshEmails(selected.id);
+    else setEmails([]);
+  }, [selected?.id, refreshEmails]);
 
   const counts = useMemo(() => ({
     total: requests.length,
@@ -107,6 +143,40 @@ export default function DemoRequestsAdmin() {
       setError(err.message || 'Unable to save demo request.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleEmailSent = payload => {
+    if (payload?.email) setEmails(current => [payload.email, ...current.filter(item => item.id !== payload.email.id)]);
+    if (payload?.request && selected) {
+      setRequests(rows => rows.map(row => row.id === selected.id ? { ...row, ...payload.request } : row));
+      setDraftStatus(payload.request.status || draftStatus);
+    }
+    setEmailOpen(false);
+    setSuccess(`Email sent to ${selected?.email || 'customer'}.`);
+  };
+
+  const remove = async () => {
+    if (!selected || !accessToken || deleting) return;
+    const label = selected.business_name || `${selected.first_name || ''} ${selected.last_name || ''}`.trim() || 'this request';
+    const confirmed = window.confirm(`Permanently delete ${label}?\n\nThis also deletes the email history attached to this demo request. This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError('');
+    setSuccess('');
+    try {
+      await deleteDemoRequest(accessToken, selected.id);
+      const remaining = requests.filter(row => row.id !== selected.id);
+      setRequests(remaining);
+      setSelectedId(remaining[0]?.id || '');
+      setEmails([]);
+      setEmailOpen(false);
+      setSuccess('Demo request deleted.');
+    } catch (err) {
+      setError(err?.message || 'Unable to delete demo request.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -162,12 +232,15 @@ export default function DemoRequestsAdmin() {
           </div>
 
           <div className="demo-request-contact-actions">
-            <a className="site-admin-btn" href={`mailto:${selected.email}?subject=${encodeURIComponent('Your JustConsignIn demo request')}`}><Mail size={14}/> Email {selected.first_name}</a>
+            <button className="site-admin-btn" type="button" onClick={() => setEmailOpen(open => !open)}><Mail size={14}/> {emailOpen ? 'Close Email' : `Email ${selected.first_name || 'Customer'}`}</button>
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call</a>}
+            <button className="site-admin-btn danger demo-request-delete" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete'}</button>
           </div>
 
+          {emailOpen && <DemoRequestEmailComposer request={selected} accessToken={accessToken} onCancel={() => setEmailOpen(false)} onSent={handleEmailSent} />}
+
           <dl className="demo-request-details">
-            <div><dt>Email</dt><dd><a href={`mailto:${selected.email}`}>{selected.email}</a></dd></div>
+            <div><dt>Email</dt><dd>{selected.email}</dd></div>
             <div><dt>Phone</dt><dd>{selected.phone || '—'}</dd></div>
             <div><dt>Submitted</dt><dd>{formatDate(selected.created_at)}</dd></div>
             <div><dt>Shopify</dt><dd>{selected.shopify_status || '—'}</dd></div>
@@ -183,6 +256,8 @@ export default function DemoRequestsAdmin() {
             <label className="wide">Admin notes<textarea rows="5" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Follow-up notes, demo details, next steps…" /></label>
             <div className="wide demo-request-save"><button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button></div>
           </div>
+
+          <DemoRequestEmailHistory emails={emails} loading={emailsLoading} />
         </>}
       </section>
     </div>}
