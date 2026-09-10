@@ -4,6 +4,7 @@ import RequireAdmin from '../auth/RequireAdmin';
 import AdminLayout from '../components/layout/AdminLayout';
 import BlogAdmin from '../features/blog/BlogAdmin';
 import Dashboard from '../features/dashboard/Dashboard';
+import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
 import SocialImageStudio from '../features/media/SocialImageStudio';
 import SocialAdmin from '../features/social-links/SocialAdmin';
@@ -16,6 +17,7 @@ export default function AdminApp() {
     <Route element={<RequireAdmin />}>
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/demo-requests" element={<DemoRequestsAdmin />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
         <Route path="/admin/videos" element={<VideosAdmin />} />

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BookOpen, Image, Link2, Video } from 'lucide-react';
+import { BookOpen, Image, Inbox, Link2, Video } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -13,6 +13,7 @@ export default function Dashboard() {
   }, [location.pathname, location.search, navigate]);
 
   const modules = [
+    { to: '/admin/demo-requests', icon: Inbox, title: 'Demo Requests', copy: 'View every free-demo lead, contact the store, schedule the walkthrough, and keep follow-up notes.' },
     { to: '/admin/blog', icon: BookOpen, title: 'Blog Posts', copy: 'View every current article first, then create or edit posts when you need to.' },
     { to: '/admin/videos', icon: Video, title: 'YouTube Videos', copy: 'Add, edit, hide, reorder, or replace website videos without changing source code.' },
     { to: '/admin/social', icon: Link2, title: 'Social Links', copy: 'Manage the social URLs used by the website footer and your admin navigation.' },
