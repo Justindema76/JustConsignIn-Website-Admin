@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BookOpen, Image, Inbox, Link2, Settings, Sparkles, Video } from 'lucide-react';
+import { BookOpen, Handshake, Image, Inbox, Link2, Settings, Sparkles, Video } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './dashboard.css';
 
@@ -9,6 +9,12 @@ const modules = [
     icon: Inbox,
     title: 'Demo Requests',
     copy: 'View every free-demo lead, contact the store, schedule the walkthrough, and keep follow-up notes.',
+  },
+  {
+    to: '/admin/beta-partners',
+    icon: Handshake,
+    title: 'Beta Partners',
+    copy: 'Create tracked partner links and manage Founding Partner applications from outreach through active testing.',
   },
   {
     to: '/admin/blog',
@@ -57,7 +63,7 @@ export default function Dashboard() {
       <div>
         <p className="site-admin-eyebrow">Overview</p>
         <h1>Dashboard</h1>
-        <p>Manage the website, leads, content, media, and social tools from one place.</p>
+        <p>Manage the website, leads, beta partners, content, media, and social tools from one place.</p>
       </div>
       <a className="site-admin-btn secondary" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">View website ↗</a>
     </div>
