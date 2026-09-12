@@ -28,8 +28,19 @@ function statusLabel(status) {
   return STATUS_OPTIONS.find(([key]) => key === status)?.[1] || status || 'New';
 }
 
-function cleanSource(value) {
+function companySource(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
+}
+
+function buildInviteLink(companyName) {
+  const company = String(companyName || '').trim();
+  if (!company) return '';
+  const params = new URLSearchParams({
+    invite: '1',
+    business: company,
+    source: companySource(company),
+  });
+  return `${PARTNER_BASE_URL}?${params.toString()}`;
 }
 
 export default function BetaApplicationsAdmin() {
@@ -45,7 +56,7 @@ export default function BetaApplicationsAdmin() {
   const [success, setSuccess] = useState('');
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
-  const [sourceInput, setSourceInput] = useState('');
+  const [inviteCompany, setInviteCompany] = useState('');
 
   const refresh = useCallback(async () => {
     if (!accessToken) return;
@@ -92,15 +103,20 @@ export default function BetaApplicationsAdmin() {
     active: applications.filter(item => item.status === 'active').length,
   }), [applications]);
 
-  const source = cleanSource(sourceInput);
-  const partnerLink = source ? `${PARTNER_BASE_URL}?source=${encodeURIComponent(source)}` : PARTNER_BASE_URL;
+  const inviteLink = buildInviteLink(inviteCompany);
 
-  async function copyLink() {
+  async function copyInviteLink(companyName = inviteCompany) {
+    const link = buildInviteLink(companyName);
+    if (!link) {
+      setError('Enter the company name first.');
+      return;
+    }
+    setError('');
     try {
-      await navigator.clipboard.writeText(partnerLink);
-      setSuccess('Partner link copied.');
+      await navigator.clipboard.writeText(link);
+      setSuccess(`Invite link copied for ${String(companyName).trim()}.`);
     } catch {
-      window.prompt('Copy this partner link:', partnerLink);
+      window.prompt('Copy this partner invite link:', link);
     }
   }
 
@@ -156,14 +172,14 @@ export default function BetaApplicationsAdmin() {
 
     <section className="site-admin-card beta-partner-link-card">
       <div>
-        <p className="site-admin-eyebrow">Tracked outreach link</p>
-        <h2>Create a partner link</h2>
-        <p>Enter a store or campaign name. If they apply through this link, the source appears on their application.</p>
+        <p className="site-admin-eyebrow">Company invite</p>
+        <h2>Generate a Partner Program link</h2>
+        <p>Type the company name exactly as you know it. The admin creates the tracking code automatically and copies a personalized invitation link for your email.</p>
       </div>
       <div className="beta-partner-link-controls">
-        <input value={sourceInput} onChange={event => setSourceInput(event.target.value)} placeholder="oakville-consignment" aria-label="Partner link source" />
-        <code>{partnerLink}</code>
-        <button className="site-admin-btn" type="button" onClick={copyLink}><Clipboard size={14}/> Copy Link</button>
+        <input value={inviteCompany} onChange={event => setInviteCompany(event.target.value)} placeholder="Company name" aria-label="Company name for partner invitation" />
+        {inviteLink && <code>{inviteLink}</code>}
+        <button className="site-admin-btn" type="button" onClick={() => copyInviteLink()}><Clipboard size={14}/> Generate & Copy Invite Link</button>
       </div>
     </section>
 
@@ -183,7 +199,7 @@ export default function BetaApplicationsAdmin() {
       </select>
     </div>
 
-    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading partner applications…</p></div> : applications.length === 0 ? <div className="site-admin-card site-admin-empty large"><Handshake size={30}/><h2>No partner applications yet</h2><p>Use the tracked link above for outreach. Submitted applications will appear here.</p></div> : <div className="demo-request-admin-grid">
+    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading partner applications…</p></div> : applications.length === 0 ? <div className="site-admin-card site-admin-empty large"><Handshake size={30}/><h2>No partner applications yet</h2><p>Generate a company invite link above and paste it into your outreach email. Submitted applications will appear here.</p></div> : <div className="demo-request-admin-grid">
       <section className="site-admin-card demo-request-list" aria-label="Partner application list">
         {filtered.length === 0 ? <div className="site-admin-empty">No applications match this filter.</div> : filtered.map(application => <button key={application.id} type="button" className={`demo-request-row${application.id === selected?.id ? ' selected' : ''}`} onClick={() => setSelectedId(application.id)}>
           <div className="demo-request-row-main">
@@ -207,6 +223,7 @@ export default function BetaApplicationsAdmin() {
 
           <div className="demo-request-contact-actions">
             <a className="site-admin-btn" href={`mailto:${selected.email}`}><Mail size={14}/> Email {selected.first_name || 'Store'}</a>
+            <button className="site-admin-btn secondary" type="button" onClick={() => copyInviteLink(selected.business_name)}><Clipboard size={14}/> Copy Invite Link</button>
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call</a>}
             {selected.business_website && <a className="site-admin-btn secondary" href={selected.business_website} target="_blank" rel="noreferrer">Website <ExternalLink size={14}/></a>}
             <button className="site-admin-btn danger demo-request-delete" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete'}</button>
