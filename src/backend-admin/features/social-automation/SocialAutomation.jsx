@@ -83,7 +83,8 @@ export default function SocialAutomation() {
 
   const stats = useMemo(() => ({
     drafts: campaigns.filter(item => item.status === 'draft' || item.status === 'ready').length,
-    scheduled: campaigns.filter(item => item.status === 'scheduled').length,
+    active: campaigns.filter(item => item.status === 'active' || (item.status === 'scheduled' && item.autoPublish)).length,
+    scheduled: campaigns.filter(item => item.status === 'scheduled' && !item.autoPublish).length,
   }), [campaigns]);
 
   const setField = (key, value) => setCampaign(current => ({ ...current, [key]: value }));
@@ -149,7 +150,7 @@ export default function SocialAutomation() {
       setMessage(result.errors?.length
         ? `Sent with warnings: ${result.errors.map(item => item.error).join(' | ')}`
         : saved.autoPublish
-          ? 'Sent to Metricool for immediate publishing.'
+          ? 'Campaign is active and has been sent for immediate publishing.'
           : 'Campaign scheduled in Metricool.');
       await refresh();
     } catch (err) {
@@ -240,7 +241,7 @@ export default function SocialAutomation() {
     <div className="social-stats">
       <div className="site-admin-card social-stat"><small>Backend Metricool</small><strong>{integration?.connected ? 'Connected' : 'Not connected'}</strong><span>{integration?.connected ? 'OAuth MCP connection active' : 'Connect once to send from this admin'}</span></div>
       <div className="site-admin-card social-stat"><small>Drafts</small><strong>{stats.drafts}</strong><span>Still editable</span></div>
-      <div className="site-admin-card social-stat"><small>Scheduled</small><strong>{stats.scheduled}</strong><span>Sent to Metricool</span></div>
+      <div className="site-admin-card social-stat"><small>Active</small><strong>{stats.active}</strong><span>{stats.scheduled ? `${stats.scheduled} scheduled for later` : 'Published / publishing now'}</span></div>
       <div className="site-admin-card social-stat"><small>Media</small><strong>{media.length}</strong><span>Supabase assets</span></div>
     </div>
 
