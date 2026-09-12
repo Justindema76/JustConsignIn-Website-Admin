@@ -8,7 +8,7 @@ import {
   refreshMetricoolOAuth,
 } from '../_lib/metricoolMcp.js';
 
-const ALLOWED_STATUS = new Set(['draft', 'ready', 'scheduled', 'published', 'failed']);
+const ALLOWED_STATUS = new Set(['draft', 'ready', 'scheduled', 'active', 'published', 'failed']);
 const ALLOWED_PLATFORMS = new Set(['instagram', 'tiktok', 'youtube', 'facebook']);
 const ALLOWED_RATIO = new Set(['1:1', '4:5', '9:16', 'original']);
 const ALLOWED_AUDIO_MODE = new Set(['none', 'uploaded', 'add-later']);
@@ -269,7 +269,7 @@ export default async function handler(req, res) {
         } catch (error) { errors.push({ network, error: error.message || String(error) }); }
       }
 
-      const status = results.length ? 'scheduled' : 'failed';
+      const status = results.length ? (campaign.auto_publish ? 'active' : 'scheduled') : 'failed';
       const update = await supabaseUserRest(user.accessToken, `social_campaigns?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH', headers: { Prefer: 'return=representation' },
         body: JSON.stringify({ status, metricool_posts: results, last_error: errors.map(e => `${e.network}: ${e.error}`).join(' | '), updated_at: new Date().toISOString() }),
