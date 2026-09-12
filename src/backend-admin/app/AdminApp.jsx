@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AdminLogin from '../auth/AdminLogin';
 import RequireAdmin from '../auth/RequireAdmin';
 import AdminLayout from '../components/layout/AdminLayout';
+import BetaApplicationsAdmin from '../features/beta-applications/BetaApplicationsAdmin';
 import BlogAdmin from '../features/blog/BlogAdmin';
 import Dashboard from '../features/dashboard/Dashboard';
 import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
@@ -19,6 +20,7 @@ export default function AdminApp() {
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/admin/demo-requests" element={<DemoRequestsAdmin />} />
+        <Route path="/admin/beta-partners" element={<BetaApplicationsAdmin />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
         <Route path="/admin/videos" element={<VideosAdmin />} />
