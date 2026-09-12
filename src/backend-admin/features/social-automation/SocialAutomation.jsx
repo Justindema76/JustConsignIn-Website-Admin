@@ -21,6 +21,8 @@ import PlatformCopyEditor from './components/PlatformCopyEditor';
 import SocialAssistant from './SocialAssistant';
 import { EMPTY_CAMPAIGN, dateTimeLocal, starterCopy, torontoIso } from './socialCampaignConfig';
 
+const IMMEDIATE_PUBLISH_BUFFER_MS = 2 * 60 * 1000;
+
 export default function SocialAutomation() {
   const { accessToken } = useAuth();
   const { id } = useParams();
@@ -54,7 +56,7 @@ export default function SocialAutomation() {
       if (editing) {
         const found = nextCampaigns.find(item => item.id === id);
         if (found) setCampaign(found);
-        else if (id === 'new') setCampaign({ ...EMPTY_CAMPAIGN, scheduledAt: new Date(Date.now() + 86400000).toISOString() });
+        else if (id === 'new') setCampaign({ ...EMPTY_CAMPAIGN });
         else setError('Campaign not found');
       }
     } catch (err) {
@@ -92,7 +94,6 @@ export default function SocialAutomation() {
       const saved = await saveSocialCampaign(accessToken, {
         ...campaign,
         status,
-        scheduledAt: campaign.scheduledAt || new Date(Date.now() + 86400000).toISOString(),
       });
       setCampaign(saved);
       setMessage('Campaign saved.');
@@ -112,12 +113,29 @@ export default function SocialAutomation() {
       setError('Choose at least one social network to publish to.');
       return;
     }
+
+    let publishAt = '';
+    if (campaign.autoPublish) {
+      publishAt = new Date(Date.now() + IMMEDIATE_PUBLISH_BUFFER_MS).toISOString();
+    } else {
+      const scheduled = campaign.scheduledAt ? new Date(campaign.scheduledAt) : null;
+      if (!scheduled || Number.isNaN(scheduled.getTime())) {
+        setError('Choose a schedule date and time, or turn on Publish right away.');
+        return;
+      }
+      if (scheduled.getTime() <= Date.now() + 60000) {
+        setError('Choose a schedule time at least a few minutes in the future.');
+        return;
+      }
+      publishAt = campaign.scheduledAt;
+    }
+
     setBusy(true); setError(''); setMessage('');
     try {
       let prepared = {
         ...campaign,
         status: 'ready',
-        scheduledAt: campaign.scheduledAt || new Date(Date.now() + 86400000).toISOString(),
+        scheduledAt: publishAt,
       };
       if (prepared.platforms.includes('tiktok') && prepared.mediaType === 'image' && prepared.mediaUrl) {
         setMessage('Preparing a TikTok-compatible JPEG…');
@@ -130,7 +148,9 @@ export default function SocialAutomation() {
       setCampaign(result.campaign);
       setMessage(result.errors?.length
         ? `Sent with warnings: ${result.errors.map(item => item.error).join(' | ')}`
-        : 'Campaign sent to Metricool.');
+        : saved.autoPublish
+          ? 'Sent to Metricool for immediate publishing.'
+          : 'Campaign scheduled in Metricool.');
       await refresh();
     } catch (err) {
       setError(err.message);
@@ -286,8 +306,8 @@ export default function SocialAutomation() {
         />
 
         <div className="social-schedule-grid">
-          <label className="social-field"><span>Toronto date & time</span><input type="datetime-local" value={dateTimeLocal(campaign.scheduledAt)} onChange={e => setField('scheduledAt', torontoIso(e.target.value))}/></label>
-          <label className="social-checkbox"><input type="checkbox" checked={campaign.autoPublish} onChange={e => setField('autoPublish', e.target.checked)}/><span><strong>Auto publish</strong><small>Off = send to Metricool as a draft for review.</small></span></label>
+          <label className="social-checkbox"><input type="checkbox" checked={campaign.autoPublish} onChange={e => setField('autoPublish', e.target.checked)}/><span><strong>Publish right away</strong><small>On = publish as soon as Metricool accepts the post. Turn it off only when you want to schedule it.</small></span></label>
+          {!campaign.autoPublish && <label className="social-field"><span>Schedule date & time (Toronto)</span><input type="datetime-local" value={dateTimeLocal(campaign.scheduledAt)} onChange={e => setField('scheduledAt', torontoIso(e.target.value))}/></label>}
         </div>
         <div className="social-editor-actions">
           <button className="site-admin-btn secondary" type="button" onClick={() => save()} disabled={busy}>{busy ? <Loader2 className="spin" size={14}/> : null} Save Draft</button>
