@@ -17,7 +17,7 @@ export const EMPTY_CAMPAIGN = {
   audioMode: 'none',
   aiImagePrompt: '',
   scheduledAt: '',
-  autoPublish: false,
+  autoPublish: true,
   metricoolPosts: [],
   lastError: '',
   createdAt: '',
