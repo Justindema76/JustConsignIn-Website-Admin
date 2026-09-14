@@ -11,7 +11,12 @@ const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
-const ALLOWED_VIDEO_TYPES = new Set(['video/mp4']);
+const ALLOWED_VIDEO_TYPES = new Set(['video/mp4', 'video/quicktime', 'video/x-m4v', 'video/m4v']);
+const VIDEO_TYPE_BY_EXTENSION = {
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  m4v: 'video/x-m4v',
+};
 
 const parseResponse = response => parseJsonResponse(response, 'Website admin request failed');
 
@@ -85,6 +90,24 @@ async function imageToJpegFile(source, filename = 'social-image.jpg') {
   return new File([jpeg], filename.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
 }
 
+function normalizeVideoUpload(file) {
+  if (!file) throw new Error('Choose a video first.');
+  const type = String(file.type || '').toLowerCase();
+  if (ALLOWED_VIDEO_TYPES.has(type)) return file;
+
+  const match = String(file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/);
+  const extension = match?.[1] || '';
+  const inferredType = VIDEO_TYPE_BY_EXTENSION[extension];
+  if (inferredType && (!type || type === 'application/octet-stream')) {
+    return new File([file], file.name || `social-video.${extension}`, {
+      type: inferredType,
+      lastModified: file.lastModified || Date.now(),
+    });
+  }
+
+  throw new Error('Use an MP4, MOV, or M4V video.');
+}
+
 export async function loadAdminVideos(accessToken) {
   const payload = await parseResponse(await adminFetch('/api/admin/site?resource=videos', {}, accessToken));
   return Array.isArray(payload.videos) ? payload.videos.map(normalizeVideo) : [];
@@ -156,10 +179,11 @@ export async function uploadSocialAudio(accessToken, file) {
 }
 
 export async function uploadSocialVideo(accessToken, file) {
-  return uploadPublicAsset(accessToken, file, {
+  const prepared = normalizeVideoUpload(file);
+  return uploadPublicAsset(accessToken, prepared, {
     bucket: SOCIAL_VIDEO_BUCKET,
     allowedTypes: ALLOWED_VIDEO_TYPES,
     maxBytes: MAX_VIDEO_BYTES,
-    invalidTypeMessage: 'Use an MP4 video.',
+    invalidTypeMessage: 'Use an MP4, MOV, or M4V video.',
   });
 }
