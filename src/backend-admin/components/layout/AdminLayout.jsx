@@ -10,6 +10,7 @@ import {
   Link2,
   LogOut,
   Menu,
+  MapPinned,
   Settings,
   Sparkles,
   Video,
@@ -27,6 +28,7 @@ const navGroups = [
     items: [
       { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox },
       { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake },
+      { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned },
     ],
   },
   {
