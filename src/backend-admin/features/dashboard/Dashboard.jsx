@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BookOpen, Handshake, Image, Inbox, Link2, Settings, Sparkles, Video } from 'lucide-react';
+import { BookOpen, Handshake, Image, Inbox, Link2, MapPinned, Settings, Sparkles, Video } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './dashboard.css';
 
@@ -20,6 +20,12 @@ const groups = [
         icon: Handshake,
         title: 'Beta Partners',
         copy: 'Manage Founding Partner applications, tracked links, outreach, and active testing.',
+      },
+      {
+        to: '/admin/outreach',
+        icon: MapPinned,
+        title: 'Outreach Map',
+        copy: 'Work through Facebook groups and consignment-shop leads while tracking every contact.',
       },
     ],
   },
