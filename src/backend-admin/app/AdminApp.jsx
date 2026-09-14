@@ -7,6 +7,7 @@ import BlogAdmin from '../features/blog/BlogAdmin';
 import Dashboard from '../features/dashboard/Dashboard';
 import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
+import OutreachMap from '../features/outreach/OutreachMap';
 import SocialImageStudio from '../features/media/SocialImageStudio';
 import SettingsAdmin from '../features/settings/SettingsAdmin';
 import SocialAdmin from '../features/social-links/SocialAdmin';
@@ -21,6 +22,7 @@ export default function AdminApp() {
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/admin/demo-requests" element={<DemoRequestsAdmin />} />
         <Route path="/admin/beta-partners" element={<BetaApplicationsAdmin />} />
+        <Route path="/admin/outreach" element={<OutreachMap />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
         <Route path="/admin/videos" element={<VideosAdmin />} />
