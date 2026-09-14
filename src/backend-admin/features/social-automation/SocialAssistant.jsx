@@ -128,7 +128,7 @@ export default function SocialAssistant({ accessToken, campaign, setCampaign, se
           <span className={selectedNetworks.length ? 'ready' : ''}>{selectedNetworks.length ? `✓ Push to: ${selectedNetworks.join(', ')}` : 'Choose social networks above'}</span>
         </div>
         <div className="site-admin-actions" style={{ marginBottom: 12 }}>
-          <label className="site-admin-btn secondary upload-button"><Video size={14}/> {videoBusy ? 'Uploading video…' : 'Upload Video'}<input type="file" accept="video/mp4,.mp4" onChange={uploadVideo} disabled={videoBusy}/></label>
+          <label className="site-admin-btn secondary upload-button"><Video size={14}/> {videoBusy ? 'Uploading video…' : 'Upload Video'}<input type="file" accept="video/*,.mp4,.mov,.m4v" onChange={uploadVideo} disabled={videoBusy}/></label>
         </div>
         {campaign.platforms?.includes('youtube') && <div className="social-reel-duration" style={{ marginBottom: 14 }}>
           <strong>YouTube type</strong>
