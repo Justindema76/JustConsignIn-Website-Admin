@@ -19,6 +19,11 @@ const groups = [
 ];
 
 const shops = [
+  { id: 's10', category: 'Nearby — contact first', name: 'The Reloved Boutique', url: 'https://therelovedboutique.com/', links: [{ label: 'Website', url: 'https://therelovedboutique.com/' }, { label: 'Facebook', url: 'https://www.facebook.com/the.reloved.boutique/' }], badge: 'Shopify lead', figures: ['Hamilton, ON', '226 James St N'], why: 'The strongest local fit: a high-volume women’s consignment shop with scheduled intake, consignor accounts, store credit, and payout requests. Its online shop is planned for fall 2026.' },
+  { id: 's11', category: 'Nearby — contact first', name: '7th Heaven Fashion Exchange', url: 'https://www.7thheavenfashionexchange.com/', links: [{ label: 'Website', url: 'https://www.7thheavenfashionexchange.com/' }], badge: 'Local', figures: ['Dundas, ON', '5 King St E'], why: 'A long-running independent consignment shop close to Hamilton. Lead with the local-founder connection and ask about its current intake and payout workflow.' },
+  { id: 's12', category: 'Nearby — contact first', name: 'Treasures and Trends', url: 'https://treasuresandtrends.ca/', links: [{ label: 'Website', url: 'https://treasuresandtrends.ca/' }], badge: 'Local', figures: ['Burlington, ON', '3300 Fairview St'], why: 'A local community consignment store handling apparel, accessories, décor, and small furniture—useful for testing a mixed-inventory workflow.' },
+  { id: 's13', category: 'Nearby — contact first', name: "Zoey's Consignment", url: 'https://zoeys.ca/', links: [{ label: 'Website', url: 'https://zoeys.ca/' }], badge: 'Shopify verified', figures: ['Burlington, ON', 'Furniture & décor'], why: 'A confirmed Shopify storefront and an especially strong integration prospect for higher-value furniture inventory.' },
+  { id: 's14', category: 'Ontario Shopify prospects', name: 'Doorstep Consignment', url: 'https://doorstepconsignment.com/', links: [{ label: 'Website', url: 'https://doorstepconsignment.com/' }, { label: 'Facebook group', url: 'https://www.facebook.com/groups/308289843386397/' }], badge: 'Shopify verified', figures: ['Mitchell, ON', '140+ consignors'], why: 'A confirmed Shopify consignment store that started as a Facebook group. Its online inventory, store-credit workflow, and 140+ consignors make this a high-priority product-fit lead.' },
   { id: 's1', name: 'Forget Me Not Consignment Boutique', url: 'https://www.facebook.com/forgetmenotinkw', badge: 'Kids/Baby', figures: ['Brantford, ON', '4.2K followers'], why: "An established children's consignment business where high consignor volume makes intake and payout tracking especially valuable." },
   { id: 's2', name: 'Sweet Bee Consignment Shop', url: 'https://www.facebook.com/profile.php?id=61561133031227', badge: 'Kids/Baby', figures: ['Arnprior, ON'], why: 'A newer small shop that may still be choosing its systems, making the timing stronger than with a business locked into older software.' },
   { id: 's3', name: 'Once Upon A Child – Toronto East York', url: 'https://www.facebook.com/OnceUponAChildTorontoEastYork', badge: 'Franchise', figures: ['East York, ON'], why: 'A major resale franchise location. Approach as workflow research first because franchise technology decisions may be centralized.' },
@@ -49,6 +54,7 @@ function loadProgress() {
 }
 
 function LeadCard({ lead, checked, onToggle, action }) {
+  const links = lead.links || [{ label: 'Facebook', url: lead.url }];
   return <article className={`outreach-card ${checked ? 'complete' : ''}`}>
     <div className="outreach-card-top">
       <h3><a href={lead.url} target="_blank" rel="noreferrer">{lead.name}</a></h3>
@@ -57,7 +63,7 @@ function LeadCard({ lead, checked, onToggle, action }) {
     <div className="outreach-figures">{lead.figures.map(figure => <span key={figure}>{figure}</span>)}</div>
     <p>{lead.why}</p>
     <div className="outreach-card-actions">
-      <a href={lead.url} target="_blank" rel="noreferrer">Open on Facebook <ExternalLink size={14}/></a>
+      <div className="outreach-card-links">{links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} <ExternalLink size={14}/></a>)}</div>
       <label><input type="checkbox" checked={checked} onChange={() => onToggle(lead.id)}/>{action}</label>
     </div>
   </article>;
@@ -67,6 +73,7 @@ export default function OutreachMap() {
   const [progress, setProgress] = useState(loadProgress);
   const [copied, setCopied] = useState(null);
   const categories = useMemo(() => [...new Set(groups.map(group => group.category))], []);
+  const shopCategories = useMemo(() => [...new Set(shops.map(shop => shop.category || 'Ontario follow-up leads'))], []);
   const groupCount = groups.filter(group => progress[group.id]).length;
   const shopCount = shops.filter(shop => progress[shop.id]).length;
 
@@ -99,10 +106,10 @@ export default function OutreachMap() {
     </div>
 
     <div className="outreach-stats">
-      <div><strong>11</strong><span>Groups mapped</span></div>
+      <div><strong>{groups.length}</strong><span>Groups mapped</span></div>
       <div><strong>~236K</strong><span>Combined reach</span></div>
-      <div><strong>9</strong><span>Shop leads</span></div>
-      <div><strong>{groupCount + shopCount}/20</strong><span>Actions completed</span></div>
+      <div><strong>{shops.length}</strong><span>Shop leads</span></div>
+      <div><strong>{groupCount + shopCount}/{groups.length + shops.length}</strong><span>Actions completed</span></div>
     </div>
 
     <section className="outreach-section">
@@ -115,7 +122,10 @@ export default function OutreachMap() {
 
     <section className="outreach-section">
       <div className="outreach-section-head"><div><h2>Shops to contact directly</h2><p>Research the shop first, personalize the message, and approach them as potential beta partners—not as names on a mass-DM list.</p></div><span>{shopCount} / {shops.length} contacted</span></div>
-      <div className="outreach-grid">{shops.map(shop => <LeadCard key={shop.id} lead={shop} checked={Boolean(progress[shop.id])} onToggle={toggle} action="Contacted"/>)}</div>
+      {shopCategories.map(category => <div className="outreach-category" key={category}>
+        <h3>{category}</h3>
+        <div className="outreach-grid">{shops.filter(shop => (shop.category || 'Ontario follow-up leads') === category).map(shop => <LeadCard key={shop.id} lead={shop} checked={Boolean(progress[shop.id])} onToggle={toggle} action="Contacted"/>)}</div>
+      </div>)}
     </section>
 
     <section className="outreach-section">
