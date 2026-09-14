@@ -14,7 +14,7 @@ export default function CampaignMediaEditor({ campaign, busy, onChooseMedia, onU
           <label className="site-admin-btn secondary small upload-button"><Upload size={13}/> Upload Image<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={onUploadImage} disabled={busy}/></label>
         </div>
         <div className="social-ratios">{RATIOS.map(ratio => <button key={ratio} type="button" className={campaign.aspectRatio === ratio ? 'selected' : ''} onClick={() => onRatioChange(ratio)}>{ratio}</button>)}</div>
-        <small>{campaign.mediaType === 'video' ? 'MP4 video selected.' : 'Images are stored in the shared Supabase media library. PNG/GIF files are converted to JPEG when TikTok requires it.'}</small>
+        <small>{campaign.mediaType === 'video' ? 'Video selected.' : 'Images are stored in the shared Supabase media library. PNG/GIF files are converted to JPEG when TikTok requires it.'}</small>
       </div>
     </div>
   </div>;
