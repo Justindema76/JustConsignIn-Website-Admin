@@ -21,7 +21,7 @@ end $$;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values
-  ('social-videos', 'social-videos', true, 52428800, array['video/mp4']::text[]),
+  ('social-videos', 'social-videos', true, 52428800, array['video/mp4','video/quicktime','video/x-m4v','video/m4v']::text[]),
   ('social-audio', 'social-audio', true, 20971520, array['audio/mpeg','audio/mp4','audio/x-m4a','audio/wav','audio/x-wav','audio/aac','audio/ogg']::text[])
 on conflict (id) do update set
   public = excluded.public,
