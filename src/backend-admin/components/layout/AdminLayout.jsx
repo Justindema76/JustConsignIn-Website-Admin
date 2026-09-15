@@ -7,6 +7,7 @@ import {
   Home,
   Image,
   Inbox,
+  LayoutTemplate,
   Link2,
   LogOut,
   Menu,
@@ -36,6 +37,7 @@ const navGroups = [
     label: 'Content Management',
     items: [
       { to: '/admin/blog', label: 'Blog Posts', icon: BookOpen },
+      { to: '/admin/content-builder', label: 'Content Builder', icon: LayoutTemplate },
       { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
       { to: '/admin/media', label: 'Media', icon: Image },
     ],
