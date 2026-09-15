@@ -95,6 +95,57 @@
   color: #364152;
 }
 
+.demo-request-admin-edit {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e9ef;
+  display: grid;
+  grid-template-columns: minmax(180px, .35fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.demo-request-admin-edit label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #5f656b;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.demo-request-admin-edit select,
+.demo-request-admin-edit textarea {
+  width: 100%;
+  border: 1px solid #d7dce1;
+  border-radius: 8px;
+  background: #fff;
+  color: #202223;
+  padding: 10px 11px;
+  font: inherit;
+}
+
+.demo-request-admin-edit select {
+  min-height: 42px;
+}
+
+.demo-request-admin-edit textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.demo-request-admin-edit select:focus,
+.demo-request-admin-edit textarea:focus {
+  outline: 3px solid #eaf2fb;
+  border-color: #1f67b2;
+}
+
+.demo-request-admin-edit .site-admin-btn {
+  min-height: 42px;
+  align-self: end;
+}
+
 .beta-application-timeline {
   display: flex;
   flex-wrap: wrap;
@@ -141,6 +192,15 @@
   .beta-partner-link-controls {
     grid-template-columns: 1fr;
   }
+
+  .demo-request-admin-edit {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .demo-request-admin-edit .site-admin-btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 720px) {
@@ -152,5 +212,10 @@
 
   .beta-application-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .demo-request-admin-edit select,
+  .demo-request-admin-edit textarea {
+    font-size: 16px;
   }
 }
