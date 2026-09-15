@@ -4,6 +4,7 @@ import RequireAdmin from '../auth/RequireAdmin';
 import AdminLayout from '../components/layout/AdminLayout';
 import BetaApplicationsAdmin from '../features/beta-applications/BetaApplicationsAdmin';
 import BlogAdmin from '../features/blog/BlogAdmin';
+import ContentBuilder from '../features/content-builder/ContentBuilder';
 import Dashboard from '../features/dashboard/Dashboard';
 import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
@@ -25,6 +26,7 @@ export default function AdminApp() {
         <Route path="/admin/outreach" element={<OutreachMap />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
+        <Route path="/admin/content-builder" element={<ContentBuilder />} />
         <Route path="/admin/videos" element={<VideosAdmin />} />
         <Route path="/admin/videos/:id" element={<VideosAdmin />} />
         <Route path="/admin/social" element={<SocialAdmin />} />
