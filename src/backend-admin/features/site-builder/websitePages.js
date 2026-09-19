@@ -1,0 +1,111 @@
+export const WEBSITE_PAGES = [
+  {
+    id: 'home',
+    title: 'Home',
+    path: '/',
+    source: 'src/website/pages/Home/Home.jsx',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Homepage with Shopify positioning, workflow highlights, videos and site links.',
+  },
+  {
+    id: 'features',
+    title: 'Features',
+    path: '/features',
+    source: 'src/website/pages/Features/Features.jsx',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Feature overview and store-type sections.',
+  },
+  {
+    id: 'how-it-works',
+    title: 'How It Works',
+    path: '/how-it-works',
+    source: 'src/website/pages/HowItWorks/HowItWorks.jsx',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Six-step intake-to-payout workflow and problem/solution content.',
+  },
+  {
+    id: 'pricing',
+    title: 'Pricing',
+    path: '/pricing',
+    source: 'src/website/pages/Pricing/Pricing.jsx',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Trial, plan details and pricing feature lists.',
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    path: '/faq',
+    source: 'src/website/pages/FAQ/FAQ.jsx',
+    kind: 'structured',
+    editor: 'custom',
+    description: 'FAQ groups plus FAQPage structured data.',
+  },
+  {
+    id: 'blog',
+    title: 'Blog',
+    path: '/blog',
+    source: 'src/website/pages/Blog/Blog.jsx',
+    kind: 'content',
+    editor: 'blog',
+    description: 'Blog index. Individual posts continue to be managed under Blog Posts.',
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    path: '/contact',
+    source: 'src/website/pages/Contact/Contact.jsx',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Support contact information and help instructions.',
+  },
+  {
+    id: 'partner-program',
+    title: 'Founding Partner Program',
+    path: '/partner-program',
+    aliases: ['/beta'],
+    source: 'src/website/pages/Beta/Beta.jsx',
+    kind: 'form',
+    editor: 'custom',
+    description: 'Founding Partner / beta landing page and application form.',
+  },
+  {
+    id: 'privacy',
+    title: 'Privacy Policy',
+    path: '/privacy',
+    source: 'src/website/pages/Legal/Privacy.jsx',
+    kind: 'legal',
+    editor: 'visual',
+    description: 'Public privacy policy.',
+  },
+  {
+    id: 'terms',
+    title: 'Terms of Service',
+    path: '/terms',
+    source: 'src/website/pages/Legal/Terms.jsx',
+    kind: 'legal',
+    editor: 'visual',
+    description: 'Public terms of service.',
+  },
+  {
+    id: 'shopify-app',
+    title: 'Shopify App Demo',
+    path: '/shopify-app',
+    aliases: ['/demo → /shopify-app'],
+    source: 'src/website/demo-app/ShopifyAppPreview.jsx',
+    kind: 'application',
+    editor: 'custom',
+    description: 'Interactive Shopify app demo. This is application UI rather than a normal marketing page.',
+  },
+];
+
+export function getWebsitePage(id) {
+  return WEBSITE_PAGES.find(page => page.id === id) || null;
+}
+
+export function livePageUrl(path) {
+  return `https://www.justconsignin.com${path === '/' ? '' : path}`;
+}
