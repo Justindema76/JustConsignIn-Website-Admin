@@ -1,3 +1,4 @@
+// JustConsignIn visual website editor prototype.
 import { useMemo, useState } from 'react';
 import { Puck } from '@puckeditor/core';
 import '@puckeditor/core/puck.css';
