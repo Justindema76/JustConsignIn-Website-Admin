@@ -1,4 +1,4 @@
-import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseRest, supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const MEDIA_BUCKETS = [
@@ -11,6 +11,96 @@ function youtubeId(value = '') {
   const raw = String(value || '').trim();
   if (!raw) return '';
   try {
+    if (req.method === 'GET' && resource === 'page') {
+      const pageId = String(req.query?.pageId || '').trim();
+      if (!pageId) return res.status(400).json({ error: 'Missing page id' });
+
+      const [draftResponse, publishedResponse] = await Promise.all([
+        supabaseRest(`site_page_drafts?page_id=eq.${encodeURIComponent(pageId)}&select=page_id,path,title,content,updated_at&limit=1`, { method: 'GET' }),
+        supabaseRest(`site_pages?page_id=eq.${encodeURIComponent(pageId)}&select=page_id,path,title,content,published_at,updated_at&limit=1`, { method: 'GET' }),
+      ]);
+
+      const draftData = await draftResponse.json();
+      const publishedData = await publishedResponse.json();
+      if (!draftResponse.ok) throw new Error(draftData?.message || 'Unable to load page draft');
+      if (!publishedResponse.ok) throw new Error(publishedData?.message || 'Unable to load published page');
+
+      return res.status(200).json({
+        draft: Array.isArray(draftData) ? (draftData[0] || null) : null,
+        published: Array.isArray(publishedData) ? (publishedData[0] || null) : null,
+      });
+    }
+
+    if (req.method === 'POST' && resource === 'page') {
+      const pageId = String(req.body?.pageId || '').trim();
+      const path = String(req.body?.path || '/').trim() || '/';
+      const title = String(req.body?.title || '').trim();
+      const action = req.body?.action === 'publish' ? 'publish' : 'draft';
+      const pageContent = req.body?.content;
+
+      if (!pageId) return res.status(400).json({ error: 'Missing page id' });
+      if (!title) return res.status(400).json({ error: 'Missing page title' });
+      if (!pageContent || typeof pageContent !== 'object' || !Array.isArray(pageContent.content)) {
+        return res.status(400).json({ error: 'Invalid page content' });
+      }
+
+      const now = new Date().toISOString();
+      const draftResponse = await supabaseRest('site_page_drafts?on_conflict=page_id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify({
+          page_id: pageId,
+          path,
+          title,
+          content: pageContent,
+          updated_at: now,
+        }),
+      });
+      const draftData = await draftResponse.json();
+      if (!draftResponse.ok) throw new Error(draftData?.message || 'Unable to save page draft');
+
+      let published = null;
+      if (action === 'publish') {
+        const publishedResponse = await supabaseRest('site_pages?on_conflict=page_id', {
+          method: 'POST',
+          headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify({
+            page_id: pageId,
+            path,
+            title,
+            content: pageContent,
+            published_at: now,
+            updated_at: now,
+          }),
+        });
+        const publishedData = await publishedResponse.json();
+        if (!publishedResponse.ok) throw new Error(publishedData?.message || 'Unable to publish page');
+        published = Array.isArray(publishedData) ? (publishedData[0] || null) : publishedData;
+
+        const versionResponse = await supabaseRest('site_page_versions', {
+          method: 'POST',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            page_id: pageId,
+            path,
+            title,
+            content: pageContent,
+            published_at: now,
+          }),
+        });
+        // Version history is secondary to the publish itself. Do not report a failed
+        // publish if the live page was already saved successfully.
+        if (!versionResponse.ok) {
+          await versionResponse.json().catch(() => ({}));
+        }
+      }
+
+      return res.status(200).json({
+        draft: Array.isArray(draftData) ? (draftData[0] || null) : draftData,
+        published,
+      });
+    }
+
     const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
     if (url.hostname.includes('youtu.be')) return url.pathname.split('/').filter(Boolean)[0] || '';
     const v = url.searchParams.get('v');
