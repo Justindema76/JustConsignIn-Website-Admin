@@ -250,3 +250,26 @@
     font-size: 16px;
   }
 }
+
+
+.jci-builder-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.jci-builder-breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.jci-builder-breadcrumb strong {
+  color: #0f172a;
+}
