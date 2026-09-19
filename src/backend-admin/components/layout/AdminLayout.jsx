@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   MapPinned,
+  PanelsTopLeft,
   Settings,
   Sparkles,
   Video,
@@ -38,6 +39,7 @@ const navGroups = [
       { to: '/admin/blog', label: 'Blog Posts', icon: BookOpen },
       { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
       { to: '/admin/media', label: 'Media', icon: Image },
+      { to: '/admin/site-builder', label: 'Website Editor', icon: PanelsTopLeft },
     ],
   },
   {
