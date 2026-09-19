@@ -88,9 +88,10 @@ function youtubeId(value = '') {
             published_at: now,
           }),
         });
+        // Version history is secondary to the publish itself. Do not report a failed
+        // publish if the live page was already saved successfully.
         if (!versionResponse.ok) {
-          const versionData = await versionResponse.json().catch(() => ({}));
-          throw new Error(versionData?.message || 'Page published but version history could not be saved');
+          await versionResponse.json().catch(() => ({}));
         }
       }
 
