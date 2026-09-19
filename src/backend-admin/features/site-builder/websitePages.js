@@ -109,3 +109,202 @@ export function getWebsitePage(id) {
 export function livePageUrl(path) {
   return `https://www.justconsignin.com${path === '/' ? '' : path}`;
 }
+
+
+const block = (type, id, props) => ({ type, props: { id, ...props } });
+const heading = (id, text, level = 'h2') => block('HeadingBlock', id, { text, level, align: 'left' });
+const text = (id, value) => block('TextBlock', id, { text: value, align: 'left' });
+const hero = (id, eyebrow, headingText, body) => block('HeroBlock', id, {
+  eyebrow,
+  heading: headingText,
+  text: body,
+  image: '',
+  imageAlt: '',
+  buttonText: '',
+  buttonUrl: '',
+  background: 'light',
+});
+const cta = (id, headingText, body, buttonText, buttonUrl) => block('CtaBlock', id, {
+  heading: headingText,
+  text: body,
+  buttonText,
+  buttonUrl,
+  background: 'dark',
+});
+
+const PAGE_EDITOR_DATA = {
+  home: {
+    content: [
+      hero(
+        'home-hero',
+        'JustConsignIn for Shopify',
+        'Create consignment products from your phone and sell them through Shopify.',
+        'JustConsignIn connects consignors, inventory, Shopify products, POS sales and payouts in one workflow — without spreadsheets or duplicate entry.'
+      ),
+      heading('home-shopify-heading', 'Intake, product creation and POS in one consignment workflow.'),
+      text('home-shopify-intro', 'Use JustConsignIn to manage the consignment details Shopify does not track on its own, while keeping the product and sale inside your Shopify workflow.'),
+      heading('home-phone-title', 'Create Shopify products from your phone', 'h3'),
+      text('home-phone-copy', 'Enter the consignor and item once, add the product details and photo, then create the Shopify product directly from intake.'),
+      heading('home-pos-title', 'Sell consignment items at the point of sale', 'h3'),
+      text('home-pos-copy', 'Publish items to Shopify POS and keep the consignment item tied back to the correct consignor when it sells.'),
+      heading('home-payout-title', 'Know exactly what each consignor is owed', 'h3'),
+      text('home-payout-copy', 'Track sold-unpaid items, commission splits, payouts and transaction history without maintaining a second spreadsheet.'),
+      heading('home-video-heading', 'See JustConsignIn in action.'),
+      text('home-video-copy', 'The live homepage currently loads the homepage YouTube gallery from the existing video content system.'),
+      heading('home-links-heading', 'Explore JustConsignIn'),
+      text('home-links-copy', 'Shopify features · How it works · Open the Shopify app demo'),
+    ],
+    root: { props: {} },
+  },
+
+  features: {
+    content: [
+      hero(
+        'features-hero',
+        'Features',
+        'Move consignment inventory from intake to sale faster.',
+        'JustConsignIn is built for Shopify store owners who process lots of unique consignment and resale inventory. Enter items quickly, create Shopify products without duplicate entry, track every sale back to the correct consignor and keep payouts organized in one workflow.'
+      ),
+      heading('features-workflow-title', 'When every item is different, intake speed matters.'),
+      text('features-workflow-copy', 'Traditional retail receives repeatable SKUs from suppliers. Consignment and resale stores often receive one-of-a-kind items in batches. JustConsignIn focuses on making that store-owner workflow faster and easier to manage from the moment inventory comes in.'),
+      heading('features-1-title', 'Built for high-volume resale inventory', 'h3'),
+      text('features-1-copy', 'JustConsignIn is designed for consignment and resale stores that receive lots of unique items. Move quickly from an item in hand to a complete consignment record without relying on paper notes or spreadsheets.'),
+      heading('features-2-title', 'Consignor accounts', 'h3'),
+      text('features-2-copy', 'Keep contact details, commission split, notes, balances and every item connected to the correct consignor.'),
+      heading('features-3-title', 'Fast mobile item intake', 'h3'),
+      text('features-3-copy', 'Create consignors and add items from your phone while you are receiving inventory. Enter the item once, add product details and photos, and keep the intake process moving.'),
+      heading('features-4-title', 'Create Shopify products without duplicate entry', 'h3'),
+      text('features-4-copy', 'Turn a consignment item into a Shopify product without typing the same information into a second system. Publish to Shopify POS and choose whether the item should also be available online.'),
+      heading('features-5-title', 'Shopify POS, online and manual sales tracking', 'h3'),
+      text('features-5-copy', 'Keep each consignment item tied to the correct consignor whether it sells in-store through Shopify POS, through your Shopify online store, or through a manual sale workflow.'),
+      heading('features-6-title', 'Payout management', 'h3'),
+      text('features-6-copy', 'See sold-unpaid items, calculate the consignor share and record payouts while preserving the full sale and payout history.'),
+      heading('features-7-title', 'Reports and transactions', 'h3'),
+      text('features-7-copy', 'Review sales, consignor earnings, payout history and transaction activity from the same workspace so you always know what sold and what is still owed.'),
+      heading('features-8-title', 'Import and export for larger inventories', 'h3'),
+      text('features-8-copy', 'Bulk import consignors and items from CSV and keep downloadable data tools available when you are moving existing inventory into JustConsignIn or maintaining your own records.'),
+      heading('features-store-types-title', 'Shopify stores with a lot of unique resale inventory to enter and track.'),
+      text('features-store-types-copy', 'The common problem is volume: many individual items, many consignors and a constant need to know who owns what, what sold and what each person is owed.'),
+      cta('features-cta', 'Spend less time entering inventory and more time selling it.', 'Explore consignors, fast mobile intake, Shopify product creation, POS and online sales tracking, and payouts in the working app demo.', 'Open Shopify App Demo', '/shopify-app'),
+    ],
+    root: { props: {} },
+  },
+
+  'how-it-works': {
+    content: [
+      hero(
+        'how-hero',
+        'How it works',
+        'From consignment intake to Shopify sale to payout.',
+        'Enter the consignor and item once. JustConsignIn carries that information through Shopify product creation, selling and the final consignor payout.'
+      ),
+      heading('how-01-title', '01 · Create the consignor'),
+      text('how-01-copy', 'Add the consignor number, contact information, commission split and notes so every item stays tied to the right person.'),
+      heading('how-02-title', '02 · Add the item from your phone'),
+      text('how-02-copy', 'Enter the item details, asking price, condition and photo while you are receiving the inventory.'),
+      heading('how-03-title', '03 · Create the Shopify product'),
+      text('how-03-copy', 'Use the same intake record to create the Shopify product and publish it to Shopify POS, with optional online publishing when needed.'),
+      heading('how-04-title', '04 · Sell through Shopify'),
+      text('how-04-copy', 'Sell the product through Shopify POS or your connected sales workflow while JustConsignIn keeps the consignment record attached to the consignor.'),
+      heading('how-05-title', '05 · Review what is owed'),
+      text('how-05-copy', 'Sold-unpaid items appear in the payout workflow with the sale price, commission split and consignor share already connected.'),
+      heading('how-06-title', '06 · Pay the consignor and keep the history'),
+      text('how-06-copy', 'Record the payout method, date and included items. Sales, payouts and transaction history remain available for reporting.'),
+      heading('how-problem-1', 'How to avoid duplicate entry when adding consignment products to Shopify'),
+      text('how-problem-1-copy', 'Enter the item during intake, then use that same JustConsignIn record to create the Shopify product. The product details do not need to be maintained once in a spreadsheet and typed again later in Shopify.'),
+      heading('how-problem-2', 'Streamlining consignment intake from your phone'),
+      text('how-problem-2-copy', 'Add the consignor, item details and photos while inventory is being received. Mobile intake is designed to move the item directly into the Shopify product workflow without waiting for a separate desktop data-entry step.'),
+      heading('how-problem-3', 'How to keep Shopify POS sales connected to consignor payouts'),
+      text('how-problem-3-copy', 'Each item remains tied to its consignor. When the item sells through the connected Shopify workflow, the sale, commission split and amount owed can move into the sold-unpaid and payout workflow together.'),
+      heading('how-problem-4', 'Managing one-of-a-kind consignment inventory without separate spreadsheets'),
+      text('how-problem-4-copy', 'JustConsignIn keeps the item record, Shopify connection, sale status and payout history together so stores can follow individual consignment pieces without maintaining separate intake, sales and payout files.'),
+      cta('how-cta', 'Run intake from the counter, floor or your phone.', 'The goal is simple: fewer spreadsheets, less duplicate entry and a clear connection between the Shopify product and the person who consigned it.', 'Open Shopify App Demo', '/shopify-app'),
+    ],
+    root: { props: {} },
+  },
+
+  pricing: {
+    content: [
+      hero(
+        'pricing-hero',
+        'Pricing',
+        'JustConsignIn for Shopify includes a 14-day free trial.',
+        'JustConsignIn brings consignors, Shopify product creation, POS sales and payouts into one workflow. Account onboarding is being finalized; the app demo is available now.'
+      ),
+      heading('pricing-plan-title', 'JustConsignIn for Shopify'),
+      text('pricing-plan-price', '14-day free trial'),
+      text('pricing-plan-note', 'The 14-day free trial will be available when account onboarding opens.'),
+      heading('pricing-features-title', 'Included', 'h3'),
+      text('pricing-features-copy', 'Consignor management · Mobile item intake · Create Shopify products · Shopify POS publishing · Optional online publishing · Manual sale tracking · Sales and payouts · Transactions and reports · CSV import / export'),
+      text('pricing-plan-shopify-copy', 'Create products from your phone, publish to Shopify POS and keep each sale connected to the correct consignor.'),
+      heading('pricing-advanced-title', 'Advanced', 'h3'),
+      text('pricing-advanced-copy', 'Coming later. For larger operations that need additional locations and workflows.'),
+    ],
+    root: { props: {} },
+  },
+
+  contact: {
+    content: [
+      hero('contact-hero', 'Contact', 'Need help with JustConsignIn?', 'For support, account questions, setup help, or general inquiries, email us directly.'),
+      heading('contact-email-title', 'Email support', 'h3'),
+      text('contact-email-copy', 'support@justconsignin.com'),
+      heading('contact-include-title', 'What to include', 'h3'),
+      text('contact-include-copy', 'If you are reporting a problem, include the page you were on, what you were trying to do, and a screenshot if possible.'),
+      heading('contact-response-title', 'Response', 'h3'),
+      text('contact-response-copy', 'We will respond through the support email address you contact us from.'),
+    ],
+    root: { props: {} },
+  },
+
+  privacy: {
+    content: [
+      hero('privacy-hero', 'Privacy', 'Privacy policy', 'Last updated: August 2026'),
+      heading('privacy-collect-title', 'Information we collect'),
+      text('privacy-collect-copy', 'JustConsignIn processes account information such as your name, business name, email address and authentication information. When you use the service, you may also enter consignor contact information, inventory records, sale records, payout records, notes and business settings.'),
+      heading('privacy-use-title', 'How we use information'),
+      text('privacy-use-copy', 'We use information to provide and secure the service, maintain your workspace, calculate and record consignment activity, provide customer support, process subscriptions, prevent abuse and improve reliability.'),
+      heading('privacy-providers-title', 'Service providers'),
+      text('privacy-providers-copy', 'Production deployments may use hosting, database/authentication, payment and email providers. These providers process information only as needed to provide their services. Payment card details are handled by the payment provider and are not intended to be stored directly by JustConsignIn.'),
+      heading('privacy-consignor-title', 'Your consignor data'),
+      text('privacy-consignor-copy', 'You are responsible for having an appropriate basis to enter and use personal information belonging to your consignors. Do not enter sensitive information that is not necessary for consignment management.'),
+      heading('privacy-retention-title', 'Retention and deletion'),
+      text('privacy-retention-copy', 'Workspace information is retained while an account is active and for a reasonable period afterward when needed for recovery, fraud prevention, legal obligations or support. Account owners may request deletion of their account and workspace, subject to records we are required to retain.'),
+      heading('privacy-security-title', 'Security'),
+      text('privacy-security-copy', 'We use access controls, protected server credentials and third-party authentication/payment services designed to reduce unauthorized access. No online service can guarantee absolute security.'),
+      heading('privacy-contact-title', 'Contact'),
+      text('privacy-contact-copy', 'Privacy questions and deletion requests should be sent using the support contact published by JustConsignIn.'),
+      text('privacy-launch-note', 'Launch draft: have this policy reviewed for the jurisdictions where you operate before accepting production customers.'),
+    ],
+    root: { props: {} },
+  },
+
+  terms: {
+    content: [
+      hero('terms-hero', 'Terms', 'Terms of service', 'Last updated: August 2026'),
+      heading('terms-use-title', 'Using JustConsignIn'),
+      text('terms-use-copy', 'You may use JustConsignIn to manage legitimate consignment and resale operations. You are responsible for the accuracy of information entered into your workspace, your staff’s access, and complying with laws that apply to your business and consignors.'),
+      heading('terms-trial-title', '14-day free trial and subscriptions'),
+      text('terms-trial-copy', 'New paid-plan signups may begin with a 14-day free trial. A valid payment method may be required to start the trial. Unless the subscription is cancelled before the trial ends, the selected recurring subscription will begin and the payment provider may charge the payment method on file according to the price shown at checkout.'),
+      heading('terms-billing-title', 'Billing and cancellation'),
+      text('terms-billing-copy', 'Subscriptions renew automatically until cancelled. Account owners can manage payment details and cancellation through the billing portal when production billing is enabled. Cancellation stops future renewal; access may continue through the end of the current paid or trial period depending on billing configuration. Fees already charged are non-refundable except where required by law or expressly stated otherwise.'),
+      heading('terms-accounts-title', 'Accounts and security'),
+      text('terms-accounts-copy', 'You must provide accurate account information and protect your login credentials. You are responsible for activity performed through your account and should notify support if you believe access has been compromised.'),
+      heading('terms-acceptable-title', 'Acceptable use'),
+      text('terms-acceptable-copy', 'Do not use the service to break the law, infringe rights, distribute malicious software, attempt unauthorized access, interfere with the service, or store information you do not have a lawful reason to process.'),
+      heading('terms-availability-title', 'Availability and changes'),
+      text('terms-availability-copy', 'We may update features, correct errors, perform maintenance, or change service availability. We aim to provide a reliable service but do not guarantee uninterrupted or error-free operation.'),
+      heading('terms-data-title', 'Your data'),
+      text('terms-data-copy', 'You retain responsibility for business and consignor information you enter. You grant JustConsignIn the limited rights necessary to host, process and back up that information to provide the service.'),
+      heading('terms-termination-title', 'Termination'),
+      text('terms-termination-copy', 'Accounts may be suspended or terminated for non-payment, abuse, security risk or material violation of these terms. You may stop using the service and cancel your subscription through the available billing controls.'),
+      heading('terms-liability-title', 'Liability'),
+      text('terms-liability-copy', 'To the extent permitted by law, JustConsignIn is provided without guarantees beyond those expressly stated, and liability is limited to the extent allowed by applicable law.'),
+      text('terms-launch-note', 'Launch draft: have these terms reviewed for the jurisdictions where you operate and confirm the final price/refund policy before accepting production customers.'),
+    ],
+    root: { props: {} },
+  },
+};
+
+export function getInitialPageBuilderData(id) {
+  return PAGE_EDITOR_DATA[id] || { content: [], root: { props: {} } };
+}
