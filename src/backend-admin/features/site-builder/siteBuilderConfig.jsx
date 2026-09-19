@@ -112,7 +112,7 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
-        text: { type: 'textarea', label: 'Description' },
+        text: { type: 'text', label: 'Description' },
         image: imageField,
         imageAlt: { type: 'text', label: 'Image alt text' },
         buttonText: { type: 'text', label: 'Button text' },
@@ -175,7 +175,7 @@ export const siteBuilderConfig = {
     TextBlock: {
       label: 'Text',
       fields: {
-        text: { type: 'textarea', label: 'Text' },
+        text: { type: 'text', label: 'Text' },
         align: {
           type: 'radio',
           label: 'Alignment',
@@ -216,7 +216,7 @@ export const siteBuilderConfig = {
         image: imageField,
         alt: { type: 'text', label: 'Image alt text' },
         heading: { type: 'text', label: 'Heading' },
-        text: { type: 'textarea', label: 'Text' },
+        text: { type: 'text', label: 'Text' },
         imagePosition: {
           type: 'radio',
           label: 'Image position',
@@ -248,7 +248,7 @@ export const siteBuilderConfig = {
       label: 'Call to Action',
       fields: {
         heading: { type: 'text', label: 'Heading' },
-        text: { type: 'textarea', label: 'Text' },
+        text: { type: 'text', label: 'Text' },
         buttonText: { type: 'text', label: 'Button text' },
         buttonUrl: { type: 'text', label: 'Button link' },
         background: { type: 'select', label: 'Background', options: backgroundOptions },
