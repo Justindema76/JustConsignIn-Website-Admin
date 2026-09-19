@@ -1,0 +1,252 @@
+.jci-site-builder-page {
+  display: grid;
+  gap: 18px;
+}
+
+.jci-site-builder-head {
+  margin-bottom: 0;
+}
+
+.jci-builder-notice {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.jci-builder-notice span {
+  margin-left: 4px;
+  color: #475569;
+}
+
+.jci-puck-editor {
+  min-height: 720px;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.jci-puck-image-field {
+  display: grid;
+  gap: 9px;
+}
+
+.jci-puck-image-thumb,
+.jci-builder-image-wrap img,
+.jci-builder-image-text-media img,
+.jci-builder-hero-media img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.jci-puck-image-thumb {
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.jci-puck-image-empty,
+.jci-builder-placeholder {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  min-height: 130px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+}
+
+.jci-puck-url-input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+
+.jci-puck-image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jci-puck-image-actions button,
+.jci-puck-image-actions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #0f172a;
+  padding: 8px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.jci-puck-image-actions input[type="file"] {
+  display: none;
+}
+
+.jci-puck-field-error {
+  color: #b91c1c;
+}
+
+.jci-builder-section,
+.jci-builder-heading-wrap,
+.jci-builder-text,
+.jci-builder-image-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 34px;
+}
+
+.jci-builder-heading-wrap,
+.jci-builder-text,
+.jci-builder-image-wrap {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.jci-builder-heading-wrap h2,
+.jci-builder-heading-wrap h3,
+.jci-builder-heading-wrap h4,
+.jci-builder-section h1,
+.jci-builder-section h2 {
+  margin: 0 0 14px;
+  color: #0f172a;
+  line-height: 1.08;
+}
+
+.jci-builder-section h1 {
+  font-size: clamp(38px, 6vw, 68px);
+}
+
+.jci-builder-section h2,
+.jci-builder-heading-wrap h2 {
+  font-size: clamp(30px, 4vw, 46px);
+}
+
+.jci-builder-section p,
+.jci-builder-text p {
+  margin: 0;
+  color: #475569;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.jci-builder-eyebrow {
+  color: #2563eb !important;
+  font-size: 13px !important;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  margin-bottom: 12px !important;
+}
+
+.jci-builder-button {
+  display: inline-flex;
+  margin-top: 22px;
+  border-radius: 9px;
+  background: #0f172a;
+  color: #fff;
+  padding: 12px 18px;
+  text-decoration: none;
+  font-weight: 750;
+}
+
+.jci-builder-hero,
+.jci-builder-image-text {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 42px;
+}
+
+.jci-builder-hero-media img,
+.jci-builder-image-text-media img {
+  width: 100%;
+  border-radius: 18px;
+}
+
+.jci-builder-image-text.image-right .jci-builder-image-text-media {
+  order: 2;
+}
+
+.jci-builder-image-wrap {
+  text-align: center;
+}
+
+.jci-builder-image-wrap img {
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+.jci-builder-cta {
+  text-align: center;
+  max-width: none;
+}
+
+.theme-white {
+  background: #fff;
+}
+
+.theme-light {
+  background: #f4f7fb;
+}
+
+.theme-dark {
+  background: #0f172a;
+  color: #fff;
+}
+
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark p {
+  color: #fff;
+}
+
+.theme-dark .jci-builder-button {
+  background: #fff;
+  color: #0f172a;
+}
+
+@media (max-width: 760px) {
+  .jci-puck-editor {
+    min-height: 640px;
+    border-radius: 10px;
+  }
+
+  .jci-builder-section,
+  .jci-builder-heading-wrap,
+  .jci-builder-text,
+  .jci-builder-image-wrap {
+    padding: 34px 18px;
+  }
+
+  .jci-builder-hero,
+  .jci-builder-image-text {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .jci-builder-image-text.image-right .jci-builder-image-text-media {
+    order: 0;
+  }
+
+  .jci-builder-section p,
+  .jci-builder-text p {
+    font-size: 16px;
+  }
+}
