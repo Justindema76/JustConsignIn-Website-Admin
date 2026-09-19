@@ -187,3 +187,37 @@ export async function uploadSocialVideo(accessToken, file) {
     invalidTypeMessage: 'Use an MP4, MOV, or M4V video.',
   });
 }
+
+export async function loadAdminSitePage(accessToken, pageId) {
+  const payload = await parseResponse(await adminFetch(
+    `/api/admin/site?resource=page&pageId=${encodeURIComponent(pageId)}`,
+    {},
+    accessToken,
+  ));
+  return {
+    draft: payload.draft || null,
+    published: payload.published || null,
+  };
+}
+
+async function saveAdminSitePage(accessToken, page, content, action) {
+  return parseResponse(await adminFetch('/api/admin/site?resource=page', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      pageId: page.id,
+      path: page.path,
+      title: page.title,
+      content,
+      action,
+    }),
+  }, accessToken));
+}
+
+export async function saveAdminSitePageDraft(accessToken, page, content) {
+  return saveAdminSitePage(accessToken, page, content, 'draft');
+}
+
+export async function publishAdminSitePage(accessToken, page, content) {
+  return saveAdminSitePage(accessToken, page, content, 'publish');
+}
