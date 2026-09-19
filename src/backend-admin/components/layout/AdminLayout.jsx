@@ -39,6 +39,12 @@ const navGroups = [
       { to: '/admin/blog', label: 'Blog Posts', icon: BookOpen },
       { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
       { to: '/admin/media', label: 'Media', icon: Image },
+    ],
+  },
+  {
+    id: 'website',
+    label: 'Website',
+    items: [
       { to: '/admin/site-builder', label: 'Website Editor', icon: PanelsTopLeft },
     ],
   },
