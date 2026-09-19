@@ -45,7 +45,7 @@ const navGroups = [
     id: 'website',
     label: 'Website',
     items: [
-      { to: '/admin/site-builder', label: 'Website Editor', icon: PanelsTopLeft },
+      { to: '/admin/website/pages', label: 'Pages', icon: PanelsTopLeft },
     ],
   },
   {

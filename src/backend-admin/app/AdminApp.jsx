@@ -11,6 +11,7 @@ import OutreachMap from '../features/outreach/OutreachMap';
 import SocialImageStudio from '../features/media/SocialImageStudio';
 import SettingsAdmin from '../features/settings/SettingsAdmin';
 import SiteBuilder from '../features/site-builder/SiteBuilder';
+import WebsitePages from '../features/site-builder/WebsitePages';
 import SocialAdmin from '../features/social-links/SocialAdmin';
 import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
@@ -30,7 +31,9 @@ export default function AdminApp() {
         <Route path="/admin/videos/:id" element={<VideosAdmin />} />
         <Route path="/admin/social" element={<SocialAdmin />} />
         <Route path="/admin/media" element={<MediaAdmin />} />
-        <Route path="/admin/site-builder" element={<SiteBuilder />} />
+        <Route path="/admin/site-builder" element={<Navigate to="/admin/website/pages" replace />} />
+        <Route path="/admin/website/pages" element={<WebsitePages />} />
+        <Route path="/admin/website/pages/:pageId" element={<SiteBuilder />} />
         <Route path="/admin/social-image" element={<SocialImageStudio />} />
         <Route path="/admin/social-automation" element={<SocialAutomation />} />
         <Route path="/admin/social-automation/:id" element={<SocialAutomation />} />
