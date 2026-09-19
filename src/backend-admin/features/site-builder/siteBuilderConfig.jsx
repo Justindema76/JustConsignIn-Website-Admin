@@ -58,8 +58,10 @@ function ImageLibraryField({ field, value, onChange }) {
           className="jci-puck-url-input"
           value={value || ''}
           onChange={event => onChange(event.target.value)}
-          placeholder="Image URL"
+          placeholder="https://example.com/path/image.png"
+          aria-label="External image URL"
         />
+        <small className="jci-puck-image-help">Use an uploaded image, choose from Media, or paste any public image URL (WordPress/CDN URLs are supported).</small>
         <div className="jci-puck-image-actions">
           <button type="button" onClick={() => setPickerOpen(true)} disabled={loading}>
             <Library size={14}/> {loading ? 'Loading…' : 'Choose Media'}
