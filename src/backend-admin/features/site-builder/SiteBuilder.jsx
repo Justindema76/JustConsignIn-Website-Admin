@@ -14,7 +14,8 @@ import { getInitialPageBuilderData, getWebsitePage, livePageUrl } from './websit
 import './siteBuilder.css';
 
 function storageKey(pageId) {
-  return `jci-site-builder-page-${pageId}-v2`;
+  const version = pageId === 'features' ? 'v3' : 'v2';
+  return `jci-site-builder-page-${pageId}-${version}`;
 }
 
 function readLocalDraft(pageId) {
@@ -34,15 +35,20 @@ function writeLocalDraft(pageId, data) {
 }
 
 function validatePublishData(page, data) {
-  if (page.id !== 'home') return;
-
   const blocks = Array.isArray(data?.content) ? data.content : [];
   const types = new Set(blocks.map(block => block?.type).filter(Boolean));
-  const required = ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'];
-  const missing = required.filter(type => !types.has(type));
 
+  const requiredByPage = {
+    home: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
+    features: ['FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock'],
+  };
+
+  const required = requiredByPage[page.id];
+  if (!required) return;
+
+  const missing = required.filter(type => !types.has(type));
   if (missing.length) {
-    throw new Error('Homepage publish blocked: restore the live homepage sections before publishing.');
+    throw new Error(`${page.title} publish blocked: restore the live page sections before publishing.`);
   }
 }
 
