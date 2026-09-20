@@ -207,6 +207,9 @@ const PAGE_EDITOR_DATA = {
         eyebrow: 'Features',
         heading: 'Move consignment inventory from intake to sale faster.',
         text: 'JustConsignIn is built for Shopify store owners who process lots of unique consignment and resale inventory. Enter items quickly, create Shopify products without duplicate entry, track every sale back to the correct consignor and keep payouts organized in one workflow.',
+        image: '',
+        imageAlt: '',
+        imagePosition: 'right',
       }),
       block('FeaturesGridBlock', 'features-grid', {
         eyebrow: 'Made for real resale workflows',
