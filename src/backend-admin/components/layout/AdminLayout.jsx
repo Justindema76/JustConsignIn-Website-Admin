@@ -162,7 +162,7 @@ export default function AdminLayout() {
     <div className="site-admin-workspace">
       <header className="site-admin-header">
         <button className="site-admin-mobile-menu" type="button" onClick={() => setMobileNavOpen(true)} aria-label="Open menu"><Menu size={22}/></button>
-        <div><strong>JustConsignIn Website Admin</strong><small>Manage justconsignin.com</small></div>
+        <div className="site-admin-header-title"><strong>JustConsignIn Website Admin</strong><small>Manage justconsignin.com</small></div>
         <div className="site-admin-header-actions">
           <a className="site-admin-btn secondary small" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
           <span className="site-admin-user"><strong>{user?.name || 'Admin'}</strong><small>{user?.email}</small></span>
