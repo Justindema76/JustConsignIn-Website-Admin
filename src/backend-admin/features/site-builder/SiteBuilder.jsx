@@ -44,7 +44,9 @@ function validatePublishData(page, data) {
   };
 
   const required = requiredByPage[page.id];
-  if (!required) return;
+  if (!required) {
+    throw new Error(`${page.title} publish is temporarily blocked until its exact live React template is connected to the builder.`);
+  }
 
   const missing = required.filter(type => !types.has(type));
   if (missing.length) {
