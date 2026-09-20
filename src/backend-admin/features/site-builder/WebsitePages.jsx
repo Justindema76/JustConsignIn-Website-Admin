@@ -11,7 +11,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { WEBSITE_PAGES, livePageUrl } from './websitePages';
+import { getWebsitePages, livePageUrl } from './websitePages';
+import { getAdminSiteKey } from '../../services/siteAdminService';
 import './websitePages.css';
 
 const kindMeta = {
@@ -46,6 +47,10 @@ function customPageNote(page) {
 }
 
 export default function WebsitePages() {
+  const siteKey = getAdminSiteKey();
+  const pages = getWebsitePages(siteKey);
+  const websiteUrl = livePageUrl('/', siteKey);
+
   return <div className="jci-website-pages">
     <div className="site-admin-page-head">
       <div>
@@ -54,7 +59,7 @@ export default function WebsitePages() {
         <p>Edit visual pages here. Structured, form, and application pages stay separate when they require special behaviour.</p>
       </div>
       <div className="site-admin-actions">
-        <a className="site-admin-btn secondary" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">
+        <a className="site-admin-btn secondary" href={websiteUrl} target="_blank" rel="noreferrer">
           View Website <ExternalLink size={14}/>
         </a>
       </div>
@@ -69,7 +74,7 @@ export default function WebsitePages() {
     </div>
 
     <div className="jci-website-page-grid">
-      {WEBSITE_PAGES.map(page => {
+      {pages.map(page => {
         const meta = kindMeta[page.kind] || kindMeta.marketing;
         const Icon = meta.icon;
         const target = editTarget(page);
@@ -91,7 +96,7 @@ export default function WebsitePages() {
             {target ? <Link className="site-admin-btn" to={target}>
               <Pencil size={14}/> {page.editor === 'blog' ? 'Manage Blog' : 'Edit Page'}
             </Link> : <span className="jci-custom-page-note">{customPageNote(page)}</span>}
-            <a className="site-admin-btn secondary" href={livePageUrl(page.path)} target="_blank" rel="noreferrer">
+            <a className="site-admin-btn secondary" href={livePageUrl(page.path, siteKey)} target="_blank" rel="noreferrer">
               Open Live <ExternalLink size={13}/>
             </a>
           </div>
