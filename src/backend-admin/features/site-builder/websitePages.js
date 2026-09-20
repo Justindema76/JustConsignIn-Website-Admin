@@ -1,4 +1,4 @@
-export const WEBSITE_PAGES = [
+export const JUSTCONSIGNIN_PAGES = [
   {
     id: 'home',
     title: 'Home',
@@ -102,12 +102,85 @@ export const WEBSITE_PAGES = [
   },
 ];
 
-export function getWebsitePage(id) {
-  return WEBSITE_PAGES.find(page => page.id === id) || null;
+export const JUSTINDEMATTEIS_PAGES = [
+  {
+    id: 'home',
+    title: 'Home',
+    path: '/',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Portfolio homepage with positioning, featured work and calls to action.',
+  },
+  {
+    id: 'work',
+    title: 'Work',
+    path: '/work',
+    source: 'shared page builder',
+    kind: 'content',
+    editor: 'visual',
+    description: 'Projects and case studies.',
+  },
+  {
+    id: 'ai-development',
+    title: 'AI + Development',
+    path: '/ai-development',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'How AI is used as part of the development and problem-solving workflow.',
+  },
+  {
+    id: 'about',
+    title: 'About',
+    path: '/about',
+    source: 'shared page builder',
+    kind: 'content',
+    editor: 'visual',
+    description: 'Career story, engineering background and transition into software development.',
+  },
+  {
+    id: 'experience',
+    title: 'Experience',
+    path: '/experience',
+    source: 'shared page builder',
+    kind: 'content',
+    editor: 'visual',
+    description: 'Professional experience, skills and technology.',
+  },
+  {
+    id: 'blog',
+    title: 'Blog',
+    path: '/blog',
+    source: 'shared blog manager',
+    kind: 'content',
+    editor: 'blog',
+    description: 'Articles and development notes for the portfolio.',
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    path: '/contact',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Employment, freelance and collaboration contact page.',
+  },
+];
+
+export const WEBSITE_PAGES = JUSTCONSIGNIN_PAGES;
+
+export function getWebsitePages(siteKey = 'justconsignin') {
+  return siteKey === 'justindematteis' ? JUSTINDEMATTEIS_PAGES : JUSTCONSIGNIN_PAGES;
 }
 
-export function livePageUrl(path) {
-  return `https://www.justconsignin.com${path === '/' ? '' : path}`;
+export function getWebsitePage(id, siteKey = 'justconsignin') {
+  return getWebsitePages(siteKey).find(page => page.id === id) || null;
+}
+
+export function livePageUrl(path, siteKey = 'justconsignin') {
+  const domain = siteKey === 'justindematteis' ? 'justindematteis.com' : 'justconsignin.com';
+  return `https://www.${domain}${path === '/' ? '' : path}`;
 }
 
 
@@ -374,6 +447,75 @@ const PAGE_EDITOR_DATA = {
   },
 };
 
-export function getInitialPageBuilderData(id) {
-  return PAGE_EDITOR_DATA[id] || { content: [], root: { props: {} } };
+
+const JUSTIN_PAGE_EDITOR_DATA = {
+  home: {
+    content: [
+      hero('justin-home-hero', 'Web & Mobile Developer', 'I build practical digital products around real business problems.', 'From Shopify applications and ecommerce workflows to custom admin systems, I combine software development, UI/UX and AI-assisted problem solving to turn ideas into working products.'),
+      block('ImageTextBlock', 'justin-home-featured', {
+        heading: 'Featured project · JustConsignIn',
+        text: 'A Shopify consignment management application built from a real store workflow, connecting consignors, item intake, products, POS sales and payouts.',
+        image: '',
+        alt: 'JustConsignIn project preview',
+        imagePosition: 'right',
+        background: 'light',
+      }),
+      heading('justin-home-ai-title', 'Building with AI as part of the development workflow'),
+      text('justin-home-ai-copy', 'AI is used as a development partner for research, architecture, iteration, testing and implementation while the product decisions, requirements and final direction stay grounded in the real business problem.'),
+      cta('justin-home-cta', 'See the work behind the finished products.', 'Explore projects, case studies and the development process behind them.', 'View Work', '/work'),
+    ],
+    root: { props: {} },
+  },
+  work: {
+    content: [
+      hero('justin-work-hero', 'Selected Work', 'Projects built around real workflows.', 'Case studies covering product development, ecommerce, Shopify, internal tools and AI-assisted development.'),
+      heading('justin-work-jci', 'JustConsignIn'),
+      text('justin-work-jci-copy', 'Shopify consignment management application covering intake, product creation, POS sales, consignor tracking and payouts.'),
+      heading('justin-work-wheels', 'Wheels Automotive'),
+      text('justin-work-wheels-copy', 'Adobe Commerce / Magento B2B ecommerce, frontend implementation, QA, SEO and dealership-product workflows.'),
+    ],
+    root: { props: {} },
+  },
+  'ai-development': {
+    content: [
+      hero('justin-ai-hero', 'AI + Development', 'AI is part of the workflow, not the product pitch.', 'The focus is on what becomes possible when AI is combined with domain knowledge, product decisions, software development and constant testing.'),
+      heading('justin-ai-problem', 'Start with a real problem'),
+      text('justin-ai-problem-copy', 'The process begins with understanding the workflow, constraints and people using the system before choosing technology or generating code.'),
+      heading('justin-ai-build', 'Use AI to accelerate iteration'),
+      text('justin-ai-build-copy', 'AI helps research approaches, reason through architecture, generate and refactor code, inspect failures and iterate faster. The system still has to be tested against the actual requirement.'),
+      heading('justin-ai-result', 'Ship something that works'),
+      text('justin-ai-result-copy', 'The value is not the prompt. The value is turning a business problem into a maintainable product that people can actually use.'),
+    ],
+    root: { props: {} },
+  },
+  about: {
+    content: [
+      hero('justin-about-hero', 'About', 'Engineering experience translated into software development.', 'My background began in mechanical engineering, CNC machining, programming and tool & die design before retraining in web and mobile development.'),
+      heading('justin-about-approach', 'How I approach development'),
+      text('justin-about-approach-copy', 'I tend to work from the process backward: understand what someone is actually trying to accomplish, remove unnecessary steps, then build the interface and system around that workflow.'),
+    ],
+    root: { props: {} },
+  },
+  experience: {
+    content: [
+      hero('justin-experience-hero', 'Experience', 'Web, mobile, ecommerce and product development.', 'React, JavaScript, TypeScript, Node, PHP, MySQL, WordPress, Shopify, Adobe Commerce and mobile development backed by an engineering and manufacturing background.'),
+      heading('justin-experience-wheels', 'Wheels Automotive Dealers Supply'),
+      text('justin-experience-wheels-copy', 'B2B ecommerce launch work, Adobe Commerce / Magento frontend implementation, QA, content, SEO and vendor coordination.'),
+      heading('justin-experience-product', 'Independent product development'),
+      text('justin-experience-product-copy', 'Designing and building JustConsignIn from a real consignment-store workflow through Shopify integration, admin tooling, deployment and product marketing.'),
+    ],
+    root: { props: {} },
+  },
+  contact: {
+    content: [
+      hero('justin-contact-hero', 'Contact', 'Looking for a developer who understands both the code and the workflow?', 'Open to development roles, ecommerce work, product collaboration and selected freelance projects.'),
+      cta('justin-contact-cta', 'Start a conversation.', 'Use the contact details on the finished site to reach out about a role or project.', 'Get in touch', '#contact'),
+    ],
+    root: { props: {} },
+  },
+};
+
+export function getInitialPageBuilderData(id, siteKey = 'justconsignin') {
+  const source = siteKey === 'justindematteis' ? JUSTIN_PAGE_EDITOR_DATA : PAGE_EDITOR_DATA;
+  return source[id] || { content: [], root: { props: {} } };
 }
