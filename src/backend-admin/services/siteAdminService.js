@@ -140,7 +140,7 @@ export async function saveAdminVideo(accessToken, video) {
 }
 
 export async function deleteAdminVideo(accessToken, id) {
-  await parseResponse(await adminFetch(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken));
+  await parseResponse(await adminFetch(siteAdminUrl(`/api/admin/site?resource=videos&id=${encodeURIComponent(id)}`), { method: 'DELETE' }, accessToken));
 }
 
 export async function loadAdminSocial(accessToken) {
