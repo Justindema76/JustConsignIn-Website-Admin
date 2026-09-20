@@ -176,6 +176,27 @@ export default async function handler(req, res) {
       });
     }
 
+    if (req.method === 'GET' && resource === 'styles') {
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?key=eq.global_styles&select=key,value,updated_at&limit=1', { method: 'GET' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.message || 'Unable to load global styles');
+      return res.status(200).json({ value: data?.[0]?.value || null, updatedAt: data?.[0]?.updated_at || '' });
+    }
+
+    if (req.method === 'POST' && resource === 'styles') {
+      const value = req.body?.value;
+      if (!value || typeof value !== 'object') return res.status(400).json({ error: 'Invalid global styles value' });
+
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify({ key: 'global_styles', value, updated_at: new Date().toISOString() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.message || 'Unable to save global styles');
+      return res.status(200).json({ value: data?.[0]?.value || value, updatedAt: data?.[0]?.updated_at || new Date().toISOString() });
+    }
+
     if (req.method === 'GET' && resource === 'global') {
       const key = String(req.query?.key || '').trim().toLowerCase();
       if (!['header', 'footer'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
