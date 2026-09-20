@@ -29,3 +29,14 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
 }
 
 @media(max-width:390px){.site-admin-main{padding-left:10px;padding-right:10px}.site-admin-nav a{font-size:8px}.site-admin-media-grid{grid-template-columns:1fr 1fr}.site-admin-page-head h1{font-size:23px}.site-admin-header-actions .site-admin-btn{padding-left:8px;padding-right:8px}}
+
+
+.site-admin-site-switcher{display:grid;gap:2px;min-width:150px}
+.site-admin-site-switcher>span{font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#6d7175}
+.site-admin-site-switcher select{height:34px;border:1px solid #d7dce1;border-radius:8px;background:#fff;color:#202223;padding:0 28px 0 9px;font-size:12px;font-weight:750;cursor:pointer}
+.site-admin-site-switcher select:focus{outline:2px solid rgba(31,103,178,.18);outline-offset:1px;border-color:#8fb6dd}
+@media(max-width:760px){
+  .site-admin-site-switcher{min-width:0;width:100%}
+  .site-admin-site-switcher>span{display:none}
+  .site-admin-site-switcher select{width:100%;height:38px}
+}
