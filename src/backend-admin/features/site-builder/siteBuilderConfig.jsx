@@ -86,7 +86,7 @@ function ImageLibraryField({ field, value, onChange }) {
   </>;
 }
 
-const imageField = {
+export const imageField = {
   type: 'custom',
   label: 'Image',
   render: props => <ImageLibraryField {...props}/>,

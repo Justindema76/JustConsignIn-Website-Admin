@@ -12,6 +12,9 @@ import {
   Menu,
   MapPinned,
   PanelsTopLeft,
+  LibraryBig,
+  PanelTop,
+  PanelBottom,
   Settings,
   Sparkles,
   Video,
@@ -46,6 +49,9 @@ const navGroups = [
     label: 'Website',
     items: [
       { to: '/admin/website/pages', label: 'Pages', icon: PanelsTopLeft },
+      { to: '/admin/website/blocks', label: 'Block Library', icon: LibraryBig },
+      { to: '/admin/website/global/header', label: 'Header', icon: PanelTop },
+      { to: '/admin/website/global/footer', label: 'Footer', icon: PanelBottom },
     ],
   },
   {
