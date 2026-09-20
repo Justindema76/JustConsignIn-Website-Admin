@@ -38,10 +38,17 @@ function writeLocalDraft(siteKey, pageId, data) {
 }
 
 function validatePublishData(page, data, siteKey) {
-  if (siteKey === 'justindematteis') {
-    throw new Error('Publishing for JustinDeMatteis.com is blocked until the public portfolio shell is connected. Drafts are safe to edit and save now.');
-  }
   const blocks = Array.isArray(data?.content) ? data.content : [];
+
+  if (siteKey === 'justindematteis') {
+    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock']);
+    const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
+    if (!blocks.length) throw new Error('This page needs at least one shared block before publishing.');
+    if (unsupported.length) {
+      throw new Error(`Portfolio publish blocked: remove unsupported site-specific blocks (${[...new Set(unsupported)].join(', ')}).`);
+    }
+    return;
+  }
   const types = new Set(blocks.map(block => block?.type).filter(Boolean));
 
   const requiredByPage = {
@@ -70,6 +77,16 @@ export default function SiteBuilder() {
   if (page.editor !== 'visual') return <Navigate to="/admin/website/pages" replace />;
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
+  const builderConfig = useMemo(() => {
+    if (siteKey !== 'justindematteis') return siteBuilderConfig;
+    return {
+      ...siteBuilderConfig,
+      categories: {
+        content: siteBuilderConfig.categories.content,
+        marketing: siteBuilderConfig.categories.marketing,
+      },
+    };
+  }, [siteKey]);
   const [initialData, setInitialData] = useState(null);
   const [currentData, setCurrentData] = useState(null);
   const [editorKey, setEditorKey] = useState(0);
@@ -244,7 +261,7 @@ export default function SiteBuilder() {
     <div className="jci-puck-editor" style={globalStyleVars(globalStyles)}>
       <Puck
         key={`${siteKey}-${page.id}-${editorKey}`}
-        config={siteBuilderConfig}
+        config={builderConfig}
         data={initialData}
         headerTitle={page.title}
         headerPath={page.path}
