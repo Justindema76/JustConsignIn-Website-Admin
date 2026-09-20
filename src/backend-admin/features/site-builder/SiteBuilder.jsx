@@ -41,7 +41,7 @@ function validatePublishData(page, data, siteKey) {
   const blocks = Array.isArray(data?.content) ? data.content : [];
 
   if (siteKey === 'justindematteis') {
-    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock']);
+    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock']);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
     if (!blocks.length) throw new Error('This page needs at least one shared block before publishing.');
     if (unsupported.length) {
@@ -82,6 +82,7 @@ export default function SiteBuilder() {
     return {
       ...siteBuilderConfig,
       categories: {
+        showcase: siteBuilderConfig.categories.showcase,
         content: siteBuilderConfig.categories.content,
         marketing: siteBuilderConfig.categories.marketing,
       },
