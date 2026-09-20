@@ -782,19 +782,22 @@ export const siteBuilderConfig = {
     CardGridBlock: {
       label: 'Card Grid',
       fields: {
+        eyebrow:{type:'text',label:'Section eyebrow'},heading:{type:'text',label:'Section heading'},text:{type:'text',label:'Section description'},
         item1Eyebrow:{type:'text',label:'Card 1 eyebrow'},item1Title:{type:'text',label:'Card 1 title'},item1Text:{type:'text',label:'Card 1 text'},item1Icon:{type:'text',label:'Card 1 icon text'},item1Style:{type:'select',label:'Card 1 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item2Eyebrow:{type:'text',label:'Card 2 eyebrow'},item2Title:{type:'text',label:'Card 2 title'},item2Text:{type:'text',label:'Card 2 text'},item2Icon:{type:'text',label:'Card 2 icon text'},item2Style:{type:'select',label:'Card 2 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item3Eyebrow:{type:'text',label:'Card 3 eyebrow'},item3Title:{type:'text',label:'Card 3 title'},item3Text:{type:'text',label:'Card 3 text'},item3Icon:{type:'text',label:'Card 3 icon text'},item3Style:{type:'select',label:'Card 3 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item4Eyebrow:{type:'text',label:'Card 4 eyebrow'},item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'text',label:'Card 4 text'},item4Icon:{type:'text',label:'Card 4 icon text'},item4Style:{type:'select',label:'Card 4 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
       },
       defaultProps: {
+        eyebrow:'Selected work',heading:'Projects that solve something real.',text:'The goal of every project is the same: make a business process clearer, faster or easier to manage.',
         item1Eyebrow:'Professional work',item1Title:'Wheels Automotive',item1Text:'Adobe Commerce / Magento, B2B ecommerce, frontend components, QA, product/category content, SEO and launch support.',item1Icon:'WA',item1Style:'dark',
         item2Eyebrow:'Custom business tools',item2Title:'Internal tools & admin systems',item2Text:'Dashboards, data-entry workflows, admin tools and interfaces designed around how people actually perform the work.',item2Icon:'UI',item2Style:'white',
         item3Eyebrow:'Ecommerce',item3Title:'Shopify & commerce integrations',item3Text:'Product workflows, POS-connected applications, publishing controls and custom ecommerce experiences.',item3Icon:'EC',item3Style:'blue',
         item4Eyebrow:'AI-assisted development',item4Title:'From idea to working software faster.',item4Text:'AI supports architecture, prototyping, debugging, refactoring, UX exploration, research and documentation while product direction stays human-led.',item4Icon:'AI',item4Style:'white',
       },
-      render: p => <section className="shared-card-grid-section"><div className="shared-wrap shared-work-grid">
-        {[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><h3>{p['item'+i+'Title']}</h3><p>{p['item'+i+'Text']}</p></article>)}
+      render: p => <section className="shared-card-grid-section"><div className="shared-wrap">
+        <div className="shared-card-grid-heading"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p></div>
+        <div className="shared-work-grid">{[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><h3>{p['item'+i+'Title']}</h3><p>{p['item'+i+'Text']}</p></article>)}</div>
       </div></section>,
     },
 
@@ -844,7 +847,7 @@ export const siteBuilderConfig = {
       label: 'Skills Grid',
       fields: {
         eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},text:{type:'text',label:'Description'},
-        item1Title:{type:'text',label:'Item 1 title'},item1Text:{type:'text',label:'Item 1 text'},item2Title:{type:'text',label:'Item 2 title'},item2Text:{type:'text',label:'Item 2 text'},item3Title:{type:'text',label:'Item 3 title'},item3Text:{type:'text',label:'Item 3 text'},item4Title:{type:'text',label:'Item 4 title'},item4Text:{type:'text',label:'Item 4 text'},
+        item1Title:{type:'text',label:'Item 1 title'},item1Text:{type:'text',label:'Item 1 text'},item2Title:{type:'text',label:'Item 2 title'},item2Text:{type:'text',label:'Item 2 text'},item3Title:{type:'text',label:'Item 3 title'},item3Text:{type:'text',label:'Item 3 text'},item4Title:{type:'text',label:'Item 4 title'},item4Text:{type:'text',label:'Item 4 text'},item5Title:{type:'text',label:'Item 5 title'},item5Text:{type:'text',label:'Item 5 text'},item6Title:{type:'text',label:'Item 6 title'},item6Text:{type:'text',label:'Item 6 text'},
       },
       defaultProps: {
         eyebrow:'Technology',heading:'Tools I use to ship real work.',text:'I prefer showing technologies in the context of what I actually build rather than treating a skills list as the portfolio itself.',
@@ -852,9 +855,11 @@ export const siteBuilderConfig = {
         item2Title:'Backend & Data',item2Text:'Node, Express, PHP, MySQL, Supabase, REST APIs and data-driven application workflows.',
         item3Title:'Commerce',item3Text:'Shopify, Shopify POS, Adobe Commerce / Magento, WordPress and ecommerce product workflows.',
         item4Title:'Delivery',item4Text:'Git, GitHub, Vercel, Linux, QA, deployment, SEO, analytics and AI-assisted development.',
+        item5Title:'UI / UX & Mobile',item5Text:'Responsive interfaces designed around the people actually using the product.',
+        item6Title:'Systems Integration',item6Text:'Connect or simplify what already exists instead of rebuilding everything from scratch.',
       },
       render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
-        {[1,2,3,4].map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
+        {[1,2,3,4,5,6].map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
       </div></div></section>,
     },
 
