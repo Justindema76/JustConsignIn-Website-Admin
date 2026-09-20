@@ -86,15 +86,23 @@ export default async function handler(req, res) {
   if (!user) return;
 
   const resource = String(req.query?.resource || '').trim().toLowerCase();
+  const siteKey = String(req.query?.site || req.body?.siteKey || 'justconsignin').trim().toLowerCase() || 'justconsignin';
+  const siteFilter = `site_key=eq.${encodeURIComponent(siteKey)}`;
 
   try {
+    if (req.method === 'GET' && resource === 'sites') {
+      const response = await supabaseUserRest(user.accessToken, 'sites?select=site_key,name,domain,admin_label,is_active&is_active=eq.true&order=name.asc', { method: 'GET' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.message || 'Unable to load websites');
+      return res.status(200).json({ sites: data });
+    }
     if (req.method === 'GET' && resource === 'page') {
       const pageId = String(req.query?.pageId || '').trim();
       if (!pageId) return res.status(400).json({ error: 'Missing page id' });
 
       const [draftResponse, publishedResponse] = await Promise.all([
-        supabaseUserRest(user.accessToken, `site_page_drafts?page_id=eq.${encodeURIComponent(pageId)}&select=page_id,path,title,content,updated_at&limit=1`, { method: 'GET' }),
-        supabaseUserRest(user.accessToken, `site_pages?page_id=eq.${encodeURIComponent(pageId)}&select=page_id,path,title,content,published_at,updated_at&limit=1`, { method: 'GET' }),
+        supabaseUserRest(user.accessToken, `site_page_drafts?${siteFilter}&page_id=eq.${encodeURIComponent(pageId)}&select=site_key,page_id,path,title,content,updated_at&limit=1`, { method: 'GET' }),
+        supabaseUserRest(user.accessToken, `site_pages?${siteFilter}&page_id=eq.${encodeURIComponent(pageId)}&select=site_key,page_id,path,title,content,published_at,updated_at&limit=1`, { method: 'GET' }),
       ]);
 
       const draftData = await draftResponse.json();
@@ -122,10 +130,11 @@ export default async function handler(req, res) {
       }
 
       const now = new Date().toISOString();
-      const draftResponse = await supabaseUserRest(user.accessToken, 'site_page_drafts?on_conflict=page_id', {
+      const draftResponse = await supabaseUserRest(user.accessToken, 'site_page_drafts?on_conflict=site_key,page_id', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify({
+          site_key: siteKey,
           page_id: pageId,
           path: pagePath,
           title,
@@ -138,10 +147,12 @@ export default async function handler(req, res) {
 
       let published = null;
       if (action === 'publish') {
-        const publishedResponse = await supabaseUserRest(user.accessToken, 'site_pages?on_conflict=page_id', {
+        const publishedResponse = await supabaseUserRest(user.accessToken, 'site_pages?on_conflict=site_key,page_id', {
           method: 'POST',
           headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
           body: JSON.stringify({
+            site_key: siteKey,
+            site_key: siteKey,
             page_id: pageId,
             path: pagePath,
             title,
@@ -177,7 +188,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET' && resource === 'styles') {
-      const response = await supabaseUserRest(user.accessToken, 'site_settings?key=eq.global_styles&select=key,value,updated_at&limit=1', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, `site_settings?${siteFilter}&key=eq.global_styles&select=site_key,key,value,updated_at&limit=1`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load global styles');
       return res.status(200).json({ value: data?.[0]?.value || null, updatedAt: data?.[0]?.updated_at || '' });
@@ -187,10 +198,10 @@ export default async function handler(req, res) {
       const value = req.body?.value;
       if (!value || typeof value !== 'object') return res.status(400).json({ error: 'Invalid global styles value' });
 
-      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=site_key,key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-        body: JSON.stringify({ key: 'global_styles', value, updated_at: new Date().toISOString() }),
+        body: JSON.stringify({ site_key: siteKey, key: 'global_styles', value, updated_at: new Date().toISOString() }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to save global styles');
@@ -200,7 +211,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET' && resource === 'global') {
       const key = String(req.query?.key || '').trim().toLowerCase();
       if (!['header', 'footer'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
-      const response = await supabaseUserRest(user.accessToken, `site_settings?key=eq.${encodeURIComponent(`global_${key}`)}&select=key,value,updated_at&limit=1`, { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, `site_settings?${siteFilter}&key=eq.${encodeURIComponent(`global_${key}`)}&select=site_key,key,value,updated_at&limit=1`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load global website section');
       return res.status(200).json({ value: data?.[0]?.value || null, updatedAt: data?.[0]?.updated_at || '' });
@@ -215,7 +226,7 @@ export default async function handler(req, res) {
       const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-        body: JSON.stringify({ key: `global_${key}`, value, updated_at: new Date().toISOString() }),
+        body: JSON.stringify({ site_key: siteKey, key: `global_${key}`, value, updated_at: new Date().toISOString() }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to save global website section');
@@ -223,14 +234,14 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET' && resource === 'videos') {
-      const response = await supabaseUserRest(user.accessToken, 'site_videos?select=*&order=placement.asc,playlist_name.asc,content_type.asc,sort_order.asc,created_at.asc', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, `site_videos?${siteFilter}&select=*&order=placement.asc,playlist_name.asc,content_type.asc,sort_order.asc,created_at.asc`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load videos');
       return res.status(200).json({ videos: data });
     }
 
     if (req.method === 'GET' && resource === 'social') {
-      const response = await supabaseUserRest(user.accessToken, 'site_settings?key=eq.social_links&select=key,value,updated_at&limit=1', { method: 'GET' });
+      const response = await supabaseUserRest(user.accessToken, `site_settings?${siteFilter}&key=eq.social_links&select=site_key,key,value,updated_at&limit=1`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load social links');
       return res.status(200).json({ social: data?.[0]?.value || socialValue({}) });
@@ -249,7 +260,7 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE' && resource === 'videos') {
       const id = String(req.query?.id || '').trim();
       if (!id) return res.status(400).json({ error: 'Missing video id' });
-      const response = await supabaseUserRest(user.accessToken, `site_videos?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+      const response = await supabaseUserRest(user.accessToken, `site_videos?${siteFilter}&id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
       if (!response.ok) throw new Error('Unable to delete video');
       return res.status(200).json({ ok: true });
     }
@@ -259,11 +270,11 @@ export default async function handler(req, res) {
       if (!payload.title) return res.status(400).json({ error: 'Video title is required' });
       if (!payload.youtube_url || !payload.youtube_id) return res.status(400).json({ error: 'Enter a valid YouTube URL' });
       const id = String(req.body?.id || '').trim();
-      const path = id ? `site_videos?id=eq.${encodeURIComponent(id)}` : 'site_videos';
+      const path = id ? `site_videos?${siteFilter}&id=eq.${encodeURIComponent(id)}` : 'site_videos';
       const response = await supabaseUserRest(user.accessToken, path, {
         method: id ? 'PATCH' : 'POST',
         headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, site_key: siteKey }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to save video');
@@ -275,7 +286,7 @@ export default async function handler(req, res) {
       const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-        body: JSON.stringify({ key: 'social_links', value, updated_at: new Date().toISOString() }),
+        body: JSON.stringify({ site_key: siteKey, key: 'social_links', value, updated_at: new Date().toISOString() }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to save social links');
