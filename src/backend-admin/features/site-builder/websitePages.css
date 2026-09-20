@@ -1,23 +1,23 @@
-.jci-website-pages{display:grid;gap:18px}
+.jci-website-pages{display:grid;gap:16px}
 .jci-page-sync-note{display:flex;align-items:flex-start;gap:10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;padding:13px 15px;color:#1e3a8a}
 .jci-page-sync-note div{display:grid;gap:3px}
 .jci-page-sync-note span{color:#475569;font-size:13px;line-height:1.45}
-.jci-website-page-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.jci-website-page-card{display:grid;align-content:start;gap:16px;min-width:0}
+.jci-website-page-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.jci-website-page-card{display:grid;align-content:start;gap:0;min-width:0;overflow:hidden;padding:0!important}
 .jci-page-card-top,.jci-page-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-.jci-page-card-top{justify-content:space-between}
+.jci-page-card-top{justify-content:space-between;padding:10px 14px 0}
 .jci-page-kind,.jci-page-editor-status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:750}
 .jci-page-kind{background:#f1f5f9;color:#475569}
 .jci-page-editor-status{background:#eef2ff;color:#4338ca}
 .jci-page-editor-status.custom{background:#fff7ed;color:#9a3412}
 .jci-page-editor-status.blog{background:#ecfdf5;color:#047857}
-.jci-page-card-copy{display:grid;gap:8px}
-.jci-page-card-copy h2{margin:0;font-size:21px;line-height:1.15}
+.jci-page-card-copy{display:grid;gap:6px;padding:10px 14px 12px}
+.jci-page-card-copy h2{margin:0;font-size:19px;line-height:1.15}
 .jci-page-card-copy>code{width:fit-content;border-radius:6px;background:#f8fafc;color:#0f172a;padding:4px 7px;font-size:12px}
-.jci-page-card-copy p{margin:0;color:#64748b;line-height:1.5;font-size:14px}
+.jci-page-card-copy p{margin:0;color:#64748b;line-height:1.45;font-size:13px;max-width:62ch}
 .jci-page-card-copy small{color:#64748b}
-.jci-custom-page-note{color:#9a3412;font-size:12px;font-weight:700;line-height:1.35;max-width:250px}
-.jci-page-source{border-top:1px solid #e2e8f0;padding-top:10px}
+.jci-custom-page-note{color:#9a3412;font-size:12px;font-weight:700;line-height:1.35;max-width:280px}
+.jci-page-card-actions{padding:0 14px 13px}.jci-page-source{border-top:1px solid #e2e8f0;padding:9px 14px 10px;background:#fbfcfd}
 .jci-page-source summary{display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#64748b;font-size:12px}
 .jci-page-source code{display:block;margin-top:8px;white-space:normal;overflow-wrap:anywhere;color:#475569;font-size:11px}
 @media(max-width:900px){.jci-website-page-grid{grid-template-columns:1fr}}
