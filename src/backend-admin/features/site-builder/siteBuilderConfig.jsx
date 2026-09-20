@@ -796,7 +796,7 @@ export const siteBuilderConfig = {
         item4Eyebrow:'AI-assisted development',item4Title:'From idea to working software faster.',item4Text:'AI supports architecture, prototyping, debugging, refactoring, UX exploration, research and documentation while product direction stays human-led.',item4Icon:'AI',item4Style:'white',
       },
       render: p => <section className="shared-card-grid-section"><div className="shared-wrap">
-        <div className="shared-card-grid-heading"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p></div>
+        {(p.eyebrow || p.heading || p.text) && <div className="shared-card-grid-heading">{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <h2 className="shared-section-title">{p.heading}</h2>}{p.text && <p className="shared-lead">{p.text}</p>}</div>}
         <div className="shared-work-grid">{[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><h3>{p['item'+i+'Title']}</h3><p>{p['item'+i+'Text']}</p></article>)}</div>
       </div></section>,
     },
@@ -859,7 +859,7 @@ export const siteBuilderConfig = {
         item6Title:'Systems Integration',item6Text:'Connect or simplify what already exists instead of rebuilding everything from scratch.',
       },
       render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
-        {[1,2,3,4,5,6].map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
+        {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
       </div></div></section>,
     },
 
