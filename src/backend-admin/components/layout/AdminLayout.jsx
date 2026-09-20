@@ -24,7 +24,7 @@ import {
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { SOCIAL_NETWORKS, emptySocialLinks } from '../../config/siteContent';
-import { loadAdminSocial } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminSites, loadAdminSocial, setAdminSiteKey } from '../../services/siteAdminService';
 
 const navGroups = [
   {
@@ -84,6 +84,8 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [social, setSocial] = useState(emptySocialLinks());
+  const [sites, setSites] = useState([]);
+  const [siteKey, setSiteKey] = useState(getAdminSiteKey());
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState(() => {
     if (typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches) {
@@ -100,8 +102,11 @@ export default function AdminLayout() {
 
   useEffect(() => {
     if (!accessToken) return;
-    loadAdminSocial(accessToken).then(setSocial).catch(() => {});
-  }, [accessToken]);
+    Promise.all([
+      loadAdminSocial(accessToken).then(setSocial).catch(() => {}),
+      loadAdminSites(accessToken).then(setSites).catch(() => {}),
+    ]);
+  }, [accessToken, siteKey]);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -109,6 +114,20 @@ export default function AdminLayout() {
       setOpenGroups(current => ({ ...current, [activeGroupId]: true }));
     }
   }, [location.pathname, activeGroupId]);
+
+  const activeSite = sites.find(site => site.site_key === siteKey) || {
+    site_key: siteKey,
+    name: siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn',
+    domain: siteKey === 'justindematteis' ? 'justindematteis.com' : 'justconsignin.com',
+    admin_label: siteKey === 'justindematteis' ? 'JustinDeMatteis.com' : 'JustConsignIn',
+  };
+
+  const changeSite = event => {
+    const nextSite = event.target.value;
+    setAdminSiteKey(nextSite);
+    setSiteKey(nextSite);
+    window.location.reload();
+  };
 
   const logout = () => { signOut(); navigate('/'); };
   const toggleGroup = id => setOpenGroups(current => ({ ...current, [id]: !current[id] }));
@@ -118,14 +137,14 @@ export default function AdminLayout() {
       <div className="site-admin-mobile-nav-head">
         <Link to="/admin" className="site-admin-brand compact" onClick={() => setMobileNavOpen(false)}>
           <span className="site-admin-brand-mark">J</span>
-          <span><strong>JustConsignIn</strong><small>Website Admin</small></span>
+          <span><strong>{activeSite.name}</strong><small>Website Admin</small></span>
         </Link>
         <button className="site-admin-mobile-close" type="button" onClick={() => setMobileNavOpen(false)} aria-label="Close menu"><X size={22}/></button>
       </div>
 
       <Link to="/admin" className="site-admin-brand desktop-brand">
         <span className="site-admin-brand-mark">J</span>
-        <span><strong>JustConsignIn</strong><small>Website Admin</small></span>
+        <span><strong>{activeSite.name}</strong><small>Website Admin</small></span>
       </Link>
 
       <nav className="site-admin-nav organized-nav">
@@ -170,9 +189,15 @@ export default function AdminLayout() {
     <div className="site-admin-workspace">
       <header className="site-admin-header">
         <button className="site-admin-mobile-menu" type="button" onClick={() => setMobileNavOpen(true)} aria-label="Open menu"><Menu size={22}/></button>
-        <div className="site-admin-header-title"><strong>JustConsignIn Website Admin</strong><small>Manage justconsignin.com</small></div>
+        <div className="site-admin-header-title"><strong>{activeSite.name} Website Admin</strong><small>Manage {activeSite.domain}</small></div>
         <div className="site-admin-header-actions">
-          <a className="site-admin-btn secondary small" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
+          <label className="site-admin-site-switcher">
+            <span>Website</span>
+            <select value={siteKey} onChange={changeSite} aria-label="Select website">
+              {(sites.length ? sites : [activeSite]).map(site => <option key={site.site_key} value={site.site_key}>{site.admin_label || site.name}</option>)}
+            </select>
+          </label>
+          <a className="site-admin-btn secondary small" href={`https://${activeSite.domain}`} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
           <span className="site-admin-user"><strong>{user?.name || 'Admin'}</strong><small>{user?.email}</small></span>
           <button className="site-admin-btn secondary small" type="button" onClick={logout}><LogOut size={13}/> Log out</button>
         </div>
