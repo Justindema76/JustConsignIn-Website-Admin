@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, ExternalLink, Image, LoaderCircle, RotateCcw, 
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import {
+  getAdminSiteKey,
   loadAdminGlobalStyles,
   loadAdminSitePage,
   publishAdminSitePage,
@@ -15,28 +16,31 @@ import { getInitialPageBuilderData, getWebsitePage, livePageUrl } from './websit
 import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
-function storageKey(pageId) {
-  const version = pageId === 'features' ? 'v3' : 'v2';
-  return `jci-site-builder-page-${pageId}-${version}`;
+function storageKey(siteKey, pageId) {
+  const version = siteKey === 'justconsignin' && pageId === 'features' ? 'v3' : 'v2';
+  return `justinnovate-site-builder-${siteKey}-${pageId}-${version}`;
 }
 
-function readLocalDraft(pageId) {
+function readLocalDraft(siteKey, pageId) {
   if (typeof window === 'undefined') return null;
   try {
-    const saved = window.localStorage.getItem(storageKey(pageId));
+    const saved = window.localStorage.getItem(storageKey(siteKey, pageId));
     return saved ? JSON.parse(saved) : null;
   } catch {
     return null;
   }
 }
 
-function writeLocalDraft(pageId, data) {
+function writeLocalDraft(siteKey, pageId, data) {
   try {
-    window.localStorage.setItem(storageKey(pageId), JSON.stringify(data));
+    window.localStorage.setItem(storageKey(siteKey, pageId), JSON.stringify(data));
   } catch {}
 }
 
-function validatePublishData(page, data) {
+function validatePublishData(page, data, siteKey) {
+  if (siteKey === 'justindematteis') {
+    throw new Error('Publishing for JustinDeMatteis.com is blocked until the public portfolio shell is connected. Drafts are safe to edit and save now.');
+  }
   const blocks = Array.isArray(data?.content) ? data.content : [];
   const types = new Set(blocks.map(block => block?.type).filter(Boolean));
 
@@ -58,13 +62,14 @@ function validatePublishData(page, data) {
 
 export default function SiteBuilder() {
   const { pageId = '' } = useParams();
-  const page = getWebsitePage(pageId);
+  const siteKey = getAdminSiteKey();
+  const page = getWebsitePage(pageId, siteKey);
   const { accessToken } = useAuth();
 
   if (!page) return <Navigate to="/admin/website/pages" replace />;
   if (page.editor !== 'visual') return <Navigate to="/admin/website/pages" replace />;
 
-  const fallbackData = useMemo(() => getInitialPageBuilderData(page.id), [page.id]);
+  const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const [initialData, setInitialData] = useState(null);
   const [currentData, setCurrentData] = useState(null);
   const [editorKey, setEditorKey] = useState(0);
@@ -97,7 +102,7 @@ export default function SiteBuilder() {
         let migratedLocal = false;
 
         if (!data) {
-          const localDraft = readLocalDraft(page.id);
+          const localDraft = readLocalDraft(siteKey, page.id);
           if (localDraft) {
             data = localDraft;
             migratedLocal = true;
@@ -123,7 +128,7 @@ export default function SiteBuilder() {
         }
       } catch (loadError) {
         if (!active) return;
-        const localDraft = readLocalDraft(page.id);
+        const localDraft = readLocalDraft(siteKey, page.id);
         const data = localDraft || fallbackData;
         setInitialData(data);
         setCurrentData(data);
@@ -135,11 +140,11 @@ export default function SiteBuilder() {
 
     if (accessToken) load();
     return () => { active = false; };
-  }, [accessToken, page.id, fallbackData]);
+  }, [accessToken, page.id, siteKey, fallbackData]);
 
   const handleChange = data => {
     setCurrentData(data);
-    writeLocalDraft(page.id, data);
+    writeLocalDraft(siteKey, page.id, data);
   };
 
   const saveDraft = async () => {
@@ -151,7 +156,7 @@ export default function SiteBuilder() {
       const saved = await saveAdminSitePageDraft(accessToken, page, data);
       const when = saved.draft?.updated_at || new Date().toISOString();
       setSavedAt(when);
-      writeLocalDraft(page.id, data);
+      writeLocalDraft(siteKey, page.id, data);
       setMessage('Draft saved. The live website has not changed.');
     } catch (saveError) {
       setError(saveError.message || 'Unable to save the draft.');
@@ -165,14 +170,14 @@ export default function SiteBuilder() {
     setError('');
     setMessage('');
     try {
-      validatePublishData(page, data);
+      validatePublishData(page, data, siteKey);
       const saved = await publishAdminSitePage(accessToken, page, data);
       const draftWhen = saved.draft?.updated_at || new Date().toISOString();
       const publishWhen = saved.published?.published_at || new Date().toISOString();
       setCurrentData(data);
       setSavedAt(draftWhen);
       setPublishedAt(publishWhen);
-      writeLocalDraft(page.id, data);
+      writeLocalDraft(siteKey, page.id, data);
       setMessage('Published. This page is now using this version on the public website.');
     } catch (publishError) {
       setError(publishError.message || 'Unable to publish the page.');
@@ -185,7 +190,7 @@ export default function SiteBuilder() {
   const reset = () => {
     setInitialData(fallbackData);
     setCurrentData(fallbackData);
-    writeLocalDraft(page.id, fallbackData);
+    writeLocalDraft(siteKey, page.id, fallbackData);
     setMessage('Live website template content restored in the editor. Save Draft or Publish when you are ready.');
     setError('');
     setEditorKey(value => value + 1);
@@ -217,7 +222,7 @@ export default function SiteBuilder() {
           {savingDraft ? 'Saving…' : 'Save Draft'}
         </button>
         <Link className="site-admin-btn secondary" to="/admin/media"><Image size={15}/> Media Library</Link>
-        <a className="site-admin-btn secondary" href={livePageUrl(page.path)} target="_blank" rel="noreferrer">
+        <a className="site-admin-btn secondary" href={livePageUrl(page.path, siteKey)} target="_blank" rel="noreferrer">
           Open Live Page <ExternalLink size={13}/>
         </a>
         <button className="site-admin-btn secondary" type="button" onClick={reset}>
@@ -238,7 +243,7 @@ export default function SiteBuilder() {
 
     <div className="jci-puck-editor" style={globalStyleVars(globalStyles)}>
       <Puck
-        key={`${page.id}-${editorKey}`}
+        key={`${siteKey}-${page.id}-${editorKey}`}
         config={siteBuilderConfig}
         data={initialData}
         headerTitle={page.title}
