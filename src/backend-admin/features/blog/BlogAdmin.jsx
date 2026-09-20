@@ -3,7 +3,7 @@ import { Check, ExternalLink, Image, Plus, Save, Trash2 } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { BLOG_STATUS, createEmptyPost, deleteAdminBlogPost, loadAdminBlogPosts, saveAdminBlogPost, slugify } from './blogStore';
-import { loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
 
 function toTags(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
@@ -11,6 +11,8 @@ function toTags(value) {
 
 export default function BlogAdmin() {
   const { user, accessToken } = useAuth();
+  const siteKey = getAdminSiteKey();
+  const liveBaseUrl = siteKey === 'justindematteis' ? 'https://www.justindematteis.com' : 'https://www.justconsignin.com';
   const { id } = useParams();
   const navigate = useNavigate();
   const adminEmails = String(import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
@@ -185,7 +187,7 @@ export default function BlogAdmin() {
       </form>
       <aside>
         <div className="site-admin-card site-admin-side-card"><h2>Publishing</h2><label>Status<select value={draft.status} onChange={event => update('status', event.target.value)}><option value={BLOG_STATUS.DRAFT}>Draft</option><option value={BLOG_STATUS.PUBLISHED}>Published</option></select></label>{draft.publishedAt && <p>Published {new Date(draft.publishedAt).toLocaleDateString()}</p>}</div>
-        <div className="site-admin-card site-admin-side-card"><h2>Live URL</h2><p>/blog/{draft.slug || 'article-slug'}</p>{draft.slug && <a className="site-admin-btn secondary small" href={`https://www.justconsignin.com/blog/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View Live</a>}</div>
+        <div className="site-admin-card site-admin-side-card"><h2>Live URL</h2><p>/blog/{draft.slug || 'article-slug'}</p>{draft.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View Live</a>}</div>
         {draft.id && <div className="site-admin-card site-admin-side-card danger-zone"><h2>Danger Zone</h2><p>Delete this article permanently.</p><button className="site-admin-btn danger small" type="button" onClick={() => remove(draft)} disabled={busy}><Trash2 size={13}/> Delete Article</button></div>}
       </aside>
     </div>
@@ -205,7 +207,7 @@ export default function BlogAdmin() {
         <div><strong>{post.title || 'Untitled article'}</strong><small>/blog/{post.slug || 'no-slug'}</small></div>
         <span className={`site-admin-status ${post.status}`}>{post.status}</span>
         <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '—'}</span>
-        <div className="site-admin-actions right"><Link className="site-admin-btn secondary small" to={`/admin/blog/${post.id}`}>Edit</Link>{post.slug && <a className="site-admin-btn secondary small" href={`https://www.justconsignin.com/blog/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}<button className="site-admin-btn danger small" type="button" onClick={() => remove(post)} disabled={busy}><Trash2 size={13}/></button></div>
+        <div className="site-admin-actions right"><Link className="site-admin-btn secondary small" to={`/admin/blog/${post.id}`}>Edit</Link>{post.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}<button className="site-admin-btn danger small" type="button" onClick={() => remove(post)} disabled={busy}><Trash2 size={13}/></button></div>
       </div>)}
       {!busy && !filtered.length && <div className="site-admin-empty">No articles found.</div>}
     </div>
