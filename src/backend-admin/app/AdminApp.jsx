@@ -14,6 +14,7 @@ import SiteBuilder from '../features/site-builder/SiteBuilder';
 import WebsitePages from '../features/site-builder/WebsitePages';
 import BlockLibrary from '../features/site-builder/BlockLibrary';
 import GlobalBuilder from '../features/site-builder/GlobalBuilder';
+import GlobalStylesAdmin from '../features/site-builder/GlobalStylesAdmin';
 import SocialAdmin from '../features/social-links/SocialAdmin';
 import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
@@ -37,6 +38,7 @@ export default function AdminApp() {
         <Route path="/admin/website/pages" element={<WebsitePages />} />
         <Route path="/admin/website/pages/:pageId" element={<SiteBuilder />} />
         <Route path="/admin/website/blocks" element={<BlockLibrary />} />
+        <Route path="/admin/website/styles" element={<GlobalStylesAdmin />} />
         <Route path="/admin/website/global/:section" element={<GlobalBuilder />} />
         <Route path="/admin/social-image" element={<SocialImageStudio />} />
         <Route path="/admin/social-automation" element={<SocialAutomation />} />
