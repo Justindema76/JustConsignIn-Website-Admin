@@ -1,9 +1,34 @@
-import { useEffect } from 'react';
-import { BookOpen, Handshake, Image, Inbox, Link2, MapPinned, Settings, Sparkles, Video } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import {
+  BookOpen,
+  ChevronDown,
+  Handshake,
+  Image,
+  Inbox,
+  LayoutTemplate,
+  Link2,
+  MapPinned,
+  Settings,
+  Sparkles,
+  Video,
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './dashboard.css';
 
 const groups = [
+  {
+    id: 'website',
+    title: 'Website & Page Builder',
+    copy: 'Edit public website pages and publish visual changes.',
+    modules: [
+      {
+        to: '/admin/website/pages',
+        icon: LayoutTemplate,
+        title: 'Page Builder',
+        copy: 'Open every public page, edit visual pages, and publish changes to the live website.',
+      },
+    ],
+  },
   {
     id: 'leads',
     title: 'Leads & Growth',
@@ -73,11 +98,30 @@ const groups = [
       },
     ],
   },
+  {
+    id: 'settings',
+    title: 'Settings',
+    copy: 'Website configuration and reusable services.',
+    modules: [
+      {
+        to: '/admin/settings',
+        icon: Settings,
+        title: 'Website Settings',
+        copy: 'Configure outgoing email and reusable website services without changing code or Vercel variables.',
+      },
+    ],
+  },
 ];
+
+function initialOpenGroups() {
+  const compact = typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches;
+  return Object.fromEntries(groups.map(group => [group.id, !compact]));
+}
 
 export default function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [openGroups, setOpenGroups] = useState(initialOpenGroups);
 
   useEffect(() => {
     if (location.pathname === '/admin' && location.search) {
@@ -85,51 +129,50 @@ export default function Dashboard() {
     }
   }, [location.pathname, location.search, navigate]);
 
+  const toggleGroup = id => {
+    setOpenGroups(current => ({ ...current, [id]: !current[id] }));
+  };
+
   return <>
     <div className="site-admin-page-head dashboard-head">
       <div>
         <p className="site-admin-eyebrow">Overview</p>
         <h1>Dashboard</h1>
-        <p>Your admin tools are grouped by what you are trying to manage, instead of one long list.</p>
+        <p>Open only the section you need. Website editing and the page builder are available directly here.</p>
       </div>
     </div>
 
     <div className="dashboard-groups">
-      {groups.map(group => <section className={`dashboard-group ${group.id}`} key={group.id}>
-        <div className="dashboard-group-head">
-          <div>
-            <h2>{group.title}</h2>
-            <p>{group.copy}</p>
-          </div>
-        </div>
-        <div className="dashboard-module-grid">
-          {group.modules.map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
-            <span className="site-admin-module-icon"><Icon size={20}/></span>
-            <span className="dashboard-module-copy">
-              <strong>{title}</strong>
-              <small>{copy}</small>
-            </span>
-            <span className="dashboard-module-arrow">›</span>
-          </Link>)}
-        </div>
-      </section>)}
-    </div>
+      {groups.map(group => {
+        const open = Boolean(openGroups[group.id]);
 
-    <section className="dashboard-group settings dashboard-settings-card">
-      <div className="dashboard-group-head">
-        <div>
-          <h2>Settings</h2>
-          <p>Website configuration stays separated at the bottom.</p>
-        </div>
-      </div>
-      <Link className="dashboard-module-link dashboard-settings-link" to="/admin/settings">
-        <span className="site-admin-module-icon"><Settings size={20}/></span>
-        <span className="dashboard-module-copy">
-          <strong>Website Settings</strong>
-          <small>Configure outgoing email and reusable website services without changing code or Vercel variables.</small>
-        </span>
-        <span className="dashboard-module-arrow">›</span>
-      </Link>
-    </section>
+        return <section className={`dashboard-group ${group.id} ${open ? 'open' : 'collapsed'}`} key={group.id}>
+          <button
+            className="dashboard-group-toggle"
+            type="button"
+            onClick={() => toggleGroup(group.id)}
+            aria-expanded={open}
+            aria-controls={`dashboard-group-${group.id}`}
+          >
+            <span className="dashboard-group-head-copy">
+              <strong>{group.title}</strong>
+              <small>{group.copy}</small>
+            </span>
+            <ChevronDown className={open ? 'open' : ''} size={20}/>
+          </button>
+
+          {open && <div className="dashboard-module-grid" id={`dashboard-group-${group.id}`}>
+            {group.modules.map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
+              <span className="site-admin-module-icon"><Icon size={20}/></span>
+              <span className="dashboard-module-copy">
+                <strong>{title}</strong>
+                <small>{copy}</small>
+              </span>
+              <span className="dashboard-module-arrow">›</span>
+            </Link>)}
+          </div>}
+        </section>;
+      })}
+    </div>
   </>;
 }
