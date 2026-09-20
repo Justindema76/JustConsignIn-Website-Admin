@@ -29,13 +29,29 @@ function editTarget(page) {
   return null;
 }
 
+function editorLabel(page) {
+  if (page.editor === 'visual') return 'Visual editor';
+  if (page.editor === 'blog') return 'Blog manager';
+  if (page.id === 'faq') return 'Structured FAQ';
+  if (page.kind === 'form') return 'Form-specific page';
+  if (page.kind === 'application') return 'Application UI';
+  return 'Custom page';
+}
+
+function customPageNote(page) {
+  if (page.id === 'faq') return 'Dedicated FAQ editor needed to preserve FAQ structured data.';
+  if (page.kind === 'form') return 'Dedicated form editor needed.';
+  if (page.kind === 'application') return 'Managed as application UI, not page-builder content.';
+  return 'Dedicated editor required.';
+}
+
 export default function WebsitePages() {
   return <div className="jci-website-pages">
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Website</p>
         <h1>Pages</h1>
-        <p>These are the pages currently created in the public JustConsignIn website codebase.</p>
+        <p>Edit visual pages here. Structured, form, and application pages stay separate when they require special behaviour.</p>
       </div>
       <div className="site-admin-actions">
         <a className="site-admin-btn secondary" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">
@@ -47,8 +63,8 @@ export default function WebsitePages() {
     <div className="jci-page-sync-note">
       <ShieldCheck size={18}/>
       <div>
-        <strong>Synced from the current public website routes</strong>
-        <span>Duplicate aliases such as /beta and the /demo redirect are attached to their real page instead of being shown as separate pages.</span>
+        <strong>Connected to the current public website routes</strong>
+        <span>Visual pages use the page builder. Special pages keep their own editor when they need structured data, forms, or application behaviour.</span>
       </div>
     </div>
 
@@ -57,12 +73,11 @@ export default function WebsitePages() {
         const meta = kindMeta[page.kind] || kindMeta.marketing;
         const Icon = meta.icon;
         const target = editTarget(page);
+
         return <article className="site-admin-card jci-website-page-card" key={page.id}>
           <div className="jci-page-card-top">
             <span className="jci-page-kind"><Icon size={14}/>{meta.label}</span>
-            <span className={`jci-page-editor-status ${page.editor}`}>
-              {page.editor === 'visual' ? 'Visual editor' : page.editor === 'blog' ? 'Blog manager' : 'Custom page'}
-            </span>
+            <span className={`jci-page-editor-status ${page.editor}`}>{editorLabel(page)}</span>
           </div>
 
           <div className="jci-page-card-copy">
@@ -75,7 +90,7 @@ export default function WebsitePages() {
           <div className="jci-page-card-actions">
             {target ? <Link className="site-admin-btn" to={target}>
               <Pencil size={14}/> {page.editor === 'blog' ? 'Manage Blog' : 'Edit Page'}
-            </Link> : <span className="jci-custom-page-note">Custom conversion required</span>}
+            </Link> : <span className="jci-custom-page-note">{customPageNote(page)}</span>}
             <a className="site-admin-btn secondary" href={livePageUrl(page.path)} target="_blank" rel="noreferrer">
               Open Live <ExternalLink size={13}/>
             </a>
