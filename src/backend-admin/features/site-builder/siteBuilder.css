@@ -716,3 +716,9 @@
   .shared-mock-flow{grid-template-columns:1fr 1fr}.shared-case-copy{padding:30px}.shared-case-visual{padding:22px}.shared-skill-grid{grid-template-columns:1fr}
   .shared-process-row{grid-template-columns:1fr}
 }
+
+
+.shared-card-grid-heading{margin-bottom:34px}
+.shared-skill-grid{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.shared-skill-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.shared-skill-grid{grid-template-columns:1fr}}
