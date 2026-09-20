@@ -35,7 +35,7 @@ export const footerDefaults = {
   copyright: 'JustConsignIn. All rights reserved.',
   privacyLabel: 'Privacy', privacyUrl: '/privacy',
   termsLabel: 'Terms', termsUrl: '/terms',
-  background: 'light',
+  background: 'dark',
 };
 
 const backgroundOptions = [
