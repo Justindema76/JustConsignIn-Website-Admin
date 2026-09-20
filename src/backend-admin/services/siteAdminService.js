@@ -239,3 +239,17 @@ export async function saveAdminGlobalSection(accessToken, key, value) {
     body: JSON.stringify({ key, value }),
   }, accessToken));
 }
+
+
+export async function loadAdminGlobalStyles(accessToken) {
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=styles', {}, accessToken));
+  return { value: payload.value || null, updatedAt: payload.updatedAt || '' };
+}
+
+export async function saveAdminGlobalStyles(accessToken, value) {
+  return parseResponse(await adminFetch('/api/admin/site?resource=styles', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ value }),
+  }, accessToken));
+}
