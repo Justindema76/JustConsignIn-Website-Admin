@@ -431,3 +431,31 @@
   .jci-public-preview .home-shorts-grid{grid-template-columns:1fr}
   .jci-public-preview .youtube-gallery-card.short{max-width:300px}
 }
+
+
+/* Exact public Features page styles inside the builder preview. */
+.jci-public-preview .public-page-hero{max-width:980px;margin:0 auto;padding:82px 28px 34px}
+.jci-public-preview .public-page-hero>span{display:block;color:#1f67b2;text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:800;margin-bottom:14px}
+.jci-public-preview .public-page-hero h1{font-size:46px;line-height:1.06;letter-spacing:-.03em;margin:0 0 18px;max-width:820px;color:#202223}
+.jci-public-preview .public-page-hero>p{font-size:18px;line-height:1.65;color:#5c6268;max-width:760px;margin:0}
+.jci-public-preview .shopify-page-brand{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.jci-public-preview .shopify-page-brand img{width:115px;height:44px;object-fit:contain}
+.jci-public-preview .shopify-page-brand span{color:#46632c;font-size:13px;font-weight:750}
+.jci-public-preview .section-heading p{margin:0;color:#60666c;line-height:1.65;max-width:760px}
+.jci-public-preview .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.jci-public-preview .public-feature-grid{grid-template-columns:repeat(2,1fr)}
+.jci-public-preview .feature-grid article{background:#fff;border:1px solid #e0e4e8;border-radius:14px;padding:22px}
+.jci-public-preview .feature-grid svg{color:#1f67b2}
+.jci-public-preview .feature-grid h3{font-size:18px;margin:18px 0 8px;color:#202223}
+.jci-public-preview .feature-grid p{color:#60666c;line-height:1.6;margin:0;font-size:14px}
+.jci-public-preview .public-cta{max-width:980px;margin:20px auto 72px;padding:28px;background:#eef5fc;border:1px solid #d5e4f4;border-radius:16px}
+.jci-public-preview .public-cta h2{margin:0 0 8px;font-size:27px;color:#202223}
+.jci-public-preview .public-cta p{margin:0 0 18px;color:#5d6670;line-height:1.6}
+@media(max-width:900px){
+  .jci-public-preview .public-feature-grid{grid-template-columns:1fr}
+  .jci-public-preview .public-page-hero h1{font-size:38px}
+}
+@media(max-width:640px){
+  .jci-public-preview .public-page-hero{padding:54px 18px 24px}
+  .jci-public-preview .public-page-hero h1{font-size:33px}
+}
