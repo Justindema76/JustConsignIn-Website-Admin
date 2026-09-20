@@ -33,6 +33,19 @@ function writeLocalDraft(pageId, data) {
   } catch {}
 }
 
+function validatePublishData(page, data) {
+  if (page.id !== 'home') return;
+
+  const blocks = Array.isArray(data?.content) ? data.content : [];
+  const types = new Set(blocks.map(block => block?.type).filter(Boolean));
+  const required = ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'];
+  const missing = required.filter(type => !types.has(type));
+
+  if (missing.length) {
+    throw new Error('Homepage publish blocked: restore the live homepage sections before publishing.');
+  }
+}
+
 export default function SiteBuilder() {
   const { pageId = '' } = useParams();
   const page = getWebsitePage(pageId);
@@ -137,6 +150,7 @@ export default function SiteBuilder() {
     setError('');
     setMessage('');
     try {
+      validatePublishData(page, data);
       const saved = await publishAdminSitePage(accessToken, page, data);
       const draftWhen = saved.draft?.updated_at || new Date().toISOString();
       const publishWhen = saved.published?.published_at || new Date().toISOString();
