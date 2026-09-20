@@ -5,12 +5,14 @@ import { ArrowLeft, CheckCircle2, ExternalLink, Image, LoaderCircle, RotateCcw, 
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import {
+  loadAdminGlobalStyles,
   loadAdminSitePage,
   publishAdminSitePage,
   saveAdminSitePageDraft,
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
 import { getInitialPageBuilderData, getWebsitePage, livePageUrl } from './websitePages';
+import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
 function storageKey(pageId) {
@@ -72,6 +74,7 @@ export default function SiteBuilder() {
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState('');
+  const [globalStyles, setGlobalStyles] = useState(DEFAULT_GLOBAL_STYLES);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -83,8 +86,12 @@ export default function SiteBuilder() {
       setMessage('');
 
       try {
-        const state = await loadAdminSitePage(accessToken, page.id);
+        const [state, styleState] = await Promise.all([
+          loadAdminSitePage(accessToken, page.id),
+          loadAdminGlobalStyles(accessToken).catch(() => ({ value: null })),
+        ]);
         if (!active) return;
+        setGlobalStyles(normalizeGlobalStyles(styleState.value));
 
         let data = state.draft?.content || null;
         let migratedLocal = false;
@@ -229,7 +236,7 @@ export default function SiteBuilder() {
     {error && <div className="jci-builder-message error"><span>{error}</span></div>}
     {publishing && <div className="jci-builder-message publishing"><LoaderCircle className="jci-spin" size={17}/><span>Publishing {page.title}…</span></div>}
 
-    <div className="jci-puck-editor">
+    <div className="jci-puck-editor" style={globalStyleVars(globalStyles)}>
       <Puck
         key={`${page.id}-${editorKey}`}
         config={siteBuilderConfig}
