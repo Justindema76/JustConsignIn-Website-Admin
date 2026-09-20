@@ -232,6 +232,9 @@ const featuresHeroDefaults = {
   eyebrow: 'Features',
   heading: 'Move consignment inventory from intake to sale faster.',
   text: 'JustConsignIn is built for Shopify store owners who process lots of unique consignment and resale inventory. Enter items quickly, create Shopify products without duplicate entry, track every sale back to the correct consignor and keep payouts organized in one workflow.',
+  image: '',
+  imageAlt: '',
+  imagePosition: 'right',
 };
 
 const featuresGridDefaults = {
@@ -460,16 +463,29 @@ export const siteBuilderConfig = {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
         text: { type: 'text', label: 'Description' },
+        image: imageField,
+        imageAlt: { type: 'text', label: 'Image alt text' },
+        imagePosition: {
+          type: 'radio',
+          label: 'Image position',
+          options: [
+            { label: 'Right', value: 'right' },
+            { label: 'Left', value: 'left' },
+          ],
+        },
       },
       defaultProps: featuresHeroDefaults,
       render: rawProps => {
         const props = { ...featuresHeroDefaults, ...rawProps };
         return <div className="jci-public-preview">
-          <section className="public-page-hero">
-            <div className="shopify-page-brand"><img src={publicAsset('/images/brand/shopify-logo1.png')} alt="Shopify"/><span>{props.brandText}</span></div>
-            <span>{props.eyebrow}</span>
-            <h1>{props.heading}</h1>
-            <p>{props.text}</p>
+          <section className={`public-page-hero ${props.image ? 'with-media' : ''} ${props.imagePosition === 'left' ? 'media-left' : 'media-right'}`}>
+            <div className="public-page-hero-copy">
+              <div className="shopify-page-brand"><img src={publicAsset('/images/brand/shopify-logo1.png')} alt="Shopify"/><span>{props.brandText}</span></div>
+              <span>{props.eyebrow}</span>
+              <h1>{props.heading}</h1>
+              <p>{props.text}</p>
+            </div>
+            {props.image && <div className="public-page-hero-media"><img src={props.image} alt={props.imageAlt || ''}/></div>}
           </section>
         </div>;
       },
