@@ -221,3 +221,21 @@ export async function saveAdminSitePageDraft(accessToken, page, content) {
 export async function publishAdminSitePage(accessToken, page, content) {
   return saveAdminSitePage(accessToken, page, content, 'publish');
 }
+
+
+export async function loadAdminGlobalSection(accessToken, key) {
+  const payload = await parseResponse(await adminFetch(
+    `/api/admin/site?resource=global&key=${encodeURIComponent(key)}`,
+    {},
+    accessToken,
+  ));
+  return { value: payload.value || null, updatedAt: payload.updatedAt || '' };
+}
+
+export async function saveAdminGlobalSection(accessToken, key, value) {
+  return parseResponse(await adminFetch('/api/admin/site?resource=global', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key, value }),
+  }, accessToken));
+}
