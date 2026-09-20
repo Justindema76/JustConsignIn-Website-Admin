@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FieldLabel } from '@puckeditor/core';
-import { ArrowRight, ClipboardList, Image as ImageIcon, Library, ScanBarcode, Smartphone, Store, Upload, Users, WalletCards } from 'lucide-react';
+import { ArrowRight, BarChart3, ClipboardList, FileUp, Image as ImageIcon, Library, PackagePlus, ReceiptText, ScanBarcode, Smartphone, Store, Upload, Users, WalletCards } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import MediaPickerModal from '../social-automation/components/MediaPickerModal';
 import { loadAdminMedia, loadAdminVideos, uploadBlogImage } from '../../services/siteAdminService';
@@ -227,11 +227,70 @@ const homeLinksDefaults = {
   link3Url: '/shopify-app',
 };
 
+const featuresHeroDefaults = {
+  brandText: 'Built for Shopify consignment stores',
+  eyebrow: 'Features',
+  heading: 'Move consignment inventory from intake to sale faster.',
+  text: 'JustConsignIn is built for Shopify store owners who process lots of unique consignment and resale inventory. Enter items quickly, create Shopify products without duplicate entry, track every sale back to the correct consignor and keep payouts organized in one workflow.',
+};
+
+const featuresGridDefaults = {
+  eyebrow: 'Made for real resale workflows',
+  heading: 'When every item is different, intake speed matters.',
+  text: 'Traditional retail receives repeatable SKUs from suppliers. Consignment and resale stores often receive one-of-a-kind items in batches. JustConsignIn focuses on making that store-owner workflow faster and easier to manage from the moment inventory comes in.',
+  item1Title: 'Built for high-volume resale inventory',
+  item1Text: 'JustConsignIn is designed for consignment and resale stores that receive lots of unique items. Move quickly from an item in hand to a complete consignment record without relying on paper notes or spreadsheets.',
+  item2Title: 'Consignor accounts',
+  item2Text: 'Keep contact details, commission split, notes, balances and every item connected to the correct consignor.',
+  item3Title: 'Fast mobile item intake',
+  item3Text: 'Create consignors and add items from your phone while you are receiving inventory. Enter the item once, add product details and photos, and keep the intake process moving.',
+  item4Title: 'Create Shopify products without duplicate entry',
+  item4Text: 'Turn a consignment item into a Shopify product without typing the same information into a second system. Publish to Shopify POS and choose whether the item should also be available online.',
+  item5Title: 'Shopify POS, online and manual sales tracking',
+  item5Text: 'Keep each consignment item tied to the correct consignor whether it sells in-store through Shopify POS, through your Shopify online store, or through a manual sale workflow.',
+  item6Title: 'Payout management',
+  item6Text: 'See sold-unpaid items, calculate the consignor share and record payouts while preserving the full sale and payout history.',
+  item7Title: 'Reports and transactions',
+  item7Text: 'Review sales, consignor earnings, payout history and transaction activity from the same workspace so you always know what sold and what is still owed.',
+  item8Title: 'Import and export for larger inventories',
+  item8Text: 'Bulk import consignors and items from CSV and keep downloadable data tools available when you are moving existing inventory into JustConsignIn or maintaining your own records.',
+};
+
+const featuresAudienceDefaults = {
+  eyebrow: 'Who JustConsignIn is for',
+  heading: 'Shopify stores with a lot of unique resale inventory to enter and track.',
+  text: 'The common problem is volume: many individual items, many consignors and a constant need to know who owns what, what sold and what each person is owed.',
+  item1Title: 'Consignment & resale shops',
+  item1Text: 'Stores taking in a steady flow of one-of-a-kind inventory from consignors.',
+  item2Title: 'Secondhand & thrift-style stores',
+  item2Text: 'Shops using Shopify that need a faster way to enter and manage large amounts of resale inventory tied to individual consignors.',
+  item3Title: 'Children’s & family resale',
+  item3Text: 'Clothing, toys, baby gear and other categories where many unique items can arrive from the same consignor at once.',
+  item4Title: 'Vintage & clothing stores',
+  item4Text: 'Apparel, accessories and vintage inventory where every item may need its own title, price, photos and consignor record.',
+  item5Title: 'Furniture & home décor consignment',
+  item5Text: 'Larger one-off pieces that need ownership, pricing, sale status and payout information kept together.',
+  item6Title: 'Specialty resale stores',
+  item6Text: 'Sporting goods, collectibles, designer goods and other resale businesses handling unique inventory through Shopify.',
+};
+
+const featuresCtaDefaults = {
+  heading: 'Spend less time entering inventory and more time selling it.',
+  text: 'Explore consignors, fast mobile intake, Shopify product creation, POS and online sales tracking, and payouts in the working app demo.',
+  buttonText: 'Open Shopify App Demo',
+  buttonUrl: '/shopify-app',
+};
+
+
 export const siteBuilderConfig = {
   categories: {
     homepage: {
       title: 'Homepage',
       components: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
+    },
+    featuresPage: {
+      title: 'Features page',
+      components: ['FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock'],
     },
     content: {
       title: 'Content',
@@ -389,6 +448,128 @@ export const siteBuilderConfig = {
             <a href={props.link1Url || '#'} onClick={previewClick}><Users size={22}/><div><strong>{props.link1Title}</strong><span>{props.link1Text}</span></div><ArrowRight size={18}/></a>
             <a href={props.link2Url || '#'} onClick={previewClick}><ClipboardList size={22}/><div><strong>{props.link2Title}</strong><span>{props.link2Text}</span></div><ArrowRight size={18}/></a>
             <a href={props.link3Url || '#'} onClick={previewClick}><Store size={22}/><div><strong>{props.link3Title}</strong><span>{props.link3Text}</span></div><ArrowRight size={18}/></a>
+          </section>
+        </div>;
+      },
+    },
+
+    FeaturesHeroBlock: {
+      label: 'Features Hero',
+      fields: {
+        brandText: { type: 'text', label: 'Shopify badge text' },
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'text', label: 'Description' },
+      },
+      defaultProps: featuresHeroDefaults,
+      render: rawProps => {
+        const props = { ...featuresHeroDefaults, ...rawProps };
+        return <div className="jci-public-preview">
+          <section className="public-page-hero">
+            <div className="shopify-page-brand"><img src={publicAsset('/images/brand/shopify-logo1.png')} alt="Shopify"/><span>{props.brandText}</span></div>
+            <span>{props.eyebrow}</span>
+            <h1>{props.heading}</h1>
+            <p>{props.text}</p>
+          </section>
+        </div>;
+      },
+    },
+    FeaturesGridBlock: {
+      label: 'Features Grid',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'text', label: 'Description' },
+        item1Title: { type: 'text', label: 'Feature 1 title' }, item1Text: { type: 'text', label: 'Feature 1 text' },
+        item2Title: { type: 'text', label: 'Feature 2 title' }, item2Text: { type: 'text', label: 'Feature 2 text' },
+        item3Title: { type: 'text', label: 'Feature 3 title' }, item3Text: { type: 'text', label: 'Feature 3 text' },
+        item4Title: { type: 'text', label: 'Feature 4 title' }, item4Text: { type: 'text', label: 'Feature 4 text' },
+        item5Title: { type: 'text', label: 'Feature 5 title' }, item5Text: { type: 'text', label: 'Feature 5 text' },
+        item6Title: { type: 'text', label: 'Feature 6 title' }, item6Text: { type: 'text', label: 'Feature 6 text' },
+        item7Title: { type: 'text', label: 'Feature 7 title' }, item7Text: { type: 'text', label: 'Feature 7 text' },
+        item8Title: { type: 'text', label: 'Feature 8 title' }, item8Text: { type: 'text', label: 'Feature 8 text' },
+      },
+      defaultProps: featuresGridDefaults,
+      render: rawProps => {
+        const props = { ...featuresGridDefaults, ...rawProps };
+        const items = [
+          [Store, props.item1Title, props.item1Text],
+          [Users, props.item2Title, props.item2Text],
+          [Smartphone, props.item3Title, props.item3Text],
+          [PackagePlus, props.item4Title, props.item4Text],
+          [ReceiptText, props.item5Title, props.item5Text],
+          [WalletCards, props.item6Title, props.item6Text],
+          [BarChart3, props.item7Title, props.item7Text],
+          [FileUp, props.item8Title, props.item8Text],
+        ];
+        return <div className="jci-public-preview">
+          <section className="public-section">
+            <div className="section-heading">
+              <span>{props.eyebrow}</span>
+              <h2>{props.heading}</h2>
+              <p>{props.text}</p>
+            </div>
+            <div className="feature-grid public-feature-grid">
+              {items.map(([Icon,title,copy], index) => <article key={index}><Icon size={26}/><h3>{title}</h3><p>{copy}</p></article>)}
+            </div>
+          </section>
+        </div>;
+      },
+    },
+    FeaturesAudienceBlock: {
+      label: 'Store Types Grid',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'text', label: 'Description' },
+        item1Title: { type: 'text', label: 'Store type 1 title' }, item1Text: { type: 'text', label: 'Store type 1 text' },
+        item2Title: { type: 'text', label: 'Store type 2 title' }, item2Text: { type: 'text', label: 'Store type 2 text' },
+        item3Title: { type: 'text', label: 'Store type 3 title' }, item3Text: { type: 'text', label: 'Store type 3 text' },
+        item4Title: { type: 'text', label: 'Store type 4 title' }, item4Text: { type: 'text', label: 'Store type 4 text' },
+        item5Title: { type: 'text', label: 'Store type 5 title' }, item5Text: { type: 'text', label: 'Store type 5 text' },
+        item6Title: { type: 'text', label: 'Store type 6 title' }, item6Text: { type: 'text', label: 'Store type 6 text' },
+      },
+      defaultProps: featuresAudienceDefaults,
+      render: rawProps => {
+        const props = { ...featuresAudienceDefaults, ...rawProps };
+        const items = [
+          [props.item1Title, props.item1Text],
+          [props.item2Title, props.item2Text],
+          [props.item3Title, props.item3Text],
+          [props.item4Title, props.item4Text],
+          [props.item5Title, props.item5Text],
+          [props.item6Title, props.item6Text],
+        ];
+        return <div className="jci-public-preview">
+          <section className="public-section">
+            <div className="section-heading">
+              <span>{props.eyebrow}</span>
+              <h2>{props.heading}</h2>
+              <p>{props.text}</p>
+            </div>
+            <div className="feature-grid public-feature-grid">
+              {items.map(([title,copy], index) => <article key={index}><h3>{title}</h3><p>{copy}</p></article>)}
+            </div>
+          </section>
+        </div>;
+      },
+    },
+    FeaturesCtaBlock: {
+      label: 'Features CTA',
+      fields: {
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'text', label: 'Text' },
+        buttonText: { type: 'text', label: 'Button text' },
+        buttonUrl: { type: 'text', label: 'Button link' },
+      },
+      defaultProps: featuresCtaDefaults,
+      render: rawProps => {
+        const props = { ...featuresCtaDefaults, ...rawProps };
+        return <div className="jci-public-preview">
+          <section className="public-cta">
+            <h2>{props.heading}</h2>
+            <p>{props.text}</p>
+            <a className="public-button large" href={props.buttonUrl || '#'} onClick={previewClick}>{props.buttonText}</a>
           </section>
         </div>;
       },
