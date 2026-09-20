@@ -18,6 +18,23 @@ const VIDEO_TYPE_BY_EXTENSION = {
   m4v: 'video/x-m4v',
 };
 
+export const DEFAULT_ADMIN_SITE_KEY = 'justconsignin';
+
+export function getAdminSiteKey() {
+  if (typeof window === 'undefined') return DEFAULT_ADMIN_SITE_KEY;
+  return window.localStorage.getItem('justinnovate-admin-site') || DEFAULT_ADMIN_SITE_KEY;
+}
+
+export function setAdminSiteKey(siteKey) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem('justinnovate-admin-site', siteKey || DEFAULT_ADMIN_SITE_KEY);
+}
+
+function siteAdminUrl(url) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}site=${encodeURIComponent(getAdminSiteKey())}`;
+}
+
 const parseResponse = response => parseJsonResponse(response, 'Website admin request failed');
 
 function safeFilename(filename = 'file') {
@@ -109,12 +126,12 @@ function normalizeVideoUpload(file) {
 }
 
 export async function loadAdminVideos(accessToken) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=videos', {}, accessToken));
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=videos'), {}, accessToken));
   return Array.isArray(payload.videos) ? payload.videos.map(normalizeVideo) : [];
 }
 
 export async function saveAdminVideo(accessToken, video) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=videos', {
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=videos'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(video),
@@ -127,12 +144,12 @@ export async function deleteAdminVideo(accessToken, id) {
 }
 
 export async function loadAdminSocial(accessToken) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=social', {}, accessToken));
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=social'), {}, accessToken));
   return { ...emptySocialLinks(), ...(payload.social || {}) };
 }
 
 export async function saveAdminSocial(accessToken, social) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=social', {
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=social'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ social }),
@@ -141,7 +158,7 @@ export async function saveAdminSocial(accessToken, social) {
 }
 
 export async function loadAdminMedia(accessToken) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=media', {}, accessToken));
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=media'), {}, accessToken));
   return Array.isArray(payload.media) ? payload.media : [];
 }
 
@@ -190,7 +207,7 @@ export async function uploadSocialVideo(accessToken, file) {
 
 export async function loadAdminSitePage(accessToken, pageId) {
   const payload = await parseResponse(await adminFetch(
-    `/api/admin/site?resource=page&pageId=${encodeURIComponent(pageId)}`,
+    siteAdminUrl(`/api/admin/site?resource=page&pageId=${encodeURIComponent(pageId)}`),
     {},
     accessToken,
   ));
@@ -201,7 +218,7 @@ export async function loadAdminSitePage(accessToken, pageId) {
 }
 
 async function saveAdminSitePage(accessToken, page, content, action) {
-  return parseResponse(await adminFetch('/api/admin/site?resource=page', {
+  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=page'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -225,7 +242,7 @@ export async function publishAdminSitePage(accessToken, page, content) {
 
 export async function loadAdminGlobalSection(accessToken, key) {
   const payload = await parseResponse(await adminFetch(
-    `/api/admin/site?resource=global&key=${encodeURIComponent(key)}`,
+    siteAdminUrl(`/api/admin/site?resource=global&key=${encodeURIComponent(key)}`),
     {},
     accessToken,
   ));
@@ -233,7 +250,7 @@ export async function loadAdminGlobalSection(accessToken, key) {
 }
 
 export async function saveAdminGlobalSection(accessToken, key, value) {
-  return parseResponse(await adminFetch('/api/admin/site?resource=global', {
+  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=global'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ key, value }),
@@ -242,14 +259,20 @@ export async function saveAdminGlobalSection(accessToken, key, value) {
 
 
 export async function loadAdminGlobalStyles(accessToken) {
-  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=styles', {}, accessToken));
+  const payload = await parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=styles'), {}, accessToken));
   return { value: payload.value || null, updatedAt: payload.updatedAt || '' };
 }
 
 export async function saveAdminGlobalStyles(accessToken, value) {
-  return parseResponse(await adminFetch('/api/admin/site?resource=styles', {
+  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=styles'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ value }),
   }, accessToken));
+}
+
+
+export async function loadAdminSites(accessToken) {
+  const payload = await parseResponse(await adminFetch('/api/admin/site?resource=sites', {}, accessToken));
+  return Array.isArray(payload.sites) ? payload.sites : [];
 }
