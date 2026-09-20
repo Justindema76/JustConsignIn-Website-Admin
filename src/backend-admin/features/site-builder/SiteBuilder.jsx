@@ -14,7 +14,7 @@ import { getInitialPageBuilderData, getWebsitePage, livePageUrl } from './websit
 import './siteBuilder.css';
 
 function storageKey(pageId) {
-  return `jci-site-builder-page-${pageId}-v1`;
+  return `jci-site-builder-page-${pageId}-v2`;
 }
 
 function readLocalDraft(pageId) {
@@ -157,7 +157,7 @@ export default function SiteBuilder() {
     setInitialData(fallbackData);
     setCurrentData(fallbackData);
     writeLocalDraft(page.id, fallbackData);
-    setMessage('Imported website content restored in the editor. Save Draft or Publish when you are ready.');
+    setMessage('Live website template content restored in the editor. Save Draft or Publish when you are ready.');
     setError('');
     setEditorKey(value => value + 1);
   };
@@ -198,7 +198,7 @@ export default function SiteBuilder() {
     </div>
 
     <div className="jci-builder-notice">
-      <strong>Live publishing is connected.</strong> Use <strong>Save Draft</strong> for private changes. Use Puck's <strong>Publish</strong> button when you want this page to replace the current live version.
+      <strong>Live publishing is connected to the page template.</strong> The builder preview uses the same public layout and CSS. Use <strong>Save Draft</strong> for private changes and <strong>Publish</strong> only when the preview is correct.
       {savedAt && <span> Draft saved {new Date(savedAt).toLocaleString()}.</span>}
       {publishedAt && <span> Published {new Date(publishedAt).toLocaleString()}.</span>}
     </div>
