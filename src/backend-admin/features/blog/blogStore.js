@@ -1,3 +1,4 @@
+import { getAdminSiteKey } from '../../services/siteAdminService';
 export const BLOG_STATUS = {
   DRAFT: 'draft',
   PUBLISHED: 'published',
@@ -117,24 +118,34 @@ export async function loadPublishedBlogPost(slug) {
 }
 
 export async function loadAdminBlogPosts(accessToken) {
-  const payload = await parseResponse(await fetch('/api/admin/blog', { headers: { Authorization: `Bearer ${accessToken}` } }));
+  const siteKey = getAdminSiteKey();
+  const payload = await parseResponse(await fetch(`/api/admin/blog?site=${encodeURIComponent(siteKey)}`, { headers: { Authorization: `Bearer ${accessToken}` } }));
   return Array.isArray(payload.posts) ? payload.posts.map(normalizeBlogPost) : [];
 }
 
 export async function saveAdminBlogPost(accessToken, input) {
-  const post = { ...input, slug: slugify(input.slug || input.title) };
-  const payload = await parseResponse(await fetch('/api/admin/blog', {
+  const siteKey = getAdminSiteKey();
+  const post = { ...input, siteKey, slug: slugify(input.slug || input.title) };
+  const payload = await parseResponse(await fetch(`/api/admin/blog?site=${encodeURIComponent(siteKey)}`, {
     method: 'POST', headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(post),
   }));
   return normalizeBlogPost(payload.post || {});
 }
 
 export async function deleteAdminBlogPost(accessToken, id) {
-  await parseResponse(await fetch(`/api/admin/blog?id=${encodeURIComponent(id)}`, {
+  const siteKey = getAdminSiteKey();
+  await parseResponse(await fetch(`/api/admin/blog?site=${encodeURIComponent(siteKey)}&id=${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` },
   }));
 }
 
-export function createEmptyPost() { return { ...EMPTY_POST, tags: [] }; }
+export function createEmptyPost(siteKey = getAdminSiteKey()) {
+  return {
+    ...EMPTY_POST,
+    tags: [],
+    category: siteKey === 'justindematteis' ? 'Development' : 'Shopify Consignment',
+    authorName: siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn',
+  };
+}
 
 export const BLOG_STORAGE_NOTE = 'Database-backed blog. Drafts and published articles are stored in Supabase; public readers only receive published posts.';
