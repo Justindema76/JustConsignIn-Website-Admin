@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, LoaderCircle, Palette, RotateCcw, Save, Type, LayoutGrid, SquareRoundCorner } from 'lucide-react';
+import { CheckCircle2, LoaderCircle, Palette, RotateCcw, Save, Type, LayoutGrid, Square } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadAdminGlobalStyles, saveAdminGlobalStyles } from '../../services/siteAdminService';
 import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
@@ -125,7 +125,7 @@ export default function GlobalStylesAdmin() {
         </section>
 
         <section className="site-admin-card global-style-section">
-          <div className="global-style-section-head"><SquareRoundCorner size={18}/><div><h2>Components</h2><p>Shared card and button shape defaults.</p></div></div>
+          <div className="global-style-section-head"><Square size={18}/><div><h2>Components</h2><p>Shared card and button shape defaults.</p></div></div>
           <div className="global-style-number-grid">
             <NumberField label="Card radius" value={styles.cardRadius} min={0} max={40} onChange={value => update('cardRadius',value)}/>
             <NumberField label="Button radius" value={styles.buttonRadius} min={0} max={40} onChange={value => update('buttonRadius',value)}/>
