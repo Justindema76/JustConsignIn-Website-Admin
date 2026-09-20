@@ -15,6 +15,7 @@ import {
   LibraryBig,
   PanelTop,
   PanelBottom,
+  Palette,
   Settings,
   Sparkles,
   Video,
@@ -50,6 +51,7 @@ const navGroups = [
     items: [
       { to: '/admin/website/pages', label: 'Pages', icon: PanelsTopLeft },
       { to: '/admin/website/blocks', label: 'Block Library', icon: LibraryBig },
+      { to: '/admin/website/styles', label: 'Global Styles', icon: Palette },
       { to: '/admin/website/global/header', label: 'Header', icon: PanelTop },
       { to: '/admin/website/global/footer', label: 'Footer', icon: PanelBottom },
     ],
