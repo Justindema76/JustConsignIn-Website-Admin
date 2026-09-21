@@ -1,4 +1,4 @@
-import { ArrowRight, Boxes, ExternalLink, Image, LayoutGrid, ListChecks, Megaphone, MonitorPlay, MousePointerClick, PanelTop, Rows3, Type } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Boxes, ExternalLink, Image, LayoutGrid, ListChecks, Megaphone, MonitorPlay, MousePointerClick, PanelTop, Rows3, Type } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './blockLibrary.css';
 
@@ -14,6 +14,7 @@ const groups = [
       { name: 'Text', icon: Rows3, description: 'Reusable copy block with alignment controls.' },
       { name: 'Image', icon: Image, description: 'Standalone responsive image from Media, upload or URL.' },
       { name: 'Call to Action', icon: MousePointerClick, description: 'Headline, copy and button for conversion sections.' },
+      { name: 'Project Card', icon: BriefcaseBusiness, description: 'Reusable work/project card with logo, semantic H1–H4 heading control, SEO summary, role, audience, technology tags, case-study link and left/right alternating dark panel.' },
     ],
   },
   {
