@@ -41,7 +41,7 @@ function validatePublishData(page, data, siteKey) {
   const blocks = Array.isArray(data?.content) ? data.content : [];
 
   if (siteKey === 'justindematteis') {
-    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock']);
+    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock', 'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock']);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
     if (!blocks.length) throw new Error('This page needs at least one shared block before publishing.');
     if (unsupported.length) {
@@ -89,7 +89,7 @@ export default function SiteBuilder() {
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const builderConfig = useMemo(() => {
-    const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock'];
+    const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock', 'ProjectCardBlock'];
     const justConsignInBlocks = [
       'HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock',
       'FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock',
@@ -140,6 +140,10 @@ export default function SiteBuilder() {
             title: 'STANDARD — Shared Marketing',
             components: ['HeroBlock', 'CtaBlock'],
           },
+          standardProjects: {
+            title: 'STANDARD — Projects / Work',
+            components: ['ProjectCardBlock'],
+          },
         }
       : {
           justConsignInHome: {
@@ -157,6 +161,10 @@ export default function SiteBuilder() {
           standardMarketing: {
             title: 'STANDARD — Shared Marketing',
             components: ['HeroBlock', 'CtaBlock'],
+          },
+          standardProjects: {
+            title: 'STANDARD — Projects / Work',
+            components: ['ProjectCardBlock'],
           },
         };
 
