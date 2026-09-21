@@ -50,6 +50,17 @@ function validatePublishData(page, data, siteKey) {
     return;
   }
   const types = new Set(blocks.map(block => block?.type).filter(Boolean));
+  const justinOnlyBlocks = new Set([
+    'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock',
+    'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
+  ]);
+  const crossSiteBlocks = blocks
+    .map(block => block?.type)
+    .filter(type => type && justinOnlyBlocks.has(type));
+
+  if (crossSiteBlocks.length) {
+    throw new Error(`JustConsignIn publish blocked: remove Justin / Just Innovate site blocks (${[...new Set(crossSiteBlocks)].join(', ')}).`);
+  }
 
   const requiredByPage = {
     home: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
@@ -78,15 +89,60 @@ export default function SiteBuilder() {
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const builderConfig = useMemo(() => {
-    if (siteKey !== 'justindematteis') return siteBuilderConfig;
-    return {
-      ...siteBuilderConfig,
-      categories: {
-        showcase: siteBuilderConfig.categories.showcase,
-        content: siteBuilderConfig.categories.content,
-        marketing: siteBuilderConfig.categories.marketing,
-      },
-    };
+    const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock'];
+    const justConsignInBlocks = [
+      'HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock',
+      'FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock',
+    ];
+    const justinBlocks = [
+      'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock',
+      'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
+    ];
+
+    const allowedBlocks = siteKey === 'justindematteis'
+      ? [...standardBlocks, ...justinBlocks]
+      : [...standardBlocks, ...justConsignInBlocks];
+
+    const allowedSet = new Set(allowedBlocks);
+    const components = Object.fromEntries(
+      Object.entries(siteBuilderConfig.components).filter(([name]) => allowedSet.has(name))
+    );
+
+    const categories = siteKey === 'justindematteis'
+      ? {
+          justinShowcase: {
+            title: 'JUSTIN / JUST INNOVATE — Site Blocks',
+            components: justinBlocks,
+          },
+          standardContent: {
+            title: 'STANDARD — Shared Content',
+            components: ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock'],
+          },
+          standardMarketing: {
+            title: 'STANDARD — Shared Marketing',
+            components: ['HeroBlock', 'CtaBlock'],
+          },
+        }
+      : {
+          justConsignInHome: {
+            title: 'JUSTCONSIGNIN — Homepage Blocks',
+            components: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
+          },
+          justConsignInFeatures: {
+            title: 'JUSTCONSIGNIN — Features Blocks',
+            components: ['FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock'],
+          },
+          standardContent: {
+            title: 'STANDARD — Shared Content',
+            components: ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock'],
+          },
+          standardMarketing: {
+            title: 'STANDARD — Shared Marketing',
+            components: ['HeroBlock', 'CtaBlock'],
+          },
+        };
+
+    return { ...siteBuilderConfig, categories, components };
   }, [siteKey]);
   const [initialData, setInitialData] = useState(null);
   const [currentData, setCurrentData] = useState(null);
