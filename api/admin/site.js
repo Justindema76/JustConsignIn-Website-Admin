@@ -1,4 +1,4 @@
-import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseAdminStorage, supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const MEDIA_BUCKETS = [
@@ -255,6 +255,27 @@ export default async function handler(req, res) {
         return right - left;
       });
       return res.status(200).json({ media });
+    }
+
+    if (req.method === 'DELETE' && resource === 'media') {
+      const bucket = String(req.query?.bucket || '').trim();
+      const objectPath = String(req.query?.path || '').trim();
+      const allowedBuckets = new Set(MEDIA_BUCKETS.map(item => item.bucket));
+
+      if (!allowedBuckets.has(bucket)) return res.status(400).json({ error: 'Invalid media bucket' });
+      if (!objectPath || objectPath.includes('..')) return res.status(400).json({ error: 'Invalid media path' });
+
+      const encodedPath = objectPath.split('/').map(encodeURIComponent).join('/');
+      const response = await supabaseAdminStorage(`object/${encodeURIComponent(bucket)}/${encodedPath}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || data?.error || 'Unable to delete media');
+      }
+
+      return res.status(200).json({ ok: true, bucket, path: objectPath });
     }
 
     if (req.method === 'DELETE' && resource === 'videos') {
