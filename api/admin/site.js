@@ -152,7 +152,6 @@ export default async function handler(req, res) {
           headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
           body: JSON.stringify({
             site_key: siteKey,
-            site_key: siteKey,
             page_id: pageId,
             path: pagePath,
             title,
@@ -169,6 +168,7 @@ export default async function handler(req, res) {
           method: 'POST',
           headers: { Prefer: 'return=minimal' },
           body: JSON.stringify({
+            site_key: siteKey,
             page_id: pageId,
             path: pagePath,
             title,
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
       if (!['header', 'footer'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
       if (!value || typeof value !== 'object') return res.status(400).json({ error: 'Invalid global section value' });
 
-      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=site_key,key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify({ site_key: siteKey, key: `global_${key}`, value, updated_at: new Date().toISOString() }),
@@ -283,7 +283,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST' && resource === 'social') {
       const value = socialValue(req.body || {});
-      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=key', {
+      const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=site_key,key', {
         method: 'POST',
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify({ site_key: siteKey, key: 'social_links', value, updated_at: new Date().toISOString() }),
