@@ -16,6 +16,21 @@ export const headerDefaults = {
   background: 'white',
 };
 
+export const justinHeaderDefaults = {
+  logo: '',
+  brand: 'JUST INNOVATE.',
+  nav1Label: 'Work', nav1Url: '/work',
+  nav2Label: 'About', nav2Url: '/about',
+  nav3Label: 'AI + Development', nav3Url: '/ai-development',
+  nav4Label: 'Skills', nav4Url: '/experience',
+  nav5Label: 'Contact', nav5Url: '/contact',
+  nav6Label: '', nav6Url: '',
+  nav7Label: '', nav7Url: '',
+  buttonText: '',
+  buttonUrl: '',
+  background: 'white',
+};
+
 export const footerDefaults = {
   logo: 'https://www.justconsignin.com/images/brand/justconsigin-logo.png',
   brand: 'JustConsignIn',
@@ -38,6 +53,28 @@ export const footerDefaults = {
   background: 'dark',
 };
 
+export const justinFooterDefaults = {
+  logo: '',
+  brand: 'JUST INNOVATE.',
+  tagline: 'Justin DeMatteis • Developer • Product Builder • AI-Assisted Problem Solver',
+  column1Title: 'Explore',
+  link1Label: 'Work', link1Url: '/work',
+  link2Label: 'About', link2Url: '/about',
+  link3Label: 'AI + Development', link3Url: '/ai-development',
+  link4Label: 'Experience', link4Url: '/experience',
+  column2Title: 'Connect',
+  link5Label: 'Blog', link5Url: '/blog',
+  link6Label: 'Contact', link6Url: '/contact',
+  link7Label: '', link7Url: '',
+  link8Label: '', link8Url: '',
+  socialTitle: 'Connect',
+  socialText: 'Development work, case studies and product updates.',
+  copyright: 'Justin DeMatteis. All rights reserved.',
+  privacyLabel: 'Privacy', privacyUrl: '/privacy',
+  termsLabel: 'Terms', termsUrl: '/terms',
+  background: 'dark',
+};
+
 const backgroundOptions = [
   { label: 'White', value: 'white' },
   { label: 'Light', value: 'light' },
@@ -46,7 +83,11 @@ const backgroundOptions = [
 
 function previewClick(event) { event.preventDefault(); }
 
-export function globalConfigFor(type) {
+export function globalConfigFor(type, siteKey = 'justconsignin') {
+  const isJustin = siteKey === 'justindematteis';
+  const activeHeaderDefaults = isJustin ? justinHeaderDefaults : headerDefaults;
+  const activeFooterDefaults = isJustin ? justinFooterDefaults : footerDefaults;
+
   if (type === 'header') {
     return {
       categories: { global: { title: 'Global Header', components: ['HeaderBlock'] } },
@@ -67,12 +108,12 @@ export function globalConfigFor(type) {
             buttonUrl: { type: 'text', label: 'Button URL' },
             background: { type: 'select', label: 'Background', options: backgroundOptions },
           },
-          defaultProps: headerDefaults,
+          defaultProps: activeHeaderDefaults,
           render: raw => {
-            const p = { ...headerDefaults, ...raw };
+            const p = { ...activeHeaderDefaults, ...raw };
             const links = Array.from({ length: 7 }, (_, i) => [p[`nav${i + 1}Label`], p[`nav${i + 1}Url`]]).filter(([label]) => label);
             return <div className={`global-header-preview global-theme-${p.background || 'white'}`}>
-              <a className="global-preview-brand" href="/" onClick={previewClick}><img src={p.logo} alt=""/><strong>{p.brand}</strong></a>
+              <a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a>
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}</a>)}</nav>
               {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
@@ -109,14 +150,14 @@ export function globalConfigFor(type) {
           termsLabel: { type: 'text', label: 'Terms label' }, termsUrl: { type: 'text', label: 'Terms URL' },
           background: { type: 'select', label: 'Background', options: backgroundOptions },
         },
-        defaultProps: footerDefaults,
+        defaultProps: activeFooterDefaults,
         render: raw => {
-          const p = { ...footerDefaults, ...raw };
+          const p = { ...activeFooterDefaults, ...raw };
           const col1 = [1,2,3,4].map(i => [p[`link${i}Label`], p[`link${i}Url`]]).filter(([label]) => label);
           const col2 = [5,6,7,8].map(i => [p[`link${i}Label`], p[`link${i}Url`]]).filter(([label]) => label);
           return <footer className={`global-footer-preview global-theme-${p.background || 'light'}`}>
             <div className="global-footer-grid">
-              <div><a className="global-preview-brand" href="/" onClick={previewClick}><img src={p.logo} alt=""/><strong>{p.brand}</strong></a><p>{p.tagline}</p></div>
+              <div><a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a><p>{p.tagline}</p></div>
               <div className="global-footer-links"><strong>{p.column1Title}</strong>{col1.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div className="global-footer-links"><strong>{p.column2Title}</strong>{col2.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p><div className="global-social-placeholder">Social icons use your Social Links settings</div></div>
@@ -129,9 +170,13 @@ export function globalConfigFor(type) {
   };
 }
 
-export function defaultGlobalData(type) {
+export function defaultGlobalData(type, siteKey = 'justconsignin') {
+  const isJustin = siteKey === 'justindematteis';
+  const defaults = type === 'header'
+    ? (isJustin ? justinHeaderDefaults : headerDefaults)
+    : (isJustin ? justinFooterDefaults : footerDefaults);
   return {
-    content: [{ type: type === 'header' ? 'HeaderBlock' : 'FooterBlock', props: { id: `global-${type}`, ...(type === 'header' ? headerDefaults : footerDefaults) } }],
+    content: [{ type: type === 'header' ? 'HeaderBlock' : 'FooterBlock', props: { id: `global-${type}`, ...defaults } }],
     root: { props: {} },
   };
 }
