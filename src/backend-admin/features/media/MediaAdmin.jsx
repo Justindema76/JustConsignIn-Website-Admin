@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Music2, Upload, Video, WandSparkles } from 'lucide-react';
+import { Check, Copy, ExternalLink, Image, Music2, Trash2, Upload, Video, WandSparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
+import { deleteAdminMedia, loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
 
 export default function MediaAdmin() {
   const { accessToken } = useAuth();
@@ -11,6 +11,8 @@ export default function MediaAdmin() {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [copiedKey, setCopiedKey] = useState('');
+  const [deletingKey, setDeletingKey] = useState('');
 
   const refresh = async () => {
     if (!accessToken) return;
@@ -26,6 +28,43 @@ export default function MediaAdmin() {
     const term = q.trim().toLowerCase();
     return !term ? items : items.filter(item => `${item.name || ''} ${item.url || ''} ${item.mediaType || ''} ${item.bucket || ''}`.toLowerCase().includes(term));
   }, [items, q]);
+
+  const copyUrl = async item => {
+    const key = `${item.bucket || 'media'}:${item.path || item.url}`;
+    try {
+      await navigator.clipboard.writeText(item.url);
+      setCopiedKey(key);
+      window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
+    } catch {
+      const input = document.createElement('textarea');
+      input.value = item.url;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+      setCopiedKey(key);
+      window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
+    }
+  };
+
+  const remove = async item => {
+    const key = `${item.bucket || 'media'}:${item.path || item.url}`;
+    const name = item.name || item.path || 'this file';
+    if (!window.confirm(`Delete "${name}" permanently from the media library?\n\nAny page still using this URL will show a broken image.`)) return;
+
+    setDeletingKey(key);
+    setError('');
+    try {
+      await deleteAdminMedia(accessToken, item);
+      setItems(current => current.filter(existing => `${existing.bucket || 'media'}:${existing.path || existing.url}` !== key));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeletingKey('');
+    }
+  };
 
   const upload = async event => {
     const files = Array.from(event.target.files || []);
@@ -62,7 +101,23 @@ export default function MediaAdmin() {
                 ? <div style={{ width: '100%', padding: 18, display: 'grid', gap: 12, justifyItems: 'center' }}><Music2 size={28}/><audio controls preload="metadata" src={item.url} style={{ width: '100%' }}/></div>
                 : <img src={item.url} alt={item.name || 'Uploaded media'}/>} 
           </div>
-          <div className="site-admin-media-copy"><strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong><small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>} {item.createdAt ? `· ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small></div>
+          <div className="site-admin-media-copy">
+            <strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong>
+            <small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>} {item.createdAt ? `· ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small>
+            <div className="site-admin-media-url-row">
+              <input className="site-admin-media-url" value={item.url || ''} readOnly aria-label={`Public URL for ${item.name || 'media'}`} onFocus={event => event.target.select()}/>
+            </div>
+            <div className="site-admin-media-actions">
+              <button type="button" className="site-admin-media-action" onClick={() => copyUrl(item)} disabled={!item.url}>
+                {copiedKey === `${item.bucket || 'media'}:${item.path || item.url}` ? <Check size={14}/> : <Copy size={14}/>}
+                {copiedKey === `${item.bucket || 'media'}:${item.path || item.url}` ? 'Copied' : 'Copy URL'}
+              </button>
+              <a className="site-admin-media-action" href={item.url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open</a>
+              <button type="button" className="site-admin-media-action danger" onClick={() => remove(item)} disabled={deletingKey === `${item.bucket || 'media'}:${item.path || item.url}`}>
+                <Trash2 size={14}/> {deletingKey === `${item.bucket || 'media'}:${item.path || item.url}` ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>;
       })}
       {!busy && !filtered.length && <div className="site-admin-card site-admin-empty large"><Image size={30}/><h2>No media found</h2><p>Upload an image, MP4 video or audio file and it will appear here for reuse.</p></div>}
