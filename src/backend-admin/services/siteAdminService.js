@@ -162,6 +162,17 @@ export async function loadAdminMedia(accessToken) {
   return Array.isArray(payload.media) ? payload.media : [];
 }
 
+export async function deleteAdminMedia(accessToken, item) {
+  const bucket = String(item?.bucket || '').trim();
+  const path = String(item?.path || '').trim();
+  if (!bucket || !path) throw new Error('This media item cannot be deleted because its storage path is missing.');
+  await parseResponse(await adminFetch(
+    siteAdminUrl(`/api/admin/site?resource=media&bucket=${encodeURIComponent(bucket)}&path=${encodeURIComponent(path)}`),
+    { method: 'DELETE' },
+    accessToken,
+  ));
+}
+
 export async function uploadBlogImage(accessToken, file) {
   return uploadPublicAsset(accessToken, file, {
     bucket: BLOG_IMAGE_BUCKET,
