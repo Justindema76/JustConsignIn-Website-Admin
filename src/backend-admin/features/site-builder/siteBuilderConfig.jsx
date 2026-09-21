@@ -870,6 +870,102 @@ export const siteBuilderConfig = {
       render: p => <section className="shared-large-cta"><div className="shared-wrap shared-large-cta-box"><div><div className="shared-eyebrow">{p.eyebrow}</div><h2>{p.heading}</h2></div>{p.buttonText&&<a className="shared-btn shared-btn-dark" href={p.buttonUrl||'#'} onClick={previewClick}>{p.buttonText}</a>}</div></section>,
     },
 
+    ProjectCardBlock: {
+      label: 'Project Card',
+      fields: {
+        logo: { ...imageField, label: 'Company / project logo' },
+        logoAlt: { type: 'text', label: 'Logo alt text' },
+        companyLabel: { type: 'text', label: 'Company label' },
+        companyName: { type: 'text', label: 'Company / project name' },
+        category: { type: 'text', label: 'Category' },
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Project headline' },
+        headingLevel: {
+          type: 'select',
+          label: 'Headline HTML tag',
+          options: [
+            { label: 'H1', value: 'h1' },
+            { label: 'H2', value: 'h2' },
+            { label: 'H3', value: 'h3' },
+            { label: 'H4', value: 'h4' },
+          ],
+        },
+        summary: { type: 'textarea', label: 'SEO-friendly project summary' },
+        roleLabel: { type: 'text', label: 'Role label' },
+        roleText: { type: 'text', label: 'Role' },
+        audienceLabel: { type: 'text', label: 'Built for label' },
+        audienceText: { type: 'text', label: 'Built for' },
+        tags: { type: 'text', label: 'Technology tags (comma separated)' },
+        note: { type: 'text', label: 'Supporting note' },
+        buttonText: { type: 'text', label: 'Case study button text' },
+        buttonUrl: { type: 'text', label: 'Case study URL' },
+        panelPosition: {
+          type: 'radio',
+          label: 'Dark panel position',
+          options: [
+            { label: 'Left', value: 'left' },
+            { label: 'Right', value: 'right' },
+          ],
+        },
+        anchorId: { type: 'text', label: 'Section anchor ID' },
+      },
+      defaultProps: {
+        logo: '',
+        logoAlt: 'JustConsignIn logo',
+        companyLabel: 'Company / Product',
+        companyName: 'JustConsignIn',
+        category: 'Shopify App · Consignment Management',
+        eyebrow: 'Featured Work',
+        heading: 'Shopify-native consignment management built around the complete retail workflow.',
+        headingLevel: 'h2',
+        summary: 'JustConsignIn is a Shopify-focused consignment management application that brings consignor intake, inventory, Shopify product creation, point-of-sale sales tracking, commission calculations and payouts into one organized workflow.',
+        roleLabel: 'My role',
+        roleText: 'Product Design · Full-Stack Development · UX · Shopify Integration',
+        audienceLabel: 'Built for',
+        audienceText: 'Consignment and resale stores using Shopify and Shopify POS',
+        tags: 'Shopify, React, Supabase, Shopify POS, Mobile Intake, Payouts, AI-Assisted Development',
+        note: 'Full case study covering the business problem, workflow, architecture, development process and product decisions.',
+        buttonText: 'View JustConsignIn Case Study →',
+        buttonUrl: '/work/justconsignin',
+        panelPosition: 'left',
+        anchorId: 'justconsignin',
+      },
+      render: p => {
+        const HeadingTag = ['h1','h2','h3','h4'].includes(p.headingLevel) ? p.headingLevel : 'h2';
+        const tags = String(p.tags || '').split(',').map(tag => tag.trim()).filter(Boolean);
+        return <section id={p.anchorId || undefined} className={`standard-project-card panel-${p.panelPosition || 'left'}`}>
+          <aside className="standard-project-panel">
+            <div className="standard-project-logo">
+              {p.logo ? <img src={p.logo} alt={p.logoAlt || ''}/> : <div className="standard-project-logo-placeholder"><ImageIcon size={34}/></div>}
+            </div>
+            <div>
+              <div className="standard-project-company-label">{p.companyLabel}</div>
+              <div className="standard-project-company-name">{p.companyName}</div>
+              <div className="standard-project-category">{p.category}</div>
+            </div>
+          </aside>
+
+          <div className="standard-project-content">
+            <div className="standard-project-eyebrow">{p.eyebrow}</div>
+            <HeadingTag>{p.heading}</HeadingTag>
+            <p className="standard-project-summary">{p.summary}</p>
+
+            <div className="standard-project-details">
+              <div><span>{p.roleLabel}</span><strong>{p.roleText}</strong></div>
+              <div><span>{p.audienceLabel}</span><strong>{p.audienceText}</strong></div>
+            </div>
+
+            {tags.length > 0 && <div className="standard-project-tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div>}
+
+            <div className="standard-project-footer">
+              <span>{p.note}</span>
+              {p.buttonText && <a className="standard-project-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
+            </div>
+          </div>
+        </section>;
+      },
+    },
+
     HeroBlock: {
       label: 'Hero',
       fields: {
