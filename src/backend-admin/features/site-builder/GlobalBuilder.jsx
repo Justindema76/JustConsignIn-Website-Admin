@@ -4,7 +4,7 @@ import '@puckeditor/core/puck.css';
 import { CheckCircle2, ExternalLink, LoaderCircle } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminGlobalSection, saveAdminGlobalSection } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminGlobalSection, saveAdminGlobalSection } from '../../services/siteAdminService';
 import { defaultGlobalData, globalConfigFor } from './globalBuilderConfig';
 import './globalBuilder.css';
 
@@ -14,8 +14,10 @@ export default function GlobalBuilder() {
   const type = section.toLowerCase();
   if (!['header','footer'].includes(type)) return <Navigate to="/admin/website/pages" replace/>;
 
-  const config = useMemo(() => globalConfigFor(type), [type]);
-  const fallback = useMemo(() => defaultGlobalData(type), [type]);
+  const siteKey = getAdminSiteKey();
+  const config = useMemo(() => globalConfigFor(type, siteKey), [type, siteKey]);
+  const fallback = useMemo(() => defaultGlobalData(type, siteKey), [type, siteKey]);
+  const liveUrl = siteKey === 'justindematteis' ? 'https://www.justindematteis.com' : 'https://www.justconsignin.com';
   const [data,setData] = useState(null);
   const [savedAt,setSavedAt] = useState('');
   const [message,setMessage] = useState('');
@@ -52,7 +54,7 @@ export default function GlobalBuilder() {
         <h1>{type === 'header' ? 'Header' : 'Footer'}</h1>
         <p>Edit this once. It is reused across every public website page.</p>
       </div>
-      <div className="site-admin-actions"><a className="site-admin-btn secondary" href="https://www.justconsignin.com" target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a></div>
+      <div className="site-admin-actions"><a className="site-admin-btn secondary" href={liveUrl} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a></div>
     </div>
     <div className="jci-builder-notice"><strong>Global component.</strong> Puck's <strong>Publish</strong> button updates this {type} everywhere.{savedAt && <span> Last published {new Date(savedAt).toLocaleString()}.</span>}</div>
     {message && <div className="jci-builder-message success"><CheckCircle2 size={17}/><span>{message}</span></div>}
