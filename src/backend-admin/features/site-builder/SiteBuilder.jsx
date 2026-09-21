@@ -104,8 +104,26 @@ export default function SiteBuilder() {
       : [...standardBlocks, ...justConsignInBlocks];
 
     const allowedSet = new Set(allowedBlocks);
+    const justConsignInSet = new Set(justConsignInBlocks);
+    const justinSet = new Set(justinBlocks);
+    const standardSet = new Set(standardBlocks);
+
     const components = Object.fromEntries(
-      Object.entries(siteBuilderConfig.components).filter(([name]) => allowedSet.has(name))
+      Object.entries(siteBuilderConfig.components)
+        .filter(([name]) => allowedSet.has(name))
+        .map(([name, definition]) => {
+          const prefix = justinSet.has(name)
+            ? 'JUSTIN'
+            : justConsignInSet.has(name)
+              ? 'JUSTCONSIGNIN'
+              : standardSet.has(name)
+                ? 'STANDARD'
+                : '';
+          return [name, {
+            ...definition,
+            label: prefix ? `${prefix} · ${definition.label || name}` : (definition.label || name),
+          }];
+        })
     );
 
     const categories = siteKey === 'justindematteis'
