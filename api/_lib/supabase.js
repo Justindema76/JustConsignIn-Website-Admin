@@ -55,17 +55,6 @@ export async function supabaseUserStorage(token, path, options = {}) {
   });
 }
 
-export async function supabaseAdminStorage(path, options = {}) {
-  const secret = supabaseSecret();
-  return fetch(`${supabaseUrl()}/storage/v1/${path}`, {
-    ...options,
-    headers: {
-      apikey: secret,
-      Authorization: `Bearer ${secret}`,
-      ...(options.headers || {}),
-    },
-  });
-}
 
 export async function getUserFromToken(token) {
   if (!token) return null;
