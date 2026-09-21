@@ -1,4 +1,4 @@
-import { supabaseAdminStorage, supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const MEDIA_BUCKETS = [
@@ -266,7 +266,7 @@ export default async function handler(req, res) {
       if (!objectPath || objectPath.includes('..')) return res.status(400).json({ error: 'Invalid media path' });
 
       const encodedPath = objectPath.split('/').map(encodeURIComponent).join('/');
-      const response = await supabaseAdminStorage(`object/${encodeURIComponent(bucket)}/${encodedPath}`, {
+      const response = await supabaseUserStorage(user.accessToken, `object/${encodeURIComponent(bucket)}/${encodedPath}`, {
         method: 'DELETE',
       });
 
