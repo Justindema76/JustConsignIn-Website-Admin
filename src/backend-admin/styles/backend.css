@@ -40,3 +40,17 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
   .site-admin-site-switcher>span{display:none}
   .site-admin-site-switcher select{width:100%;height:38px}
 }
+
+.site-admin-media-url-row{margin-top:10px}
+.site-admin-media-url{width:100%;min-width:0;height:34px;border:1px solid #dfe3e8;border-radius:8px;background:#f8fafc;color:#4b5563;padding:0 9px;font-size:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+.site-admin-media-url:focus{outline:2px solid rgba(31,103,178,.18);border-color:#8bb8e4}
+.site-admin-media-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.site-admin-media-action{min-height:32px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 9px;border:1px solid #dfe3e8;border-radius:8px;background:#fff;color:#1f2937;text-decoration:none;font-size:10px;font-weight:800;cursor:pointer}
+.site-admin-media-action:hover{background:#f4f7fa;border-color:#c7d2dd}
+.site-admin-media-action:disabled{opacity:.55;cursor:not-allowed}
+.site-admin-media-action.danger{color:#b42318;border-color:#f1c5c0;background:#fff8f7}
+.site-admin-media-action.danger:hover{background:#fff0ee;border-color:#eaa39b}
+@media(max-width:760px){
+  .site-admin-media-actions{display:grid;grid-template-columns:1fr 1fr}
+  .site-admin-media-action.danger{grid-column:1/-1}
+}
