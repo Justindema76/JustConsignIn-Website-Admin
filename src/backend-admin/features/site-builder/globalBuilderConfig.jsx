@@ -19,8 +19,8 @@ export const headerDefaults = {
 export const justinHeaderDefaults = {
   logo: '',
   brand: 'JUST INNOVATE.',
-  nav1Label: 'Work', nav1Url: '/work',
-  nav2Label: 'About', nav2Url: '/about',
+  nav1Label: 'About', nav1Url: '/about',
+  nav2Label: 'Work', nav2Url: '/work',
   nav3Label: 'AI + Development', nav3Url: '/ai-development',
   nav4Label: 'Skills', nav4Url: '/experience',
   nav5Label: 'Contact', nav5Url: '/contact',
