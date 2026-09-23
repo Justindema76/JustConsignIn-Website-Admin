@@ -4,6 +4,7 @@ import { adminFetch, currentAccessToken, parseJsonResponse, refreshAdminAccessTo
 const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL || 'https://nowsajdmbpxvlvrhopjg.supabase.co').replace(/\/$/, '');
 const SUPABASE_PUBLISHABLE_KEY = String(import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w');
 const BLOG_IMAGE_BUCKET = 'blog-images';
+const SITE_ASSET_BUCKET = 'site-assets';
 const SOCIAL_AUDIO_BUCKET = 'social-audio';
 const SOCIAL_VIDEO_BUCKET = 'social-videos';
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -176,6 +177,15 @@ export async function deleteAdminMedia(accessToken, item) {
 export async function uploadBlogImage(accessToken, file) {
   return uploadPublicAsset(accessToken, file, {
     bucket: BLOG_IMAGE_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+  });
+}
+
+export async function uploadSiteImage(accessToken, file) {
+  return uploadPublicAsset(accessToken, file, {
+    bucket: SITE_ASSET_BUCKET,
     allowedTypes: ALLOWED_IMAGE_TYPES,
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
