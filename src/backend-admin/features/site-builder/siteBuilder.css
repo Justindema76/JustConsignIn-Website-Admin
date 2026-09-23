@@ -7,6 +7,33 @@
   margin-bottom: 0;
 }
 
+.jci-builder-page-switcher {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 420px);
+  margin-top: 14px;
+}
+
+.jci-builder-page-switcher span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.jci-builder-page-switcher select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+  color: #0f172a;
+  padding: 9px 34px 9px 11px;
+  font: inherit;
+  font-weight: 700;
+}
+
 .jci-builder-notice {
   border: 1px solid #bfdbfe;
   background: #eff6ff;
