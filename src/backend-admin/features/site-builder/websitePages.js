@@ -226,11 +226,16 @@ const text = (id, value) => block('TextBlock', id, { text: value, align: 'left' 
 const hero = (id, eyebrow, headingText, body) => block('HeroBlock', id, {
   eyebrow,
   heading: headingText,
+  accent: '',
+  headingSize: 'medium',
   text: body,
+  primaryButtonText: '',
+  primaryButtonUrl: '',
+  secondaryButtonText: '',
+  secondaryButtonUrl: '',
+  note: '',
   image: '',
   imageAlt: '',
-  buttonText: '',
-  buttonUrl: '',
   background: 'light',
 });
 const cta = (id, headingText, body, buttonText, buttonUrl) => block('CtaBlock', id, {
