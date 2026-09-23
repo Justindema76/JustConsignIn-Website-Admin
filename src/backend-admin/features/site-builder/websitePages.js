@@ -122,15 +122,6 @@ export const JUSTINDEMATTEIS_PAGES = [
     description: 'Professional ecommerce, web and product work.',
   },
   {
-    id: 'work-justconsignin',
-    title: 'Case Study — JustConsignIn',
-    path: '/work/justconsignin',
-    source: 'shared page builder',
-    kind: 'content',
-    editor: 'visual',
-    description: 'Shopify consignment software product-development case study.',
-  },
-  {
     id: 'work-jill',
     title: 'Case Study — Jill & The Beanstalk',
     path: '/work/jill-and-the-beanstalk',
