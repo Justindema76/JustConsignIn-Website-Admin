@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Puck } from '@puckeditor/core';
 import '@puckeditor/core/puck.css';
 import { ArrowLeft, CheckCircle2, ExternalLink, Image, LoaderCircle, RotateCcw, Save } from 'lucide-react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import {
   getAdminSiteKey,
@@ -12,7 +12,7 @@ import {
   saveAdminSitePageDraft,
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
-import { getInitialPageBuilderData, getWebsitePage, livePageUrl } from './websitePages';
+import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePages';
 import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
@@ -80,8 +80,13 @@ function validatePublishData(page, data, siteKey) {
 
 export default function SiteBuilder() {
   const { pageId = '' } = useParams();
+  const navigate = useNavigate();
   const siteKey = getAdminSiteKey();
   const page = getWebsitePage(pageId, siteKey);
+  const editorPages = useMemo(
+    () => getWebsitePages(siteKey).filter(item => item.editor === 'visual'),
+    [siteKey]
+  );
   const { accessToken } = useAuth();
 
   if (!page) return <Navigate to="/admin/website/pages" replace />;
@@ -315,6 +320,20 @@ export default function SiteBuilder() {
         <p className="site-admin-eyebrow">Website · {page.path}</p>
         <h1>Edit {page.title}</h1>
         <p>Edit the page, save a private draft, and publish it to the live website when it is ready.</p>
+        <label className="jci-builder-page-switcher">
+          <span>Edit page</span>
+          <select
+            value={page.id}
+            onChange={event => navigate(`/admin/website/pages/${event.target.value}`)}
+            aria-label="Choose website page to edit"
+          >
+            {editorPages.map(item => (
+              <option key={item.id} value={item.id}>
+                {item.id.startsWith('work-') ? `Work → ${item.title.replace('Case Study — ', '')}` : item.title}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="site-admin-actions">
         <button className="site-admin-btn" type="button" onClick={saveDraft} disabled={savingDraft || publishing}>
