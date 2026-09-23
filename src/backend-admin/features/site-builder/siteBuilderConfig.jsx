@@ -3,7 +3,7 @@ import { FieldLabel } from '@puckeditor/core';
 import { ArrowRight, BarChart3, ClipboardList, FileUp, Image as ImageIcon, Library, PackagePlus, ReceiptText, ScanBarcode, Smartphone, Store, Upload, Users, WalletCards } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import MediaPickerModal from '../social-automation/components/MediaPickerModal';
-import { loadAdminMedia, loadAdminVideos, uploadBlogImage } from '../../services/siteAdminService';
+import { loadAdminMedia, loadAdminVideos, uploadSiteImage } from '../../services/siteAdminService';
 import { FALLBACK_VIDEOS } from '../../config/siteContent';
 
 function ImageLibraryField({ field, value, onChange }) {
@@ -38,7 +38,7 @@ function ImageLibraryField({ field, value, onChange }) {
     setUploading(true);
     setError('');
     try {
-      const url = await uploadBlogImage(accessToken, file);
+      const url = await uploadSiteImage(accessToken, file);
       onChange(url);
       await refresh();
     } catch (err) {
