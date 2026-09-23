@@ -3,6 +3,7 @@ import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const MEDIA_BUCKETS = [
   { bucket: 'site-assets', mediaType: 'image', protectedAsset: true },
+  { bucket: 'work-media', mediaType: 'work' },
   { bucket: 'blog-images', mediaType: 'image' },
   { bucket: 'social-videos', mediaType: 'video' },
   { bucket: 'social-audio', mediaType: 'audio' },
