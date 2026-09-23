@@ -22,3 +22,75 @@
 .jci-page-source code{display:block;margin-top:8px;white-space:normal;overflow-wrap:anywhere;color:#475569;font-size:11px}
 @media(max-width:900px){.jci-website-page-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.jci-website-pages{gap:12px}.jci-page-sync-note{padding:10px 11px;border-radius:10px;gap:8px}.jci-page-sync-note>svg{width:16px;height:16px;flex:0 0 auto}.jci-page-sync-note strong{font-size:12px;line-height:1.3}.jci-page-sync-note span{font-size:11px;line-height:1.35}.jci-website-page-grid{gap:10px}.jci-website-page-card{gap:11px;padding:13px!important;border-radius:13px!important}.jci-page-card-top{gap:6px}.jci-page-kind,.jci-page-editor-status{padding:4px 7px;font-size:10.5px;gap:4px}.jci-page-kind svg{width:12px;height:12px}.jci-page-card-copy{gap:6px}.jci-page-card-copy h2{font-size:20px!important;line-height:1.1!important}.jci-page-card-copy>code{padding:3px 6px;font-size:11px}.jci-page-card-copy p{font-size:13px!important;line-height:1.4!important}.jci-page-card-copy small{font-size:11px}.jci-page-card-actions{align-items:flex-start;gap:7px}.jci-page-card-actions .site-admin-btn{min-height:38px!important;padding:8px 11px!important;font-size:12px!important;line-height:1.1!important;width:auto!important}.jci-custom-page-note{font-size:11px;max-width:100%;flex:1 1 100%}.jci-page-source{padding-top:8px}.jci-page-source summary{font-size:11px}.jci-page-source code{font-size:10px}}
+
+.jci-work-page-dropdown{
+  border-top:1px solid #e2e8f0;
+  background:#f8fafc;
+}
+.jci-work-page-dropdown>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  cursor:pointer;
+  color:#0f172a;
+  font-size:13px;
+  font-weight:850;
+  list-style:none;
+}
+.jci-work-page-dropdown>summary::-webkit-details-marker{display:none}
+.jci-work-page-dropdown>summary strong{
+  min-width:28px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  background:#e8f0ff;
+  color:#2f6bff;
+  font-size:12px;
+}
+.jci-work-page-list{
+  display:grid;
+  gap:8px;
+  padding:0 14px 14px;
+}
+.jci-work-page-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:11px 12px;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  background:#fff;
+}
+.jci-work-page-row>div:first-child{
+  display:grid;
+  gap:3px;
+  min-width:0;
+}
+.jci-work-page-row strong{
+  color:#0f172a;
+  font-size:13px;
+}
+.jci-work-page-row code{
+  color:#64748b;
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+.jci-work-page-row-actions{
+  display:flex;
+  gap:6px;
+  flex:0 0 auto;
+}
+.jci-work-post-manager-link{
+  display:block;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#0b1f33;
+  color:#fff;
+  font-size:12px;
+  font-weight:850;
+}
+.jci-work-post-manager-link:hover{background:#163552}
