@@ -113,8 +113,14 @@ export default function MediaAdmin() {
                 {copiedKey === `${item.bucket || 'media'}:${item.path || item.url}` ? 'Copied' : 'Copy URL'}
               </button>
               <a className="site-admin-media-action" href={item.url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open</a>
-              <button type="button" className="site-admin-media-action danger" onClick={() => remove(item)} disabled={deletingKey === `${item.bucket || 'media'}:${item.path || item.url}`}>
-                <Trash2 size={14}/> {deletingKey === `${item.bucket || 'media'}:${item.path || item.url}` ? 'Deleting…' : 'Delete'}
+              <button
+                type="button"
+                className="site-admin-media-action danger"
+                onClick={() => remove(item)}
+                disabled={item.protectedAsset || deletingKey === `${item.bucket || 'media'}:${item.path || item.url}`}
+                title={item.protectedAsset ? 'Website page assets are protected from deletion.' : ''}
+              >
+                <Trash2 size={14}/> {item.protectedAsset ? 'Protected' : deletingKey === `${item.bucket || 'media'}:${item.path || item.url}` ? 'Deleting…' : 'Delete'}
               </button>
             </div>
           </div>
