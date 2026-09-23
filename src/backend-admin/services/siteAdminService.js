@@ -5,14 +5,17 @@ const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL || 'https://nowsaj
 const SUPABASE_PUBLISHABLE_KEY = String(import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w');
 const BLOG_IMAGE_BUCKET = 'blog-images';
 const SITE_ASSET_BUCKET = 'site-assets';
+const WORK_MEDIA_BUCKET = 'work-media';
 const SOCIAL_AUDIO_BUCKET = 'social-audio';
 const SOCIAL_VIDEO_BUCKET = 'social-videos';
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const MAX_WORK_VIDEO_BYTES = 100 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const ALLOWED_AUDIO_TYPES = new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/aac', 'audio/x-m4a', 'audio/ogg']);
 const ALLOWED_VIDEO_TYPES = new Set(['video/mp4', 'video/quicktime', 'video/x-m4v', 'video/m4v']);
+const ALLOWED_WORK_VIDEO_TYPES = new Set([...ALLOWED_VIDEO_TYPES, 'video/webm']);
 const VIDEO_TYPE_BY_EXTENSION = {
   mp4: 'video/mp4',
   mov: 'video/quicktime',
@@ -189,6 +192,27 @@ export async function uploadSiteImage(accessToken, file) {
     allowedTypes: ALLOWED_IMAGE_TYPES,
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+  });
+}
+
+export async function uploadWorkImage(accessToken, file) {
+  return uploadPublicAsset(accessToken, file, {
+    bucket: WORK_MEDIA_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+  });
+}
+
+export async function uploadWorkVideo(accessToken, file) {
+  if (!file) throw new Error('Choose a video first.');
+  const type = String(file.type || '').toLowerCase();
+  if (!ALLOWED_WORK_VIDEO_TYPES.has(type)) throw new Error('Use an MP4, MOV, M4V, or WebM video.');
+  return uploadPublicAsset(accessToken, file, {
+    bucket: WORK_MEDIA_BUCKET,
+    allowedTypes: ALLOWED_WORK_VIDEO_TYPES,
+    maxBytes: MAX_WORK_VIDEO_BYTES,
+    invalidTypeMessage: 'Use an MP4, MOV, M4V, or WebM video.',
   });
 }
 
