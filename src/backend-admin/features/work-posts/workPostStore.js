@@ -73,17 +73,17 @@ function url(path = '') {
 }
 
 export async function loadAdminWorkPosts(accessToken) {
-  const payload = await parse(await adminFetch(url('/api/admin/work-posts'), {}, accessToken));
+  const payload = await parse(await adminFetch(url('/api/admin/site?resource=work-posts'), {}, accessToken));
   return Array.isArray(payload.posts) ? payload.posts.map(normalizeWorkPost) : [];
 }
 
 export async function loadAdminWorkPost(accessToken, id) {
-  const payload = await parse(await adminFetch(url(`/api/admin/work-posts?id=${encodeURIComponent(id)}`), {}, accessToken));
+  const payload = await parse(await adminFetch(url(`/api/admin/site?resource=work-posts&id=${encodeURIComponent(id)}`), {}, accessToken));
   return normalizeWorkPost(payload.posts?.[0] || {});
 }
 
 export async function saveAdminWorkPost(accessToken, input) {
-  const payload = await parse(await adminFetch(url('/api/admin/work-posts'), {
+  const payload = await parse(await adminFetch(url('/api/admin/site?resource=work-posts'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -96,7 +96,7 @@ export async function saveAdminWorkPost(accessToken, input) {
 }
 
 export async function deleteAdminWorkPost(accessToken, id) {
-  await parse(await adminFetch(url(`/api/admin/work-posts?id=${encodeURIComponent(id)}`), { method: 'DELETE' }, accessToken));
+  await parse(await adminFetch(url(`/api/admin/site?resource=work-posts&id=${encodeURIComponent(id)}`), { method: 'DELETE' }, accessToken));
 }
 
 export function createEmptyWorkPost() {
