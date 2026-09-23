@@ -971,6 +971,15 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
+        headingSize: {
+          type: 'radio',
+          label: 'Heading size',
+          options: [
+            { label: 'Small', value: 'small' },
+            { label: 'Medium', value: 'medium' },
+            { label: 'Large', value: 'large' },
+          ],
+        },
         text: { type: 'text', label: 'Description' },
         image: imageField,
         imageAlt: { type: 'text', label: 'Image alt text' },
@@ -981,6 +990,7 @@ export const siteBuilderConfig = {
       defaultProps: {
         eyebrow: 'JustConsignIn',
         heading: 'Consignment management built for Shopify',
+        headingSize: 'medium',
         text: 'Manage consignors, items, sales and payouts from one organized workflow.',
         image: '',
         imageAlt: '',
@@ -988,7 +998,7 @@ export const siteBuilderConfig = {
         buttonUrl: '/shopify-app',
         background: 'light',
       },
-      render: props => <section className={`jci-builder-section jci-builder-hero theme-${props.background || 'light'}`}>
+      render: props => <section className={`jci-builder-section jci-builder-hero hero-heading-${props.headingSize || 'medium'} theme-${props.background || 'light'}`}>
         <div className="jci-builder-hero-copy">
           {props.eyebrow && <p className="jci-builder-eyebrow">{props.eyebrow}</p>}
           <h1>{props.heading}</h1>
