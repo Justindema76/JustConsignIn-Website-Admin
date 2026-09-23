@@ -87,3 +87,45 @@ on conflict (id) do update set
   public=excluded.public,
   file_size_limit=excluded.file_size_limit,
   allowed_mime_types=excluded.allowed_mime_types;
+
+
+drop policy if exists "public reads work media" on storage.objects;
+create policy "public reads work media"
+on storage.objects for select
+to anon, authenticated
+using (bucket_id='work-media');
+
+drop policy if exists "owner uploads work media" on storage.objects;
+create policy "owner uploads work media"
+on storage.objects for insert
+to authenticated
+with check (
+  bucket_id='work-media'
+  and (select auth.jwt() ->> 'email')='justindema76@gmail.com'
+  and (select auth.jwt() -> 'app_metadata' ->> 'provider')='google'
+);
+
+drop policy if exists "owner updates work media" on storage.objects;
+create policy "owner updates work media"
+on storage.objects for update
+to authenticated
+using (
+  bucket_id='work-media'
+  and (select auth.jwt() ->> 'email')='justindema76@gmail.com'
+  and (select auth.jwt() -> 'app_metadata' ->> 'provider')='google'
+)
+with check (
+  bucket_id='work-media'
+  and (select auth.jwt() ->> 'email')='justindema76@gmail.com'
+  and (select auth.jwt() -> 'app_metadata' ->> 'provider')='google'
+);
+
+drop policy if exists "owner deletes work media" on storage.objects;
+create policy "owner deletes work media"
+on storage.objects for delete
+to authenticated
+using (
+  bucket_id='work-media'
+  and (select auth.jwt() ->> 'email')='justindema76@gmail.com'
+  and (select auth.jwt() -> 'app_metadata' ->> 'provider')='google'
+);
