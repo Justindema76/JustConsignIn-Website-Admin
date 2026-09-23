@@ -911,24 +911,24 @@ export const siteBuilderConfig = {
       },
       defaultProps: {
         logo: '',
-        logoAlt: 'JustConsignIn logo',
-        companyLabel: 'Company / Product',
-        companyName: 'JustConsignIn',
-        category: 'Shopify App · Consignment Management',
-        eyebrow: 'Featured Work',
-        heading: 'Shopify-native consignment management built around the complete retail workflow.',
+        logoAlt: '',
+        companyLabel: '',
+        companyName: '',
+        category: '',
+        eyebrow: '',
+        heading: '',
         headingLevel: 'h2',
-        summary: 'JustConsignIn is a Shopify-focused consignment management application that brings consignor intake, inventory, Shopify product creation, point-of-sale sales tracking, commission calculations and payouts into one organized workflow.',
-        roleLabel: 'My role',
-        roleText: 'Product Design · Full-Stack Development · UX · Shopify Integration',
-        audienceLabel: 'Built for',
-        audienceText: 'Consignment and resale stores using Shopify and Shopify POS',
-        tags: 'Shopify, React, Supabase, Shopify POS, Mobile Intake, Payouts, AI-Assisted Development',
-        note: 'Full case study covering the business problem, workflow, architecture, development process and product decisions.',
-        buttonText: 'View JustConsignIn Case Study →',
-        buttonUrl: '/work/justconsignin',
+        summary: '',
+        roleLabel: '',
+        roleText: '',
+        audienceLabel: '',
+        audienceText: '',
+        tags: '',
+        note: '',
+        buttonText: '',
+        buttonUrl: '',
         panelPosition: 'left',
-        anchorId: 'justconsignin',
+        anchorId: '',
       },
       render: p => {
         const HeadingTag = ['h1','h2','h3','h4'].includes(p.headingLevel) ? p.headingLevel : 'h2';
@@ -992,13 +992,13 @@ export const siteBuilderConfig = {
         background: { type: 'select', label: 'Background', options: backgroundOptions },
       },
       defaultProps: {
-        eyebrow: 'JustConsignIn',
-        heading: 'Consignment management built for Shopify',
+        eyebrow: '',
+        heading: '',
         accent: '',
         headingSize: 'medium',
-        text: 'Manage consignors, items, sales and payouts from one organized workflow.',
-        primaryButtonText: 'Start 14-Day Free Trial',
-        primaryButtonUrl: '/shopify-app',
+        text: '',
+        primaryButtonText: '',
+        primaryButtonUrl: '',
         secondaryButtonText: '',
         secondaryButtonUrl: '',
         note: '',
@@ -1052,7 +1052,7 @@ export const siteBuilderConfig = {
           ],
         },
       },
-      defaultProps: { text: 'Section heading', level: 'h2', align: 'left' },
+      defaultProps: { text: '', level: 'h2', align: 'left' },
       render: ({ text, level = 'h2', align = 'left' }) => {
         const Tag = level;
         return <div className="jci-builder-heading-wrap" style={{ textAlign: align }}><Tag>{text}</Tag></div>;
@@ -1071,7 +1071,7 @@ export const siteBuilderConfig = {
           ],
         },
       },
-      defaultProps: { text: 'Add your text here.', align: 'left' },
+      defaultProps: { text: '', align: 'left' },
       render: ({ text, align = 'left' }) => <div className="jci-builder-text" style={{ textAlign: align }}><p>{text}</p></div>,
     },
     ImageBlock: {
@@ -1116,8 +1116,8 @@ export const siteBuilderConfig = {
       defaultProps: {
         image: '',
         alt: '',
-        heading: 'Create products from your phone',
-        text: 'Replace this text with the finished copy for the section.',
+        heading: '',
+        text: '',
         imagePosition: 'left',
         background: 'white',
       },
@@ -1140,10 +1140,10 @@ export const siteBuilderConfig = {
         background: { type: 'select', label: 'Background', options: backgroundOptions },
       },
       defaultProps: {
-        heading: 'Ready to simplify consignment?',
-        text: 'Try JustConsignIn free for 14 days.',
-        buttonText: 'Start Free Trial',
-        buttonUrl: '/shopify-app',
+        heading: '',
+        text: '',
+        buttonText: '',
+        buttonUrl: '',
         background: 'dark',
       },
       render: ({ heading, text, buttonText, buttonUrl, background = 'dark' }) => <section className={`jci-builder-section jci-builder-cta theme-${background}`}>
@@ -1155,33 +1155,6 @@ export const siteBuilderConfig = {
 };
 
 export const defaultSiteBuilderData = {
-  content: [
-    {
-      type: 'HeroBlock',
-      props: {
-        id: 'hero-prototype',
-        eyebrow: 'JustConsignIn',
-        heading: 'Consignment management built for Shopify',
-        text: 'This is a safe editor prototype. Change the text, replace the image, move sections and publish a draft without changing the live website.',
-        image: '',
-        imageAlt: '',
-        buttonText: 'Start 14-Day Free Trial',
-        buttonUrl: '/shopify-app',
-        background: 'light',
-      },
-    },
-    {
-      type: 'ImageTextBlock',
-      props: {
-        id: 'phone-prototype',
-        image: '',
-        alt: '',
-        heading: 'Create Shopify products from your phone',
-        text: 'Choose an image from the existing Supabase media library or upload a new one directly inside the editor.',
-        imagePosition: 'left',
-        background: 'white',
-      },
-    },
-  ],
+  content: [],
   root: { props: {} },
 };
