@@ -971,6 +971,7 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
+        accent: { type: 'text', label: 'Accent text (optional)' },
         headingSize: {
           type: 'radio',
           label: 'Heading size',
@@ -981,36 +982,52 @@ export const siteBuilderConfig = {
           ],
         },
         text: { type: 'text', label: 'Description' },
+        primaryButtonText: { type: 'text', label: 'Primary button text' },
+        primaryButtonUrl: { type: 'text', label: 'Primary button link' },
+        secondaryButtonText: { type: 'text', label: 'Secondary button text' },
+        secondaryButtonUrl: { type: 'text', label: 'Secondary button link' },
+        note: { type: 'text', label: 'Small note (optional)' },
         image: imageField,
         imageAlt: { type: 'text', label: 'Image alt text' },
-        buttonText: { type: 'text', label: 'Button text' },
-        buttonUrl: { type: 'text', label: 'Button link' },
         background: { type: 'select', label: 'Background', options: backgroundOptions },
       },
       defaultProps: {
         eyebrow: 'JustConsignIn',
         heading: 'Consignment management built for Shopify',
+        accent: '',
         headingSize: 'medium',
         text: 'Manage consignors, items, sales and payouts from one organized workflow.',
+        primaryButtonText: 'Start 14-Day Free Trial',
+        primaryButtonUrl: '/shopify-app',
+        secondaryButtonText: '',
+        secondaryButtonUrl: '',
+        note: '',
         image: '',
         imageAlt: '',
-        buttonText: 'Start 14-Day Free Trial',
-        buttonUrl: '/shopify-app',
         background: 'light',
       },
-      render: props => <section className={`jci-builder-section jci-builder-hero hero-heading-${props.headingSize || 'medium'} theme-${props.background || 'light'}`}>
-        <div className="jci-builder-hero-copy">
-          {props.eyebrow && <p className="jci-builder-eyebrow">{props.eyebrow}</p>}
-          <h1>{props.heading}</h1>
-          <p>{props.text}</p>
-          {props.buttonText && <a className="jci-builder-button" href={props.buttonUrl || '#'}>{props.buttonText}</a>}
-        </div>
-        <div className="jci-builder-hero-media">
-          {props.image
-            ? <img src={props.image} alt={props.imageAlt || ''}/>
-            : <div className="jci-builder-placeholder"><ImageIcon size={34}/><span>Choose an image</span></div>}
-        </div>
-      </section>,
+      render: rawProps => {
+        const props = {
+          ...rawProps,
+          primaryButtonText: rawProps.primaryButtonText ?? rawProps.buttonText ?? '',
+          primaryButtonUrl: rawProps.primaryButtonUrl ?? rawProps.buttonUrl ?? '',
+        };
+        return <section className={`jci-builder-section jci-builder-hero showcase-style-hero hero-heading-${props.headingSize || 'medium'} theme-${props.background || 'light'} ${props.image ? 'with-media' : 'without-media'}`}>
+          <div className="jci-builder-hero-copy">
+            {props.eyebrow && <p className="jci-builder-eyebrow">{props.eyebrow}</p>}
+            <h1>{props.heading}{props.accent ? <> <span>{props.accent}</span></> : null}</h1>
+            {props.text && <p>{props.text}</p>}
+            {(props.primaryButtonText || props.secondaryButtonText) && <div className="shared-showcase-actions">
+              {props.primaryButtonText && <a className="shared-btn shared-btn-primary" href={props.primaryButtonUrl || '#'} onClick={previewClick}>{props.primaryButtonText}</a>}
+              {props.secondaryButtonText && <a className="shared-btn shared-btn-secondary" href={props.secondaryButtonUrl || '#'} onClick={previewClick}>{props.secondaryButtonText}</a>}
+            </div>}
+            {props.note && <div className="shared-showcase-note">{props.note}</div>}
+          </div>
+          {props.image && <div className="jci-builder-hero-media">
+            <img src={props.image} alt={props.imageAlt || ''}/>
+          </div>}
+        </section>;
+      },
     },
     HeadingBlock: {
       label: 'Heading',
