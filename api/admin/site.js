@@ -2,6 +2,7 @@ import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supa
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 const MEDIA_BUCKETS = [
+  { bucket: 'site-assets', mediaType: 'image', protectedAsset: true },
   { bucket: 'blog-images', mediaType: 'image' },
   { bucket: 'social-videos', mediaType: 'video' },
   { bucket: 'social-audio', mediaType: 'audio' },
@@ -58,7 +59,7 @@ function publicMediaUrl(bucket, name) {
   return `${supabaseUrl()}/storage/v1/object/public/${bucket}/${String(name || '').split('/').map(encodeURIComponent).join('/')}`;
 }
 
-async function listMediaBucket(accessToken, { bucket, mediaType }) {
+async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset = false }) {
   const response = await supabaseUserStorage(accessToken, `object/list/${bucket}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -77,6 +78,7 @@ async function listMediaBucket(accessToken, { bucket, mediaType }) {
       createdAt: item.created_at || item.updated_at || '',
       updatedAt: item.updated_at || '',
       metadata: item.metadata || {},
+      protectedAsset,
     }));
 }
 
@@ -263,6 +265,9 @@ export default async function handler(req, res) {
       const allowedBuckets = new Set(MEDIA_BUCKETS.map(item => item.bucket));
 
       if (!allowedBuckets.has(bucket)) return res.status(400).json({ error: 'Invalid media bucket' });
+      if (bucket === 'site-assets') {
+        return res.status(409).json({ error: 'Website page assets are protected. Replace the image on the page instead of deleting the stored asset.' });
+      }
       if (!objectPath || objectPath.includes('..')) return res.status(400).json({ error: 'Invalid media path' });
 
       const encodedPath = objectPath.split('/').map(encodeURIComponent).join('/');
