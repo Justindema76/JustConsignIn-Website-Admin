@@ -995,3 +995,88 @@
   .standard-project-footer{align-items:flex-start;flex-direction:column}
   .standard-project-button{width:100%}
 }
+
+
+/* Portfolio builder parity + per-block background controls */
+.jci-builder-block-surface{
+  width:100%;
+  display:flow-root;
+  font-family:var(--site-body-font,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);
+}
+.jci-builder-block-surface.theme-white{background:#fff}
+.jci-builder-block-surface.theme-light{background:var(--site-light-surface,#E8F0FF)}
+.jci-builder-block-surface.theme-page{background:var(--site-page-bg,#F8F7F4)}
+.jci-builder-block-surface.theme-dark{background:var(--site-dark-surface,#081522)}
+.jci-builder-block-surface.theme-primary{background:var(--site-primary,#2F6BFF)}
+
+.jci-builder-block-surface:not(.block-ProjectCardBlock)>section,
+.jci-builder-block-surface:not(.block-ProjectCardBlock)>.jci-public-preview>section{
+  background:transparent!important;
+}
+
+.jci-puck-editor .shared-section-title,
+.jci-puck-editor .shared-showcase-heading,
+.jci-puck-editor .shared-work-card-heading,
+.jci-puck-editor .shared-story-card-heading,
+.jci-puck-editor .shared-story-point-heading,
+.jci-puck-editor .shared-process-row-heading,
+.jci-puck-editor .shared-skill-card-heading,
+.jci-puck-editor .shared-large-cta-heading,
+.jci-puck-editor .resume-skills-heading,
+.jci-puck-editor .resume-skill-card-title,
+.jci-puck-editor .standard-project-heading,
+.jci-puck-editor .standard-project-company-name{
+  font-family:var(--site-heading-font,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)!important;
+}
+
+.jci-puck-editor .shared-card-grid-heading .shared-section-title{
+  font-size:clamp(30px,4vw,46px)!important;
+}
+.jci-puck-editor .shared-work-card-heading{
+  font-size:clamp(22px,2.4vw,32px)!important;
+}
+
+/* Make chosen light backgrounds readable even for blocks that are dark by default. */
+.jci-builder-block-surface.theme-white:not(.block-ProjectCardBlock) .shared-section-title,
+.jci-builder-block-surface.theme-light:not(.block-ProjectCardBlock) .shared-section-title,
+.jci-builder-block-surface.theme-page:not(.block-ProjectCardBlock) .shared-section-title,
+.jci-builder-block-surface.theme-white:not(.block-ProjectCardBlock) .shared-large-cta-heading,
+.jci-builder-block-surface.theme-light:not(.block-ProjectCardBlock) .shared-large-cta-heading,
+.jci-builder-block-surface.theme-page:not(.block-ProjectCardBlock) .shared-large-cta-heading,
+.jci-builder-block-surface.theme-white:not(.block-ProjectCardBlock) .resume-skills-heading,
+.jci-builder-block-surface.theme-light:not(.block-ProjectCardBlock) .resume-skills-heading,
+.jci-builder-block-surface.theme-page:not(.block-ProjectCardBlock) .resume-skills-heading{
+  color:var(--site-text,#1D2935)!important;
+}
+.jci-builder-block-surface.theme-white>.shared-process,
+.jci-builder-block-surface.theme-light>.shared-process,
+.jci-builder-block-surface.theme-page>.shared-process{
+  color:var(--site-text,#1D2935)!important;
+}
+.jci-builder-block-surface.theme-white .shared-process-row,
+.jci-builder-block-surface.theme-light .shared-process-row,
+.jci-builder-block-surface.theme-page .shared-process-row{
+  background:var(--site-surface,#fff)!important;
+  border-color:var(--site-border,#DCE4EC)!important;
+  color:var(--site-text,#1D2935)!important;
+}
+
+/* Make dark / primary selections carry the heading and lead text with them. */
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock),
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock){
+  color:#fff;
+}
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .shared-section-title,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .shared-section-title,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .shared-large-cta-heading,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .shared-large-cta-heading,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .resume-skills-heading,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .resume-skills-heading{
+  color:#fff!important;
+}
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .shared-lead,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .shared-lead,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .resume-skills-intro,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .resume-skills-intro{
+  color:rgba(255,255,255,.76)!important;
+}
