@@ -49,7 +49,7 @@ function cleanVideo(body = {}) {
 
 function socialValue(body = {}) {
   const input = body.social || body.value || body;
-  const keys = ['facebook', 'instagram', 'linkedin', 'youtube', 'tiktok'];
+  const keys = ['facebook', 'instagram', 'linkedin', 'github', 'youtube', 'tiktok'];
   return Object.fromEntries(keys.map(key => [key, {
     url: String(input?.[key]?.url || '').trim(),
     enabled: input?.[key]?.enabled !== false,
