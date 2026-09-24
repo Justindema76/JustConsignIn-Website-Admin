@@ -98,6 +98,20 @@ const backgroundOptions = [
   { label: 'Dark', value: 'dark' },
 ];
 
+const headingLevelOptions = [
+  { label: 'H1', value: 'h1' },
+  { label: 'H2', value: 'h2' },
+  { label: 'H3', value: 'h3' },
+  { label: 'H4', value: 'h4' },
+];
+
+const headingLevelField = { type: 'select', label: 'Heading level', options: headingLevelOptions };
+const JUSTIN_SHOWCASE_IMAGE = 'https://raw.githubusercontent.com/Justindema76/Justin-DeMatteis-Main-Site/main/public/images/projects/justconsignin-showcase.svg';
+
+function BlockHeading({ level = 'h2', className = '', children }) {
+  const Tag = ['h1','h2','h3','h4'].includes(level) ? level : 'h2';
+  return <Tag className={`${className} heading-level-${Tag}`.trim()}>{children}</Tag>;
+}
 
 const publicAsset = path => `https://www.justconsignin.com${path}`;
 
@@ -493,7 +507,7 @@ export const siteBuilderConfig = {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
         text: { type: 'text', label: 'Description' },
-        image: imageField,
+        image: { ...imageField, label: 'Hero image' },
         imageAlt: { type: 'text', label: 'Image alt text' },
         imagePosition: {
           type: 'radio',
@@ -630,6 +644,7 @@ export const siteBuilderConfig = {
       label: 'Features CTA',
       fields: {
         heading: { type: 'text', label: 'Heading' },
+        headingLevel: { ...headingLevelField, label: 'Heading level' },
         text: { type: 'text', label: 'Text' },
         buttonText: { type: 'text', label: 'Button text' },
         buttonUrl: { type: 'text', label: 'Button link' },
@@ -652,6 +667,7 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
+        headingLevel: { ...headingLevelField, label: 'Heading level' },
         accent: { type: 'text', label: 'Accent text' },
         text: { type: 'text', label: 'Description' },
         primaryButtonText: { type: 'text', label: 'Primary button text' },
@@ -659,17 +675,13 @@ export const siteBuilderConfig = {
         secondaryButtonText: { type: 'text', label: 'Secondary button text' },
         secondaryButtonUrl: { type: 'text', label: 'Secondary button link' },
         note: { type: 'text', label: 'Small note' },
-        cardBadge: { type: 'text', label: 'Showcase badge' },
-        cardTitle: { type: 'text', label: 'Showcase title' },
-        cardText: { type: 'text', label: 'Showcase text' },
-        flow1: { type: 'text', label: 'Flow step 1' },
-        flow2: { type: 'text', label: 'Flow step 2' },
-        flow3: { type: 'text', label: 'Flow step 3' },
-        flow4: { type: 'text', label: 'Flow step 4' },
+        image: { ...imageField, label: 'Hero image' },
+        imageAlt: { type: 'text', label: 'Hero image alt text' },
       },
       defaultProps: {
         eyebrow: 'Developer • Product Builder • Problem Solver',
         heading: 'I build digital products that',
+        headingLevel: 'h1',
         accent: 'solve real problems.',
         text: 'Web applications, Shopify solutions, ecommerce systems, automation and AI-assisted development — from the first idea through testing, refinement and deployment.',
         primaryButtonText: 'View my work →',
@@ -677,19 +689,14 @@ export const siteBuilderConfig = {
         secondaryButtonText: 'How I work with AI',
         secondaryButtonUrl: '/ai-development',
         note: 'Based in Ontario, Canada • Building real products for real business workflows',
-        cardBadge: 'FEATURED PROJECT',
-        cardTitle: 'JustConsignIn — Shopify consignment management built from a real store problem.',
-        cardText: 'A working product connecting consignors, inventory, Shopify products, POS sales and payouts.',
-        flow1: 'Intake',
-        flow2: 'Shopify',
-        flow3: 'Sold',
-        flow4: 'Paid',
+        image: JUSTIN_SHOWCASE_IMAGE,
+        imageAlt: 'JustConsignIn featured project',
       },
       render: p => <section className="shared-showcase-hero">
         <div className="shared-wrap shared-showcase-grid">
           <div className="shared-showcase-copy">
             <div className="shared-eyebrow">{p.eyebrow}</div>
-            <h1>{p.heading} <span>{p.accent}</span></h1>
+            <BlockHeading level={p.headingLevel || 'h1'} className="shared-showcase-heading">{p.heading} {p.accent && <span>{p.accent}</span>}</BlockHeading>
             <p>{p.text}</p>
             <div className="shared-showcase-actions">
               {p.primaryButtonText && <a className="shared-btn shared-btn-primary" href={p.primaryButtonUrl || '#'} onClick={previewClick}>{p.primaryButtonText}</a>}
@@ -697,17 +704,7 @@ export const siteBuilderConfig = {
             </div>
             {p.note && <div className="shared-showcase-note">{p.note}</div>}
           </div>
-          <div className="shared-profile-card">
-            <div className="shared-browser">
-              <div className="shared-browser-top"><i/><i/><i/></div>
-              <div className="shared-browser-body">
-                <span className="shared-mini-badge">{p.cardBadge}</span>
-                <div className="shared-mock-title">{p.cardTitle}</div>
-                <p>{p.cardText}</p>
-                <div className="shared-mock-flow"><span>{p.flow1}</span><span>{p.flow2}</span><span>{p.flow3}</span><span>{p.flow4}</span></div>
-              </div>
-            </div>
-          </div>
+          <div className="shared-showcase-image"><img src={p.image || JUSTIN_SHOWCASE_IMAGE} alt={p.imageAlt || 'JustConsignIn featured project'}/></div>
         </div>
       </section>,
     },
@@ -715,17 +712,19 @@ export const siteBuilderConfig = {
     ProofStripBlock: {
       label: 'Proof Strip',
       fields: {
+        itemHeadingLevel: { ...headingLevelField, label: 'Proof title level' },
         item1Title: { type: 'text', label: 'Item 1 title' }, item1Text: { type: 'text', label: 'Item 1 text' },
         item2Title: { type: 'text', label: 'Item 2 title' }, item2Text: { type: 'text', label: 'Item 2 text' },
         item3Title: { type: 'text', label: 'Item 3 title' }, item3Text: { type: 'text', label: 'Item 3 text' },
       },
       defaultProps: {
+        itemHeadingLevel: 'h3',
         item1Title: 'Real products', item1Text: 'Not mockups built only for a portfolio.',
         item2Title: 'Real workflows', item2Text: 'Software designed around actual business needs.',
         item3Title: 'AI-assisted', item3Text: 'Faster prototyping, debugging, iteration and delivery.',
       },
       render: p => <section className="shared-proof-strip"><div className="shared-wrap shared-proof-grid">
-        {[[p.item1Title,p.item1Text],[p.item2Title,p.item2Text],[p.item3Title,p.item3Text]].map(([title,copy],i)=><div className="shared-proof" key={i}><strong>{title}</strong><span>{copy}</span></div>)}
+        {[[p.item1Title,p.item1Text],[p.item2Title,p.item2Text],[p.item3Title,p.item3Text]].map(([title,copy],i)=><div className="shared-proof" key={i}><BlockHeading level={p.itemHeadingLevel || 'h3'} className="shared-proof-title">{title}</BlockHeading><span>{copy}</span></div>)}
       </div></section>,
     },
 
@@ -734,28 +733,34 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Section eyebrow' },
         sectionHeading: { type: 'text', label: 'Section heading' },
+        sectionHeadingLevel: { ...headingLevelField, label: 'Section heading level' },
         sectionText: { type: 'text', label: 'Section description' },
         projectEyebrow: { type: 'text', label: 'Project eyebrow' },
         projectHeading: { type: 'text', label: 'Project heading' },
+        projectHeadingLevel: { ...headingLevelField, label: 'Project heading level' },
         projectText: { type: 'text', label: 'Project text' },
         tags: { type: 'text', label: 'Tags (comma separated)' },
         buttonText: { type: 'text', label: 'Button text' },
         buttonUrl: { type: 'text', label: 'Button link' },
         workflowTitle: { type: 'text', label: 'Workflow title' },
+        workflowHeadingLevel: { ...headingLevelField, label: 'Workflow title level' },
         step1: { type: 'text', label: 'Workflow step 1' }, step2: { type: 'text', label: 'Workflow step 2' },
         step3: { type: 'text', label: 'Workflow step 3' }, step4: { type: 'text', label: 'Workflow step 4' },
       },
       defaultProps: {
         eyebrow: 'Featured case study',
         sectionHeading: 'From a real store problem to a working Shopify product.',
+        sectionHeadingLevel: 'h2',
         sectionText: 'JustConsignIn started with a real consignment workflow at Jill & The Beanstalk and grew into a Shopify-focused application for managing consignors, products, sales and payouts.',
         projectEyebrow: 'JustConsignIn',
         projectHeading: 'Build around the business. Not the other way around.',
+        projectHeadingLevel: 'h3',
         projectText: 'The goal was not to build another spreadsheet. It was to remove duplicate entry, connect consignment inventory to Shopify, support mobile intake, track sold items and make consignor payouts easier to understand.',
         tags: 'Shopify, React, POS, Supabase, Mobile Intake, Payouts',
         buttonText: 'Read the story →',
         buttonUrl: '/work',
         workflowTitle: 'Consignment workflow',
+        workflowHeadingLevel: 'h4',
         step1: 'Create consignor + item',
         step2: 'Publish to Shopify POS / Online Store',
         step3: 'Track the sale back to the consignor',
@@ -763,16 +768,16 @@ export const siteBuilderConfig = {
       },
       render: p => <section className="shared-section shared-featured-case"><div className="shared-wrap">
         <div className="shared-eyebrow">{p.eyebrow}</div>
-        <h2 className="shared-section-title">{p.sectionHeading}</h2>
+        <BlockHeading level={p.sectionHeadingLevel || 'h2'} className="shared-section-title">{p.sectionHeading}</BlockHeading>
         <p className="shared-lead">{p.sectionText}</p>
         <div className="shared-case-card">
           <div className="shared-case-copy">
             <div className="shared-eyebrow">{p.projectEyebrow}</div>
-            <h3>{p.projectHeading}</h3><p>{p.projectText}</p>
+            <BlockHeading level={p.projectHeadingLevel || 'h3'} className="shared-case-heading">{p.projectHeading}</BlockHeading><p>{p.projectText}</p>
             <div className="shared-tag-row">{String(p.tags||'').split(',').map(tag=>tag.trim()).filter(Boolean).map(tag=><span className="shared-tag" key={tag}>{tag}</span>)}</div>
             {p.buttonText && <a className="shared-btn shared-btn-primary" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
           </div>
-          <div className="shared-case-visual"><div className="shared-workflow-card"><h4>{p.workflowTitle}</h4>
+          <div className="shared-case-visual"><div className="shared-workflow-card"><BlockHeading level={p.workflowHeadingLevel || 'h4'} className="shared-workflow-heading">{p.workflowTitle}</BlockHeading>
             <div className="shared-workflow-list">{[p.step1,p.step2,p.step3,p.step4].map((step,i)=><div className="shared-workflow-item" key={i}><b>{i+1}</b><span>{step}</span></div>)}</div>
           </div></div>
         </div>
@@ -782,47 +787,47 @@ export const siteBuilderConfig = {
     CardGridBlock: {
       label: 'Card Grid',
       fields: {
-        eyebrow:{type:'text',label:'Section eyebrow'},heading:{type:'text',label:'Section heading'},text:{type:'text',label:'Section description'},
+        eyebrow:{type:'text',label:'Section eyebrow'},heading:{type:'text',label:'Section heading'},headingLevel:{...headingLevelField,label:'Section heading level'},itemHeadingLevel:{...headingLevelField,label:'Card title level'},text:{type:'text',label:'Section description'},
         item1Eyebrow:{type:'text',label:'Card 1 eyebrow'},item1Title:{type:'text',label:'Card 1 title'},item1Text:{type:'text',label:'Card 1 text'},item1Icon:{type:'text',label:'Card 1 icon text'},item1Style:{type:'select',label:'Card 1 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item2Eyebrow:{type:'text',label:'Card 2 eyebrow'},item2Title:{type:'text',label:'Card 2 title'},item2Text:{type:'text',label:'Card 2 text'},item2Icon:{type:'text',label:'Card 2 icon text'},item2Style:{type:'select',label:'Card 2 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item3Eyebrow:{type:'text',label:'Card 3 eyebrow'},item3Title:{type:'text',label:'Card 3 title'},item3Text:{type:'text',label:'Card 3 text'},item3Icon:{type:'text',label:'Card 3 icon text'},item3Style:{type:'select',label:'Card 3 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
         item4Eyebrow:{type:'text',label:'Card 4 eyebrow'},item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'text',label:'Card 4 text'},item4Icon:{type:'text',label:'Card 4 icon text'},item4Style:{type:'select',label:'Card 4 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
       },
       defaultProps: {
-        eyebrow:'Selected work',heading:'Projects that solve something real.',text:'The goal of every project is the same: make a business process clearer, faster or easier to manage.',
+        eyebrow:'Selected work',heading:'Projects that solve something real.',headingLevel:'h2',itemHeadingLevel:'h3',text:'The goal of every project is the same: make a business process clearer, faster or easier to manage.',
         item1Eyebrow:'Professional work',item1Title:'Wheels Automotive',item1Text:'Adobe Commerce / Magento, B2B ecommerce, frontend components, QA, product/category content, SEO and launch support.',item1Icon:'WA',item1Style:'dark',
         item2Eyebrow:'Custom business tools',item2Title:'Internal tools & admin systems',item2Text:'Dashboards, data-entry workflows, admin tools and interfaces designed around how people actually perform the work.',item2Icon:'UI',item2Style:'white',
         item3Eyebrow:'Ecommerce',item3Title:'Shopify & commerce integrations',item3Text:'Product workflows, POS-connected applications, publishing controls and custom ecommerce experiences.',item3Icon:'EC',item3Style:'blue',
         item4Eyebrow:'AI-assisted development',item4Title:'From idea to working software faster.',item4Text:'AI supports architecture, prototyping, debugging, refactoring, UX exploration, research and documentation while product direction stays human-led.',item4Icon:'AI',item4Style:'white',
       },
       render: p => <section className="shared-card-grid-section"><div className="shared-wrap">
-        {(p.eyebrow || p.heading || p.text) && <div className="shared-card-grid-heading">{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <h2 className="shared-section-title">{p.heading}</h2>}{p.text && <p className="shared-lead">{p.text}</p>}</div>}
-        <div className="shared-work-grid">{[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><h3>{p['item'+i+'Title']}</h3><p>{p['item'+i+'Text']}</p></article>)}</div>
+        {(p.eyebrow || p.heading || p.text) && <div className="shared-card-grid-heading">{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading>}{p.text && <p className="shared-lead">{p.text}</p>}</div>}
+        <div className="shared-work-grid">{[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><BlockHeading level={p.itemHeadingLevel || 'h3'} className="shared-work-card-heading">{p['item'+i+'Title']}</BlockHeading><p>{p['item'+i+'Text']}</p></article>)}</div>
       </div></section>,
     },
 
     StorySplitBlock: {
       label: 'Story Split',
       fields: {
-        leftEyebrow:{type:'text',label:'Left eyebrow'},leftHeading:{type:'text',label:'Left heading'},leftText1:{type:'text',label:'Left paragraph 1'},leftText2:{type:'text',label:'Left paragraph 2'},
-        rightEyebrow:{type:'text',label:'Right eyebrow'},rightHeading:{type:'text',label:'Right heading'},
+        leftEyebrow:{type:'text',label:'Left eyebrow'},leftHeading:{type:'text',label:'Left heading'},leftHeadingLevel:{...headingLevelField,label:'Left heading level'},leftText1:{type:'text',label:'Left paragraph 1'},leftText2:{type:'text',label:'Left paragraph 2'},
+        rightEyebrow:{type:'text',label:'Right eyebrow'},rightHeading:{type:'text',label:'Right heading'},rightHeadingLevel:{...headingLevelField,label:'Right heading level'},pointHeadingLevel:{...headingLevelField,label:'Point title level'},
         point1Title:{type:'text',label:'Point 1 title'},point1Text:{type:'text',label:'Point 1 text'},
         point2Title:{type:'text',label:'Point 2 title'},point2Text:{type:'text',label:'Point 2 text'},
         point3Title:{type:'text',label:'Point 3 title'},point3Text:{type:'text',label:'Point 3 text'},
         point4Title:{type:'text',label:'Point 4 title'},point4Text:{type:'text',label:'Point 4 text'},
       },
       defaultProps: {
-        leftEyebrow:'About me',leftHeading:'I didn’t start my career behind a laptop.',leftText1:'My background is in mechanical engineering technology, CNC programming and tool & die design. That taught me to think about systems, tolerances, workflows and how things actually have to work in the real world.',leftText2:'I brought that same problem-solving mindset into web and mobile development.',
-        rightEyebrow:'How I think',rightHeading:'Software should remove friction, not create more of it.',
+        leftEyebrow:'About me',leftHeading:'I didn’t start my career behind a laptop.',leftHeadingLevel:'h3',leftText1:'My background is in mechanical engineering technology, CNC programming and tool & die design. That taught me to think about systems, tolerances, workflows and how things actually have to work in the real world.',leftText2:'I brought that same problem-solving mindset into web and mobile development.',
+        rightEyebrow:'How I think',rightHeading:'Software should remove friction, not create more of it.',rightHeadingLevel:'h2',pointHeadingLevel:'h4',
         point1Title:'Understand the workflow first',point1Text:'Before writing code, I want to know what people are doing today, what is repetitive and where the process breaks down.',
         point2Title:'Build the simplest useful version',point2Text:'I would rather test a useful working flow early than spend months polishing the wrong solution.',
         point3Title:'Connect the systems already in use',point3Text:'Shopify, POS, APIs, databases and internal tools should work together instead of creating more duplicate work.',
         point4Title:'Keep changing the product when reality says it should change',point4Text:'Real usage exposes things a specification never will. The software should evolve around what users actually need.',
       },
       render: p => <section className="shared-section"><div className="shared-wrap shared-story-grid">
-        <aside className="shared-story-card"><div className="shared-eyebrow">{p.leftEyebrow}</div><h3>{p.leftHeading}</h3><p>{p.leftText1}</p><p>{p.leftText2}</p></aside>
-        <div><div className="shared-eyebrow">{p.rightEyebrow}</div><h2 className="shared-section-title">{p.rightHeading}</h2><div className="shared-story-points">
-          {[1,2,3,4].map(i=><div className="shared-story-point" key={i}><h4>{p['point'+i+'Title']}</h4><p>{p['point'+i+'Text']}</p></div>)}
+        <aside className="shared-story-card"><div className="shared-eyebrow">{p.leftEyebrow}</div><BlockHeading level={p.leftHeadingLevel || 'h3'} className="shared-story-card-heading">{p.leftHeading}</BlockHeading><p>{p.leftText1}</p><p>{p.leftText2}</p></aside>
+        <div><div className="shared-eyebrow">{p.rightEyebrow}</div><BlockHeading level={p.rightHeadingLevel || 'h2'} className="shared-section-title">{p.rightHeading}</BlockHeading><div className="shared-story-points">
+          {[1,2,3,4].map(i=><div className="shared-story-point" key={i}><BlockHeading level={p.pointHeadingLevel || 'h4'} className="shared-story-point-heading">{p['point'+i+'Title']}</BlockHeading><p>{p['point'+i+'Text']}</p></div>)}
         </div></div>
       </div></section>,
     },
@@ -830,16 +835,16 @@ export const siteBuilderConfig = {
     ProcessRowsBlock: {
       label: 'Process Rows',
       fields: {
-        eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},text:{type:'text',label:'Description'},note:{type:'text',label:'Note'},
+        eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},headingLevel:{...headingLevelField,label:'Heading level'},rowHeadingLevel:{...headingLevelField,label:'Row label level'},text:{type:'text',label:'Description'},note:{type:'text',label:'Note'},
         row1Label:{type:'text',label:'Row 1 label'},row1Text:{type:'text',label:'Row 1 text'},row2Label:{type:'text',label:'Row 2 label'},row2Text:{type:'text',label:'Row 2 text'},row3Label:{type:'text',label:'Row 3 label'},row3Text:{type:'text',label:'Row 3 text'},row4Label:{type:'text',label:'Row 4 label'},row4Text:{type:'text',label:'Row 4 text'},row5Label:{type:'text',label:'Row 5 label'},row5Text:{type:'text',label:'Row 5 text'},
       },
       defaultProps: {
-        eyebrow:'AI + Development',heading:'AI changes what one developer can accomplish.',text:'I use AI throughout the development process — not as a replacement for judgment, but as a way to move faster across more parts of a project.',note:'The business problem, product decisions, testing and final direction still need a human who understands what the software is supposed to accomplish.',
+        eyebrow:'AI + Development',heading:'AI changes what one developer can accomplish.',headingLevel:'h2',rowHeadingLevel:'h4',text:'I use AI throughout the development process — not as a replacement for judgment, but as a way to move faster across more parts of a project.',note:'The business problem, product decisions, testing and final direction still need a human who understands what the software is supposed to accomplish.',
         row1Label:'RESEARCH',row1Text:'Explore technologies, approaches and business requirements quickly.',row2Label:'ARCHITECTURE',row2Text:'Break a product into workflows, data structures and technical components.',row3Label:'BUILD',row3Text:'Accelerate frontend, backend, integrations and rapid prototyping.',row4Label:'DEBUG',row4Text:'Investigate problems, compare approaches and iterate much faster.',row5Label:'REFINE',row5Text:'Improve UX, documentation, SEO, content and deployment workflows.',
       },
       render: p => <section className="shared-section shared-process"><div className="shared-wrap shared-process-grid">
-        <div><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-process-note">{p.note}</div></div>
-        <div className="shared-process-rows">{[1,2,3,4,5].map(i=><div className="shared-process-row" key={i}><strong>{p['row'+i+'Label']}</strong><span>{p['row'+i+'Text']}</span></div>)}</div>
+        <div><div className="shared-eyebrow">{p.eyebrow}</div><BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading><p className="shared-lead">{p.text}</p><div className="shared-process-note">{p.note}</div></div>
+        <div className="shared-process-rows">{[1,2,3,4,5].map(i=><div className="shared-process-row" key={i}><BlockHeading level={p.rowHeadingLevel || 'h4'} className="shared-process-row-heading">{p['row'+i+'Label']}</BlockHeading><span>{p['row'+i+'Text']}</span></div>)}</div>
       </div></section>,
     },
 
@@ -847,16 +852,13 @@ export const siteBuilderConfig = {
       label: 'Skills Grid',
       fields: {
         eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},
-        headingSize:{type:'select',label:'Heading size',options:[
-          {label:'Small',value:'small'},
-          {label:'Medium',value:'medium'},
-          {label:'Large',value:'large'},
-        ]},
+        headingLevel:{...headingLevelField,label:'Heading level'},
+        itemHeadingLevel:{...headingLevelField,label:'Card title level'},
         text:{type:'text',label:'Description'},
         item1Title:{type:'text',label:'Item 1 title'},item1Text:{type:'text',label:'Item 1 text'},item2Title:{type:'text',label:'Item 2 title'},item2Text:{type:'text',label:'Item 2 text'},item3Title:{type:'text',label:'Item 3 title'},item3Text:{type:'text',label:'Item 3 text'},item4Title:{type:'text',label:'Item 4 title'},item4Text:{type:'text',label:'Item 4 text'},item5Title:{type:'text',label:'Item 5 title'},item5Text:{type:'text',label:'Item 5 text'},item6Title:{type:'text',label:'Item 6 title'},item6Text:{type:'text',label:'Item 6 text'},
       },
       defaultProps: {
-        eyebrow:'Technology',heading:'Tools I use to ship real work.',headingSize:'medium',text:'I prefer showing technologies in the context of what I actually build rather than treating a skills list as the portfolio itself.',
+        eyebrow:'Technology',heading:'Tools I use to ship real work.',headingLevel:'h2',itemHeadingLevel:'h4',text:'I prefer showing technologies in the context of what I actually build rather than treating a skills list as the portfolio itself.',
         item1Title:'Frontend',item1Text:'HTML, CSS, JavaScript, React, Angular, TypeScript, responsive UI and mobile-first design.',
         item2Title:'Backend & Data',item2Text:'Node, Express, PHP, MySQL, Supabase, REST APIs and data-driven application workflows.',
         item3Title:'Commerce',item3Text:'Shopify, Shopify POS, Adobe Commerce / Magento, WordPress and ecommerce product workflows.',
@@ -864,16 +866,16 @@ export const siteBuilderConfig = {
         item5Title:'UI / UX & Mobile',item5Text:'Responsive interfaces designed around the people actually using the product.',
         item6Title:'Systems Integration',item6Text:'Connect or simplify what already exists instead of rebuilding everything from scratch.',
       },
-      render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className={`shared-section-title heading-size-${p.headingSize || 'medium'}`}>{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
-        {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
+      render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
+        {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i=><div className="shared-skill-card" key={i}><BlockHeading level={p.itemHeadingLevel || 'h4'} className="shared-skill-card-heading">{p['item'+i+'Title']}</BlockHeading><p>{p['item'+i+'Text']}</p></div>)}
       </div></div></section>,
     },
 
     LargeCtaBlock: {
       label: 'Large CTA',
-      fields: { eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},buttonText:{type:'text',label:'Button text'},buttonUrl:{type:'text',label:'Button link'} },
-      defaultProps: { eyebrow:'Open to the right opportunity',heading:'Need someone who can understand the problem and build the solution?',buttonText:'Get in touch →',buttonUrl:'/contact' },
-      render: p => <section className="shared-large-cta"><div className="shared-wrap shared-large-cta-box"><div><div className="shared-eyebrow">{p.eyebrow}</div><h2>{p.heading}</h2></div>{p.buttonText&&<a className="shared-btn shared-btn-dark" href={p.buttonUrl||'#'} onClick={previewClick}>{p.buttonText}</a>}</div></section>,
+      fields: { eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},headingLevel:{...headingLevelField,label:'Heading level'},buttonText:{type:'text',label:'Button text'},buttonUrl:{type:'text',label:'Button link'} },
+      defaultProps: { eyebrow:'Open to the right opportunity',heading:'Need someone who can understand the problem and build the solution?',headingLevel:'h2',buttonText:'Get in touch →',buttonUrl:'/contact' },
+      render: p => <section className="shared-large-cta"><div className="shared-wrap shared-large-cta-box"><div><div className="shared-eyebrow">{p.eyebrow}</div><BlockHeading level={p.headingLevel || 'h2'} className="shared-large-cta-heading">{p.heading}</BlockHeading></div>{p.buttonText&&<a className="shared-btn shared-btn-dark" href={p.buttonUrl||'#'} onClick={previewClick}>{p.buttonText}</a>}</div></section>,
     },
 
     ProjectCardBlock: {
@@ -977,16 +979,8 @@ export const siteBuilderConfig = {
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
+        headingLevel: { ...headingLevelField, label: 'Heading level' },
         accent: { type: 'text', label: 'Accent text (optional)' },
-        headingSize: {
-          type: 'radio',
-          label: 'Heading size',
-          options: [
-            { label: 'Small', value: 'small' },
-            { label: 'Medium', value: 'medium' },
-            { label: 'Large', value: 'large' },
-          ],
-        },
         text: { type: 'text', label: 'Description' },
         primaryButtonText: { type: 'text', label: 'Primary button text' },
         primaryButtonUrl: { type: 'text', label: 'Primary button link' },
@@ -1000,8 +994,8 @@ export const siteBuilderConfig = {
       defaultProps: {
         eyebrow: '',
         heading: '',
+        headingLevel: 'h1',
         accent: '',
-        headingSize: 'medium',
         text: '',
         primaryButtonText: '',
         primaryButtonUrl: '',
@@ -1018,10 +1012,10 @@ export const siteBuilderConfig = {
           primaryButtonText: rawProps.primaryButtonText ?? rawProps.buttonText ?? '',
           primaryButtonUrl: rawProps.primaryButtonUrl ?? rawProps.buttonUrl ?? '',
         };
-        return <section className={`jci-builder-section jci-builder-hero showcase-style-hero hero-heading-${props.headingSize || 'medium'} theme-${props.background || 'light'} ${props.image ? 'with-media' : 'without-media'}`}>
+        return <section className={`jci-builder-section jci-builder-hero showcase-style-hero theme-${props.background || 'light'} ${props.image ? 'with-media' : 'without-media'}`}>
           <div className="jci-builder-hero-copy">
             {props.eyebrow && <p className="jci-builder-eyebrow">{props.eyebrow}</p>}
-            <h1>{props.heading}{props.accent ? <> <span>{props.accent}</span></> : null}</h1>
+            <BlockHeading level={props.headingLevel || 'h1'} className="jci-builder-hero-heading">{props.heading}{props.accent ? <> <span>{props.accent}</span></> : null}</BlockHeading>
             {props.text && <p>{props.text}</p>}
             {(props.primaryButtonText || props.secondaryButtonText) && <div className="shared-showcase-actions">
               {props.primaryButtonText && <a className="shared-btn shared-btn-primary" href={props.primaryButtonUrl || '#'} onClick={previewClick}>{props.primaryButtonText}</a>}
@@ -1042,11 +1036,7 @@ export const siteBuilderConfig = {
         level: {
           type: 'select',
           label: 'Size',
-          options: [
-            { label: 'Large', value: 'h2' },
-            { label: 'Medium', value: 'h3' },
-            { label: 'Small', value: 'h4' },
-          ],
+          options: headingLevelOptions,
         },
         align: {
           type: 'radio',
@@ -1108,6 +1098,7 @@ export const siteBuilderConfig = {
         image: imageField,
         alt: { type: 'text', label: 'Image alt text' },
         heading: { type: 'text', label: 'Heading' },
+        headingLevel: { ...headingLevelField, label: 'Heading level' },
         text: { type: 'text', label: 'Text' },
         imagePosition: {
           type: 'radio',
@@ -1123,17 +1114,18 @@ export const siteBuilderConfig = {
         image: '',
         alt: '',
         heading: '',
+        headingLevel: 'h2',
         text: '',
         imagePosition: 'left',
         background: 'white',
       },
-      render: ({ image, alt, heading, text, imagePosition = 'left', background = 'white' }) => <section className={`jci-builder-section jci-builder-image-text theme-${background} image-${imagePosition}`}>
+      render: ({ image, alt, heading, headingLevel = 'h2', text, imagePosition = 'left', background = 'white' }) => <section className={`jci-builder-section jci-builder-image-text theme-${background} image-${imagePosition}`}>
         <div className="jci-builder-image-text-media">
           {image
             ? <img src={image} alt={alt || ''}/>
             : <div className="jci-builder-placeholder"><ImageIcon size={34}/><span>Choose an image</span></div>}
         </div>
-        <div className="jci-builder-image-text-copy"><h2>{heading}</h2><p>{text}</p></div>
+        <div className="jci-builder-image-text-copy"><BlockHeading level={headingLevel} className="jci-builder-image-text-heading">{heading}</BlockHeading><p>{text}</p></div>
       </section>,
     },
     CtaBlock: {
@@ -1147,13 +1139,14 @@ export const siteBuilderConfig = {
       },
       defaultProps: {
         heading: '',
+        headingLevel: 'h2',
         text: '',
         buttonText: '',
         buttonUrl: '',
         background: 'dark',
       },
-      render: ({ heading, text, buttonText, buttonUrl, background = 'dark' }) => <section className={`jci-builder-section jci-builder-cta theme-${background}`}>
-        <h2>{heading}</h2><p>{text}</p>
+      render: ({ heading, headingLevel = 'h2', text, buttonText, buttonUrl, background = 'dark' }) => <section className={`jci-builder-section jci-builder-cta theme-${background}`}>
+        <BlockHeading level={headingLevel} className="jci-builder-cta-heading">{heading}</BlockHeading><p>{text}</p>
         {buttonText && <a className="jci-builder-button" href={buttonUrl || '#'}>{buttonText}</a>}
       </section>,
     },
