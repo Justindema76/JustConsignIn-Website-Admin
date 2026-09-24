@@ -324,6 +324,49 @@ export default function SiteBuilder() {
       });
     }
 
+    if (siteKey === 'justindematteis') {
+      const backgroundField = {
+        type: 'select',
+        label: 'Block background',
+        options: [
+          { label: 'White', value: 'white' },
+          { label: 'Light', value: 'light' },
+          { label: 'Page background', value: 'page' },
+          { label: 'Dark', value: 'dark' },
+          { label: 'Primary blue', value: 'primary' },
+        ],
+      };
+
+      Object.entries(components).forEach(([name, definition]) => {
+        const originalRender = definition.render;
+        const originalFields = definition.fields || {};
+        const defaultBackground = definition.defaultProps?.background || 'white';
+
+        components[name] = {
+          ...definition,
+          fields: {
+            ...originalFields,
+            background: backgroundField,
+          },
+          defaultProps: {
+            ...(definition.defaultProps || {}),
+            background: defaultBackground,
+          },
+          render: props => {
+            const background = props.background || defaultBackground;
+            const content = typeof originalRender === 'function' ? originalRender(props) : null;
+            return <div
+              className={`jci-builder-block-surface theme-${background} block-${name}`}
+              data-block-type={name}
+              data-block-background={background}
+            >
+              {content}
+            </div>;
+          },
+        };
+      });
+    }
+
     const categories = siteKey === 'justindematteis'
       ? {
           resumeHomepage: {
