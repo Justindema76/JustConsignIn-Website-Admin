@@ -19,6 +19,7 @@ import SocialAdmin from '../features/social-links/SocialAdmin';
 import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
 import WorkPostsAdmin from '../features/work-posts/WorkPostsAdmin';
+import AiPostsAdmin from '../features/ai-posts/AiPostsAdmin';
 
 export default function AdminApp() {
   return <Routes>
@@ -33,6 +34,8 @@ export default function AdminApp() {
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
         <Route path="/admin/work-posts" element={<WorkPostsAdmin />} />
         <Route path="/admin/work-posts/:id" element={<WorkPostsAdmin />} />
+        <Route path="/admin/ai-posts" element={<AiPostsAdmin />} />
+        <Route path="/admin/ai-posts/:id" element={<AiPostsAdmin />} />
         <Route path="/admin/videos" element={<VideosAdmin />} />
         <Route path="/admin/videos/:id" element={<VideosAdmin />} />
         <Route path="/admin/social" element={<SocialAdmin />} />
