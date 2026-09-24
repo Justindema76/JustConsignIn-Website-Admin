@@ -4,7 +4,7 @@ import '@puckeditor/core/puck.css';
 import { CheckCircle2, ExternalLink, LoaderCircle } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { getAdminSiteKey, loadAdminGlobalSection, saveAdminGlobalSection } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminGlobalSection, loadAdminSocial, saveAdminGlobalSection } from '../../services/siteAdminService';
 import { defaultGlobalData, globalConfigFor } from './globalBuilderConfig';
 import './globalBuilder.css';
 
@@ -15,7 +15,8 @@ export default function GlobalBuilder() {
   if (!['header','footer'].includes(type)) return <Navigate to="/admin/website/pages" replace/>;
 
   const siteKey = getAdminSiteKey();
-  const config = useMemo(() => globalConfigFor(type, siteKey), [type, siteKey]);
+  const [socialLinks,setSocialLinks] = useState({});
+  const config = useMemo(() => globalConfigFor(type, siteKey, socialLinks), [type, siteKey, socialLinks]);
   const fallback = useMemo(() => defaultGlobalData(type, siteKey), [type, siteKey]);
   const liveUrl = siteKey === 'justindematteis' ? 'https://www.justindematteis.com' : 'https://www.justconsignin.com';
   const [data,setData] = useState(null);
@@ -26,9 +27,22 @@ export default function GlobalBuilder() {
   useEffect(() => {
     let active = true;
     setData(null); setError(''); setMessage('');
-    loadAdminGlobalSection(accessToken,type)
-      .then(result => { if(active){ setData(result.value || fallback); setSavedAt(result.updatedAt || ''); }})
-      .catch(err => { if(active){ setData(fallback); setError(err.message || 'Unable to load global section.'); }});
+    Promise.all([
+      loadAdminGlobalSection(accessToken,type),
+      loadAdminSocial(accessToken).catch(() => ({})),
+    ])
+      .then(([result,social]) => {
+        if (!active) return;
+        setData(result.value || fallback);
+        setSavedAt(result.updatedAt || '');
+        setSocialLinks(social || {});
+      })
+      .catch(err => {
+        if (!active) return;
+        setData(fallback);
+        setSocialLinks({});
+        setError(err.message || 'Unable to load global section.');
+      });
     return () => { active = false; };
   },[accessToken,type,fallback]);
 
