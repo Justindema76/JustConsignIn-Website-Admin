@@ -871,6 +871,68 @@ export const siteBuilderConfig = {
       </div></div></section>,
     },
 
+    ResumeSkillsBlock: {
+      label: 'RESUME · Skills',
+      fields: {
+        eyebrow:{type:'text',label:'Eyebrow'},
+        heading:{type:'text',label:'Heading'},
+        headingLevel:{...headingLevelField,label:'Heading level'},
+        text:{type:'text',label:'Intro text'},
+        itemHeadingLevel:{...headingLevelField,label:'Card title level'},
+        item1Title:{type:'text',label:'Card 1 title'},item1Text:{type:'textarea',label:'Card 1 description'},item1Tags:{type:'text',label:'Card 1 skill bubbles (comma separated)'},
+        item2Title:{type:'text',label:'Card 2 title'},item2Text:{type:'textarea',label:'Card 2 description'},item2Tags:{type:'text',label:'Card 2 skill bubbles (comma separated)'},
+        item3Title:{type:'text',label:'Card 3 title'},item3Text:{type:'textarea',label:'Card 3 description'},item3Tags:{type:'text',label:'Card 3 skill bubbles (comma separated)'},
+        item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'textarea',label:'Card 4 description'},item4Tags:{type:'text',label:'Card 4 skill bubbles (comma separated)'},
+        item5Title:{type:'text',label:'Card 5 title'},item5Text:{type:'textarea',label:'Card 5 description'},item5Tags:{type:'text',label:'Card 5 skill bubbles (comma separated)'},
+        item6Title:{type:'text',label:'Card 6 title'},item6Text:{type:'textarea',label:'Card 6 description'},item6Tags:{type:'text',label:'Card 6 skill bubbles (comma separated)'},
+      },
+      defaultProps: {
+        eyebrow:'RESUME',
+        heading:'Skills',
+        headingLevel:'h2',
+        itemHeadingLevel:'h4',
+        text:'Development, ecommerce, data, SEO and delivery skills used across real client work and application projects.',
+        item1Title:'Frontend Development',
+        item1Text:'Responsive web interfaces, component-based applications and mobile-first user experiences.',
+        item1Tags:'HTML, CSS, JavaScript, React, Angular, TypeScript, Bootstrap',
+        item2Title:'Backend & Data',
+        item2Text:'APIs, application logic, relational data and cloud-backed application workflows.',
+        item2Tags:'Node, Express, PHP, MySQL, Supabase, REST APIs',
+        item3Title:'Ecommerce',
+        item3Text:'Storefront development, product workflows, integrations, B2B testing and ecommerce operations.',
+        item3Tags:'Shopify, Shopify POS, Adobe Commerce, Magento 2, WordPress',
+        item4Title:'SEO & Digital',
+        item4Text:'Technical and on-page optimization, content architecture, search visibility and ecommerce content.',
+        item4Tags:'Technical SEO, Search Console, Analytics, Product Content, Category Content',
+        item5Title:'Development & Delivery',
+        item5Text:'Source control, deployment, QA, debugging and production delivery.',
+        item5Tags:'Git, GitHub, Vercel, Linux, QA, Deployment',
+        item6Title:'AI-Assisted Development',
+        item6Text:'Using AI throughout research, architecture, prototyping, debugging, iteration and documentation.',
+        item6Tags:'Research, Architecture, Prototyping, Debugging, Refactoring',
+      },
+      render: p => <section className="resume-skills-section"><div className="shared-wrap">
+        <div className="resume-skills-head">
+          <div className="resume-skills-title">
+            <div className="shared-eyebrow">{p.eyebrow}</div>
+            <BlockHeading level={p.headingLevel || 'h2'} className="resume-skills-heading">{p.heading}</BlockHeading>
+          </div>
+          <p className="resume-skills-intro">{p.text}</p>
+        </div>
+        <div className="resume-skills-divider"/>
+        <div className="resume-skills-grid">
+          {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i => {
+            const tags = String(p['item'+i+'Tags'] || '').split(',').map(v=>v.trim()).filter(Boolean);
+            return <article className="resume-skill-card" key={i}>
+              <BlockHeading level={p.itemHeadingLevel || 'h4'} className="resume-skill-card-title">{p['item'+i+'Title']}</BlockHeading>
+              <p>{p['item'+i+'Text']}</p>
+              {tags.length > 0 && <div className="resume-skill-pills">{tags.map(tag=><span key={tag}>{tag}</span>)}</div>}
+            </article>;
+          })}
+        </div>
+      </div></section>,
+    },
+
     LargeCtaBlock: {
       label: 'Large CTA',
       fields: { eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},headingLevel:{...headingLevelField,label:'Heading level'},buttonText:{type:'text',label:'Button text'},buttonUrl:{type:'text',label:'Button link'} },
