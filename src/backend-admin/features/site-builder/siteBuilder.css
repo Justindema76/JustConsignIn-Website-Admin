@@ -757,6 +757,41 @@
 .shared-skill-card{border:1px solid var(--site-border,#DCE4EC);border-radius:20px;padding:22px;background:#FBFCFE}.shared-skill-card-heading{margin:0 0 10px;color:#0B1F33}.shared-skill-card p{margin:0;color:var(--site-muted,#66788A);font-size:.92rem}
 
 
+
+/* Resume work experience block */
+.resume-work-section{padding:72px 0 96px;background:#fff}
+.resume-work-head{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(420px,1.2fr);gap:64px;align-items:end}
+.resume-work-heading{margin:8px 0 0;color:#0B1F33;line-height:.95;letter-spacing:-.05em}
+.resume-work-intro{margin:0 0 8px auto;max-width:650px;text-align:right;color:var(--site-muted,#66788A);font-size:1.05rem;line-height:1.55}
+.resume-work-divider{height:1px;background:var(--site-border,#DCE4EC);margin:26px 0 30px}
+.resume-work-list{display:grid;gap:20px}
+.resume-work-card{display:grid;grid-template-columns:210px minmax(0,1fr);overflow:hidden;border:1px solid var(--site-border,#DCE4EC);border-radius:22px;background:#fff;box-shadow:0 8px 26px rgba(11,31,51,.04)}
+.resume-work-company{padding:28px 26px;display:flex;flex-direction:column;gap:18px;border-right:1px solid var(--site-border,#DCE4EC);background:#fff}
+.resume-work-logo{width:72px;height:72px;display:grid;place-items:center;padding:7px;border:1px solid var(--site-border,#DCE4EC);border-radius:16px;background:#fff;overflow:hidden}
+.resume-work-logo img{width:100%;height:100%;object-fit:contain}
+.resume-work-company-meta{margin-top:auto}
+.resume-work-label{margin-bottom:6px;color:#7F8D9C;text-transform:uppercase;letter-spacing:.13em;font-size:.68rem;font-weight:900;line-height:1.35}
+.resume-work-company-meta strong{display:block;color:#0B1F33;font-size:1.05rem;line-height:1.18}
+.resume-work-content{padding:28px 32px 30px}
+.resume-work-kicker{color:var(--site-primary,#2F6BFF);text-transform:uppercase;letter-spacing:.15em;font-size:.74rem;font-weight:900;line-height:1.35}
+.resume-work-role{margin:7px 0 10px;color:#0B1F33;line-height:1.02;letter-spacing:-.035em}
+.resume-work-content>p{margin:0 0 14px;color:var(--site-muted,#66788A);font-size:1rem;line-height:1.55}
+.resume-work-content ul{margin:0;padding-left:21px;color:var(--site-muted,#66788A);font-size:1rem;line-height:1.55}
+.resume-work-content li+li{margin-top:7px}
+.resume-work-link{display:inline-flex;margin-top:20px;color:var(--site-primary,#2F6BFF);font-size:1rem;font-weight:850;text-decoration:none}
+.resume-work-link:hover{text-decoration:underline}
+@media(max-width:820px){
+  .resume-work-head{grid-template-columns:1fr;gap:16px;align-items:start}
+  .resume-work-intro{text-align:left;margin:0;max-width:760px}
+  .resume-work-card{grid-template-columns:1fr}
+  .resume-work-company{border-right:0;border-bottom:1px solid var(--site-border,#DCE4EC);display:grid;grid-template-columns:72px 1fr;align-items:center}
+  .resume-work-company-meta{margin-top:0}
+}
+@media(max-width:640px){
+  .resume-work-section{padding:56px 0 72px}
+  .resume-work-content{padding:24px}
+}
+
 /* Resume skills block */
 .resume-skills-section{padding:72px 0 94px;background:#fff}
 .resume-skills-head{display:grid;grid-template-columns:minmax(240px,.75fr) minmax(420px,1.25fr);gap:64px;align-items:end}
