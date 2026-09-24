@@ -85,7 +85,11 @@ export default function WorkPostsAdmin() {
 
   const updateArrayItem = (key, index, patch) => {
     const next = [...(draft.sections?.[key] || [])];
-    next[index] = typeof patch === 'function' ? patch(next[index]) : { ...next[index], ...patch };
+    next[index] = typeof patch === 'function'
+      ? patch(next[index])
+      : patch && typeof patch === 'object' && !Array.isArray(patch)
+        ? { ...(next[index] || {}), ...patch }
+        : patch;
     updateSection(key, next);
   };
 
