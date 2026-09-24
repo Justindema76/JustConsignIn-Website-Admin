@@ -846,11 +846,17 @@ export const siteBuilderConfig = {
     SkillsGridBlock: {
       label: 'Skills Grid',
       fields: {
-        eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},text:{type:'text',label:'Description'},
+        eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},
+        headingSize:{type:'select',label:'Heading size',options:[
+          {label:'Small',value:'small'},
+          {label:'Medium',value:'medium'},
+          {label:'Large',value:'large'},
+        ]},
+        text:{type:'text',label:'Description'},
         item1Title:{type:'text',label:'Item 1 title'},item1Text:{type:'text',label:'Item 1 text'},item2Title:{type:'text',label:'Item 2 title'},item2Text:{type:'text',label:'Item 2 text'},item3Title:{type:'text',label:'Item 3 title'},item3Text:{type:'text',label:'Item 3 text'},item4Title:{type:'text',label:'Item 4 title'},item4Text:{type:'text',label:'Item 4 text'},item5Title:{type:'text',label:'Item 5 title'},item5Text:{type:'text',label:'Item 5 text'},item6Title:{type:'text',label:'Item 6 title'},item6Text:{type:'text',label:'Item 6 text'},
       },
       defaultProps: {
-        eyebrow:'Technology',heading:'Tools I use to ship real work.',text:'I prefer showing technologies in the context of what I actually build rather than treating a skills list as the portfolio itself.',
+        eyebrow:'Technology',heading:'Tools I use to ship real work.',headingSize:'medium',text:'I prefer showing technologies in the context of what I actually build rather than treating a skills list as the portfolio itself.',
         item1Title:'Frontend',item1Text:'HTML, CSS, JavaScript, React, Angular, TypeScript, responsive UI and mobile-first design.',
         item2Title:'Backend & Data',item2Text:'Node, Express, PHP, MySQL, Supabase, REST APIs and data-driven application workflows.',
         item3Title:'Commerce',item3Text:'Shopify, Shopify POS, Adobe Commerce / Magento, WordPress and ecommerce product workflows.',
@@ -858,7 +864,7 @@ export const siteBuilderConfig = {
         item5Title:'UI / UX & Mobile',item5Text:'Responsive interfaces designed around the people actually using the product.',
         item6Title:'Systems Integration',item6Text:'Connect or simplify what already exists instead of rebuilding everything from scratch.',
       },
-      render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className="shared-section-title">{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
+      render: p => <section className="shared-section shared-skills"><div className="shared-wrap"><div className="shared-eyebrow">{p.eyebrow}</div><h2 className={`shared-section-title heading-size-${p.headingSize || 'medium'}`}>{p.heading}</h2><p className="shared-lead">{p.text}</p><div className="shared-skill-grid">
         {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i=><div className="shared-skill-card" key={i}><h4>{p['item'+i+'Title']}</h4><p>{p['item'+i+'Text']}</p></div>)}
       </div></div></section>,
     },
