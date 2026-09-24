@@ -122,15 +122,6 @@ export const JUSTINDEMATTEIS_PAGES = [
     description: 'Professional ecommerce, web and product work.',
   },
   {
-    id: 'work-jill',
-    title: 'Case Study — Jill & The Beanstalk',
-    path: '/work/jill-and-the-beanstalk',
-    source: 'shared page builder',
-    kind: 'content',
-    editor: 'visual',
-    description: 'Shopify ecommerce, SEO and growth case study.',
-  },
-  {
     id: 'work-wordpress',
     title: 'Case Study — WordPress Websites',
     path: '/work/wordpress-websites',
