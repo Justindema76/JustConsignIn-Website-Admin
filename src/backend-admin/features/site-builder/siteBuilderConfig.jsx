@@ -1035,7 +1035,7 @@ export const siteBuilderConfig = {
         text: { type: 'text', label: 'Heading' },
         level: {
           type: 'select',
-          label: 'Size',
+          label: 'Heading level',
           options: headingLevelOptions,
         },
         align: {
