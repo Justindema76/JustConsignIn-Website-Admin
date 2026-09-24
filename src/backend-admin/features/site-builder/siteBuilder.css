@@ -1080,3 +1080,5 @@
 .jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .resume-skills-intro{
   color:rgba(255,255,255,.76)!important;
 }
+
+.shared-section-cta{display:flex;justify-content:flex-start;margin-top:28px}
