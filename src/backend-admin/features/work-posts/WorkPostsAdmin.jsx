@@ -322,8 +322,8 @@ export default function WorkPostsAdmin() {
             {draft.featuredImage ? <img src={draft.featuredImage} alt="Cover preview"/> : <><Image size={30}/><span>No cover image</span></>}
           </div>
           <div>
-            <strong>Featured / cover image</strong>
-            <p>This is the project image used in the hero and social preview.</p>
+            <strong>Lead project image</strong>
+            <p>This appears below the hero as its own project media section. It never sits inside the project facts card.</p>
             <div className="site-admin-actions">
               <button className="site-admin-btn secondary small" type="button" onClick={() => coverRef.current?.click()} disabled={uploading === 'cover'}><Upload size={13}/>{uploading === 'cover' ? 'Uploading…' : 'Upload Cover'}</button>
               {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
