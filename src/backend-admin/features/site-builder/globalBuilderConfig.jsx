@@ -19,6 +19,10 @@ export const headerDefaults = {
 export const justinHeaderDefaults = {
   logo: '',
   brand: 'Justin DeMatteis',
+  brandFirst: 'Justin',
+  brandSecond: 'DeMatteis',
+  brandFirstColor: '#0B1F33',
+  brandSecondColor: '#2F6BFF',
   nav1Label: 'Skills', nav1Url: '/#skills',
   nav2Label: 'Work Experience', nav2Url: '/work',
   nav3Label: 'AI + Development', nav3Url: '/ai-development',
@@ -96,7 +100,14 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
           label: 'Website Header',
           fields: {
             logo: { ...imageField, label: 'Logo' },
-            brand: { type: 'text', label: 'Brand name' },
+            ...(isJustin ? {
+              brandFirst: { type: 'text', label: 'Brand first part' },
+              brandFirstColor: { type: 'text', label: 'Brand first colour' },
+              brandSecond: { type: 'text', label: 'Brand second part' },
+              brandSecondColor: { type: 'text', label: 'Brand second colour' },
+            } : {
+              brand: { type: 'text', label: 'Brand name' },
+            }),
             nav1Label: { type: 'text', label: 'Link 1 label' }, nav1Url: { type: 'text', label: 'Link 1 URL' },
             nav2Label: { type: 'text', label: 'Link 2 label' }, nav2Url: { type: 'text', label: 'Link 2 URL' },
             nav3Label: { type: 'text', label: 'Link 3 label' }, nav3Url: { type: 'text', label: 'Link 3 URL' },
@@ -113,7 +124,12 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
             const p = { ...activeHeaderDefaults, ...raw };
             const links = Array.from({ length: 7 }, (_, i) => [p[`nav${i + 1}Label`], p[`nav${i + 1}Url`]]).filter(([label]) => label);
             return <div className={`global-header-preview global-theme-${p.background || 'white'}`}>
-              <a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a>
+              <a className="global-preview-brand" href="/" onClick={previewClick}>
+                {p.logo ? <img src={p.logo} alt=""/> : null}
+                {isJustin
+                  ? <strong><span style={{color:p.brandFirstColor || '#0B1F33'}}>{p.brandFirst || 'Justin'}</span>{' '}<span style={{color:p.brandSecondColor || '#2F6BFF'}}>{p.brandSecond || 'DeMatteis'}</span></strong>
+                  : <strong>{p.brand}</strong>}
+              </a>
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}</a>)}</nav>
               {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
