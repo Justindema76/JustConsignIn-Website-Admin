@@ -41,7 +41,11 @@ function validatePublishData(page, data, siteKey) {
   const blocks = Array.isArray(data?.content) ? data.content : [];
 
   if (siteKey === 'justindematteis') {
-    const allowed = new Set(['HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock', 'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock']);
+    const allowed = new Set([
+      'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock',
+      'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
+      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock'
+    ]);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
     if (!blocks.length) throw new Error('This page needs at least one shared block before publishing.');
     if (unsupported.length) {
@@ -104,8 +108,63 @@ export default function SiteBuilder() {
       'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
     ];
 
+    const resumeBlocks = [
+      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock',
+      'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock',
+    ];
+
+    const resumeAliases = {
+      ResumeHeroBlock: {
+        base: 'HeroBlock',
+        label: 'RESUME · Hero',
+        defaultProps: {
+          eyebrow: '', heading: '', accent: '', headingSize: 'large', text: '',
+          primaryButtonText: '', primaryButtonUrl: '', secondaryButtonText: '', secondaryButtonUrl: '',
+          note: '', image: '', imageAlt: '', background: 'light',
+        },
+      },
+      ResumeSkillsBlock: {
+        base: 'SkillsGridBlock',
+        label: 'RESUME · Skills',
+      },
+      ResumeWorkBlock: {
+        base: 'SkillsGridBlock',
+        label: 'RESUME · Work Experience',
+      },
+      ResumeProjectsBlock: {
+        base: 'SkillsGridBlock',
+        label: 'RESUME · Projects',
+      },
+      ResumeEducationBlock: {
+        base: 'SkillsGridBlock',
+        label: 'RESUME · Education',
+      },
+      ResumeAboutBlock: {
+        base: 'StorySplitBlock',
+        label: 'RESUME · About Summary',
+      },
+      ResumeContactBlock: {
+        base: 'LargeCtaBlock',
+        label: 'RESUME · Contact CTA',
+      },
+    };
+
+    const blankSixCardProps = {
+      eyebrow: '', heading: '', text: '',
+      item1Title: '', item1Text: '', item2Title: '', item2Text: '',
+      item3Title: '', item3Text: '', item4Title: '', item4Text: '',
+      item5Title: '', item5Text: '', item6Title: '', item6Text: '',
+    };
+
+    const blankAboutProps = {
+      leftEyebrow: '', leftHeading: '', leftText1: '', leftText2: '',
+      rightEyebrow: '', rightHeading: '',
+      point1Title: '', point1Text: '', point2Title: '', point2Text: '',
+      point3Title: '', point3Text: '', point4Title: '', point4Text: '',
+    };
+
     const allowedBlocks = siteKey === 'justindematteis'
-      ? [...standardBlocks, ...justinBlocks]
+      ? [...standardBlocks, ...justinBlocks, ...resumeBlocks]
       : [...standardBlocks, ...justConsignInBlocks];
 
     const allowedSet = new Set(allowedBlocks);
@@ -131,8 +190,34 @@ export default function SiteBuilder() {
         })
     );
 
+    if (siteKey === 'justindematteis') {
+      Object.entries(resumeAliases).forEach(([alias, config]) => {
+        const base = siteBuilderConfig.components[config.base];
+        if (!base) return;
+        let defaultProps = base.defaultProps;
+        if (['ResumeSkillsBlock','ResumeWorkBlock','ResumeProjectsBlock','ResumeEducationBlock'].includes(alias)) {
+          defaultProps = blankSixCardProps;
+        } else if (alias === 'ResumeAboutBlock') {
+          defaultProps = blankAboutProps;
+        } else if (alias === 'ResumeContactBlock') {
+          defaultProps = { eyebrow: '', heading: '', buttonText: '', buttonUrl: '' };
+        } else if (config.defaultProps) {
+          defaultProps = config.defaultProps;
+        }
+        components[alias] = {
+          ...base,
+          label: config.label,
+          defaultProps,
+        };
+      });
+    }
+
     const categories = siteKey === 'justindematteis'
       ? {
+          resumeHomepage: {
+            title: 'RESUME HOMEPAGE — New Draft Blocks',
+            components: resumeBlocks,
+          },
           justinShowcase: {
             title: 'JUSTIN / JUST INNOVATE — Site Blocks',
             components: justinBlocks,
