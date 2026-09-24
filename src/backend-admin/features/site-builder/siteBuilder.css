@@ -1082,3 +1082,21 @@
 }
 
 .shared-section-cta{display:flex;justify-content:flex-start;margin-top:28px}
+
+
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .shared-showcase-copy>p,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .shared-showcase-copy>p,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .jci-builder-text p,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .jci-builder-text p{
+  color:rgba(255,255,255,.76)!important;
+}
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h1,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h2,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h3,
+.jci-builder-block-surface.theme-dark:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h4,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h1,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h2,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h3,
+.jci-builder-block-surface.theme-primary:not(.block-ProjectCardBlock) .jci-builder-heading-wrap h4{
+  color:#fff!important;
+}
