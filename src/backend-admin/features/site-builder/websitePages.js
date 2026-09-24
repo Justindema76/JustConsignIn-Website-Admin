@@ -131,15 +131,6 @@ export const JUSTINDEMATTEIS_PAGES = [
     description: 'Shopify ecommerce, SEO and growth case study.',
   },
   {
-    id: 'work-wheels',
-    title: 'Case Study — Wheels Automotive',
-    path: '/work/wheels-automotive',
-    source: 'shared page builder',
-    kind: 'content',
-    editor: 'visual',
-    description: 'Adobe Commerce / Magento B2B ecommerce case study.',
-  },
-  {
     id: 'work-wordpress',
     title: 'Case Study — WordPress Websites',
     path: '/work/wordpress-websites',

@@ -4,13 +4,17 @@ import { adminFetch, parseJsonResponse } from '../../services/apiClient';
 export const WORK_STATUS = { DRAFT: 'draft', PUBLISHED: 'published' };
 
 export const DEFAULT_WORK_SECTIONS = {
+  overviewHeading: 'Overview',
   overview: '',
   overviewSecondary: '',
   quote: '',
+  problemHeading: 'The business problem',
   problem: '',
   problemPoints: [],
+  builtHeading: 'What I built',
   built: '',
   connectedWorkflow: '',
+  visualsHeading: 'Product visuals',
   visualsIntro: '',
   gallery: [],
   youtubeHeading: '',
@@ -18,6 +22,7 @@ export const DEFAULT_WORK_SECTIONS = {
   youtubeUrl: '',
   videos: [],
   workflow: [],
+  ongoingHeading: 'Ongoing work',
   ongoing: '',
   extras: [],
 };

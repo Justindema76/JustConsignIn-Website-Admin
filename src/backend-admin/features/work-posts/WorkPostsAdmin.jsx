@@ -271,15 +271,17 @@ export default function WorkPostsAdmin() {
         </div>
 
         <div className="site-admin-card work-post-panel">
-          <div className="work-post-panel-head"><div><span>2</span><div><h2>Overview</h2><p>The opening of the case study.</p></div></div></div>
+          <div className="work-post-panel-head"><div><span>2</span><div><h2>{sections.overviewHeading || 'Overview'}</h2><p>The opening of the case study.</p></div></div></div>
+          <label>Section title<input value={sections.overviewHeading || ''} onChange={event => updateSection('overviewHeading', event.target.value)}/></label>
           <label>Overview<textarea rows="6" value={sections.overview || ''} onChange={event => updateSection('overview', event.target.value)}/></label>
           <label>Second paragraph<textarea rows="4" value={sections.overviewSecondary || ''} onChange={event => updateSection('overviewSecondary', event.target.value)}/></label>
           <label>Pull quote<textarea rows="3" value={sections.quote || ''} onChange={event => updateSection('quote', event.target.value)}/></label>
         </div>
 
         <div className="site-admin-card work-post-panel">
-          <div className="work-post-panel-head"><div><span>3</span><div><h2>The business problem</h2><p>Explain the problem, then list the important pain points.</p></div></div></div>
-          <label>Problem<textarea rows="6" value={sections.problem || ''} onChange={event => updateSection('problem', event.target.value)}/></label>
+          <div className="work-post-panel-head"><div><span>3</span><div><h2>{sections.problemHeading || 'The business problem'}</h2><p>Use this for the problem, business context, challenge, or environment.</p></div></div></div>
+          <label>Section title<input value={sections.problemHeading || ''} onChange={event => updateSection('problemHeading', event.target.value)}/></label>
+          <label>Section content<textarea rows="6" value={sections.problem || ''} onChange={event => updateSection('problem', event.target.value)}/></label>
           <div className="work-post-repeat-list">
             {(sections.problemPoints || []).map((point, index) => <div className="work-post-repeat-row" key={index}>
               <input value={point} onChange={event => updateArrayItem('problemPoints', index, event.target.value)} placeholder="Problem point"/>
@@ -290,16 +292,18 @@ export default function WorkPostsAdmin() {
         </div>
 
         <div className="site-admin-card work-post-panel">
-          <div className="work-post-panel-head"><div><span>4</span><div><h2>What I built</h2><p>Describe the solution and the connected workflow.</p></div></div></div>
-          <label>What I built<textarea rows="6" value={sections.built || ''} onChange={event => updateSection('built', event.target.value)}/></label>
-          <label>Connected workflow<input value={sections.connectedWorkflow || ''} onChange={event => updateSection('connectedWorkflow', event.target.value)} placeholder="Consignor → Item → Shopify Product → Sale → Payout"/></label>
+          <div className="work-post-panel-head"><div><span>4</span><div><h2>{sections.builtHeading || 'What I built'}</h2><p>Describe the implementation, responsibilities, or solution.</p></div></div></div>
+          <label>Section title<input value={sections.builtHeading || ''} onChange={event => updateSection('builtHeading', event.target.value)}/></label>
+          <label>Section content<textarea rows="6" value={sections.built || ''} onChange={event => updateSection('built', event.target.value)}/></label>
+          <label>Connected workflow <small>(optional)</small><input value={sections.connectedWorkflow || ''} onChange={event => updateSection('connectedWorkflow', event.target.value)} placeholder="Leave blank if this project does not have a workflow"/></label>
         </div>
 
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head">
-            <div><span>5</span><div><h2>Product visuals</h2><p>Upload screenshots and edit their captions individually.</p></div></div>
+            <div><span>5</span><div><h2>{sections.visualsHeading || 'Product visuals'}</h2><p>Optional screenshots and project visuals.</p></div></div>
             <button className="site-admin-btn secondary small" type="button" onClick={() => galleryRef.current?.click()} disabled={uploading === 'gallery'}><Upload size={13}/>{uploading === 'gallery' ? 'Uploading…' : 'Add Images'}</button>
           </div>
+          <label>Section title<input value={sections.visualsHeading || ''} onChange={event => updateSection('visualsHeading', event.target.value)}/></label>
           <label>Section intro<textarea rows="3" value={sections.visualsIntro || ''} onChange={event => updateSection('visualsIntro', event.target.value)}/></label>
           <input ref={galleryRef} hidden type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadGallery}/>
           <div className="work-post-media-editor-grid">
@@ -351,8 +355,9 @@ export default function WorkPostsAdmin() {
         </div>
 
         <div className="site-admin-card work-post-panel">
-          <div className="work-post-panel-head"><div><span>9</span><div><h2>Ongoing work</h2><p>Update this whenever the project changes.</p></div></div></div>
-          <label>Ongoing work<textarea rows="6" value={sections.ongoing || ''} onChange={event => updateSection('ongoing', event.target.value)}/></label>
+          <div className="work-post-panel-head"><div><span>9</span><div><h2>{sections.ongoingHeading || 'Ongoing work'}</h2><p>Optional closing section for active or continuing work.</p></div></div></div>
+          <label>Section title<input value={sections.ongoingHeading || ''} onChange={event => updateSection('ongoingHeading', event.target.value)}/></label>
+          <label>Section content<textarea rows="6" value={sections.ongoing || ''} onChange={event => updateSection('ongoing', event.target.value)}/></label>
         </div>
 
         <div className="site-admin-card work-post-panel">
