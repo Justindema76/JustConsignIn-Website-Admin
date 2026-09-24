@@ -25,6 +25,7 @@ const kindMeta = {
 };
 
 function editTarget(page) {
+  if (page.editorTarget) return page.editorTarget;
   if (page.editor === 'blog') return '/admin/blog';
   if (page.editor === 'visual') return `/admin/website/pages/${page.id}`;
   return null;
@@ -33,6 +34,7 @@ function editTarget(page) {
 function editorLabel(page) {
   if (page.editor === 'visual') return 'Visual editor';
   if (page.editor === 'blog') return 'Blog manager';
+  if (page.editor === 'work-post') return 'Work Post editor';
   if (page.id === 'faq') return 'Structured FAQ';
   if (page.kind === 'form') return 'Form-specific page';
   if (page.kind === 'application') return 'Application UI';
