@@ -118,7 +118,7 @@ export default function SiteBuilder() {
         base: 'HeroBlock',
         label: 'RESUME · Hero',
         defaultProps: {
-          eyebrow: '', heading: '', accent: '', headingSize: 'large', text: '',
+          eyebrow: '', heading: '', headingLevel: 'h1', accent: '', text: '',
           primaryButtonText: '', primaryButtonUrl: '', secondaryButtonText: '', secondaryButtonUrl: '',
           note: '', image: '', imageAlt: '', background: 'light',
         },
@@ -154,15 +154,15 @@ export default function SiteBuilder() {
     };
 
     const blankSixCardProps = {
-      eyebrow: '', heading: '', headingSize: 'small', text: '',
+      eyebrow: '', heading: '', headingLevel: 'h2', itemHeadingLevel: 'h4', text: '',
       item1Title: '', item1Text: '', item2Title: '', item2Text: '',
       item3Title: '', item3Text: '', item4Title: '', item4Text: '',
       item5Title: '', item5Text: '', item6Title: '', item6Text: '',
     };
 
     const blankAboutProps = {
-      leftEyebrow: '', leftHeading: '', leftText1: '', leftText2: '',
-      rightEyebrow: '', rightHeading: '',
+      leftEyebrow: '', leftHeading: '', leftHeadingLevel: 'h3', leftText1: '', leftText2: '',
+      rightEyebrow: '', rightHeading: '', rightHeadingLevel: 'h2', pointHeadingLevel: 'h4',
       point1Title: '', point1Text: '', point2Title: '', point2Text: '',
       point3Title: '', point3Text: '', point4Title: '', point4Text: '',
     };
@@ -204,7 +204,7 @@ export default function SiteBuilder() {
         } else if (alias === 'ResumeAboutBlock') {
           defaultProps = blankAboutProps;
         } else if (alias === 'ResumeContactBlock') {
-          defaultProps = { eyebrow: '', heading: '', buttonText: '', buttonUrl: '' };
+          defaultProps = { eyebrow: '', heading: '', headingLevel: 'h2', buttonText: '', buttonUrl: '' };
         } else if (config.defaultProps) {
           defaultProps = config.defaultProps;
         }
