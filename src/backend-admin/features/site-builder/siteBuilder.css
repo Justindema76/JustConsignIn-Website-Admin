@@ -679,6 +679,9 @@
 .shared-section{padding:var(--site-section-space,96px) 0}
 .shared-eyebrow{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--site-primary,#2F6BFF)}
 .shared-section-title{margin:8px 0 18px;font-size:clamp(2.2rem,5vw,4.2rem);line-height:1.02;letter-spacing:-.045em;color:#0B1F33}
+.shared-section-title.heading-size-small{font-size:clamp(2rem,3vw,3rem)}
+.shared-section-title.heading-size-medium{font-size:clamp(2.2rem,5vw,4.2rem)}
+.shared-section-title.heading-size-large{font-size:clamp(3rem,6vw,5.4rem)}
 .shared-lead{font-size:1.16rem;color:var(--site-muted,#66788A);max-width:760px}
 .shared-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--site-button-height,48px);padding:13px 20px;border-radius:var(--site-button-radius,999px);font-weight:800;border:1px solid transparent;text-decoration:none;transition:.2s ease}
 .shared-btn-primary{background:var(--site-primary,#2F6BFF);color:#fff}.shared-btn-primary:hover{transform:translateY(-2px);background:var(--site-primary-dark,#2559D7)}
