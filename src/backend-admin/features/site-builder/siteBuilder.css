@@ -686,10 +686,10 @@
 .shared-section{padding:var(--site-section-space,96px) 0}
 .shared-eyebrow{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--site-primary,#2F6BFF)}
 .shared-section-title{margin:8px 0 18px;line-height:1.02;letter-spacing:-.045em;color:#0B1F33}
-.heading-level-h1{font-size:clamp(3.25rem,6vw,5.8rem)!important}
-.heading-level-h2{font-size:clamp(2.4rem,4.5vw,4rem)!important}
-.heading-level-h3{font-size:clamp(1.75rem,3vw,2.65rem)!important}
-.heading-level-h4{font-size:clamp(1.05rem,1.8vw,1.45rem)!important}
+.heading-level-h1{font-size:clamp(calc(var(--site-h1-size,64px) * .68),5vw,var(--site-h1-size,64px))!important}
+.heading-level-h2{font-size:clamp(calc(var(--site-h2-size,48px) * .72),4.5vw,var(--site-h2-size,48px))!important}
+.heading-level-h3{font-size:clamp(calc(var(--site-h3-size,36px) * .76),3.5vw,var(--site-h3-size,36px))!important}
+.heading-level-h4{font-size:clamp(calc(var(--site-h4-size,24px) * .80),2.5vw,var(--site-h4-size,24px))!important}
 .shared-section-title.heading-size-small{font-size:clamp(2rem,3vw,3rem)}
 .shared-section-title.heading-size-medium{font-size:clamp(2.2rem,5vw,4.2rem)}
 .shared-section-title.heading-size-large{font-size:clamp(3rem,6vw,5.4rem)}
