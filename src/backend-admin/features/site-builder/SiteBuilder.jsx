@@ -154,7 +154,7 @@ export default function SiteBuilder() {
     };
 
     const blankSixCardProps = {
-      eyebrow: '', heading: '', text: '',
+      eyebrow: '', heading: '', headingSize: 'small', text: '',
       item1Title: '', item1Text: '', item2Title: '', item2Text: '',
       item3Title: '', item3Text: '', item4Title: '', item4Text: '',
       item5Title: '', item5Text: '', item6Title: '', item6Text: '',
