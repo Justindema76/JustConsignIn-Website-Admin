@@ -42,6 +42,7 @@ const navGroups = [
     items: [
       { to: '/admin/blog', label: 'Blog Posts', icon: BookOpen },
       { to: '/admin/work-posts', label: 'Work Posts', icon: PanelsTopLeft },
+      { to: '/admin/ai-posts', label: 'AI Posts', icon: Sparkles },
       { to: '/admin/videos', label: 'YouTube Videos', icon: Video },
       { to: '/admin/media', label: 'Media', icon: Image },
     ],
