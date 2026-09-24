@@ -114,6 +114,12 @@ export default function GlobalStylesAdmin() {
             <label><span>Heading font</span><input value={styles.headingFont} onChange={event => update('headingFont',event.target.value)}/></label>
             <label><span>Body font</span><input value={styles.bodyFont} onChange={event => update('bodyFont',event.target.value)}/></label>
           </div>
+          <div className="global-style-number-grid global-heading-size-grid">
+            <NumberField label="H1 size" value={styles.h1Size} min={36} max={96} onChange={value => update('h1Size',value)}/>
+            <NumberField label="H2 size" value={styles.h2Size} min={28} max={80} onChange={value => update('h2Size',value)}/>
+            <NumberField label="H3 size" value={styles.h3Size} min={22} max={64} onChange={value => update('h3Size',value)}/>
+            <NumberField label="H4 size" value={styles.h4Size} min={16} max={48} onChange={value => update('h4Size',value)}/>
+          </div>
         </section>
 
         <section className="site-admin-card global-style-section">
@@ -147,7 +153,10 @@ export default function GlobalStylesAdmin() {
 
       <aside className="site-admin-card global-styles-preview" style={vars}>
         <span className="global-preview-eyebrow">Live design tokens</span>
-        <h2>Shared block preview</h2>
+        <h1 style={{fontSize:'var(--site-h1-size)'}}>H1 heading</h1>
+        <h2 style={{fontSize:'var(--site-h2-size)'}}>H2 heading</h2>
+        <h3 style={{fontSize:'var(--site-h3-size)'}}>H3 heading</h3>
+        <h4 style={{fontSize:'var(--site-h4-size)'}}>H4 heading</h4>
         <p>Every shared block should use these values unless that block has an intentional local override.</p>
         <div className="global-preview-card">
           <span>Example card</span>
