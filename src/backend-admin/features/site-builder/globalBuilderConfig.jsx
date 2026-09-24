@@ -61,7 +61,7 @@ export const justinFooterDefaults = {
   link1Label: 'Work', link1Url: '/work',
   link2Label: 'About', link2Url: '/about',
   link3Label: 'AI + Development', link3Url: '/ai-development',
-  link4Label: 'Experience', link4Url: '/experience',
+  link4Label: 'Work Experience', link4Url: '/work',
   column2Title: 'Connect',
   link5Label: 'Blog', link5Url: '/blog',
   link6Label: 'Contact', link6Url: '/contact',
