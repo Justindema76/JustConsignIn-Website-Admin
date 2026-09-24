@@ -311,6 +311,173 @@ const featuresCtaDefaults = {
 };
 
 
+
+const resumeHeadingOptions = [
+  { label: 'H1', value: 'h1' },
+  { label: 'H2', value: 'h2' },
+  { label: 'H3', value: 'h3' },
+  { label: 'H4', value: 'h4' },
+];
+
+const resumeGridBlock = (label, defaults = {}) => ({
+  label,
+  fields: {
+    anchorId: { type: 'text', label: 'Section anchor ID' },
+    eyebrow: { type: 'text', label: 'Eyebrow' },
+    heading: { type: 'text', label: 'Section heading' },
+    headingLevel: { type: 'select', label: 'Section heading HTML tag', options: resumeHeadingOptions },
+    text: { type: 'textarea', label: 'Section description' },
+    itemHeadingLevel: { type: 'select', label: 'Item heading HTML tag', options: resumeHeadingOptions },
+    item1Title:{type:'text',label:'Item 1 title'},item1Text:{type:'textarea',label:'Item 1 text'},
+    item2Title:{type:'text',label:'Item 2 title'},item2Text:{type:'textarea',label:'Item 2 text'},
+    item3Title:{type:'text',label:'Item 3 title'},item3Text:{type:'textarea',label:'Item 3 text'},
+    item4Title:{type:'text',label:'Item 4 title'},item4Text:{type:'textarea',label:'Item 4 text'},
+    item5Title:{type:'text',label:'Item 5 title'},item5Text:{type:'textarea',label:'Item 5 text'},
+    item6Title:{type:'text',label:'Item 6 title'},item6Text:{type:'textarea',label:'Item 6 text'},
+  },
+  defaultProps: {
+    anchorId: '',
+    eyebrow: '',
+    heading: '',
+    headingLevel: 'h2',
+    text: '',
+    itemHeadingLevel: 'h3',
+    item1Title:'',item1Text:'',item2Title:'',item2Text:'',item3Title:'',item3Text:'',
+    item4Title:'',item4Text:'',item5Title:'',item5Text:'',item6Title:'',item6Text:'',
+    ...defaults,
+  },
+  render: p => {
+    const HeadingTag = ['h1','h2','h3','h4'].includes(p.headingLevel) ? p.headingLevel : 'h2';
+    const ItemTag = ['h1','h2','h3','h4'].includes(p.itemHeadingLevel) ? p.itemHeadingLevel : 'h3';
+    return <section id={p.anchorId || undefined} className="shared-section shared-skills">
+      <div className="shared-wrap">
+        {p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}
+        {p.heading && <HeadingTag className="shared-section-title">{p.heading}</HeadingTag>}
+        {p.text && <p className="shared-lead">{p.text}</p>}
+        <div className="shared-skill-grid">
+          {[1,2,3,4,5,6].filter(i => p['item'+i+'Title'] || p['item'+i+'Text']).map(i =>
+            <div className="shared-skill-card" key={i}>
+              {p['item'+i+'Title'] && <ItemTag>{p['item'+i+'Title']}</ItemTag>}
+              {p['item'+i+'Text'] && <p>{p['item'+i+'Text']}</p>}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>;
+  },
+});
+
+const resumeHeroBlock = {
+  label: 'Resume Hero',
+  fields: {
+    anchorId:{type:'text',label:'Section anchor ID'},
+    eyebrow:{type:'text',label:'Eyebrow'},
+    heading:{type:'text',label:'Name / H1'},
+    headingLevel:{type:'select',label:'Heading HTML tag',options:resumeHeadingOptions},
+    professionalTitle:{type:'text',label:'Professional title'},
+    text:{type:'textarea',label:'Professional summary'},
+    primaryButtonText:{type:'text',label:'Primary button text'},
+    primaryButtonUrl:{type:'text',label:'Primary button URL'},
+    secondaryButtonText:{type:'text',label:'Secondary button text'},
+    secondaryButtonUrl:{type:'text',label:'Secondary button URL'},
+    note:{type:'text',label:'Location / availability'},
+  },
+  defaultProps:{
+    anchorId:'top',eyebrow:'Portfolio · Résumé',heading:'Justin DeMatteis',headingLevel:'h1',
+    professionalTitle:'Web, Ecommerce & Application Developer',text:'',
+    primaryButtonText:'View Work Experience →',primaryButtonUrl:'/#work-experience',
+    secondaryButtonText:'Contact',secondaryButtonUrl:'/contact',
+    note:'Ontario, Canada',
+  },
+  render:p=>{
+    const HeadingTag=['h1','h2','h3','h4'].includes(p.headingLevel)?p.headingLevel:'h1';
+    return <section id={p.anchorId || undefined} className="shared-showcase-hero">
+      <div className="shared-wrap shared-showcase-grid" style={{gridTemplateColumns:'minmax(0,900px)'}}>
+        <div className="shared-showcase-copy">
+          {p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}
+          <HeadingTag>{p.heading}</HeadingTag>
+          {p.professionalTitle && <h2 className="resume-professional-title">{p.professionalTitle}</h2>}
+          {p.text && <p>{p.text}</p>}
+          <div className="shared-showcase-actions">
+            {p.primaryButtonText && <a className="shared-btn shared-btn-primary" href={p.primaryButtonUrl || '#'} onClick={previewClick}>{p.primaryButtonText}</a>}
+            {p.secondaryButtonText && <a className="shared-btn shared-btn-secondary" href={p.secondaryButtonUrl || '#'} onClick={previewClick}>{p.secondaryButtonText}</a>}
+          </div>
+          {p.note && <div className="shared-showcase-note">{p.note}</div>}
+        </div>
+      </div>
+    </section>;
+  },
+};
+
+const resumeAiBlock = {
+  label: 'Resume AI + Development',
+  fields: {
+    anchorId:{type:'text',label:'Section anchor ID'},
+    eyebrow:{type:'text',label:'Eyebrow'},
+    heading:{type:'text',label:'Section heading'},
+    headingLevel:{type:'select',label:'Section heading HTML tag',options:resumeHeadingOptions},
+    text:{type:'textarea',label:'Description'},
+    rowHeadingLevel:{type:'select',label:'Row heading HTML tag',options:resumeHeadingOptions},
+    row1Label:{type:'text',label:'Row 1 title'},row1Text:{type:'textarea',label:'Row 1 text'},
+    row2Label:{type:'text',label:'Row 2 title'},row2Text:{type:'textarea',label:'Row 2 text'},
+    row3Label:{type:'text',label:'Row 3 title'},row3Text:{type:'textarea',label:'Row 3 text'},
+    row4Label:{type:'text',label:'Row 4 title'},row4Text:{type:'textarea',label:'Row 4 text'},
+    row5Label:{type:'text',label:'Row 5 title'},row5Text:{type:'textarea',label:'Row 5 text'},
+    note:{type:'textarea',label:'Supporting note'},
+  },
+  defaultProps:{
+    anchorId:'ai-development',eyebrow:'AI + Development',heading:'AI + Development',headingLevel:'h2',
+    text:'',rowHeadingLevel:'h3',
+    row1Label:'Research',row1Text:'',row2Label:'Architecture',row2Text:'',row3Label:'Build',row3Text:'',
+    row4Label:'Debug',row4Text:'',row5Label:'Refine',row5Text:'',note:'',
+  },
+  render:p=>{
+    const HeadingTag=['h1','h2','h3','h4'].includes(p.headingLevel)?p.headingLevel:'h2';
+    const RowTag=['h1','h2','h3','h4'].includes(p.rowHeadingLevel)?p.rowHeadingLevel:'h3';
+    return <section id={p.anchorId || undefined} className="shared-section shared-process">
+      <div className="shared-wrap shared-process-grid">
+        <div>
+          {p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}
+          {p.heading && <HeadingTag className="shared-section-title">{p.heading}</HeadingTag>}
+          {p.text && <p className="shared-lead">{p.text}</p>}
+          {p.note && <div className="shared-process-note">{p.note}</div>}
+        </div>
+        <div className="shared-process-rows">
+          {[1,2,3,4,5].filter(i=>p['row'+i+'Label']||p['row'+i+'Text']).map(i=>
+            <div className="shared-process-row" key={i}>
+              {p['row'+i+'Label'] && <RowTag>{p['row'+i+'Label']}</RowTag>}
+              {p['row'+i+'Text'] && <span>{p['row'+i+'Text']}</span>}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>;
+  },
+};
+
+const resumeContactBlock = {
+  label: 'Resume Contact',
+  fields:{
+    anchorId:{type:'text',label:'Section anchor ID'},
+    eyebrow:{type:'text',label:'Eyebrow'},
+    heading:{type:'text',label:'Section heading'},
+    headingLevel:{type:'select',label:'Section heading HTML tag',options:resumeHeadingOptions},
+    text:{type:'textarea',label:'Description'},
+    buttonText:{type:'text',label:'Button text'},
+    buttonUrl:{type:'text',label:'Button URL'},
+  },
+  defaultProps:{anchorId:'contact',eyebrow:'Contact',heading:'Interested in working together?',headingLevel:'h2',text:'',buttonText:'Get in touch →',buttonUrl:'/contact'},
+  render:p=>{
+    const HeadingTag=['h1','h2','h3','h4'].includes(p.headingLevel)?p.headingLevel:'h2';
+    return <section id={p.anchorId || undefined} className="shared-large-cta">
+      <div className="shared-wrap shared-large-cta-box">
+        <div>{p.eyebrow&&<div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading&&<HeadingTag>{p.heading}</HeadingTag>}{p.text&&<p>{p.text}</p>}</div>
+        {p.buttonText&&<a className="shared-btn shared-btn-dark" href={p.buttonUrl||'#'} onClick={previewClick}>{p.buttonText}</a>}
+      </div>
+    </section>;
+  },
+};
+
 export const siteBuilderConfig = {
   categories: {
     homepage: {
@@ -333,8 +500,21 @@ export const siteBuilderConfig = {
       title: 'Showcase',
       components: ['ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock'],
     },
+    resume: {
+      title: 'Portfolio Résumé',
+      components: ['ResumeHeroBlock','ResumeSkillsBlock','ResumeWorkBlock','ResumeProjectsBlock','ResumeAiBlock','ResumeEducationBlock','ResumeContactBlock'],
+    },
   },
   components: {
+
+    ResumeHeroBlock: resumeHeroBlock,
+    ResumeSkillsBlock: resumeGridBlock('Resume Skills', { anchorId:'skills', eyebrow:'Skills', heading:'Skills', headingLevel:'h2', itemHeadingLevel:'h3' }),
+    ResumeWorkBlock: resumeGridBlock('Resume Work Experience', { anchorId:'work-experience', eyebrow:'Experience', heading:'Work Experience', headingLevel:'h2', itemHeadingLevel:'h3' }),
+    ResumeProjectsBlock: resumeGridBlock('Resume Projects', { anchorId:'projects', eyebrow:'Selected Projects', heading:'Projects', headingLevel:'h2', itemHeadingLevel:'h3' }),
+    ResumeAiBlock: resumeAiBlock,
+    ResumeEducationBlock: resumeGridBlock('Resume Education', { anchorId:'education', eyebrow:'Education', heading:'Education & Training', headingLevel:'h2', itemHeadingLevel:'h3' }),
+    ResumeContactBlock: resumeContactBlock,
+
 
     HomeHeroBlock: {
       label: 'Homepage Hero',
