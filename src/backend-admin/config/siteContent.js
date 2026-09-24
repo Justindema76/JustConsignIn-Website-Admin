@@ -2,6 +2,7 @@ export const SOCIAL_NETWORKS = [
   { key: 'facebook', label: 'Facebook', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/facebook-logo.png' },
   { key: 'instagram', label: 'Instagram', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/instagram-logo.png' },
   { key: 'linkedin', label: 'LinkedIn', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/linkedin-logo.jpeg' },
+  { key: 'github', label: 'GitHub', icon: '/images/brand/social-media-icons/github-logo.svg' },
   { key: 'youtube', label: 'YouTube', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/youtube-logo.png' },
   { key: 'tiktok', label: 'TikTok', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/ticktok-logo.png' },
 ];
