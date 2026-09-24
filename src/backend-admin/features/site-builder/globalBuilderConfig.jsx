@@ -1,5 +1,6 @@
 import { Menu } from 'lucide-react';
 import { imageField } from './siteBuilderConfig';
+import { SOCIAL_NETWORKS } from '../../config/siteContent';
 
 export const headerDefaults = {
   logo: 'https://www.justconsignin.com/images/brand/justconsigin-logo.png',
@@ -120,10 +121,15 @@ const cssColorField = label => ({
   render: props => <CssColorField {...props}/>,
 });
 
-export function globalConfigFor(type, siteKey = 'justconsignin') {
+export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {}) {
   const isJustin = siteKey === 'justindematteis';
   const activeHeaderDefaults = isJustin ? justinHeaderDefaults : headerDefaults;
   const activeFooterDefaults = isJustin ? justinFooterDefaults : footerDefaults;
+  const socialOrder = ['linkedin','github','instagram','facebook','youtube','tiktok'];
+  const activeSocial = socialOrder
+    .map(key => SOCIAL_NETWORKS.find(network => network.key === key))
+    .filter(Boolean)
+    .filter(network => socialLinks?.[network.key]?.url && socialLinks?.[network.key]?.enabled !== false);
 
   if (type === 'header') {
     return {
@@ -170,14 +176,14 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
                   ? <strong><span style={{color:p.brandFirstColor || '#0B1F33'}}>{p.brandFirst || 'Justin'}</span>{' '}<span style={{color:p.brandSecondColor || '#2F6BFF'}}>{p.brandSecond || 'DeMatteis'}</span></strong>
                   : <strong>{p.brand}</strong>}
               </a>
-              <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}</a>)}</nav>
-              {isJustin && <div className="global-social-preview" style={{
+              <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}{['/work','/ai-development'].includes(url) ? ' ▾' : ''}</a>)}</nav>
+              {isJustin && activeSocial.length > 0 && <div className="global-social-preview" style={{
                 '--preview-social-color':p.socialIconColor,
                 '--preview-social-background':p.socialIconBackground,
                 '--preview-social-border':p.socialIconBorder,
                 '--preview-social-hover-color':p.socialIconHoverColor,
                 '--preview-social-hover-background':p.socialIconHoverBackground,
-              }}><span>in</span><span>GH</span></div>}
+              }}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div>}
               {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
             </div>;
@@ -231,13 +237,13 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
               <div className="global-footer-links"><strong>{p.column1Title}</strong>{col1.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div className="global-footer-links"><strong>{p.column2Title}</strong>{col2.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p>{isJustin
-                ? <div className="global-social-preview" style={{
+                ? (activeSocial.length > 0 ? <div className="global-social-preview" style={{
                     '--preview-social-color':p.socialIconColor,
                     '--preview-social-background':p.socialIconBackground,
                     '--preview-social-border':p.socialIconBorder,
                     '--preview-social-hover-color':p.socialIconHoverColor,
                     '--preview-social-hover-background':p.socialIconHoverBackground,
-                  }}><span>in</span><span>GH</span></div>
+                  }}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div> : <div className="global-social-placeholder">No enabled social links</div>)
                 : <div className="global-social-placeholder">Social icons use your Social Links settings</div>}</div>
             </div>
             <div className="global-footer-bottom"><span>© {new Date().getFullYear()} {p.copyright}</span><span><a href={p.privacyUrl} onClick={previewClick}>{p.privacyLabel}</a><a href={p.termsUrl} onClick={previewClick}>{p.termsLabel}</a></span></div>
