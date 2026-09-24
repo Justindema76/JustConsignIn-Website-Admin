@@ -44,7 +44,7 @@ function validatePublishData(page, data, siteKey) {
     const allowed = new Set([
       'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock',
       'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
-      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock'
+      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeAiBlock', 'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock'
     ]);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
     if (!blocks.length) throw new Error('This page needs at least one shared block before publishing.');
@@ -109,7 +109,7 @@ export default function SiteBuilder() {
     ];
 
     const resumeBlocks = [
-      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock',
+      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeAiBlock',
       'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock',
     ];
 
@@ -134,6 +134,10 @@ export default function SiteBuilder() {
       ResumeProjectsBlock: {
         base: 'SkillsGridBlock',
         label: 'RESUME · Projects',
+      },
+      ResumeAiBlock: {
+        base: 'ProcessRowsBlock',
+        label: 'RESUME · AI + Development',
       },
       ResumeEducationBlock: {
         base: 'SkillsGridBlock',
