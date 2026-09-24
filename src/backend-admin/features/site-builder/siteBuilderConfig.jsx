@@ -885,6 +885,7 @@ export const siteBuilderConfig = {
         item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'textarea',label:'Card 4 description'},item4Tags:{type:'text',label:'Card 4 skill bubbles (comma separated)'},
         item5Title:{type:'text',label:'Card 5 title'},item5Text:{type:'textarea',label:'Card 5 description'},item5Tags:{type:'text',label:'Card 5 skill bubbles (comma separated)'},
         item6Title:{type:'text',label:'Card 6 title'},item6Text:{type:'textarea',label:'Card 6 description'},item6Tags:{type:'text',label:'Card 6 skill bubbles (comma separated)'},
+        buttonText:{type:'text',label:'CTA button text'},buttonUrl:{type:'text',label:'CTA button link'},
       },
       defaultProps: {
         eyebrow:'RESUME',
@@ -910,6 +911,8 @@ export const siteBuilderConfig = {
         item6Title:'AI-Assisted Development',
         item6Text:'Using AI throughout research, architecture, prototyping, debugging, iteration and documentation.',
         item6Tags:'Research, Architecture, Prototyping, Debugging, Refactoring',
+        buttonText:'Explore Skills →',
+        buttonUrl:'/skills',
       },
       render: p => <section className="resume-skills-section"><div className="shared-wrap">
         <div className="resume-skills-head">
@@ -930,6 +933,7 @@ export const siteBuilderConfig = {
             </article>;
           })}
         </div>
+        {p.buttonText && <div className="shared-section-cta"><a className="shared-btn shared-btn-primary" href={p.buttonUrl || '/skills'} onClick={previewClick}>{p.buttonText}</a></div>}
       </div></section>,
     },
 
