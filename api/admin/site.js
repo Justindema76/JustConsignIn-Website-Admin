@@ -62,6 +62,7 @@ const WORK_POST_FIELDS = [
   'sections','body_html','seo_title','seo_description','og_image','status','author_name',
   'published_at','created_at','updated_at'
 ].join(',');
+const AI_POST_FIELDS = WORK_POST_FIELDS;
 
 function cleanWorkPost(body = {}) {
   const status = body.status === 'published' ? 'published' : 'draft';
@@ -316,6 +317,53 @@ export default async function handler(req, res) {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data?.message || 'Unable to save work post');
+        return res.status(200).json({ post: Array.isArray(data) ? data[0] : data });
+      }
+    }
+
+    if (resource === 'ai-posts') {
+      if (req.method === 'GET') {
+        const id = String(req.query?.id || '').trim();
+        const slug = String(req.query?.slug || '').trim();
+        let path = `ai_posts?${siteFilter}&select=${AI_POST_FIELDS}&order=updated_at.desc`;
+        if (id) path = `ai_posts?${siteFilter}&id=eq.${encodeURIComponent(id)}&select=${AI_POST_FIELDS}&limit=1`;
+        else if (slug) path = `ai_posts?${siteFilter}&slug=eq.${encodeURIComponent(slug)}&select=${AI_POST_FIELDS}&limit=1`;
+
+        const response = await supabaseUserRest(user.accessToken, path, { method: 'GET' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.message || 'Unable to load AI posts');
+        return res.status(200).json({ posts: Array.isArray(data) ? data : [] });
+      }
+
+      if (req.method === 'DELETE') {
+        const id = String(req.query?.id || '').trim();
+        if (!id) return res.status(400).json({ error: 'Missing AI post id' });
+        const response = await supabaseUserRest(
+          user.accessToken,
+          `ai_posts?${siteFilter}&id=eq.${encodeURIComponent(id)}`,
+          { method: 'DELETE', headers: { Prefer: 'return=minimal' } },
+        );
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data?.message || 'Unable to delete AI post');
+        }
+        return res.status(200).json({ ok: true });
+      }
+
+      if (req.method === 'POST') {
+        const payload = { ...cleanWorkPost(req.body || {}), site_key: siteKey };
+        if (!payload.title) return res.status(400).json({ error: 'Title is required' });
+        if (!payload.slug) return res.status(400).json({ error: 'Slug is required' });
+
+        const id = String(req.body?.id || '').trim();
+        const path = id ? `ai_posts?${siteFilter}&id=eq.${encodeURIComponent(id)}` : 'ai_posts';
+        const response = await supabaseUserRest(user.accessToken, path, {
+          method: id ? 'PATCH' : 'POST',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.message || 'Unable to save AI post');
         return res.status(200).json({ post: Array.isArray(data) ? data[0] : data });
       }
     }
