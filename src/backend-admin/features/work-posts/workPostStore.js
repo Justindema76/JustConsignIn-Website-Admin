@@ -3,6 +3,37 @@ import { adminFetch, parseJsonResponse } from '../../services/apiClient';
 
 export const WORK_STATUS = { DRAFT: 'draft', PUBLISHED: 'published' };
 
+export const DEFAULT_WORK_SECTIONS = {
+  overview: '',
+  overviewSecondary: '',
+  quote: '',
+  problem: '',
+  problemPoints: [],
+  built: '',
+  connectedWorkflow: '',
+  visualsIntro: '',
+  gallery: [],
+  youtubeHeading: '',
+  youtubeIntro: '',
+  youtubeUrl: '',
+  videos: [],
+  workflow: [],
+  ongoing: '',
+  extras: [],
+};
+
+function cloneSections(value = {}) {
+  return {
+    ...DEFAULT_WORK_SECTIONS,
+    ...(value && typeof value === 'object' && !Array.isArray(value) ? value : {}),
+    problemPoints: Array.isArray(value?.problemPoints) ? value.problemPoints : [],
+    gallery: Array.isArray(value?.gallery) ? value.gallery : [],
+    videos: Array.isArray(value?.videos) ? value.videos : [],
+    workflow: Array.isArray(value?.workflow) ? value.workflow : [],
+    extras: Array.isArray(value?.extras) ? value.extras : [],
+  };
+}
+
 export const EMPTY_WORK_POST = {
   id: '',
   slug: '',
@@ -18,7 +49,7 @@ export const EMPTY_WORK_POST = {
   projectUrl: '',
   secondaryUrl: '',
   tags: [],
-  bodyHtml: '',
+  sections: cloneSections(),
   seoTitle: '',
   seoDescription: '',
   ogImage: '',
@@ -50,7 +81,7 @@ export function normalizeWorkPost(row = {}) {
     projectUrl: row.project_url ?? row.projectUrl ?? '',
     secondaryUrl: row.secondary_url ?? row.secondaryUrl ?? '',
     tags: Array.isArray(row.tags) ? row.tags : [],
-    bodyHtml: row.body_html ?? row.bodyHtml ?? '',
+    sections: cloneSections(row.sections),
     seoTitle: row.seo_title ?? row.seoTitle ?? '',
     seoDescription: row.seo_description ?? row.seoDescription ?? '',
     ogImage: row.og_image ?? row.ogImage ?? '',
@@ -90,6 +121,7 @@ export async function saveAdminWorkPost(accessToken, input) {
       ...input,
       siteKey: getAdminSiteKey(),
       slug: slugifyWork(input.slug || input.title),
+      sections: cloneSections(input.sections),
     }),
   }, accessToken));
   return normalizeWorkPost(payload.post || {});
@@ -100,5 +132,5 @@ export async function deleteAdminWorkPost(accessToken, id) {
 }
 
 export function createEmptyWorkPost() {
-  return { ...EMPTY_WORK_POST, tags: [] };
+  return { ...EMPTY_WORK_POST, tags: [], sections: cloneSections() };
 }

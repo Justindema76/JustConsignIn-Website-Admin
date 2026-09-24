@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, ExternalLink, Image, Images, Link2, List, Plus, Quote, Save, Trash2, Upload, Video } from 'lucide-react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { CheckCircle2, ExternalLink, Image, Plus, Save, Trash2, Upload, Video, X } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { getAdminSiteKey, uploadWorkImage, uploadWorkVideo } from '../../services/siteAdminService';
 import {
@@ -14,27 +14,14 @@ import {
 } from './workPostStore';
 import './workPosts.css';
 
+const PORTFOLIO_PREVIEW_BASE = import.meta.env.VITE_PORTFOLIO_PREVIEW_URL || 'https://justin-de-matteis-main-site.vercel.app';
+
 function tagsFrom(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
 }
 
-function youtubeId(value = '') {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  try {
-    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
-    if (url.hostname.includes('youtu.be')) return url.pathname.split('/').filter(Boolean)[0] || '';
-    const direct = url.searchParams.get('v');
-    if (direct) return direct;
-    const parts = url.pathname.split('/').filter(Boolean);
-    const marker = parts.findIndex(part => ['embed', 'shorts', 'live'].includes(part));
-    if (marker >= 0) return parts[marker + 1] || '';
-  } catch {}
-  return /^[A-Za-z0-9_-]{6,}$/.test(raw) ? raw : '';
-}
-
-function escAttr(value = '') {
-  return String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+function previewUrl(slug = '') {
+  return `${PORTFOLIO_PREVIEW_BASE}/work/${encodeURIComponent(slug)}`;
 }
 
 export default function WorkPostsAdmin() {
@@ -49,12 +36,9 @@ export default function WorkPostsAdmin() {
   const [uploading, setUploading] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const editorRef = useRef(null);
-  const bodyHtmlRef = useRef('');
-  const inlineImageRef = useRef(null);
+  const projectLogoRef = useRef(null);
   const galleryRef = useRef(null);
   const videoRef = useRef(null);
-  const projectLogoRef = useRef(null);
 
   const sorted = useMemo(
     () => [...posts].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)),
@@ -79,20 +63,11 @@ export default function WorkPostsAdmin() {
     setError('');
     setMessage('');
     if (id === 'new') {
-      const fresh = createEmptyWorkPost();
-      setDraft(fresh);
-      bodyHtmlRef.current = '';
-      if (editorRef.current) editorRef.current.innerHTML = '';
+      setDraft(createEmptyWorkPost());
       return;
     }
     loadAdminWorkPost(accessToken, id)
-      .then(post => {
-        setDraft(post);
-        bodyHtmlRef.current = post.bodyHtml || '';
-        requestAnimationFrame(() => {
-          if (editorRef.current) editorRef.current.innerHTML = post.bodyHtml || '';
-        });
-      })
+      .then(setDraft)
       .catch(err => setError(err.message));
   }, [editing, id, accessToken, siteKey]);
 
@@ -103,56 +78,19 @@ export default function WorkPostsAdmin() {
   }
 
   const update = (key, value) => setDraft(current => ({ ...current, [key]: value }));
+  const updateSection = (key, value) => setDraft(current => ({
+    ...current,
+    sections: { ...current.sections, [key]: value },
+  }));
 
-  const runCommand = (command, value = null) => {
-    editorRef.current?.focus();
-    document.execCommand(command, false, value);
-    bodyHtmlRef.current = editorRef.current?.innerHTML || bodyHtmlRef.current;
+  const updateArrayItem = (key, index, patch) => {
+    const next = [...(draft.sections?.[key] || [])];
+    next[index] = typeof patch === 'function' ? patch(next[index]) : { ...next[index], ...patch };
+    updateSection(key, next);
   };
 
-  const formatBlock = tag => runCommand('formatBlock', tag);
-
-  const insertHtml = html => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    editor.focus();
-
-    const selection = window.getSelection();
-    const anchor = selection?.anchorNode;
-    if (selection && selection.rangeCount && anchor && editor.contains(anchor)) {
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      const fragment = range.createContextualFragment(html);
-      const last = fragment.lastChild;
-      range.insertNode(fragment);
-      if (last) {
-        range.setStartAfter(last);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-    } else {
-      editor.insertAdjacentHTML('beforeend', html);
-    }
-
-    bodyHtmlRef.current = editor.innerHTML;
-    setMessage('Content inserted. Save the Work Post when you are ready.');
-  };
-
-  const addLink = () => {
-    const url = window.prompt('Paste the link URL');
-    if (!url) return;
-    runCommand('createLink', url.trim());
-  };
-
-  const addYouTube = () => {
-    const raw = window.prompt('Paste a YouTube URL');
-    const videoId = youtubeId(raw || '');
-    if (!videoId) {
-      setError('That does not look like a valid YouTube URL.');
-      return;
-    }
-    insertHtml(`<div class="work-post-video"><iframe src="https://www.youtube.com/embed/${escAttr(videoId)}" title="Project video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><p></p>`);
+  const removeArrayItem = (key, index) => {
+    updateSection(key, (draft.sections?.[key] || []).filter((_, itemIndex) => itemIndex !== index));
   };
 
   const uploadProjectLogo = async event => {
@@ -162,22 +100,8 @@ export default function WorkPostsAdmin() {
     try {
       const url = await uploadWorkImage(accessToken, file);
       update('featuredImage', url);
+      update('featuredImageAlt', draft.featuredImageAlt || `${draft.company || draft.title || 'Project'} logo`);
       setMessage('Project logo uploaded. Save the Work Post to keep it.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUploading('');
-      event.target.value = '';
-    }
-  };
-
-  const uploadInlineImage = async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading('image'); setError('');
-    try {
-      const url = await uploadWorkImage(accessToken, file);
-      insertHtml(`<figure><img src="${escAttr(url)}" alt=""><figcaption></figcaption></figure><p></p>`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -191,10 +115,13 @@ export default function WorkPostsAdmin() {
     if (!files.length) return;
     setUploading('gallery'); setError('');
     try {
-      const urls = [];
-      for (const file of files) urls.push(await uploadWorkImage(accessToken, file));
-      const figures = urls.map(url => `<figure><img src="${escAttr(url)}" alt=""><figcaption></figcaption></figure>`).join('');
-      insertHtml(`<div class="work-post-gallery">${figures}</div><p></p>`);
+      const uploaded = [];
+      for (const file of files) {
+        const url = await uploadWorkImage(accessToken, file);
+        uploaded.push({ url, alt: '', caption: '' });
+      }
+      updateSection('gallery', [...(draft.sections.gallery || []), ...uploaded]);
+      setMessage(`${uploaded.length} image${uploaded.length === 1 ? '' : 's'} added. Save the Work Post to keep them.`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -209,7 +136,11 @@ export default function WorkPostsAdmin() {
     setUploading('video'); setError('');
     try {
       const url = await uploadWorkVideo(accessToken, file);
-      insertHtml(`<video controls preload="metadata" src="${escAttr(url)}"></video><p></p>`);
+      updateSection('videos', [
+        ...(draft.sections.videos || []),
+        { url, title: file.name.replace(/\.[^.]+$/, ''), caption: '' },
+      ]);
+      setMessage('Video uploaded. Save the Work Post to keep it.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -219,17 +150,15 @@ export default function WorkPostsAdmin() {
   };
 
   const save = async event => {
-    event.preventDefault();
+    event?.preventDefault?.();
     if (!draft.title.trim()) return setError('Add the Work Post title.');
     setBusy(true); setError(''); setMessage('');
     try {
       const saved = await saveAdminWorkPost(accessToken, {
         ...draft,
         slug: draft.slug || slugifyWork(draft.title),
-        bodyHtml: editorRef.current?.innerHTML || bodyHtmlRef.current || draft.bodyHtml,
       });
       setDraft(saved);
-      bodyHtmlRef.current = saved.bodyHtml || '';
       setMessage('Work Post saved.');
       await refresh();
       if (id === 'new') navigate(`/admin/work-posts/${saved.id}`, { replace: true });
@@ -260,7 +189,7 @@ export default function WorkPostsAdmin() {
         <div>
           <p className="site-admin-eyebrow">Portfolio Content</p>
           <h1>Work Posts</h1>
-          <p>Each project has one permanent case-study post that can keep growing over time.</p>
+          <p>Each project has one permanent case study made from structured fields.</p>
         </div>
         <Link className="site-admin-btn" to="/admin/work-posts/new"><Plus size={15}/> New Work Post</Link>
       </div>
@@ -274,7 +203,7 @@ export default function WorkPostsAdmin() {
           <span>{post.updatedAt ? new Date(post.updatedAt).toLocaleDateString() : '—'}</span>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`/admin/work-posts/${post.id}`}>Edit</Link>
-            {post.slug && <a className="site-admin-btn secondary small" href={`https://www.justindematteis.com/work/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}
+            {post.slug && <a className="site-admin-btn secondary small" href={previewUrl(post.slug)} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}
           </div>
         </div>)}
         {!busy && !posts.length && <div className="site-admin-empty">No Work Posts yet.</div>}
@@ -282,17 +211,19 @@ export default function WorkPostsAdmin() {
     </>;
   }
 
+  const sections = draft.sections || {};
+
   return <>
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Portfolio · Work Post</p>
         <h1>{id === 'new' ? 'New Work Post' : 'Edit Work Post'}</h1>
-        <p>Write the case study as one article. Add images, galleries, YouTube, uploaded video and new sections whenever you need them.</p>
+        <p>Edit the case study by field. Each section maps directly to the finished portfolio page.</p>
       </div>
       <div className="site-admin-actions">
         <Link className="site-admin-btn secondary" to="/admin/work-posts">← Work Posts</Link>
-        {draft.slug && <a className="site-admin-btn secondary" href={`https://www.justindematteis.com/work/${draft.slug}`} target="_blank" rel="noreferrer">Preview <ExternalLink size={13}/></a>}
-        <button className="site-admin-btn" form="work-post-form" type="submit" disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save Work Post'}</button>
+        {draft.slug && <a className="site-admin-btn secondary" href={previewUrl(draft.slug)} target="_blank" rel="noreferrer">Preview <ExternalLink size={13}/></a>}
+        <button className="site-admin-btn" type="button" onClick={save} disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save Work Post'}</button>
       </div>
     </div>
 
@@ -300,65 +231,138 @@ export default function WorkPostsAdmin() {
     {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
 
     <form id="work-post-form" className="work-post-editor-grid" onSubmit={save}>
-      <section className="site-admin-card work-post-editor-main">
-        <h2>Project information</h2>
-        <div className="site-admin-form work-post-fields">
-          <label className="wide">Work post title<input value={draft.title} onChange={event => {
-            const title = event.target.value;
-            setDraft(current => ({ ...current, title, slug: current.id ? current.slug : slugifyWork(title) }));
-          }}/></label>
-          <label>URL slug<input value={draft.slug} onChange={event => update('slug', slugifyWork(event.target.value))}/><small>/work/{draft.slug || 'project-slug'}</small></label>
-          <label>Work type<input value={draft.workType} onChange={event => update('workType', event.target.value)} placeholder="Product Development"/></label>
-          <label>Company / project<input value={draft.company} onChange={event => update('company', event.target.value)}/></label>
-          <label>Platform<input value={draft.platform} onChange={event => update('platform', event.target.value)} placeholder="Shopify · React · Supabase"/></label>
-          <label className="wide">My role<input value={draft.role} onChange={event => update('role', event.target.value)}/></label>
-          <label className="wide">Built for<input value={draft.audience} onChange={event => update('audience', event.target.value)}/></label>
-          <label className="wide">Short summary<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)}/></label>
-        </div>
-
-        <div className="work-post-logo-field">
-          <div className="work-post-logo-preview">
-            {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
+      <section className="work-post-editor-main">
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>1</span><div><h2>Project information</h2><p>Hero and project snapshot.</p></div></div>
           </div>
-          <div>
-            <strong>Project logo</strong>
-            <p>Small logo shown in the Work Post hero.</p>
-            <div className="site-admin-actions">
-              <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
-              {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
+          <div className="site-admin-form work-post-fields">
+            <label className="wide">Work post title<input value={draft.title} onChange={event => {
+              const title = event.target.value;
+              setDraft(current => ({ ...current, title, slug: current.id ? current.slug : slugifyWork(title) }));
+            }}/></label>
+            <label>URL slug<input value={draft.slug} onChange={event => update('slug', slugifyWork(event.target.value))}/><small>/work/{draft.slug || 'project-slug'}</small></label>
+            <label>Work type<input value={draft.workType} onChange={event => update('workType', event.target.value)} placeholder="Product Development"/></label>
+            <label>Company / project<input value={draft.company} onChange={event => update('company', event.target.value)}/></label>
+            <label>Platform<input value={draft.platform} onChange={event => update('platform', event.target.value)} placeholder="Shopify · React · Supabase"/></label>
+            <label className="wide">My role<input value={draft.role} onChange={event => update('role', event.target.value)}/></label>
+            <label className="wide">Built for<input value={draft.audience} onChange={event => update('audience', event.target.value)}/></label>
+            <label className="wide">Short summary<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)}/></label>
+          </div>
+
+          <div className="work-post-logo-field">
+            <div className="work-post-logo-preview">
+              {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
             </div>
-            <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
+            <div>
+              <strong>Project logo</strong>
+              <p>Small logo used in the Project card.</p>
+              <div className="site-admin-actions">
+                <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
+                {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
+              </div>
+              <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
+            </div>
           </div>
         </div>
 
-        <div className="work-post-story-head">
-          <div><h2>Work story</h2><p>One article. Add to it whenever the project changes.</p></div>
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>2</span><div><h2>Overview</h2><p>The opening of the case study.</p></div></div></div>
+          <label>Overview<textarea rows="6" value={sections.overview || ''} onChange={event => updateSection('overview', event.target.value)}/></label>
+          <label>Second paragraph<textarea rows="4" value={sections.overviewSecondary || ''} onChange={event => updateSection('overviewSecondary', event.target.value)}/></label>
+          <label>Pull quote<textarea rows="3" value={sections.quote || ''} onChange={event => updateSection('quote', event.target.value)}/></label>
         </div>
 
-        <div className="work-post-rich-editor">
-          <div className="work-post-toolbar">
-            <button type="button" onClick={() => formatBlock('h2')}>H2</button>
-            <button type="button" onClick={() => formatBlock('h3')}>H3</button>
-            <button type="button" onClick={() => formatBlock('p')}>Paragraph</button>
-            <button type="button" onClick={() => runCommand('bold')}><strong>B</strong></button>
-            <button type="button" onClick={addLink}><Link2 size={14}/> Link</button>
-            <button type="button" onClick={() => runCommand('insertUnorderedList')}><List size={14}/> Bullets</button>
-            <button type="button" onClick={() => formatBlock('blockquote')}><Quote size={14}/> Quote</button>
-            <button type="button" onClick={() => inlineImageRef.current?.click()}><Image size={14}/> {uploading === 'image' ? 'Uploading…' : 'Image'}</button>
-            <button type="button" onClick={() => galleryRef.current?.click()}><Images size={14}/> {uploading === 'gallery' ? 'Uploading…' : 'Gallery'}</button>
-            <button type="button" onClick={addYouTube}><Video size={14}/> YouTube</button>
-            <button type="button" onClick={() => videoRef.current?.click()}><Upload size={14}/> {uploading === 'video' ? 'Uploading…' : 'Video File'}</button>
-            <input ref={inlineImageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadInlineImage}/>
-            <input ref={galleryRef} hidden type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadGallery}/>
-            <input ref={videoRef} hidden type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/webm" onChange={uploadVideo}/>
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>3</span><div><h2>The business problem</h2><p>Explain the problem, then list the important pain points.</p></div></div></div>
+          <label>Problem<textarea rows="6" value={sections.problem || ''} onChange={event => updateSection('problem', event.target.value)}/></label>
+          <div className="work-post-repeat-list">
+            {(sections.problemPoints || []).map((point, index) => <div className="work-post-repeat-row" key={index}>
+              <input value={point} onChange={event => updateArrayItem('problemPoints', index, event.target.value)} placeholder="Problem point"/>
+              <button type="button" onClick={() => removeArrayItem('problemPoints', index)} aria-label="Remove problem point"><X size={14}/></button>
+            </div>)}
           </div>
-          <div
-            ref={editorRef}
-            className="work-post-content-editor"
-            contentEditable
-            suppressContentEditableWarning
-            onInput={event => { bodyHtmlRef.current = event.currentTarget.innerHTML; }}
-          />
+          <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('problemPoints', [...(sections.problemPoints || []), ''])}><Plus size={13}/> Add problem point</button>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>4</span><div><h2>What I built</h2><p>Describe the solution and the connected workflow.</p></div></div></div>
+          <label>What I built<textarea rows="6" value={sections.built || ''} onChange={event => updateSection('built', event.target.value)}/></label>
+          <label>Connected workflow<input value={sections.connectedWorkflow || ''} onChange={event => updateSection('connectedWorkflow', event.target.value)} placeholder="Consignor → Item → Shopify Product → Sale → Payout"/></label>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>5</span><div><h2>Product visuals</h2><p>Upload screenshots and edit their captions individually.</p></div></div>
+            <button className="site-admin-btn secondary small" type="button" onClick={() => galleryRef.current?.click()} disabled={uploading === 'gallery'}><Upload size={13}/>{uploading === 'gallery' ? 'Uploading…' : 'Add Images'}</button>
+          </div>
+          <label>Section intro<textarea rows="3" value={sections.visualsIntro || ''} onChange={event => updateSection('visualsIntro', event.target.value)}/></label>
+          <input ref={galleryRef} hidden type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadGallery}/>
+          <div className="work-post-media-editor-grid">
+            {(sections.gallery || []).map((item, index) => <article className="work-post-media-edit" key={item.url || index}>
+              <img src={item.url} alt=""/>
+              <label>Alt text<input value={item.alt || ''} onChange={event => updateArrayItem('gallery', index, { alt: event.target.value })}/></label>
+              <label>Caption<input value={item.caption || ''} onChange={event => updateArrayItem('gallery', index, { caption: event.target.value })}/></label>
+              <button className="site-admin-btn danger small" type="button" onClick={() => removeArrayItem('gallery', index)}><Trash2 size={13}/> Remove</button>
+            </article>)}
+          </div>
+          {!(sections.gallery || []).length && <div className="work-post-empty-field">No screenshots yet. Click <strong>Add Images</strong>.</div>}
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>6</span><div><h2>YouTube demo</h2><p>Paste the public YouTube link. No YouTube account connection is required.</p></div></div></div>
+          <label>Heading<input value={sections.youtubeHeading || ''} onChange={event => updateSection('youtubeHeading', event.target.value)}/></label>
+          <label>Description<textarea rows="3" value={sections.youtubeIntro || ''} onChange={event => updateSection('youtubeIntro', event.target.value)}/></label>
+          <label>YouTube URL<input value={sections.youtubeUrl || ''} onChange={event => updateSection('youtubeUrl', event.target.value)} placeholder="https://youtu.be/..."/></label>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>7</span><div><h2>Uploaded videos</h2><p>Optional MP4/WebM videos stored with the project.</p></div></div>
+            <button className="site-admin-btn secondary small" type="button" onClick={() => videoRef.current?.click()} disabled={uploading === 'video'}><Video size={13}/>{uploading === 'video' ? 'Uploading…' : 'Add Video'}</button>
+          </div>
+          <input ref={videoRef} hidden type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/webm" onChange={uploadVideo}/>
+          <div className="work-post-video-fields">
+            {(sections.videos || []).map((item, index) => <div className="work-post-repeat-card" key={item.url || index}>
+              <video controls preload="metadata" src={item.url}/>
+              <label>Video title<input value={item.title || ''} onChange={event => updateArrayItem('videos', index, { title: event.target.value })}/></label>
+              <label>Caption<textarea rows="2" value={item.caption || ''} onChange={event => updateArrayItem('videos', index, { caption: event.target.value })}/></label>
+              <button className="site-admin-btn danger small" type="button" onClick={() => removeArrayItem('videos', index)}><Trash2 size={13}/> Remove</button>
+            </div>)}
+          </div>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>8</span><div><h2>Workflow</h2><p>Each step is its own editable field.</p></div></div>
+            <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('workflow', [...(sections.workflow || []), { title: '', text: '' }])}><Plus size={13}/> Add Step</button>
+          </div>
+          <div className="work-post-step-editor">
+            {(sections.workflow || []).map((step, index) => <article className="work-post-repeat-card" key={index}>
+              <div className="work-post-repeat-card-head"><strong>Step {index + 1}</strong><button type="button" onClick={() => removeArrayItem('workflow', index)}><X size={14}/></button></div>
+              <label>Step title<input value={step.title || ''} onChange={event => updateArrayItem('workflow', index, { title: event.target.value })}/></label>
+              <label>Description<textarea rows="3" value={step.text || ''} onChange={event => updateArrayItem('workflow', index, { text: event.target.value })}/></label>
+            </article>)}
+          </div>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>9</span><div><h2>Ongoing work</h2><p>Update this whenever the project changes.</p></div></div></div>
+          <label>Ongoing work<textarea rows="6" value={sections.ongoing || ''} onChange={event => updateSection('ongoing', event.target.value)}/></label>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>+</span><div><h2>Additional sections</h2><p>Add more sections without changing the template.</p></div></div>
+            <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('extras', [...(sections.extras || []), { heading: '', text: '' }])}><Plus size={13}/> Add Section</button>
+          </div>
+          <div className="work-post-step-editor">
+            {(sections.extras || []).map((section, index) => <article className="work-post-repeat-card" key={index}>
+              <div className="work-post-repeat-card-head"><strong>Extra section {index + 1}</strong><button type="button" onClick={() => removeArrayItem('extras', index)}><X size={14}/></button></div>
+              <label>Heading<input value={section.heading || ''} onChange={event => updateArrayItem('extras', index, { heading: event.target.value })}/></label>
+              <label>Content<textarea rows="5" value={section.text || ''} onChange={event => updateArrayItem('extras', index, { text: event.target.value })}/></label>
+            </article>)}
+          </div>
         </div>
       </section>
 
@@ -370,6 +374,7 @@ export default function WorkPostsAdmin() {
             <option value={WORK_STATUS.PUBLISHED}>Published</option>
           </select></label>
           {draft.publishedAt && <p>Published {new Date(draft.publishedAt).toLocaleDateString()}</p>}
+          <button className="site-admin-btn work-post-side-save" type="button" onClick={save} disabled={busy}><Save size={14}/> {busy ? 'Saving…' : 'Save'}</button>
         </div>
 
         <div className="site-admin-card site-admin-side-card">

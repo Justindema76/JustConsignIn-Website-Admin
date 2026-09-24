@@ -59,7 +59,7 @@ function socialValue(body = {}) {
 const WORK_POST_FIELDS = [
   'site_key','id','slug','title','work_type','company','role','platform','audience',
   'excerpt','featured_image','featured_image_alt','project_url','secondary_url','tags',
-  'body_html','seo_title','seo_description','og_image','status','author_name',
+  'sections','body_html','seo_title','seo_description','og_image','status','author_name',
   'published_at','created_at','updated_at'
 ].join(',');
 
@@ -79,6 +79,7 @@ function cleanWorkPost(body = {}) {
     project_url: String(body.projectUrl ?? body.project_url ?? ''),
     secondary_url: String(body.secondaryUrl ?? body.secondary_url ?? ''),
     tags: Array.isArray(body.tags) ? body.tags.map(value => String(value).trim()).filter(Boolean) : [],
+    sections: body.sections && typeof body.sections === 'object' && !Array.isArray(body.sections) ? body.sections : {},
     body_html: String(body.bodyHtml ?? body.body_html ?? ''),
     seo_title: String(body.seoTitle ?? body.seo_title ?? ''),
     seo_description: String(body.seoDescription ?? body.seo_description ?? ''),
