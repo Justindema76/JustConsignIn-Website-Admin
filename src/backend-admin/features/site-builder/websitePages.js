@@ -179,15 +179,6 @@ export const JUSTINDEMATTEIS_PAGES = [
     description: 'Career story, engineering background and transition into software development.',
   },
   {
-    id: 'experience',
-    title: 'Experience',
-    path: '/experience',
-    source: 'shared page builder',
-    kind: 'content',
-    editor: 'visual',
-    description: 'Professional experience, skills and technology.',
-  },
-  {
     id: 'blog',
     title: 'Blog',
     path: '/blog',
