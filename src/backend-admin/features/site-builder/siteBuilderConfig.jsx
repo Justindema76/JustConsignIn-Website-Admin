@@ -933,6 +933,105 @@ export const siteBuilderConfig = {
       </div></section>,
     },
 
+    ResumeWorkBlock: {
+      label: 'RESUME · Work Experience',
+      fields: {
+        eyebrow:{type:'text',label:'Eyebrow'},
+        heading:{type:'text',label:'Heading'},
+        headingLevel:{...headingLevelField,label:'Heading level'},
+        text:{type:'textarea',label:'Intro text'},
+        itemHeadingLevel:{...headingLevelField,label:'Role title level'},
+
+        item1Logo:{...imageField,label:'Experience 1 logo'},
+        item1Label:{type:'text',label:'Experience 1 label'},
+        item1Company:{type:'text',label:'Experience 1 company'},
+        item1Kicker:{type:'text',label:'Experience 1 category'},
+        item1Title:{type:'text',label:'Experience 1 role title'},
+        item1Text:{type:'textarea',label:'Experience 1 summary'},
+        item1Bullet1:{type:'text',label:'Experience 1 bullet 1'},
+        item1Bullet2:{type:'text',label:'Experience 1 bullet 2'},
+        item1Bullet3:{type:'text',label:'Experience 1 bullet 3'},
+        item1Bullet4:{type:'text',label:'Experience 1 bullet 4'},
+        item1ButtonText:{type:'text',label:'Experience 1 button text'},
+        item1ButtonUrl:{type:'text',label:'Experience 1 button link'},
+
+        item2Logo:{...imageField,label:'Experience 2 logo'},
+        item2Label:{type:'text',label:'Experience 2 label'},
+        item2Company:{type:'text',label:'Experience 2 company'},
+        item2Kicker:{type:'text',label:'Experience 2 category'},
+        item2Title:{type:'text',label:'Experience 2 role title'},
+        item2Text:{type:'textarea',label:'Experience 2 summary'},
+        item2Bullet1:{type:'text',label:'Experience 2 bullet 1'},
+        item2Bullet2:{type:'text',label:'Experience 2 bullet 2'},
+        item2Bullet3:{type:'text',label:'Experience 2 bullet 3'},
+        item2Bullet4:{type:'text',label:'Experience 2 bullet 4'},
+        item2ButtonText:{type:'text',label:'Experience 2 button text'},
+        item2ButtonUrl:{type:'text',label:'Experience 2 button link'},
+      },
+      defaultProps: {
+        eyebrow:'RESUME',
+        heading:'Work Experience',
+        headingLevel:'h1',
+        itemHeadingLevel:'h2',
+        text:'Professional ecommerce and development work focused on improving real business systems, storefronts and customer workflows.',
+        item1Logo:'https://raw.githubusercontent.com/Justindema76/Justin-DeMatteis-Main-Site/main/public/images/projects/wheels-automotive-mark.svg',
+        item1Label:'Professional Experience',
+        item1Company:'Wheels Automotive Dealer Supplies',
+        item1Kicker:'Adobe Commerce / Magento · B2B Ecommerce',
+        item1Title:'Ecommerce Development, Frontend, QA & SEO',
+        item1Text:'Supporting the launch and ongoing improvement of a large B2B automotive dealer-supply ecommerce platform.',
+        item1Bullet1:'Adobe Commerce / Magento frontend and PageBuilder implementation.',
+        item1Bullet2:'B2B account, login, checkout and payment workflow testing.',
+        item1Bullet3:'Product and category SEO, merchandising content and storefront updates.',
+        item1Bullet4:'QA, issue reproduction and coordination with the implementation vendor.',
+        item1ButtonText:'View Wheels case study →',
+        item1ButtonUrl:'/work/wheels-automotive',
+        item2Logo:'https://raw.githubusercontent.com/Justindema76/Justin-DeMatteis-Main-Site/main/public/images/projects/jill-beanstalk-mark.svg',
+        item2Label:'Client Ecommerce',
+        item2Company:'Jill & The Beanstalk',
+        item2Kicker:'Shopify · SEO · Ecommerce Growth',
+        item2Title:'Shopify Management, SEO & Storefront Optimization',
+        item2Text:'Ongoing ecommerce work focused on making the store easier to discover, easier to shop and stronger as an online sales channel.',
+        item2Bullet1:'Shopify storefront improvements, mobile UX and content organization.',
+        item2Bullet2:'Technical and on-page SEO, metadata and search-focused copy.',
+        item2Bullet3:'Product/category content, reviews, onsite search and integrations.',
+        item2Bullet4:'Ongoing troubleshooting, analytics and conversion-focused improvements.',
+        item2ButtonText:'View Jill & The Beanstalk case study →',
+        item2ButtonUrl:'/work/jill-and-the-beanstalk',
+      },
+      render: p => <section className="resume-work-section"><div className="shared-wrap">
+        <div className="resume-work-head">
+          <div>
+            <div className="shared-eyebrow">{p.eyebrow}</div>
+            <BlockHeading level={p.headingLevel || 'h1'} className="resume-work-heading">{p.heading}</BlockHeading>
+          </div>
+          <p className="resume-work-intro">{p.text}</p>
+        </div>
+        <div className="resume-work-divider"/>
+        <div className="resume-work-list">
+          {[1,2].filter(i => p['item'+i+'Company'] || p['item'+i+'Title']).map(i => {
+            const bullets=[1,2,3,4].map(n=>p['item'+i+'Bullet'+n]).filter(Boolean);
+            return <article className="resume-work-card" key={i}>
+              <aside className="resume-work-company">
+                {p['item'+i+'Logo'] && <div className="resume-work-logo"><img src={p['item'+i+'Logo']} alt={p['item'+i+'Company'] || ''}/></div>}
+                <div className="resume-work-company-meta">
+                  <div className="resume-work-label">{p['item'+i+'Label']}</div>
+                  <strong>{p['item'+i+'Company']}</strong>
+                </div>
+              </aside>
+              <div className="resume-work-content">
+                <div className="resume-work-kicker">{p['item'+i+'Kicker']}</div>
+                <BlockHeading level={p.itemHeadingLevel || 'h2'} className="resume-work-role">{p['item'+i+'Title']}</BlockHeading>
+                <p>{p['item'+i+'Text']}</p>
+                {bullets.length>0 && <ul>{bullets.map((b,n)=><li key={n}>{b}</li>)}</ul>}
+                {p['item'+i+'ButtonText'] && <a className="resume-work-link" href={p['item'+i+'ButtonUrl'] || '#'} onClick={previewClick}>{p['item'+i+'ButtonText']}</a>}
+              </div>
+            </article>;
+          })}
+        </div>
+      </div></section>,
+    },
+
     LargeCtaBlock: {
       label: 'Large CTA',
       fields: { eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},headingLevel:{...headingLevelField,label:'Heading level'},buttonText:{type:'text',label:'Button text'},buttonUrl:{type:'text',label:'Button link'} },
