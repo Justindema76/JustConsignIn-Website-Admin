@@ -37,6 +37,7 @@ export default function WorkPostsAdmin() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const projectLogoRef = useRef(null);
+  const heroImageRef = useRef(null);
   const galleryRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -106,6 +107,23 @@ export default function WorkPostsAdmin() {
       update('featuredImage', url);
       update('featuredImageAlt', draft.featuredImageAlt || `${draft.company || draft.title || 'Project'} logo`);
       setMessage('Project logo uploaded. Save the Work Post to keep it.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading('');
+      event.target.value = '';
+    }
+  };
+
+  const uploadHeroImage = async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading('hero'); setError('');
+    try {
+      const url = await uploadWorkImage(accessToken, file);
+      updateSection('heroImage', url);
+      updateSection('heroImageAlt', draft.sections?.heroImageAlt || `${draft.company || draft.title || 'Project'} case study hero image`);
+      setMessage('Hero image uploaded. Save the Work Post to keep it.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -254,18 +272,36 @@ export default function WorkPostsAdmin() {
             <label className="wide">Short summary<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)}/></label>
           </div>
 
-          <div className="work-post-logo-field">
-            <div className="work-post-logo-preview">
-              {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
-            </div>
-            <div>
-              <strong>Project logo</strong>
-              <p>Small logo used in the Project card.</p>
-              <div className="site-admin-actions">
-                <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
-                {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
+          <div className="work-post-project-media">
+            <div className="work-post-logo-field">
+              <div className="work-post-logo-preview">
+                {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
               </div>
-              <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
+              <div>
+                <strong>Project logo</strong>
+                <p>Small logo used in the Project card.</p>
+                <div className="site-admin-actions">
+                  <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
+                  {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
+                </div>
+                <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
+              </div>
+            </div>
+
+            <div className="work-post-hero-image-field">
+              <div className="work-post-hero-image-preview">
+                {sections.heroImage ? <img src={sections.heroImage} alt={sections.heroImageAlt || 'Hero image preview'}/> : <><Image size={28}/><span>No hero image</span></>}
+              </div>
+              <div className="work-post-hero-image-controls">
+                <strong>Hero image</strong>
+                <p>Large image shown in the case study header beside the title and summary.</p>
+                <label>Alt text<input value={sections.heroImageAlt || ''} onChange={event => updateSection('heroImageAlt', event.target.value)} placeholder="Describe the hero image"/></label>
+                <div className="site-admin-actions">
+                  <button className="site-admin-btn secondary small" type="button" onClick={() => heroImageRef.current?.click()} disabled={uploading === 'hero'}><Upload size={13}/>{uploading === 'hero' ? 'Uploading…' : 'Upload Hero Image'}</button>
+                  {sections.heroImage && <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('heroImage', '')}>Remove</button>}
+                </div>
+                <input ref={heroImageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadHeroImage}/>
+              </div>
             </div>
           </div>
         </div>
