@@ -113,6 +113,15 @@ export const JUSTINDEMATTEIS_PAGES = [
     description: 'Portfolio homepage with positioning, featured work and calls to action.',
   },
   {
+    id: 'skills',
+    title: 'Skills',
+    path: '/skills',
+    source: 'shared page builder',
+    kind: 'content',
+    editor: 'visual',
+    description: 'Expanded SEO, ecommerce, WordPress, Adobe and development capabilities.',
+  },
+  {
     id: 'work',
     title: 'Work Experience',
     path: '/work',
