@@ -32,6 +32,11 @@ export const justinHeaderDefaults = {
   nav7Label: '', nav7Url: '',
   buttonText: '',
   buttonUrl: '',
+  socialIconColor: '#415162',
+  socialIconBackground: 'var(--site-surface,#fff)',
+  socialIconBorder: 'var(--site-border,#DCE4EC)',
+  socialIconHoverColor: '#ffffff',
+  socialIconHoverBackground: 'var(--site-primary,#2F6BFF)',
   background: 'white',
 }
 
@@ -54,6 +59,11 @@ export const footerDefaults = {
   copyright: 'JustConsignIn. All rights reserved.',
   privacyLabel: 'Privacy', privacyUrl: '/privacy',
   termsLabel: 'Terms', termsUrl: '/terms',
+  socialIconColor: '#ffffff',
+  socialIconBackground: 'rgba(255,255,255,.04)',
+  socialIconBorder: 'rgba(255,255,255,.18)',
+  socialIconHoverColor: '#ffffff',
+  socialIconHoverBackground: 'var(--site-primary,#2F6BFF)',
   background: 'dark',
 };
 
@@ -76,6 +86,11 @@ export const justinFooterDefaults = {
   copyright: 'Justin DeMatteis. All rights reserved.',
   privacyLabel: 'Privacy', privacyUrl: '/privacy',
   termsLabel: 'Terms', termsUrl: '/terms',
+  socialIconColor: '#ffffff',
+  socialIconBackground: 'rgba(255,255,255,.04)',
+  socialIconBorder: 'rgba(255,255,255,.18)',
+  socialIconHoverColor: '#ffffff',
+  socialIconHoverBackground: 'var(--site-primary,#2F6BFF)',
   background: 'dark',
 };
 
@@ -86,6 +101,24 @@ const backgroundOptions = [
 ];
 
 function previewClick(event) { event.preventDefault(); }
+
+function CssColorField({ field, value, onChange }) {
+  const raw = value || '';
+  const pickerValue = /^#[0-9a-f]{6}$/i.test(raw) ? raw : '#000000';
+  return <label className="global-css-color-field">
+    <span>{field.label}</span>
+    <div>
+      <input type="color" value={pickerValue} onChange={event => onChange(event.target.value)} aria-label={field.label}/>
+      <input type="text" value={raw} onChange={event => onChange(event.target.value)} placeholder="#000000 or any CSS colour"/>
+    </div>
+  </label>;
+}
+
+const cssColorField = label => ({
+  type: 'custom',
+  label,
+  render: props => <CssColorField {...props}/>,
+});
 
 export function globalConfigFor(type, siteKey = 'justconsignin') {
   const isJustin = siteKey === 'justindematteis';
@@ -117,6 +150,13 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
             nav7Label: { type: 'text', label: 'Link 7 label' }, nav7Url: { type: 'text', label: 'Link 7 URL' },
             buttonText: { type: 'text', label: 'Button text' },
             buttonUrl: { type: 'text', label: 'Button URL' },
+            ...(isJustin ? {
+              socialIconColor: cssColorField('Social icon colour'),
+              socialIconBackground: cssColorField('Social icon background'),
+              socialIconBorder: cssColorField('Social icon border'),
+              socialIconHoverColor: cssColorField('Social icon hover colour'),
+              socialIconHoverBackground: cssColorField('Social icon hover background'),
+            } : {}),
             background: { type: 'select', label: 'Background', options: backgroundOptions },
           },
           defaultProps: activeHeaderDefaults,
@@ -131,6 +171,13 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
                   : <strong>{p.brand}</strong>}
               </a>
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}</a>)}</nav>
+              {isJustin && <div className="global-social-preview" style={{
+                '--preview-social-color':p.socialIconColor,
+                '--preview-social-background':p.socialIconBackground,
+                '--preview-social-border':p.socialIconBorder,
+                '--preview-social-hover-color':p.socialIconHoverColor,
+                '--preview-social-hover-background':p.socialIconHoverBackground,
+              }}><span>in</span><span>GH</span></div>}
               {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
             </div>;
@@ -164,6 +211,13 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
           copyright: { type: 'text', label: 'Copyright text' },
           privacyLabel: { type: 'text', label: 'Privacy label' }, privacyUrl: { type: 'text', label: 'Privacy URL' },
           termsLabel: { type: 'text', label: 'Terms label' }, termsUrl: { type: 'text', label: 'Terms URL' },
+          ...(isJustin ? {
+            socialIconColor: cssColorField('Social icon colour'),
+            socialIconBackground: cssColorField('Social icon background'),
+            socialIconBorder: cssColorField('Social icon border'),
+            socialIconHoverColor: cssColorField('Social icon hover colour'),
+            socialIconHoverBackground: cssColorField('Social icon hover background'),
+          } : {}),
           background: { type: 'select', label: 'Background', options: backgroundOptions },
         },
         defaultProps: activeFooterDefaults,
@@ -176,7 +230,15 @@ export function globalConfigFor(type, siteKey = 'justconsignin') {
               <div><a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a><p>{p.tagline}</p></div>
               <div className="global-footer-links"><strong>{p.column1Title}</strong>{col1.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div className="global-footer-links"><strong>{p.column2Title}</strong>{col2.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
-              <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p><div className="global-social-placeholder">Social icons use your Social Links settings</div></div>
+              <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p>{isJustin
+                ? <div className="global-social-preview" style={{
+                    '--preview-social-color':p.socialIconColor,
+                    '--preview-social-background':p.socialIconBackground,
+                    '--preview-social-border':p.socialIconBorder,
+                    '--preview-social-hover-color':p.socialIconHoverColor,
+                    '--preview-social-hover-background':p.socialIconHoverBackground,
+                  }}><span>in</span><span>GH</span></div>
+                : <div className="global-social-placeholder">Social icons use your Social Links settings</div>}</div>
             </div>
             <div className="global-footer-bottom"><span>© {new Date().getFullYear()} {p.copyright}</span><span><a href={p.privacyUrl} onClick={previewClick}>{p.privacyLabel}</a><a href={p.termsUrl} onClick={previewClick}>{p.termsLabel}</a></span></div>
           </footer>;
