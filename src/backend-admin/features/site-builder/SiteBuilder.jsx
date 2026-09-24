@@ -340,7 +340,16 @@ export default function SiteBuilder() {
       Object.entries(components).forEach(([name, definition]) => {
         const originalRender = definition.render;
         const originalFields = definition.fields || {};
-        const defaultBackground = definition.defaultProps?.background || 'white';
+        const fallbackBackground = ['HeroBlock','ResumeHeroBlock','ShowcaseHeroBlock'].includes(name)
+          ? 'light'
+          : ['ProcessRowsBlock','ResumeAiBlock','CtaBlock'].includes(name)
+            ? 'dark'
+            : ['LargeCtaBlock','ResumeContactBlock'].includes(name)
+              ? 'primary'
+              : name === 'ProjectCardBlock'
+                ? 'page'
+                : 'white';
+        const defaultBackground = definition.defaultProps?.background || fallbackBackground;
 
         components[name] = {
           ...definition,
