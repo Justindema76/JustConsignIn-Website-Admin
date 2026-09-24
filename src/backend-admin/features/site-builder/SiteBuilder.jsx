@@ -312,6 +312,7 @@ export default function SiteBuilder() {
 
     if (siteKey === 'justindematteis') {
       Object.entries(resumeAliases).forEach(([alias, config]) => {
+        if (components[alias]) return;
         const base = siteBuilderConfig.components[config.base];
         if (!base) return;
         const defaultProps = config.defaultProps || base.defaultProps;
