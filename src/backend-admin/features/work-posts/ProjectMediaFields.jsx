@@ -19,6 +19,12 @@ export default function ProjectMediaFields({
   const logoRef = useRef(null);
   const heroRef = useRef(null);
   const sections = draft?.sections || {};
+  const heroFit = sections.heroImageFit || 'cover';
+  const heroRatio = sections.heroImageRatio || '4/3';
+  const heroPosition = sections.heroImagePosition || 'center';
+  const heroWidth = sections.heroImageWidth || '42';
+  const heroRadius = sections.heroImageRadius || '26';
+  const previewRatio = heroRatio === 'auto' ? '16/10' : heroRatio;
 
   const uploadLogo = async event => {
     const file = event.target.files?.[0];
@@ -99,8 +105,12 @@ export default function ProjectMediaFields({
       </div>
 
       <div className="work-post-hero-image-field">
-        <div className="work-post-hero-image-preview">
-          {sections.heroImage ? <img src={sections.heroImage} alt={sections.heroImageAlt || 'Hero image preview'}/> : <><Image size={28}/><span>No hero image</span></>}
+        <div className="work-post-hero-image-preview" style={{ aspectRatio: previewRatio }}>
+          {sections.heroImage ? <img
+            src={sections.heroImage}
+            alt={sections.heroImageAlt || 'Hero image preview'}
+            style={{ objectFit: heroFit, objectPosition: heroPosition, borderRadius: `${Math.min(Number(heroRadius) || 0, 18)}px` }}
+          /> : <><Image size={28}/><span>No hero image</span></>}
         </div>
         <div className="work-post-hero-image-controls">
           <strong>Hero image</strong>
@@ -119,6 +129,56 @@ export default function ProjectMediaFields({
               placeholder="Describe the hero image"
             />
           </label>
+
+          <div className="work-post-hero-options">
+            <label>Image fit
+              <select value={heroFit} onChange={event => updateSection('heroImageFit', event.target.value)}>
+                <option value="cover">Cover — crop to fill</option>
+                <option value="contain">Contain — show whole image</option>
+              </select>
+            </label>
+
+            <label>Aspect ratio
+              <select value={heroRatio} onChange={event => updateSection('heroImageRatio', event.target.value)}>
+                <option value="auto">Natural / auto</option>
+                <option value="1/1">Square 1:1</option>
+                <option value="4/3">4:3</option>
+                <option value="3/2">3:2</option>
+                <option value="16/9">16:9</option>
+              </select>
+            </label>
+
+            <label>Image position
+              <select value={heroPosition} onChange={event => updateSection('heroImagePosition', event.target.value)}>
+                <option value="center">Center</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+              </select>
+            </label>
+
+            <label>Image width
+              <select value={heroWidth} onChange={event => updateSection('heroImageWidth', event.target.value)}>
+                <option value="35">35%</option>
+                <option value="40">40%</option>
+                <option value="42">42%</option>
+                <option value="45">45%</option>
+                <option value="50">50%</option>
+              </select>
+            </label>
+
+            <label>Corner radius
+              <select value={heroRadius} onChange={event => updateSection('heroImageRadius', event.target.value)}>
+                <option value="0">Square</option>
+                <option value="12">Small</option>
+                <option value="20">Medium</option>
+                <option value="26">Rounded</option>
+                <option value="36">Extra rounded</option>
+              </select>
+            </label>
+          </div>
+
           <div className="site-admin-actions">
             <button className="site-admin-btn secondary small" type="button" onClick={openMedia}>Choose Media</button>
             <button className="site-admin-btn secondary small" type="button" onClick={() => heroRef.current?.click()} disabled={uploading === 'hero'}>
