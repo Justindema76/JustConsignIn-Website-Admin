@@ -34,6 +34,7 @@ export const DEFAULT_AI_SECTIONS = {
   footerCtaText: 'This AI Post can continue growing as the product changes.',
   footerCtaButtonText: '',
   footerCtaButtonUrl: '',
+  footerCtaTheme: 'dark',
   relatedEnabled: true,
   relatedEyebrow: 'More AI + Development',
   relatedHeading: 'Other apps and systems',
