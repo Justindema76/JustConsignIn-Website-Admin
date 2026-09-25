@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Mail, Phone, RefreshCw, Search, Trash2, Workflow } from 'lucide-react';
+import { Building2, ExternalLink, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import DemoRequestEmailHistory from '../demo-requests/components/DemoRequestEmailHistory';
 import ServiceRequestEmailComposer from './components/ServiceRequestEmailComposer';
@@ -8,11 +8,14 @@ import {
   loadServiceRequestEmails,
   loadServiceRequests,
   updateServiceRequest,
+  assignServiceRequestDepartment,
 } from './serviceRequests.service';
+import { loadDepartments } from '../departments/departments.service';
 
 const STATUS_OPTIONS = [
   ['new', 'New'],
   ['reviewing', 'Reviewing'],
+  ['needs_quote', 'Needs Quote'],
   ['contacted', 'Contacted'],
   ['discovery', 'Discovery'],
   ['proposal_sent', 'Proposal Sent'],
@@ -90,14 +93,22 @@ export default function ServiceRequestsAdmin() {
   const [emailOpen, setEmailOpen] = useState(false);
   const [emails, setEmails] = useState([]);
   const [emailsLoading, setEmailsLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState('');
+  const [assignmentNote, setAssignmentNote] = useState('');
+  const [assigning, setAssigning] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!accessToken) return;
     setLoading(true);
     setError('');
     try {
-      const rows = await loadServiceRequests(accessToken);
+      const [rows, departmentRows] = await Promise.all([
+        loadServiceRequests(accessToken),
+        loadDepartments(accessToken),
+      ]);
       setRequests(rows);
+      setDepartments(departmentRows);
       setSelectedId(current => current && rows.some(row => row.id === current) ? current : (rows[0]?.id || ''));
     } catch (err) {
       setError(err?.message || 'Unable to load service requests.');
@@ -139,6 +150,8 @@ export default function ServiceRequestsAdmin() {
     setSelectedId(selected.id);
     setDraftStatus(selected.status || 'new');
     setDraftNotes(selected.admin_notes || '');
+    setSelectedDepartmentId(selected.assigned_department_id || '');
+    setAssignmentNote('');
     setSuccess('');
     setEmailOpen(false);
   }, [selected?.id, selected?.status, selected?.admin_notes]);
@@ -168,7 +181,7 @@ export default function ServiceRequestsAdmin() {
     new: requests.filter(item => item.status === 'new').length,
     active: requests.filter(item => !['complete', 'declined', 'spam'].includes(item.status)).length,
     high: requests.filter(item => item.ai_priority === 'high' && !['complete', 'declined', 'spam'].includes(item.status)).length,
-    accepted: requests.filter(item => ['accepted', 'in_progress', 'complete'].includes(item.status)).length,
+    needsQuote: requests.filter(item => item.status === 'needs_quote').length,
   }), [requests]);
 
   const availableServices = useMemo(() => {
@@ -197,6 +210,32 @@ export default function ServiceRequestsAdmin() {
       setError(err?.message || 'Unable to save service request.');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function assignDepartment() {
+    if (!selected || !accessToken || !selectedDepartmentId) return;
+    setAssigning(true);
+    setError('');
+    setSuccess('');
+    try {
+      const payload = await assignServiceRequestDepartment(accessToken, {
+        requestId: selected.id,
+        departmentId: selectedDepartmentId,
+        note: assignmentNote,
+      });
+      if (payload?.request) {
+        setRequests(rows => rows.map(row => row.id === selected.id ? { ...row, ...payload.request } : row));
+        setDraftStatus(payload.request.status || 'needs_quote');
+      }
+      const departmentName = payload?.department?.name || 'department';
+      setSuccess(payload?.emailSent
+        ? `Assigned to ${departmentName} and quote-request email sent.`
+        : `Assigned to ${departmentName}, but the email failed: ${payload?.emailError || 'unknown email error'}`);
+    } catch (err) {
+      setError(err?.message || 'Unable to assign department.');
+    } finally {
+      setAssigning(false);
     }
   }
 
@@ -250,7 +289,7 @@ export default function ServiceRequestsAdmin() {
       <div className="site-admin-card"><span>New</span><strong>{counts.new}</strong></div>
       <div className="site-admin-card"><span>Active</span><strong>{counts.active}</strong></div>
       <div className="site-admin-card"><span>High Priority</span><strong>{counts.high}</strong></div>
-      <div className="site-admin-card"><span>Accepted+</span><strong>{counts.accepted}</strong></div>
+      <div className="site-admin-card"><span>Needs Quote</span><strong>{counts.needsQuote}</strong></div>
     </div>
 
     <div className="site-admin-toolbar demo-request-toolbar service-request-toolbar">
@@ -272,7 +311,7 @@ export default function ServiceRequestsAdmin() {
           <div className="demo-request-row-main">
             <strong>{request.company || request.name}</strong>
             <span>{request.name}</span>
-            <small>{serviceLabel(request.ai_primary_service || request.requested_service)} · {request.ai_summary || request.email}</small>
+            <small>{serviceLabel(request.ai_primary_service || request.requested_service)} · {request.assigned_department_name ? `Assigned: ${request.assigned_department_name}` : 'Unassigned'}</small>
           </div>
           <div className="demo-request-row-meta">
             {request.ai_priority === 'high' && <span className="service-request-priority high">High</span>}
@@ -301,6 +340,39 @@ export default function ServiceRequestsAdmin() {
           </div>
 
           {emailOpen && <ServiceRequestEmailComposer request={selected} accessToken={accessToken} onCancel={() => setEmailOpen(false)} onSent={handleEmailSent} />}
+
+          <section className="service-request-assignment-card">
+            <div className="service-request-assignment-head">
+              <div>
+                <p className="site-admin-eyebrow">Quote routing</p>
+                <h3>{selected.assigned_department_name ? `Assigned to ${selected.assigned_department_name}` : 'Choose a department'}</h3>
+                <p>The department email receives the request and a note to prepare a quote. No individual employee assignment yet.</p>
+              </div>
+              <Building2 size={21}/>
+            </div>
+            <div className="service-request-assignment-controls">
+              <label>
+                <span>Department</span>
+                <select value={selectedDepartmentId} onChange={event => setSelectedDepartmentId(event.target.value)}>
+                  <option value="">Select department</option>
+                  {departments.filter(item => item.active !== false).map(department => <option key={department.id} value={department.id}>{department.name} — {department.email}</option>)}
+                </select>
+              </label>
+              <label className="wide">
+                <span>Assignment note <small>(optional)</small></span>
+                <textarea rows="3" value={assignmentNote} onChange={event => setAssignmentNote(event.target.value)} placeholder="What should this department review or include in the quote?" />
+              </label>
+              <button className="site-admin-btn" type="button" onClick={assignDepartment} disabled={!selectedDepartmentId || assigning}>
+                <Send size={15}/>{assigning ? 'Assigning & sending…' : 'Assign Department & Send'}
+              </button>
+            </div>
+            {selected.assigned_department_name && <div className="service-request-assignment-meta">
+              <span>Department <strong>{selected.assigned_department_name}</strong></span>
+              <span>Email <strong>{selected.assigned_department_email}</strong></span>
+              <span>Assigned <strong>{formatDate(selected.assigned_at)}</strong></span>
+              <span>Assignment email <strong>{selected.assignment_email_sent_at ? `Sent ${formatDate(selected.assignment_email_sent_at)}` : (selected.assignment_email_error || 'Not sent')}</strong></span>
+            </div>}
+          </section>
 
           <section className="service-request-ai-card">
             <div className="service-request-ai-head">
