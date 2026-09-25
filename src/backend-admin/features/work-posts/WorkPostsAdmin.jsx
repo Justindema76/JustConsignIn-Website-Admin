@@ -379,6 +379,9 @@ export default function WorkPostsAdmin() {
           updateSection={updateSection}
           backLabel="Back to Work"
           backUrl="/work"
+          relatedEyebrowDefault="More Work"
+          relatedHeadingDefault="Related projects"
+          ctaTextDefault="This Work Post can continue growing as the project changes."
         />
 
         <div className="site-admin-card site-admin-side-card">
