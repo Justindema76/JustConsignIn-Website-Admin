@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, ExternalLink, Image, Plus, Save, Trash2, Upload, Video, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { getAdminSiteKey, loadAdminMedia, uploadWorkImage, uploadWorkVideo } from '../../services/siteAdminService';
+import { getAdminSiteKey, uploadWorkImage, uploadWorkVideo } from '../../services/siteAdminService';
 import {
   WORK_STATUS,
   createEmptyWorkPost,
@@ -12,6 +12,7 @@ import {
   saveAdminWorkPost,
   slugifyWork,
 } from './workPostStore';
+import ProjectMediaFields from './ProjectMediaFields';
 import './workPosts.css';
 
 const PORTFOLIO_PREVIEW_BASE = import.meta.env.VITE_PORTFOLIO_PREVIEW_URL || 'https://justin-de-matteis-main-site.vercel.app';
@@ -36,11 +37,6 @@ export default function WorkPostsAdmin() {
   const [uploading, setUploading] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [heroMediaOpen, setHeroMediaOpen] = useState(false);
-  const [heroMediaItems, setHeroMediaItems] = useState([]);
-  const [heroMediaBusy, setHeroMediaBusy] = useState(false);
-  const projectLogoRef = useRef(null);
-  const heroImageRef = useRef(null);
   const galleryRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -99,63 +95,6 @@ export default function WorkPostsAdmin() {
 
   const removeArrayItem = (key, index) => {
     updateSection(key, (draft.sections?.[key] || []).filter((_, itemIndex) => itemIndex !== index));
-  };
-
-  const uploadProjectLogo = async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading('logo'); setError('');
-    try {
-      const url = await uploadWorkImage(accessToken, file);
-      update('featuredImage', url);
-      update('featuredImageAlt', draft.featuredImageAlt || `${draft.company || draft.title || 'Project'} logo`);
-      setMessage('Project logo uploaded. Save the Work Post to keep it.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUploading('');
-      event.target.value = '';
-    }
-  };
-
-  const uploadHeroImage = async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading('hero'); setError('');
-    try {
-      const url = await uploadWorkImage(accessToken, file);
-      updateSection('heroImage', url);
-      updateSection('heroImageAlt', draft.sections?.heroImageAlt || `${draft.company || draft.title || 'Project'} case study hero image`);
-      setMessage('Hero image uploaded. Save the Work Post to keep it.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUploading('');
-      event.target.value = '';
-    }
-  };
-
-  const openHeroMedia = async () => {
-    setHeroMediaOpen(true);
-    if (heroMediaItems.length) return;
-    setHeroMediaBusy(true);
-    setError('');
-    try {
-      const items = await loadAdminMedia(accessToken);
-      setHeroMediaItems((items || []).filter(item => (item.mediaType || 'image') === 'image' && item.url));
-    } catch (err) {
-      setError(err.message || 'Unable to load the media library.');
-      setHeroMediaOpen(false);
-    } finally {
-      setHeroMediaBusy(false);
-    }
-  };
-
-  const chooseHeroMedia = item => {
-    updateSection('heroImage', item.url || '');
-    updateSection('heroImageAlt', draft.sections?.heroImageAlt || item.name || `${draft.company || draft.title || 'Project'} case study hero image`);
-    setHeroMediaOpen(false);
-    setMessage('Hero image selected from Media. Save the Work Post to keep it.');
   };
 
   const uploadGallery = async event => {
@@ -298,41 +237,17 @@ export default function WorkPostsAdmin() {
             <label className="wide">Short summary<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)}/></label>
           </div>
 
-          <div className="work-post-project-media">
-            <div className="work-post-logo-field">
-              <div className="work-post-logo-preview">
-                {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
-              </div>
-              <div>
-                <strong>Project logo</strong>
-                <p>Small logo used in the Project card.</p>
-                <div className="site-admin-actions">
-                  <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
-                  {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
-                </div>
-                <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
-              </div>
-            </div>
-
-            <div className="work-post-hero-image-field">
-              <div className="work-post-hero-image-preview">
-                {sections.heroImage ? <img src={sections.heroImage} alt={sections.heroImageAlt || 'Hero image preview'}/> : <><Image size={28}/><span>No hero image</span></>}
-              </div>
-              <div className="work-post-hero-image-controls">
-                <strong>Hero image</strong>
-                <p>Large image shown in the case study header beside the title and summary.</p>
-                <label>Image URL<input value={sections.heroImage || ''} onChange={event => updateSection('heroImage', event.target.value)} placeholder="Paste an existing image URL"/></label>
-                <label>Alt text<input value={sections.heroImageAlt || ''} onChange={event => updateSection('heroImageAlt', event.target.value)} placeholder="Describe the hero image"/></label>
-                <div className="site-admin-actions">
-                  <button className="site-admin-btn secondary small" type="button" onClick={openHeroMedia}>Choose Media</button>
-                  <button className="site-admin-btn secondary small" type="button" onClick={() => heroImageRef.current?.click()} disabled={uploading === 'hero'}><Upload size={13}/>{uploading === 'hero' ? 'Uploading…' : 'Upload New'}</button>
-                  {sections.heroImage && <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('heroImage', '')}>Remove</button>}
-                </div>
-                <input ref={heroImageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadHeroImage}/>
-              </div>
-            </div>
-          </div>
-        </div>
+          <ProjectMediaFields
+            accessToken={accessToken}
+            draft={draft}
+            update={update}
+            updateSection={updateSection}
+            uploading={uploading}
+            setUploading={setUploading}
+            setError={setError}
+            setMessage={setMessage}
+            postLabel="Work Post"
+          />
 
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head"><div><span>2</span><div><h2>{sections.overviewHeading || 'Overview'}</h2><p>The opening of the case study.</p></div></div></div>
@@ -476,20 +391,6 @@ export default function WorkPostsAdmin() {
         </div>}
       </aside>
     </form>
-    {heroMediaOpen && <div className="work-post-media-modal" onClick={() => setHeroMediaOpen(false)}>
-      <div className="work-post-media-modal-card" onClick={event => event.stopPropagation()}>
-        <div className="work-post-media-modal-head">
-          <div><strong>Choose from Media</strong><span>Select an image that is already uploaded.</span></div>
-          <button type="button" onClick={() => setHeroMediaOpen(false)} aria-label="Close media picker"><X size={18}/></button>
-        </div>
-        {heroMediaBusy ? <div className="work-post-empty-field">Loading media…</div> : <div className="work-post-media-library-grid">
-          {heroMediaItems.map(item => <button key={`${item.bucket || 'media'}:${item.path || item.url}`} type="button" onClick={() => chooseHeroMedia(item)}>
-            <img src={item.url} alt=""/>
-            <span>{item.name || 'Image'}</span>
-          </button>)}
-          {!heroMediaItems.length && <div className="work-post-empty-field">No uploaded images found.</div>}
-        </div>}
-      </div>
-    </div>}
+
   </>;
 }
