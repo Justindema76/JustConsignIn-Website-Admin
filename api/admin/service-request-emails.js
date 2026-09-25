@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     if (!message) return res.status(400).json({ error: 'Message is required.' });
 
     try {
-      const response = await fetch(`${supabaseUrl()}/functions/v1/send-site-email`, {
+      const response = await fetch(`${supabaseUrl()}/functions/v1/send-service-request-email`, {
         method: 'POST',
         headers: {
           apikey: supabaseAnon(),
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'service_reply',
+          action: 'reply',
           requestId,
           subject,
           message,
