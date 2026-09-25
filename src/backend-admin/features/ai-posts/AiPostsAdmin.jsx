@@ -379,6 +379,9 @@ export default function AiPostsAdmin() {
           updateSection={updateSection}
           backLabel="Back to AI + Development"
           backUrl="/ai-development"
+          relatedEyebrowDefault="More AI + Development"
+          relatedHeadingDefault="Other apps and systems"
+          ctaTextDefault="This AI Post can continue growing as the product changes."
         />
 
         <div className="site-admin-card site-admin-side-card">
