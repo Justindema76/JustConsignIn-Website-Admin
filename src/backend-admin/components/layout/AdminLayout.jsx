@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   BookOpen,
+  BriefcaseBusiness,
   ChevronDown,
   ExternalLink,
   Handshake,
@@ -32,6 +33,7 @@ const navGroups = [
     label: 'Leads & Growth',
     items: [
       { to: '/admin/service-requests', label: 'Service Requests', icon: Inbox, sites: ['justindematteis'] },
+      { to: '/admin/hiring-contacts', label: 'Hiring Contacts', icon: BriefcaseBusiness, sites: ['justindematteis'] },
       { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox, sites: ['justconsignin'] },
       { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake, sites: ['justconsignin'] },
       { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned, sites: ['justconsignin'] },
