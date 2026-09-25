@@ -5,6 +5,7 @@ import { loadEmailSettings, saveEmailSettings, sendEmailSettingsTest } from './e
 
 const EVENT_OPTIONS = [
   ['demo_request', 'Demo Requests'],
+  ['service_request', 'Service Requests'],
   ['beta_application', 'Beta Applications'],
   ['contact', 'Contact Form'],
   ['all', 'All website notifications'],
