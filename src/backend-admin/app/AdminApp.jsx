@@ -20,6 +20,7 @@ import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
 import WorkPostsAdmin from '../features/work-posts/WorkPostsAdmin';
 import AiPostsAdmin from '../features/ai-posts/AiPostsAdmin';
+import ServiceRequestsAdmin from '../features/service-requests/ServiceRequestsAdmin';
 
 export default function AdminApp() {
   return <Routes>
@@ -28,6 +29,7 @@ export default function AdminApp() {
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/admin/demo-requests" element={<DemoRequestsAdmin />} />
+        <Route path="/admin/service-requests" element={<ServiceRequestsAdmin />} />
         <Route path="/admin/beta-partners" element={<BetaApplicationsAdmin />} />
         <Route path="/admin/outreach" element={<OutreachMap />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
