@@ -32,6 +32,7 @@ const SITE_PROFILES = {
     routeId: 'service-primary',
     events: [
       ['service_request', 'Service Requests'],
+      ['hiring_contact', 'Hiring Contacts'],
       ['contact', 'Contact Form'],
       ['all', 'All website notifications'],
     ],
