@@ -14,6 +14,7 @@ import {
   Video,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getAdminSiteKey } from '../../services/siteAdminService';
 import './dashboard.css';
 
 const groups = [
@@ -46,6 +47,13 @@ const groups = [
         icon: Inbox,
         title: 'Demo Requests',
         copy: 'Review free-demo leads, contact stores, schedule walkthroughs, and manage follow-up.',
+      },
+      {
+        to: '/admin/service-requests',
+        icon: Inbox,
+        title: 'Service Requests',
+        copy: 'Review portfolio enquiries, AI routing, project details, email follow-up, and status.',
+        site: 'justindematteis',
       },
       {
         to: '/admin/beta-partners',
@@ -126,6 +134,7 @@ function initialOpenGroups() {
 }
 
 export default function Dashboard() {
+  const siteKey = getAdminSiteKey();
   const location = useLocation();
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState(initialOpenGroups);
@@ -169,7 +178,7 @@ export default function Dashboard() {
           </button>
 
           {open && <div className="dashboard-module-grid" id={`dashboard-group-${group.id}`}>
-            {group.modules.map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
+            {group.modules.filter(module => !module.site || module.site === siteKey).map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
               <span className="site-admin-module-icon"><Icon size={20}/></span>
               <span className="dashboard-module-copy">
                 <strong>{title}</strong>
