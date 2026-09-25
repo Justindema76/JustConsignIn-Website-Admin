@@ -23,7 +23,7 @@ const SITE_PROFILES = {
   },
   justindematteis: {
     label: 'Justin DeMatteis',
-    smtpHost: 'mail.justindematteis.com',
+    smtpHost: 'sh-cp11.yyz2.servername.online',
     smtpUsername: 'justin@justindematteis.com',
     fromEmail: 'justin@justindematteis.com',
     fromName: 'Justin DeMatteis',
