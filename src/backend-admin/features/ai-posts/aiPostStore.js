@@ -56,6 +56,7 @@ export const DEFAULT_AI_SECTIONS = {
   ongoingHeading: 'Ongoing work',
   ongoing: '',
   extras: [],
+  githubUrl: '',
 };
 
 function cloneSections(value = {}) {
