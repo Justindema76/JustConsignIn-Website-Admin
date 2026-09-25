@@ -12,7 +12,7 @@ insert into public.email_settings (
   password_secret_id, updated_at, updated_by
 )
 values (
-  'justindematteis', true, 'smtp', 'mail.justindematteis.com', 465, true,
+  'justindematteis', true, 'smtp', 'justindematteis.com', 465, true,
   'justin@justindematteis.com', 'justin@justindematteis.com', 'Justin DeMatteis',
   'justin@justindematteis.com',
   jsonb_build_array(jsonb_build_object(
