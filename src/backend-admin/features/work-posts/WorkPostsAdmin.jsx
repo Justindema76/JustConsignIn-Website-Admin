@@ -248,6 +248,7 @@ export default function WorkPostsAdmin() {
             setMessage={setMessage}
             postLabel="Work Post"
           />
+        </div>
 
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head"><div><span>2</span><div><h2>{sections.overviewHeading || 'Overview'}</h2><p>The opening of the case study.</p></div></div></div>
