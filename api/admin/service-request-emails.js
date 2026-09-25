@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseAnon, supabaseRest, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseAnon, supabaseUrl, supabaseUserRest } from '../_lib/supabase.js';
 
 function readBody(req) {
   if (!req.body) return {};
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     try {
       const select = 'id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id';
       const query = `service_request_emails?service_request_id=eq.${encodeURIComponent(requestId)}&select=${encodeURIComponent(select)}&order=created_at.desc&limit=200`;
-      const emails = await parseSupabase(await supabaseRest(query, { method: 'GET' }), 'Unable to load email history.');
+      const emails = await parseSupabase(await supabaseUserRest(owner.accessToken, query, { method: 'GET' }), 'Unable to load email history.');
       return res.status(200).json({ emails: Array.isArray(emails) ? emails : [] });
     } catch (error) {
       console.error('Service request email history GET failed', error);
