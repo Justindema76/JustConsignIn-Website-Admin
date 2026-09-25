@@ -341,7 +341,7 @@ export const siteBuilderConfig = {
     },
     marketing: {
       title: 'Marketing',
-      components: ['HeroBlock', 'CtaBlock', 'ServiceRequestBlock'],
+      components: ['HeroBlock', 'CtaBlock', 'ServiceRequestBlock', 'HiringContactBlock'],
     },
     showcase: {
       title: 'Showcase',
@@ -1421,6 +1421,56 @@ export const siteBuilderConfig = {
         </section>;
       },
     },
+    HiringContactBlock: {
+      label: 'Hiring / Interview Contact',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Intro text' },
+        submitButtonText: { type: 'text', label: 'Submit button text' },
+        successHeading: { type: 'text', label: 'Success heading' },
+        successText: { type: 'textarea', label: 'Success text' },
+        background: { type: 'select', label: 'Background', options: backgroundOptions },
+      },
+      defaultProps: {
+        eyebrow: 'Hiring & interviews',
+        heading: 'Interested in interviewing or hiring me?',
+        text: 'Use this form for job opportunities, interview requests or recruiter contact. Sales and service pitches are filtered.',
+        submitButtonText: 'Contact Justin',
+        successHeading: 'Message received.',
+        successText: 'Thanks. I received your employment-related message and will review it.',
+        background: 'white',
+      },
+      render: rawProps => {
+        const props = {
+          eyebrow: 'Hiring & interviews',
+          heading: 'Interested in interviewing or hiring me?',
+          text: 'Use this form for job opportunities, interview requests or recruiter contact. Sales and service pitches are filtered.',
+          submitButtonText: 'Contact Justin',
+          background: 'white',
+          ...rawProps,
+        };
+
+        return <section className={`jci-builder-section theme-${props.background || 'white'}`}>
+          <div className="jci-builder-eyebrow">{props.eyebrow}</div>
+          <h2 style={{margin:'8px 0 10px'}}>{props.heading}</h2>
+          <p>{props.text}</p>
+          <div style={{display:'grid',gap:'10px',marginTop:'18px',padding:'18px',border:'1px solid #d7dce1',borderRadius:'12px',background:'#fff'}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            </div>
+            <div style={{height:'110px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            <span className="jci-builder-button" style={{width:'max-content'}}>{props.submitButtonText}</span>
+          </div>
+        </section>;
+      },
+    },
+
     CtaBlock: {
       label: 'Call to Action',
       fields: {
