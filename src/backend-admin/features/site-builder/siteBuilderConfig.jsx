@@ -785,25 +785,52 @@ export const siteBuilderConfig = {
     },
 
     CardGridBlock: {
-      label: 'Card Grid',
+      label: 'Card Grid / Work Experience',
       fields: {
+        variant:{type:'select',label:'Layout',options:[{label:'Standard cards',value:'cards'},{label:'Resume work experience',value:'resume'}]},
         eyebrow:{type:'text',label:'Section eyebrow'},heading:{type:'text',label:'Section heading'},headingLevel:{...headingLevelField,label:'Section heading level'},itemHeadingLevel:{...headingLevelField,label:'Card title level'},text:{type:'text',label:'Section description'},
-        item1Eyebrow:{type:'text',label:'Card 1 eyebrow'},item1Title:{type:'text',label:'Card 1 title'},item1Text:{type:'text',label:'Card 1 text'},item1Icon:{type:'text',label:'Card 1 icon text'},item1Style:{type:'select',label:'Card 1 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
-        item2Eyebrow:{type:'text',label:'Card 2 eyebrow'},item2Title:{type:'text',label:'Card 2 title'},item2Text:{type:'text',label:'Card 2 text'},item2Icon:{type:'text',label:'Card 2 icon text'},item2Style:{type:'select',label:'Card 2 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
-        item3Eyebrow:{type:'text',label:'Card 3 eyebrow'},item3Title:{type:'text',label:'Card 3 title'},item3Text:{type:'text',label:'Card 3 text'},item3Icon:{type:'text',label:'Card 3 icon text'},item3Style:{type:'select',label:'Card 3 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
-        item4Eyebrow:{type:'text',label:'Card 4 eyebrow'},item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'text',label:'Card 4 text'},item4Icon:{type:'text',label:'Card 4 icon text'},item4Style:{type:'select',label:'Card 4 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
+        item1Date:{type:'text',label:'Item 1 date'},item1Location:{type:'text',label:'Item 1 location'},item1Company:{type:'text',label:'Item 1 company'},item1Tags:{type:'text',label:'Item 1 tags (comma separated)'},item1Eyebrow:{type:'text',label:'Card 1 eyebrow'},item1Title:{type:'text',label:'Card 1 title'},item1Text:{type:'textarea',label:'Card 1 text'},item1Icon:{type:'text',label:'Card 1 icon text'},item1Style:{type:'select',label:'Card 1 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
+        item2Date:{type:'text',label:'Item 2 date'},item2Location:{type:'text',label:'Item 2 location'},item2Company:{type:'text',label:'Item 2 company'},item2Tags:{type:'text',label:'Item 2 tags (comma separated)'},item2Eyebrow:{type:'text',label:'Card 2 eyebrow'},item2Title:{type:'text',label:'Card 2 title'},item2Text:{type:'textarea',label:'Card 2 text'},item2Icon:{type:'text',label:'Card 2 icon text'},item2Style:{type:'select',label:'Card 2 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
+        item3Date:{type:'text',label:'Item 3 date'},item3Location:{type:'text',label:'Item 3 location'},item3Company:{type:'text',label:'Item 3 company'},item3Tags:{type:'text',label:'Item 3 tags (comma separated)'},item3Eyebrow:{type:'text',label:'Card 3 eyebrow'},item3Title:{type:'text',label:'Card 3 title'},item3Text:{type:'textarea',label:'Card 3 text'},item3Icon:{type:'text',label:'Card 3 icon text'},item3Style:{type:'select',label:'Card 3 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
+        item4Date:{type:'text',label:'Item 4 date'},item4Location:{type:'text',label:'Item 4 location'},item4Company:{type:'text',label:'Item 4 company'},item4Tags:{type:'text',label:'Item 4 tags (comma separated)'},item4Eyebrow:{type:'text',label:'Card 4 eyebrow'},item4Title:{type:'text',label:'Card 4 title'},item4Text:{type:'textarea',label:'Card 4 text'},item4Icon:{type:'text',label:'Card 4 icon text'},item4Style:{type:'select',label:'Card 4 style',options:[{label:'White',value:'white'},{label:'Blue',value:'blue'},{label:'Dark',value:'dark'}]},
+        buttonText:{type:'text',label:'CTA button text'},buttonUrl:{type:'text',label:'CTA button link'},
       },
       defaultProps: {
+        variant:'cards',
         eyebrow:'Selected work',heading:'Projects that solve something real.',headingLevel:'h2',itemHeadingLevel:'h3',text:'The goal of every project is the same: make a business process clearer, faster or easier to manage.',
         item1Eyebrow:'Professional work',item1Title:'Wheels Automotive',item1Text:'Adobe Commerce / Magento, B2B ecommerce, frontend components, QA, product/category content, SEO and launch support.',item1Icon:'WA',item1Style:'dark',
         item2Eyebrow:'Custom business tools',item2Title:'Internal tools & admin systems',item2Text:'Dashboards, data-entry workflows, admin tools and interfaces designed around how people actually perform the work.',item2Icon:'UI',item2Style:'white',
         item3Eyebrow:'Ecommerce',item3Title:'Shopify & commerce integrations',item3Text:'Product workflows, POS-connected applications, publishing controls and custom ecommerce experiences.',item3Icon:'EC',item3Style:'blue',
         item4Eyebrow:'AI-assisted development',item4Title:'From idea to working software faster.',item4Text:'AI supports architecture, prototyping, debugging, refactoring, UX exploration, research and documentation while product direction stays human-led.',item4Icon:'AI',item4Style:'white',
+        buttonText:'View Work Experience →',buttonUrl:'/work',
       },
-      render: p => <section className="shared-card-grid-section"><div className="shared-wrap">
-        {(p.eyebrow || p.heading || p.text) && <div className="shared-card-grid-heading">{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading>}{p.text && <p className="shared-lead">{p.text}</p>}</div>}
-        <div className="shared-work-grid">{[1,2,3,4].map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><BlockHeading level={p.itemHeadingLevel || 'h3'} className="shared-work-card-heading">{p['item'+i+'Title']}</BlockHeading><p>{p['item'+i+'Text']}</p></article>)}</div>
-      </div></section>,
+      render: p => {
+        if (p.variant === 'resume') {
+          const items = [1,2,3,4].filter(i => p['item'+i+'Title'] || p['item'+i+'Company'] || p['item'+i+'Text']);
+          return <section className="resume-work-preview-section"><div className="shared-wrap">
+            <div className="resume-work-preview-head">
+              <div>{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <BlockHeading level={p.headingLevel || 'h2'} className="resume-work-preview-heading">{p.heading}</BlockHeading>}</div>
+              {p.text && <p className="resume-work-preview-intro">{p.text}</p>}
+            </div>
+            <div className="resume-work-preview-list">
+              {items.map((i,index)=>{
+                const tags=String(p['item'+i+'Tags']||'').split(',').map(v=>v.trim()).filter(Boolean);
+                return <article className="resume-work-preview-card" key={i}>
+                  <div className="resume-work-preview-marker">{String(index+1).padStart(2,'0')}</div>
+                  <div className="resume-work-preview-meta"><span className="resume-work-preview-date">{p['item'+i+'Date'] || p['item'+i+'Eyebrow']}</span>{p['item'+i+'Location'] && <span className="resume-work-preview-location">{p['item'+i+'Location']}</span>}</div>
+                  <div className="resume-work-preview-content"><BlockHeading level={p.itemHeadingLevel || 'h3'} className="resume-work-preview-title">{p['item'+i+'Title']}</BlockHeading>{p['item'+i+'Company'] && <div className="resume-work-preview-company">{p['item'+i+'Company']}</div>}{p['item'+i+'Text'] && <p>{p['item'+i+'Text']}</p>}{tags.length>0 && <div className="resume-work-preview-tags">{tags.map(tag=><span key={tag}>{tag}</span>)}</div>}</div>
+                </article>;
+              })}
+            </div>
+            {p.buttonText && <div className="shared-section-cta"><a className="shared-btn shared-btn-primary" href={p.buttonUrl || '/work'} onClick={previewClick}>{p.buttonText}</a></div>}
+          </div></section>;
+        }
+        return <section className="shared-card-grid-section"><div className="shared-wrap">
+          {(p.eyebrow || p.heading || p.text) && <div className="shared-card-grid-heading">{p.eyebrow && <div className="shared-eyebrow">{p.eyebrow}</div>}{p.heading && <BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading>}{p.text && <p className="shared-lead">{p.text}</p>}</div>}
+          <div className="shared-work-grid">{[1,2,3,4].filter(i=>p['item'+i+'Title'] || p['item'+i+'Text']).map(i=><article className={'shared-work-card '+(p['item'+i+'Style']||'white')} key={i}><div className="shared-card-icon">{p['item'+i+'Icon']}</div><div className="shared-eyebrow">{p['item'+i+'Eyebrow']}</div><BlockHeading level={p.itemHeadingLevel || 'h3'} className="shared-work-card-heading">{p['item'+i+'Title']}</BlockHeading><p>{p['item'+i+'Text']}</p></article>)}</div>
+          {p.buttonText && <div className="shared-section-cta"><a className="shared-btn shared-btn-primary" href={p.buttonUrl || '/work'} onClick={previewClick}>{p.buttonText}</a></div>}
+        </div></section>;
+      },
     },
 
     StorySplitBlock: {
