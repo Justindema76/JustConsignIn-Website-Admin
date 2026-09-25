@@ -8,6 +8,8 @@ export const DEFAULT_WORK_SECTIONS = {
   overview: '',
   overviewSecondary: '',
   quote: '',
+  heroImage: '',
+  heroImageAlt: '',
   problemHeading: 'The business problem',
   problem: '',
   problemPoints: [],
