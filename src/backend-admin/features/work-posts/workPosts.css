@@ -77,3 +77,8 @@
 .case-study-button-group-head strong{font-size:13px;color:#0f172a}
 .case-study-button-toggle,.case-study-button-check{display:flex!important;align-items:center;gap:7px;margin:0!important;font-size:12px!important;font-weight:800!important;color:#475569!important}
 .case-study-button-toggle input,.case-study-button-check input{width:15px!important;height:15px!important;margin:0!important}
+
+
+.case-study-control-section{display:grid;gap:10px;padding-top:14px;border-top:1px solid #e2e8f0}
+.case-study-control-section:first-of-type{padding-top:0;border-top:0}
+.case-study-control-section h3{margin:0;color:#0f172a;font-size:13px}
