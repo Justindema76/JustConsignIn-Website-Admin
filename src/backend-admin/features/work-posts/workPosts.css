@@ -49,3 +49,19 @@
 @media(max-width:1050px){.work-post-editor-grid{grid-template-columns:1fr}.work-post-editor-side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.work-post-fields,.work-post-media-editor-grid,.work-post-editor-side{grid-template-columns:1fr}}
 @media(max-width:700px){.site-admin-table-head.work-post-list{display:none}.site-admin-table-row.work-post-list{grid-template-columns:1fr;gap:9px}.work-post-panel{padding:17px}.work-post-panel-head{flex-direction:column}.work-post-logo-field{grid-template-columns:1fr}.work-post-logo-preview{width:82px}}
+
+
+.work-post-media-modal{position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.54);display:grid;place-items:center;padding:24px}
+.work-post-media-modal-card{width:min(980px,100%);max-height:min(760px,90vh);overflow:auto;background:#fff;border:1px solid #dbe4ee;border-radius:18px;box-shadow:0 28px 80px rgba(15,23,42,.25);padding:18px}
+.work-post-media-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px}
+.work-post-media-modal-head>div{display:grid;gap:3px}
+.work-post-media-modal-head strong{font-size:18px;color:#0f172a}
+.work-post-media-modal-head span{font-size:12px;color:#64748b}
+.work-post-media-modal-head button{width:34px;height:34px;border:0;border-radius:9px;background:#f1f5f9;color:#334155;display:grid;place-items:center;cursor:pointer}
+.work-post-media-library-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.work-post-media-library-grid button{display:grid;gap:8px;text-align:left;border:1px solid #dbe4ee;border-radius:12px;background:#fff;padding:8px;cursor:pointer}
+.work-post-media-library-grid button:hover{border-color:#2f6bff;box-shadow:0 0 0 2px rgba(47,107,255,.12)}
+.work-post-media-library-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:9px;background:#f8fafc}
+.work-post-media-library-grid span{font-size:11px;font-weight:800;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:900px){.work-post-media-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.work-post-media-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.work-post-media-modal{padding:12px}}
