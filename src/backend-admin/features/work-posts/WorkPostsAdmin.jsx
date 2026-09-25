@@ -13,6 +13,7 @@ import {
   slugifyWork,
 } from './workPostStore';
 import ProjectMediaFields from './ProjectMediaFields';
+import CaseStudyButtonFields from './CaseStudyButtonFields';
 import './workPosts.css';
 
 const PORTFOLIO_PREVIEW_BASE = import.meta.env.VITE_PORTFOLIO_PREVIEW_URL || 'https://justin-de-matteis-main-site.vercel.app';
@@ -369,9 +370,16 @@ export default function WorkPostsAdmin() {
         <div className="site-admin-card site-admin-side-card">
           <h2>Project details</h2>
           <label>Technology tags<textarea rows="5" value={(draft.tags || []).join(', ')} onChange={event => update('tags', tagsFrom(event.target.value))}/></label>
-          <label>Primary project URL<input value={draft.projectUrl} onChange={event => update('projectUrl', event.target.value)}/></label>
-          <label>Secondary URL<input value={draft.secondaryUrl} onChange={event => update('secondaryUrl', event.target.value)} placeholder="YouTube, GitHub, demo…"/></label>
+          <label>Secondary project URL<input value={draft.secondaryUrl} onChange={event => update('secondaryUrl', event.target.value)} placeholder="YouTube, GitHub, demo…"/></label>
         </div>
+
+        <CaseStudyButtonFields
+          draft={draft}
+          update={update}
+          updateSection={updateSection}
+          backLabel="Back to Work"
+          backUrl="/work"
+        />
 
         <div className="site-admin-card site-admin-side-card">
           <h2>SEO</h2>
