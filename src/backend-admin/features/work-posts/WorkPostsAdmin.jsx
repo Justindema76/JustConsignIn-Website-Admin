@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, ExternalLink, Image, Plus, Save, Trash2, Upload, Video, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { getAdminSiteKey, uploadWorkImage, uploadWorkVideo } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminMedia, uploadWorkImage, uploadWorkVideo } from '../../services/siteAdminService';
 import {
   WORK_STATUS,
   createEmptyWorkPost,
@@ -36,6 +36,9 @@ export default function WorkPostsAdmin() {
   const [uploading, setUploading] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [heroMediaOpen, setHeroMediaOpen] = useState(false);
+  const [heroMediaItems, setHeroMediaItems] = useState([]);
+  const [heroMediaBusy, setHeroMediaBusy] = useState(false);
   const projectLogoRef = useRef(null);
   const heroImageRef = useRef(null);
   const galleryRef = useRef(null);
@@ -130,6 +133,29 @@ export default function WorkPostsAdmin() {
       setUploading('');
       event.target.value = '';
     }
+  };
+
+  const openHeroMedia = async () => {
+    setHeroMediaOpen(true);
+    if (heroMediaItems.length) return;
+    setHeroMediaBusy(true);
+    setError('');
+    try {
+      const items = await loadAdminMedia(accessToken);
+      setHeroMediaItems((items || []).filter(item => (item.mediaType || 'image') === 'image' && item.url));
+    } catch (err) {
+      setError(err.message || 'Unable to load the media library.');
+      setHeroMediaOpen(false);
+    } finally {
+      setHeroMediaBusy(false);
+    }
+  };
+
+  const chooseHeroMedia = item => {
+    updateSection('heroImage', item.url || '');
+    updateSection('heroImageAlt', draft.sections?.heroImageAlt || item.name || `${draft.company || draft.title || 'Project'} case study hero image`);
+    setHeroMediaOpen(false);
+    setMessage('Hero image selected from Media. Save the Work Post to keep it.');
   };
 
   const uploadGallery = async event => {
@@ -295,9 +321,11 @@ export default function WorkPostsAdmin() {
               <div className="work-post-hero-image-controls">
                 <strong>Hero image</strong>
                 <p>Large image shown in the case study header beside the title and summary.</p>
+                <label>Image URL<input value={sections.heroImage || ''} onChange={event => updateSection('heroImage', event.target.value)} placeholder="Paste an existing image URL"/></label>
                 <label>Alt text<input value={sections.heroImageAlt || ''} onChange={event => updateSection('heroImageAlt', event.target.value)} placeholder="Describe the hero image"/></label>
                 <div className="site-admin-actions">
-                  <button className="site-admin-btn secondary small" type="button" onClick={() => heroImageRef.current?.click()} disabled={uploading === 'hero'}><Upload size={13}/>{uploading === 'hero' ? 'Uploading…' : 'Upload Hero Image'}</button>
+                  <button className="site-admin-btn secondary small" type="button" onClick={openHeroMedia}>Choose Media</button>
+                  <button className="site-admin-btn secondary small" type="button" onClick={() => heroImageRef.current?.click()} disabled={uploading === 'hero'}><Upload size={13}/>{uploading === 'hero' ? 'Uploading…' : 'Upload New'}</button>
                   {sections.heroImage && <button className="site-admin-btn secondary small" type="button" onClick={() => updateSection('heroImage', '')}>Remove</button>}
                 </div>
                 <input ref={heroImageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadHeroImage}/>
@@ -448,5 +476,20 @@ export default function WorkPostsAdmin() {
         </div>}
       </aside>
     </form>
+    {heroMediaOpen && <div className="work-post-media-modal" onClick={() => setHeroMediaOpen(false)}>
+      <div className="work-post-media-modal-card" onClick={event => event.stopPropagation()}>
+        <div className="work-post-media-modal-head">
+          <div><strong>Choose from Media</strong><span>Select an image that is already uploaded.</span></div>
+          <button type="button" onClick={() => setHeroMediaOpen(false)} aria-label="Close media picker"><X size={18}/></button>
+        </div>
+        {heroMediaBusy ? <div className="work-post-empty-field">Loading media…</div> : <div className="work-post-media-library-grid">
+          {heroMediaItems.map(item => <button key={`${item.bucket || 'media'}:${item.path || item.url}`} type="button" onClick={() => chooseHeroMedia(item)}>
+            <img src={item.url} alt=""/>
+            <span>{item.name || 'Image'}</span>
+          </button>)}
+          {!heroMediaItems.length && <div className="work-post-empty-field">No uploaded images found.</div>}
+        </div>}
+      </div>
+    </div>}
   </>;
 }
