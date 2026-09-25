@@ -58,8 +58,9 @@ function userClient(token: string) {
   });
 }
 
-async function loadSettings() {
-  const { data, error } = await admin.rpc('service_get_email_settings');
+async function loadSettings(siteKey = 'justconsignin') {
+  const safeSiteKey = siteKey === 'justindematteis' ? 'justindematteis' : 'justconsignin';
+  const { data, error } = await admin.rpc('service_get_email_settings', { p_site_key: safeSiteKey });
   if (error) throw new Error(`Unable to load email settings: ${error.message}`);
   const settings = Array.isArray(data) ? data[0] : data;
   if (!settings?.enabled) throw new Error('Email notifications are disabled in Website Admin.');
@@ -143,7 +144,7 @@ async function sendDemo(body: any) {
 
   await admin.from('demo_requests').update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
   try {
-    const settings = await loadSettings();
+    const settings = await loadSettings('justconsignin');
     await transportFor(settings).sendMail(demoMessage(record, settings));
     await admin.from('demo_requests').update({ email_notified_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
     return Response.json({ ok: true, sent: true });
@@ -197,7 +198,7 @@ async function sendReply(req: Request, body: any) {
   const to = clean(record.email, 320).toLowerCase();
   if (!validEmail(to)) return Response.json({ error: 'The demo request does not have a valid email address.' }, { status: 400 });
 
-  const settings = await loadSettings();
+  const settings = await loadSettings('justconsignin');
   const fromEmail = clean(settings.smtp_from_email, 320).toLowerCase();
   const sentAt = new Date().toISOString();
   const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
@@ -372,7 +373,7 @@ async function sendSchedule(req: Request, body: any) {
   }
 
   try {
-    const settings = await loadSettings();
+    const settings = await loadSettings('justconsignin');
     const email = scheduleEmail(record, updatedRequest.scheduled_at, durationMinutes, timezone, location, notes, settings);
     const invite = buildCalendarInvite(record, updatedRequest.scheduled_at, durationMinutes, location, notes, settings);
     const subject = 'Your JustConsignIn demo is scheduled';
@@ -474,7 +475,7 @@ async function sendServiceRequestNotification(body: any) {
   await admin.from('service_requests').update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
 
   try {
-    const settings = await loadSettings();
+    const settings = await loadSettings('justindematteis');
     await transportFor(settings).sendMail(serviceRequestMessage(record, settings));
     await admin.from('service_requests').update({ email_notified_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
     return Response.json({ ok: true, sent: true });
@@ -527,7 +528,7 @@ async function sendServiceRequestReply(req: Request, body: any) {
   const to = clean(record.email, 320).toLowerCase();
   if (!validEmail(to)) return Response.json({ error: 'The service request does not have a valid email address.' }, { status: 400 });
 
-  const settings = await loadSettings();
+  const settings = await loadSettings('justindematteis');
   const fromEmail = clean(settings.smtp_from_email, 320).toLowerCase();
   const sentAt = new Date().toISOString();
   const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
@@ -579,21 +580,27 @@ async function sendServiceRequestReply(req: Request, body: any) {
   }
 }
 
-async function sendTest(req: Request) {
+async function sendTest(req: Request, body: any) {
   const ownerAuth = await requireOwner(req);
   if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  const siteKey = clean(body?.siteKey, 80).toLowerCase() === 'justindematteis' ? 'justindematteis' : 'justconsignin';
+  const eventKey = siteKey === 'justindematteis' ? 'service_request' : 'demo_request';
+  const siteLabel = siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn';
+  const eventLabel = siteKey === 'justindematteis' ? 'Service Requests' : 'Demo Requests';
+
   try {
-    const settings = await loadSettings();
+    const settings = await loadSettings(siteKey);
     const transport = transportFor(settings);
     await transport.verify();
     await transport.sendMail({
       from: fromAddress(settings),
-      ...recipientsFor(settings, 'demo_request'),
-      subject: 'JustConsignIn Email Settings Test',
-      text: 'Your Website Admin SMTP settings and Demo Requests routing are working.',
-      html: '<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="margin:0 0 12px">Email settings are working</h2><p>Your JustConsignIn Website Admin successfully connected to the configured SMTP server and sent this message using the saved Demo Requests routing.</p></div>',
+      ...recipientsFor(settings, eventKey),
+      subject: `${siteLabel} Email Settings Test`,
+      text: `Your Website Admin SMTP settings and ${eventLabel} routing are working.`,
+      html: `<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="margin:0 0 12px">Email settings are working</h2><p>Your ${siteLabel} Website Admin successfully connected to the configured SMTP server and sent this message using the saved ${eventLabel} routing.</p></div>`,
     });
-    return Response.json({ ok: true, sent: true });
+    return Response.json({ ok: true, sent: true, siteKey });
   } catch (error) {
     const message = clean(error instanceof Error ? error.message : error, 1000) || 'Email test failed.';
     console.error('SMTP test failed', message);
@@ -610,6 +617,6 @@ Deno.serve(async (req: Request) => {
   if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'service_reply') return sendServiceRequestReply(req, body);
   if (body.action === 'schedule') return sendSchedule(req, body);
-  if (body.action === 'test') return sendTest(req);
+  if (body.action === 'test') return sendTest(req, body);
   return Response.json({ error: 'Invalid action' }, { status: 400 });
 });
