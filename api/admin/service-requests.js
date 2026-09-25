@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 
 const SITE_KEY = 'justindematteis';
 const STATUSES = new Set(['new', 'reviewing', 'contacted', 'discovery', 'proposal_sent', 'accepted', 'in_progress', 'complete', 'declined', 'spam']);
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const query = `service_requests?site_key=eq.${encodeURIComponent(SITE_KEY)}&select=${encodeURIComponent(SELECT)}&order=created_at.desc&limit=500`;
-      const requests = await parseSupabase(await supabaseRest(query, { method: 'GET' }), 'Unable to load service requests.');
+      const requests = await parseSupabase(await supabaseUserRest(owner.accessToken, query, { method: 'GET' }), 'Unable to load service requests.');
       return res.status(200).json({ requests: Array.isArray(requests) ? requests : [] });
     } catch (error) {
       console.error('Service requests GET failed', error);
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 
     try {
       const query = `service_requests?id=eq.${encodeURIComponent(id)}&site_key=eq.${encodeURIComponent(SITE_KEY)}&select=${encodeURIComponent(SELECT)}`;
-      const rows = await parseSupabase(await supabaseRest(query, {
+      const rows = await parseSupabase(await supabaseUserRest(owner.accessToken, query, {
         method: 'PATCH',
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify(patch),
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
 
     try {
       const query = `service_requests?id=eq.${encodeURIComponent(id)}&site_key=eq.${encodeURIComponent(SITE_KEY)}&select=id`;
-      const rows = await parseSupabase(await supabaseRest(query, {
+      const rows = await parseSupabase(await supabaseUserRest(owner.accessToken, query, {
         method: 'DELETE',
         headers: { Prefer: 'return=representation' },
       }), 'Unable to delete service request.');
