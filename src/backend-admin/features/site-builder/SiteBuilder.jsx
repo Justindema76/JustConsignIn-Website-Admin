@@ -109,7 +109,7 @@ export default function SiteBuilder() {
     ];
 
     const resumeBlocks = [
-      'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeAiBlock',
+      'ResumeHeroBlock', 'ResumeSkillsBlock', 'WorkExperiencePreviewBlock', 'ResumeProjectsBlock', 'ResumeAiBlock',
       'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock',
     ];
 
@@ -340,7 +340,7 @@ export default function SiteBuilder() {
       Object.entries(components).forEach(([name, definition]) => {
         const originalRender = definition.render;
         const originalFields = definition.fields || {};
-        const fallbackBackground = ['HeroBlock','ResumeHeroBlock','ShowcaseHeroBlock'].includes(name)
+        const fallbackBackground = ['HeroBlock','ResumeHeroBlock','ShowcaseHeroBlock','WorkExperiencePreviewBlock'].includes(name)
           ? 'light'
           : ['ProcessRowsBlock','ResumeAiBlock','CtaBlock'].includes(name)
             ? 'dark'
