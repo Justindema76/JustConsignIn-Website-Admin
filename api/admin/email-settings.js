@@ -1,5 +1,6 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 import { supabaseAnon, supabaseUrl, supabaseUserRest } from '../_lib/supabase.js';
+import { loadSiteEmailSettings, recipientsFor, sendSiteEmail } from '../_lib/smtp.js';
 
 const ROUTE_TYPES = new Set(['to', 'cc', 'bcc']);
 const EVENT_KEY = /^[a-z0-9_-]{1,60}$/;
@@ -178,6 +179,18 @@ export default async function handler(req, res) {
     if (body.action !== 'test') return res.status(400).json({ error: 'Invalid action.' });
 
     try {
+      if (siteKey === 'justindematteis') {
+        const settings = await loadSiteEmailSettings(siteKey);
+        const recipients = recipientsFor(settings, site.requiredEvent);
+        await sendSiteEmail(settings, {
+          ...recipients,
+          subject: 'Justin DeMatteis Email Settings Test',
+          text: 'Your Website Admin SMTP settings and Service Requests routing are working.',
+          html: '<div style="font-family:Arial,sans-serif;padding:24px"><h2 style="margin:0 0 12px">Email settings are working</h2><p>Your Justin DeMatteis Website Admin successfully connected to HostPapa and sent this message using the saved Service Requests routing.</p></div>',
+        });
+        return res.status(200).json({ ok: true, message: 'Test email sent.' });
+      }
+
       const response = await fetch(`${supabaseUrl()}/functions/v1/send-site-email`, {
         method: 'POST',
         headers: {
@@ -191,8 +204,9 @@ export default async function handler(req, res) {
       if (!response.ok) return res.status(502).json({ error: payload?.error || 'Test email failed.' });
       return res.status(200).json({ ok: true, message: 'Test email sent.' });
     } catch (error) {
+      const message = error?.message || 'Test email failed.';
       console.error('Email settings test failed', error);
-      return res.status(502).json({ error: 'Test email failed.' });
+      return res.status(502).json({ error: message });
     }
   }
 
