@@ -233,6 +233,14 @@
   margin-top: 24px;
 }
 
+.jci-builder-hero-media {
+  min-width: 0;
+}
+
+.jci-builder-hero-media .jci-builder-hero-actions {
+  margin-top: 16px;
+}
+
 .jci-builder-hero-media img,
 .jci-builder-image-text-media img {
   width: 100%;
