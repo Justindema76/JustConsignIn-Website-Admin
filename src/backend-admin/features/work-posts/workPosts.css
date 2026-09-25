@@ -68,3 +68,12 @@
 .work-post-media-library-grid span{font-size:11px;font-weight:800;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:900px){.work-post-media-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:640px){.work-post-media-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.work-post-media-modal{padding:12px}}
+
+
+.case-study-button-controls{display:grid;gap:14px}
+.case-study-button-help{margin:-6px 0 0;color:#64748b;font-size:12px;line-height:1.45}
+.case-study-button-group{display:grid;gap:10px;padding:12px;border:1px solid #dbe4ee;border-radius:12px;background:#fbfcfe}
+.case-study-button-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.case-study-button-group-head strong{font-size:13px;color:#0f172a}
+.case-study-button-toggle,.case-study-button-check{display:flex!important;align-items:center;gap:7px;margin:0!important;font-size:12px!important;font-weight:800!important;color:#475569!important}
+.case-study-button-toggle input,.case-study-button-check input{width:15px!important;height:15px!important;margin:0!important}
