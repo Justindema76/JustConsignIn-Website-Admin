@@ -32,6 +32,7 @@ const navGroups = [
     label: 'Leads & Growth',
     items: [
       { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox },
+      { to: '/admin/service-requests', label: 'Service Requests', icon: Inbox, site: 'justindematteis' },
       { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake },
       { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned },
     ],
@@ -77,8 +78,8 @@ const navGroups = [
 
 const desktopDefaults = Object.fromEntries(navGroups.map(group => [group.id, true]));
 
-function isPathInGroup(pathname, group) {
-  return group.items.some(item => pathname === item.to || pathname.startsWith(`${item.to}/`));
+function isPathInGroup(pathname, group, siteKey) {
+  return group.items.some(item => (!item.site || item.site === siteKey) && (pathname === item.to || pathname.startsWith(`${item.to}/`)));
 }
 
 export default function AdminLayout() {
@@ -91,15 +92,15 @@ export default function AdminLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState(() => {
     if (typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches) {
-      const active = navGroups.find(group => isPathInGroup(window.location.pathname, group));
+      const active = navGroups.find(group => isPathInGroup(window.location.pathname, group, getAdminSiteKey()));
       return active ? { [active.id]: true } : {};
     }
     return desktopDefaults;
   });
 
   const activeGroupId = useMemo(
-    () => navGroups.find(group => isPathInGroup(location.pathname, group))?.id || '',
-    [location.pathname],
+    () => navGroups.find(group => isPathInGroup(location.pathname, group, siteKey))?.id || '',
+    [location.pathname, siteKey],
   );
 
   useEffect(() => {
@@ -168,7 +169,7 @@ export default function AdminLayout() {
               <ChevronDown size={15} className={open ? 'open' : ''}/>
             </button>
             <div className={`site-admin-nav-group-links ${open ? 'open' : ''}`}>
-              {group.items.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
+              {group.items.filter(item => !item.site || item.site === siteKey).map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
                 <Icon size={17}/><span>{label}</span>
               </NavLink>)}
             </div>
