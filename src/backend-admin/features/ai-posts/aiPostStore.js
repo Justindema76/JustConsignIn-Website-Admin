@@ -8,6 +8,8 @@ export const DEFAULT_AI_SECTIONS = {
   overview: '',
   overviewSecondary: '',
   quote: '',
+  heroImage: '',
+  heroImageAlt: '',
   problemHeading: 'The business problem',
   problem: '',
   problemPoints: [],
