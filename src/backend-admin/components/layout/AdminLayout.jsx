@@ -31,9 +31,10 @@ const navGroups = [
     id: 'leads',
     label: 'Leads & Growth',
     items: [
-      { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox },
-      { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake },
-      { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned },
+      { to: '/admin/service-requests', label: 'Service Requests', icon: Inbox, sites: ['justindematteis'] },
+      { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox, sites: ['justconsignin'] },
+      { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake, sites: ['justconsignin'] },
+      { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned, sites: ['justconsignin'] },
     ],
   },
   {
@@ -168,7 +169,7 @@ export default function AdminLayout() {
               <ChevronDown size={15} className={open ? 'open' : ''}/>
             </button>
             <div className={`site-admin-nav-group-links ${open ? 'open' : ''}`}>
-              {group.items.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
+              {group.items.filter(item => !item.sites || item.sites.includes(siteKey)).map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
                 <Icon size={17}/><span>{label}</span>
               </NavLink>)}
             </div>
