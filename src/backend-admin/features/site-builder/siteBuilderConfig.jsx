@@ -341,7 +341,7 @@ export const siteBuilderConfig = {
     },
     marketing: {
       title: 'Marketing',
-      components: ['HeroBlock', 'CtaBlock'],
+      components: ['HeroBlock', 'CtaBlock', 'ServiceRequestBlock'],
     },
     showcase: {
       title: 'Showcase',
@@ -1372,6 +1372,54 @@ export const siteBuilderConfig = {
         </div>
         <div className="jci-builder-image-text-copy"><BlockHeading level={headingLevel} className="jci-builder-image-text-heading">{heading}</BlockHeading><p>{text}</p></div>
       </section>,
+    },
+    ServiceRequestBlock: {
+      label: 'Service Request Form',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Intro text' },
+        serviceOptions: { type: 'textarea', label: 'Service options (value|label, comma separated)' },
+        submitButtonText: { type: 'text', label: 'Submit button text' },
+        successHeading: { type: 'text', label: 'Success heading' },
+        successText: { type: 'textarea', label: 'Success text' },
+        background: { type: 'select', label: 'Background', options: backgroundOptions },
+      },
+      defaultProps: {
+        eyebrow: 'Start a project',
+        heading: 'Tell me what you need.',
+        text: 'Describe the problem, the systems involved, and what you want to improve.',
+        serviceOptions: 'website_wordpress|Website / WordPress, wordpress_plugin|Custom WordPress Plugin, shopify_ecommerce|Shopify / Ecommerce, ai_automation|AI Automation, api_integration|API Integration, custom_web_app|Custom Web App, seo_digital|SEO / Digital Marketing, not_sure|Not sure yet',
+        submitButtonText: 'Send service request',
+        successHeading: 'Request received.',
+        successText: 'I have your project details and will review the request.',
+        background: 'white',
+      },
+      render: rawProps => {
+        const props = {
+          eyebrow: 'Start a project',
+          heading: 'Tell me what you need.',
+          text: 'Describe the problem, the systems involved, and what you want to improve.',
+          submitButtonText: 'Send service request',
+          background: 'white',
+          ...rawProps,
+        };
+
+        return <section className={`jci-builder-section theme-${props.background || 'white'}`}>
+          <div className="jci-builder-eyebrow">{props.eyebrow}</div>
+          <h2 style={{margin:'8px 0 10px'}}>{props.heading}</h2>
+          <p>{props.text}</p>
+          <div style={{display:'grid',gap:'10px',marginTop:'18px',padding:'18px',border:'1px solid #d7dce1',borderRadius:'12px',background:'#fff'}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+              <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            </div>
+            <div style={{height:'42px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            <div style={{height:'110px',border:'1px solid #d7dce1',borderRadius:'8px',background:'#f8fafc'}} />
+            <span className="jci-builder-button" style={{width:'max-content'}}>{props.submitButtonText}</span>
+          </div>
+        </section>;
+      },
     },
     CtaBlock: {
       label: 'Call to Action',
