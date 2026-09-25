@@ -34,6 +34,7 @@ export const DEFAULT_WORK_SECTIONS = {
   footerCtaText: 'This Work Post can continue growing as the project changes.',
   footerCtaButtonText: '',
   footerCtaButtonUrl: '',
+  footerCtaTheme: 'dark',
   relatedEnabled: true,
   relatedEyebrow: 'More Work',
   relatedHeading: 'Related projects',
