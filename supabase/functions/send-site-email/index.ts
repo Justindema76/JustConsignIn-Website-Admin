@@ -453,6 +453,191 @@ function serviceRequestMessage(record: any, settings: any) {
   };
 }
 
+function hiringSpamScore(values: any) {
+  const text = [
+    clean(values.company, 200),
+    clean(values.website_or_linkedin, 500),
+    clean(values.role_title, 200),
+    clean(values.message, 6000),
+  ].join(' ').toLowerCase();
+
+  const rules: Array<[RegExp, number, string]> = [
+    [/\bseo services?\b/i, 5, 'SEO services pitch'],
+    [/\bguest post(?:ing)?\b/i, 5, 'Guest-post pitch'],
+    [/\bbacklinks?\b/i, 5, 'Backlink pitch'],
+    [/\blink building\b/i, 5, 'Link-building pitch'],
+    [/(increase|boost|grow).{0,24}(traffic|rankings?)/i, 4, 'Traffic/ranking sales pitch'],
+    [/(rank|ranking).{0,18}(google|search)/i, 4, 'Search-ranking sales pitch'],
+    [/\bdigital marketing services?\b/i, 4, 'Marketing-services pitch'],
+    [/\bweb(?:site)? design services?\b/i, 4, 'Web-design services pitch'],
+    [/\bapp development services?\b/i, 4, 'Development-services pitch'],
+    [/\blead generation services?\b/i, 5, 'Lead-generation pitch'],
+    [/\b(we|i) can help (you|your)\b/i, 3, 'Unsolicited services language'],
+    [/\bour (agency|team|company).{0,60}(offer|provide|speciali[sz]e)/i, 3, 'Agency sales language'],
+    [/(cheap|affordable).{0,24}(seo|website|marketing|development)/i, 4, 'Low-cost services pitch'],
+  ];
+
+  let score = 0;
+  const reasons: string[] = [];
+  for (const [pattern, points, reason] of rules) {
+    if (pattern.test(text)) {
+      score += points;
+      reasons.push(reason);
+    }
+  }
+
+  return { score, reasons };
+}
+
+function hiringContactMessage(record: any, settings: any) {
+  const display = (value: unknown) => clean(value, 3000) || 'Not provided';
+  const reasonLabels: Record<string,string> = {
+    interview: 'Interview request',
+    job_opportunity: 'Job opportunity',
+    recruiter: 'Recruiter',
+    other_employment: 'Other employment-related',
+  };
+  const reason = reasonLabels[clean(record.reason, 80)] || 'Employment-related';
+  const campaign = [record.utm_source, record.utm_medium, record.utm_campaign].filter(Boolean).join(' / ') || 'Direct / unknown';
+  const row = (label: string, value: unknown) => `<tr><td style="padding:8px 12px;color:#6d7175;font-weight:700;vertical-align:top;width:150px">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#202223;vertical-align:top">${escapeHtml(display(value))}</td></tr>`;
+
+  const text = [
+    'New JustinDeMatteis.com hiring contact', '',
+    `Name: ${display(record.name)}`,
+    `Company: ${display(record.company)}`,
+    `Email: ${display(record.email)}`,
+    `Phone: ${display(record.phone)}`,
+    `Reason: ${reason}`,
+    `Position / role: ${display(record.role_title)}`,
+    `LinkedIn / company website: ${display(record.website_or_linkedin)}`, '',
+    'Message:', display(record.message), '',
+    `Source page: ${display(record.source_path)}`,
+    `Campaign: ${campaign}`, '',
+    'This message is saved in Website Admin → Hiring Contacts.',
+  ].join('\n');
+
+  const html = `<div style="font-family:Arial,sans-serif;background:#f5f6f8;padding:24px;color:#202223"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #dfe3e8;border-radius:14px;overflow:hidden"><div style="background:#0b1f33;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85">Justin DeMatteis</div><h1 style="margin:5px 0 0;font-size:24px">Hiring / Interview Contact</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name',record.name)}${row('Company',record.company)}${row('Email',record.email)}${row('Phone',record.phone)}${row('Reason',reason)}${row('Position / role',record.role_title)}${row('LinkedIn / website',record.website_or_linkedin)}${row('Source',campaign)}</table><div style="margin:16px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">Message</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#6d7175;font-size:13px">Reply to this email to respond directly to ${escapeHtml(display(record.name))}. The message is also saved in Website Admin → Hiring Contacts.</p></div></div></div>`;
+
+  return {
+    from: fromAddress(settings),
+    ...recipientsFor(settings, 'hiring_contact'),
+    replyTo: record.email,
+    subject: `Hiring Contact — ${display(record.company)} — ${display(record.name)}`,
+    text,
+    html,
+  };
+}
+
+async function submitHiringContact(body: any) {
+  if (clean(body.company_services, 200)) {
+    return Response.json({ ok: true, saved: true, filtered: true });
+  }
+
+  const name = clean(body.name, 120);
+  const company = clean(body.company, 160);
+  const email = clean(body.email, 254).toLowerCase();
+  const reason = clean(body.reason, 80).toLowerCase();
+  const roleTitle = clean(body.role_title, 180);
+  const message = clean(body.message, 6000);
+  const allowedReasons = ['interview','job_opportunity','recruiter','other_employment'];
+
+  if (!name || !company || !validEmail(email) || !allowedReasons.includes(reason) || !roleTitle || message.length < 30 || body.employment_consent !== true) {
+    return Response.json({ error: 'Please complete the required employment contact fields.' }, { status: 400 });
+  }
+
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { data: recent } = await admin
+    .from('hiring_contacts')
+    .select('id')
+    .eq('email', email)
+    .gte('created_at', since)
+    .limit(3);
+
+  if (Array.isArray(recent) && recent.length >= 3) {
+    return Response.json({ ok: true, saved: true, filtered: true });
+  }
+
+  const spam = hiringSpamScore({
+    company,
+    website_or_linkedin: body.website_or_linkedin,
+    role_title: roleTitle,
+    message,
+  });
+  const isSpam = spam.score >= 5;
+
+  const record = {
+    site_key: 'justindematteis',
+    name,
+    company,
+    email,
+    phone: clean(body.phone, 60),
+    website_or_linkedin: clean(body.website_or_linkedin, 500),
+    reason,
+    role_title: roleTitle,
+    message,
+    employment_consent: true,
+    status: isSpam ? 'spam' : 'new',
+    spam_score: spam.score,
+    spam_reasons: spam.reasons,
+    is_spam: isSpam,
+    source_path: clean(body.source_path, 500),
+    referrer: clean(body.referrer, 1000),
+    utm_source: clean(body.utm_source, 200),
+    utm_medium: clean(body.utm_medium, 200),
+    utm_campaign: clean(body.utm_campaign, 300),
+    utm_content: clean(body.utm_content, 300),
+    utm_term: clean(body.utm_term, 300),
+    metadata: { submitted_via: 'portfolio_hiring_contact' },
+  };
+
+  const { data: saved, error: insertError } = await admin
+    .from('hiring_contacts')
+    .insert(record)
+    .select('id,site_key,created_at,name,company,email,phone,website_or_linkedin,reason,role_title,message,status,spam_score,spam_reasons,is_spam,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,email_notified_at')
+    .single();
+
+  if (insertError || !saved) {
+    console.error('Hiring contact insert failed', insertError?.message || 'No saved row returned');
+    return Response.json({ error: 'Unable to save hiring contact.' }, { status: 500 });
+  }
+
+  if (isSpam) {
+    console.log('Hiring contact filtered as spam', saved.id, spam.score, spam.reasons.join(', '));
+    return Response.json({ ok: true, saved: true, filtered: true, request: { id: saved.id } });
+  }
+
+  let emailSent = false;
+  let emailError = '';
+  try {
+    await admin.from('hiring_contacts')
+      .update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null })
+      .eq('id', saved.id);
+
+    const settings = await loadSettings('justindematteis');
+    await transportFor(settings).sendMail(hiringContactMessage(saved, settings));
+
+    await admin.from('hiring_contacts')
+      .update({ email_notified_at: new Date().toISOString(), email_notification_error: null })
+      .eq('id', saved.id);
+
+    emailSent = true;
+  } catch (error) {
+    emailError = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await admin.from('hiring_contacts')
+      .update({ email_notification_error: emailError })
+      .eq('id', saved.id);
+    console.error('Hiring contact saved but notification failed', emailError);
+  }
+
+  return Response.json({
+    ok: true,
+    saved: true,
+    emailSent,
+    emailError: emailSent ? null : emailError,
+    request: { id: saved.id },
+  });
+}
+
 async function submitServiceRequest(body: any) {
   const name = clean(body.name, 120);
   const email = clean(body.email, 254).toLowerCase();
@@ -706,6 +891,7 @@ Deno.serve(async (req: Request) => {
   try { body = await req.json(); } catch { return Response.json({ error: 'Invalid request' }, { status: 400 }); }
   if (body.action === 'demo') return sendDemo(body);
   if (body.action === 'service_submit') return submitServiceRequest(body);
+  if (body.action === 'hiring_contact_submit') return submitHiringContact(body);
   if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'service_reply') return sendServiceRequestReply(req, body);
