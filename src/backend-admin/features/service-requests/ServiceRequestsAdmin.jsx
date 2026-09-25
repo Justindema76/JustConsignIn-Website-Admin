@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, ExternalLink, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow } from 'lucide-react';
+import { Building2, ChevronRight, ExternalLink, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import DemoRequestEmailHistory from '../demo-requests/components/DemoRequestEmailHistory';
 import ServiceRequestEmailComposer from './components/ServiceRequestEmailComposer';
 import {
+  assignServiceRequestDepartment,
   deleteServiceRequest,
   loadServiceRequestEmails,
   loadServiceRequests,
   updateServiceRequest,
-  assignServiceRequestDepartment,
 } from './serviceRequests.service';
 import { loadDepartments } from '../departments/departments.service';
 
@@ -42,6 +42,12 @@ function formatDate(value) {
   if (!value) return '—';
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+}
+
+function shortDate(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function statusLabel(status) {
@@ -79,6 +85,7 @@ function sourceLabel(request) {
 export default function ServiceRequestsAdmin() {
   const { accessToken } = useAuth();
   const [requests, setRequests] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [selectedId, setSelectedId] = useState('');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
@@ -86,17 +93,18 @@ export default function ServiceRequestsAdmin() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState('');
+  const [assignmentNote, setAssignmentNote] = useState('');
   const [emailOpen, setEmailOpen] = useState(false);
   const [emails, setEmails] = useState([]);
   const [emailsLoading, setEmailsLoading] = useState(false);
-  const [departments, setDepartments] = useState([]);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState('');
-  const [assignmentNote, setAssignmentNote] = useState('');
-  const [assigning, setAssigning] = useState(false);
+
+  const selected = requests.find(request => request.id === selectedId) || null;
 
   const refresh = useCallback(async () => {
     if (!accessToken) return;
@@ -109,7 +117,6 @@ export default function ServiceRequestsAdmin() {
       ]);
       setRequests(rows);
       setDepartments(departmentRows);
-      setSelectedId(current => current && rows.some(row => row.id === current) ? current : (rows[0]?.id || ''));
     } catch (err) {
       setError(err?.message || 'Unable to load service requests.');
     } finally {
@@ -118,6 +125,53 @@ export default function ServiceRequestsAdmin() {
   }, [accessToken]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  useEffect(() => {
+    if (!selected) {
+      setEmails([]);
+      setEmailOpen(false);
+      return;
+    }
+    setDraftStatus(selected.status || 'new');
+    setDraftNotes(selected.admin_notes || '');
+    setSelectedDepartmentId(selected.assigned_department_id || '');
+    setAssignmentNote('');
+    setSuccess('');
+    setEmailOpen(false);
+  }, [selected?.id]);
+
+  const refreshEmails = useCallback(async requestId => {
+    if (!accessToken || !requestId) {
+      setEmails([]);
+      return;
+    }
+    setEmailsLoading(true);
+    try {
+      setEmails(await loadServiceRequestEmails(accessToken, requestId));
+    } catch (err) {
+      setError(err?.message || 'Unable to load email history.');
+    } finally {
+      setEmailsLoading(false);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (selectedId) refreshEmails(selectedId);
+  }, [selectedId, refreshEmails]);
+
+  useEffect(() => {
+    if (!selectedId) return undefined;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = event => {
+      if (event.key === 'Escape') setSelectedId('');
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [selectedId]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -136,46 +190,10 @@ export default function ServiceRequestsAdmin() {
         request.ai_primary_service,
         request.ai_summary,
         request.message,
+        request.assigned_department_name,
       ].filter(Boolean).join(' ').toLowerCase().includes(needle);
     });
   }, [requests, query, statusFilter, serviceFilter]);
-
-  const selected = requests.find(request => request.id === selectedId) || filtered[0] || null;
-
-  useEffect(() => {
-    if (!selected) {
-      setEmails([]);
-      return;
-    }
-    setSelectedId(selected.id);
-    setDraftStatus(selected.status || 'new');
-    setDraftNotes(selected.admin_notes || '');
-    setSelectedDepartmentId(selected.assigned_department_id || '');
-    setAssignmentNote('');
-    setSuccess('');
-    setEmailOpen(false);
-  }, [selected?.id, selected?.status, selected?.admin_notes]);
-
-  const refreshEmails = useCallback(async requestId => {
-    if (!accessToken || !requestId) {
-      setEmails([]);
-      return;
-    }
-    setEmailsLoading(true);
-    try {
-      const rows = await loadServiceRequestEmails(accessToken, requestId);
-      setEmails(rows);
-    } catch (err) {
-      setError(err?.message || 'Unable to load email history.');
-    } finally {
-      setEmailsLoading(false);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    if (selected?.id) refreshEmails(selected.id);
-    else setEmails([]);
-  }, [selected?.id, refreshEmails]);
 
   const counts = useMemo(() => ({
     new: requests.filter(item => item.status === 'new').length,
@@ -192,6 +210,12 @@ export default function ServiceRequestsAdmin() {
     });
     return [...values].sort((a, b) => serviceLabel(a).localeCompare(serviceLabel(b)));
   }, [requests]);
+
+  function closeDrawer() {
+    setSelectedId('');
+    setEmailOpen(false);
+    setAssignmentNote('');
+  }
 
   async function save() {
     if (!selected || !accessToken) return;
@@ -259,11 +283,8 @@ export default function ServiceRequestsAdmin() {
     setSuccess('');
     try {
       await deleteServiceRequest(accessToken, selected.id);
-      const remaining = requests.filter(row => row.id !== selected.id);
-      setRequests(remaining);
-      setSelectedId(remaining[0]?.id || '');
-      setEmails([]);
-      setEmailOpen(false);
+      setRequests(rows => rows.filter(row => row.id !== selected.id));
+      closeDrawer();
       setSuccess('Service request deleted.');
     } catch (err) {
       setError(err?.message || 'Unable to delete service request.');
@@ -277,78 +298,100 @@ export default function ServiceRequestsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Leads</p>
         <h1>Service Requests</h1>
-        <p>Review enquiries from JustinDeMatteis.com, see AI routing, contact clients, and track each project from first request to completion.</p>
+        <p>Review new enquiries, route quote requests to a department, and open a request only when you need the full details.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
 
     {error && <div className="site-admin-alert error">{error}</div>}
-    {success && <div className="site-admin-alert success">{success}</div>}
+    {success && !selected && <div className="site-admin-alert success">{success}</div>}
 
-    <div className="demo-request-stats">
-      <div className="site-admin-card"><span>New</span><strong>{counts.new}</strong></div>
-      <div className="site-admin-card"><span>Active</span><strong>{counts.active}</strong></div>
-      <div className="site-admin-card"><span>High Priority</span><strong>{counts.high}</strong></div>
-      <div className="site-admin-card"><span>Needs Quote</span><strong>{counts.needsQuote}</strong></div>
+    <div className="demo-request-stats service-request-stats">
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('new')}><span>New</span><strong>{counts.new}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('active')}><span>Open / Active</span><strong>{counts.active}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('needs_quote')}><span>Needs Quote</span><strong>{counts.needsQuote}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('active')}><span>High Priority</span><strong>{counts.high}</strong></button>
     </div>
 
     <div className="site-admin-toolbar demo-request-toolbar service-request-toolbar">
-      <label className="site-admin-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search name, company, email, service or message" /></label>
+      <label className="site-admin-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search company, contact, service or department" /></label>
       <select value={serviceFilter} onChange={event => setServiceFilter(event.target.value)} aria-label="Filter by service">
         <option value="all">All services</option>
         {availableServices.map(value => <option value={value} key={value}>{serviceLabel(value)}</option>)}
       </select>
       <select value={statusFilter} onChange={event => setStatusFilter(event.target.value)} aria-label="Filter by status">
         <option value="active">Open / active</option>
-        <option value="all">All</option>
+        <option value="all">All requests</option>
         {STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
       </select>
     </div>
 
-    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading service requests…</p></div> : requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>No service requests yet</h2><p>When someone submits the service form on JustinDeMatteis.com, the request will appear here.</p></div> : <div className="demo-request-admin-grid">
-      <section className="site-admin-card demo-request-list" aria-label="Service request list">
-        {filtered.length === 0 ? <div className="site-admin-empty">No requests match these filters.</div> : filtered.map(request => <button key={request.id} type="button" className={`demo-request-row${request.id === selected?.id ? ' selected' : ''}`} onClick={() => setSelectedId(request.id)}>
-          <div className="demo-request-row-main">
-            <strong>{request.company || request.name}</strong>
-            <span>{request.name}</span>
-            <small>{serviceLabel(request.ai_primary_service || request.requested_service)} · {request.assigned_department_name ? `Assigned: ${request.assigned_department_name}` : 'Unassigned'}</small>
-          </div>
-          <div className="demo-request-row-meta">
-            {request.ai_priority === 'high' && <span className="service-request-priority high">High</span>}
-            <span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span>
-            <small>{formatDate(request.created_at)}</small>
-          </div>
-        </button>)}
+    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading service requests…</p></div> :
+      requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>No service requests yet</h2><p>When someone submits the service form on JustinDeMatteis.com, the request will appear here.</p></div> :
+      <section className="site-admin-card service-request-queue" aria-label="Service request queue">
+        <div className="service-request-queue-head">
+          <span>Customer</span>
+          <span>Service</span>
+          <span>Department</span>
+          <span>Status</span>
+          <span>Priority</span>
+          <span>Received</span>
+          <span aria-hidden="true"></span>
+        </div>
+
+        {filtered.length === 0 ? <div className="site-admin-empty service-request-empty">No requests match these filters.</div> :
+          filtered.map(request => <button key={request.id} type="button" className="service-request-queue-row" onClick={() => setSelectedId(request.id)}>
+            <span className="service-request-customer">
+              <strong>{request.company || request.name}</strong>
+              <small>{request.name}{request.company ? ` · ${request.email}` : ''}</small>
+            </span>
+            <span className="service-request-service">{serviceLabel(request.ai_primary_service || request.requested_service)}</span>
+            <span className={`service-request-department ${request.assigned_department_name ? 'assigned' : 'unassigned'}`}>
+              {request.assigned_department_name || 'Unassigned'}
+            </span>
+            <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
+            <span><span className={`service-request-priority ${request.ai_priority || 'normal'}`}>{request.ai_priority || 'normal'}</span></span>
+            <span className="service-request-date">{shortDate(request.created_at)}</span>
+            <ChevronRight className="service-request-open-icon" size={18}/>
+          </button>)
+        }
       </section>
+    }
 
-      <section className="site-admin-card demo-request-detail">
-        {!selected ? <div className="site-admin-empty">Choose a request.</div> : <>
-          <div className="demo-request-detail-head">
-            <div>
-              <p className="site-admin-eyebrow">{serviceLabel(selected.ai_primary_service || selected.requested_service)}</p>
+    {selected && <>
+      <div className="service-request-drawer-overlay" onClick={closeDrawer} />
+      <aside className="service-request-drawer" role="dialog" aria-modal="true" aria-label={`Service request from ${selected.company || selected.name}`}>
+        <header className="service-request-drawer-head">
+          <div>
+            <p className="site-admin-eyebrow">{serviceLabel(selected.ai_primary_service || selected.requested_service)}</p>
+            <div className="service-request-drawer-title">
               <h2>{selected.company || selected.name}</h2>
-              <p>{selected.name}</p>
+              <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
             </div>
-            <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
+            <p>{selected.company ? selected.name : selected.email} · {formatDate(selected.created_at)}</p>
           </div>
+          <button className="service-request-drawer-close" type="button" onClick={closeDrawer} aria-label="Close service request"><X size={20}/></button>
+        </header>
 
-          <div className="demo-request-contact-actions">
-            <button className="site-admin-btn" type="button" onClick={() => setEmailOpen(open => !open)}><Mail size={14}/> {emailOpen ? 'Close Email' : `Email ${selected.name?.split(/\s+/)[0] || 'Client'}`}</button>
+        <div className="service-request-drawer-body">
+          {success && <div className="site-admin-alert success">{success}</div>}
+          {error && <div className="site-admin-alert error">{error}</div>}
+
+          <div className="service-request-quick-actions">
+            <button className="site-admin-btn" type="button" onClick={() => setEmailOpen(open => !open)}><Mail size={14}/> {emailOpen ? 'Close Email' : 'Email Client'}</button>
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call</a>}
             {selected.website && <a className="site-admin-btn secondary" href={selected.website} target="_blank" rel="noreferrer">Website <ExternalLink size={14}/></a>}
-            <button className="site-admin-btn danger demo-request-delete" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete'}</button>
           </div>
 
           {emailOpen && <ServiceRequestEmailComposer request={selected} accessToken={accessToken} onCancel={() => setEmailOpen(false)} onSent={handleEmailSent} />}
 
-          <section className="service-request-assignment-card">
-            <div className="service-request-assignment-head">
+          <section className="service-request-drawer-section primary-section">
+            <div className="service-request-section-head">
               <div>
                 <p className="site-admin-eyebrow">Quote routing</p>
-                <h3>{selected.assigned_department_name ? `Assigned to ${selected.assigned_department_name}` : 'Choose a department'}</h3>
-                <p>The department email receives the request and a note to prepare a quote. No individual employee assignment yet.</p>
+                <h3>{selected.assigned_department_name ? `Assigned to ${selected.assigned_department_name}` : 'Assign this request'}</h3>
               </div>
-              <Building2 size={21}/>
+              <Building2 size={20}/>
             </div>
             <div className="service-request-assignment-controls">
               <label>
@@ -366,52 +409,67 @@ export default function ServiceRequestsAdmin() {
                 <Send size={15}/>{assigning ? 'Assigning & sending…' : 'Assign Department & Send'}
               </button>
             </div>
-            {selected.assigned_department_name && <div className="service-request-assignment-meta">
-              <span>Department <strong>{selected.assigned_department_name}</strong></span>
-              <span>Email <strong>{selected.assigned_department_email}</strong></span>
-              <span>Assigned <strong>{formatDate(selected.assigned_at)}</strong></span>
-              <span>Assignment email <strong>{selected.assignment_email_sent_at ? `Sent ${formatDate(selected.assignment_email_sent_at)}` : (selected.assignment_email_error || 'Not sent')}</strong></span>
+            {selected.assigned_department_name && <div className="service-request-assignment-summary">
+              <div><span>Department</span><strong>{selected.assigned_department_name}</strong></div>
+              <div><span>Department email</span><strong>{selected.assigned_department_email}</strong></div>
+              <div><span>Assigned</span><strong>{formatDate(selected.assigned_at)}</strong></div>
+              <div><span>Email status</span><strong>{selected.assignment_email_sent_at ? 'Sent' : (selected.assignment_email_error || 'Not sent')}</strong></div>
             </div>}
           </section>
 
-          <section className="service-request-ai-card">
-            <div className="service-request-ai-head">
-              <div>
-                <p className="site-admin-eyebrow">AI Routing</p>
-                <h3>{serviceLabel(selected.ai_primary_service)}</h3>
-              </div>
-              <span className={`service-request-priority ${selected.ai_priority || 'normal'}`}>{selected.ai_priority || 'normal'}</span>
-            </div>
-            {selected.ai_secondary_services?.length > 0 && <div className="service-request-ai-tags">{selected.ai_secondary_services.map(item => <span key={item}>{serviceLabel(item)}</span>)}</div>}
-            <p>{selected.ai_summary || 'No AI summary available.'}</p>
-            <div className="service-request-ai-meta">
-              <span>Confidence <strong>{Math.round(Number(selected.ai_confidence || 0) * 100)}%</strong></span>
-              <span>Routing <strong>{selected.routed_queue || '—'}</strong></span>
-              <span>Method <strong>{selected.ai_provider || 'rules'}</strong></span>
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Customer request</p>
+            <p className="service-request-message">{selected.message}</p>
+          </section>
+
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Contact & project</p>
+            <dl className="service-request-compact-details">
+              <div><dt>Email</dt><dd>{selected.email}</dd></div>
+              <div><dt>Phone</dt><dd>{selected.phone || '—'}</dd></div>
+              <div><dt>Requested service</dt><dd>{serviceLabel(selected.requested_service)}</dd></div>
+              <div><dt>Budget</dt><dd>{budgetLabel(selected.budget_range)}</dd></div>
+              <div><dt>Timeline</dt><dd>{timelineLabel(selected.timeline)}</dd></div>
+              <div><dt>Source</dt><dd>{sourceLabel(selected)}</dd></div>
+            </dl>
+          </section>
+
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Workflow</p>
+            <div className="service-request-workflow-compact">
+              <label>Status<select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+              <label>Private notes<textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Requirements, follow-up, quote notes…" /></label>
+              <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</button>
             </div>
           </section>
 
-          <dl className="demo-request-details">
-            <div><dt>Email</dt><dd>{selected.email}</dd></div>
-            <div><dt>Phone</dt><dd>{selected.phone || '—'}</dd></div>
-            <div><dt>Requested service</dt><dd>{serviceLabel(selected.requested_service)}</dd></div>
-            <div><dt>Submitted</dt><dd>{formatDate(selected.created_at)}</dd></div>
-            <div><dt>Budget</dt><dd>{budgetLabel(selected.budget_range)}</dd></div>
-            <div><dt>Timeline</dt><dd>{timelineLabel(selected.timeline)}</dd></div>
-            <div><dt>Source</dt><dd>{sourceLabel(selected)}</dd></div>
-            <div><dt>Notification</dt><dd>{selected.email_notified_at ? `Sent ${formatDate(selected.email_notified_at)}` : (selected.email_notification_error || 'Not sent yet')}</dd></div>
-            <div className="wide"><dt>Project request</dt><dd>{selected.message}</dd></div>
-          </dl>
+          <details className="service-request-collapsible">
+            <summary>AI classification & routing</summary>
+            <section className="service-request-ai-card">
+              <div className="service-request-ai-head">
+                <div><p className="site-admin-eyebrow">AI Routing</p><h3>{serviceLabel(selected.ai_primary_service)}</h3></div>
+                <span className={`service-request-priority ${selected.ai_priority || 'normal'}`}>{selected.ai_priority || 'normal'}</span>
+              </div>
+              {selected.ai_secondary_services?.length > 0 && <div className="service-request-ai-tags">{selected.ai_secondary_services.map(item => <span key={item}>{serviceLabel(item)}</span>)}</div>}
+              <p>{selected.ai_summary || 'No AI summary available.'}</p>
+              <div className="service-request-ai-meta">
+                <span>Confidence <strong>{Math.round(Number(selected.ai_confidence || 0) * 100)}%</strong></span>
+                <span>Routing <strong>{selected.routed_queue || '—'}</strong></span>
+                <span>Method <strong>{selected.ai_provider || 'rules'}</strong></span>
+              </div>
+            </section>
+          </details>
 
-          <div className="demo-request-workflow">
-            <label>Status<select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label className="wide">Private notes<textarea rows="5" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Discovery notes, requirements, follow-up, proposal details…" /></label>
-            <div className="wide demo-request-save"><button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button></div>
+          <details className="service-request-collapsible">
+            <summary>Email history ({emails.length})</summary>
+            <DemoRequestEmailHistory emails={emails} loading={emailsLoading} />
+          </details>
+
+          <div className="service-request-danger-zone">
+            <button className="site-admin-btn danger" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete Request'}</button>
           </div>
-
-          <DemoRequestEmailHistory emails={emails} loading={emailsLoading} />
-        </>}
-      </section>
-    </div>}
+        </div>
+      </aside>
+    </>}
   </>;
 }
