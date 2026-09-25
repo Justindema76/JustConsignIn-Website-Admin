@@ -44,6 +44,7 @@ function validatePublishData(page, data, siteKey) {
     const allowed = new Set([
       'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock',
       'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
+      'WorkExperiencePreviewBlock',
       'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeAiBlock', 'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock'
     ]);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
@@ -55,7 +56,7 @@ function validatePublishData(page, data, siteKey) {
   }
   const types = new Set(blocks.map(block => block?.type).filter(Boolean));
   const justinOnlyBlocks = new Set([
-    'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock',
+    'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'WorkExperiencePreviewBlock',
     'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
   ]);
   const crossSiteBlocks = blocks
