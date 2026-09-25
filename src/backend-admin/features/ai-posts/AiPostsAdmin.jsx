@@ -12,6 +12,7 @@ import {
   saveAdminAiPost,
   slugifyAi,
 } from './aiPostStore';
+import ProjectMediaFields from '../work-posts/ProjectMediaFields';
 import '../work-posts/workPosts.css';
 
 const PORTFOLIO_PREVIEW_BASE = import.meta.env.VITE_PORTFOLIO_PREVIEW_URL || 'https://justin-de-matteis-main-site.vercel.app';
@@ -36,7 +37,6 @@ export default function AiPostsAdmin() {
   const [uploading, setUploading] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const projectLogoRef = useRef(null);
   const galleryRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -95,23 +95,6 @@ export default function AiPostsAdmin() {
 
   const removeArrayItem = (key, index) => {
     updateSection(key, (draft.sections?.[key] || []).filter((_, itemIndex) => itemIndex !== index));
-  };
-
-  const uploadProjectLogo = async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploading('logo'); setError('');
-    try {
-      const url = await uploadWorkImage(accessToken, file);
-      update('featuredImage', url);
-      update('featuredImageAlt', draft.featuredImageAlt || `${draft.company || draft.title || 'Project'} logo`);
-      setMessage('Project logo uploaded. Save the AI Post to keep it.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUploading('');
-      event.target.value = '';
-    }
   };
 
   const uploadGallery = async event => {
@@ -254,20 +237,17 @@ export default function AiPostsAdmin() {
             <label className="wide">Short summary<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)}/></label>
           </div>
 
-          <div className="work-post-logo-field">
-            <div className="work-post-logo-preview">
-              {draft.featuredImage ? <img src={draft.featuredImage} alt="Project logo preview"/> : <><Image size={24}/><span>No logo</span></>}
-            </div>
-            <div>
-              <strong>Project logo</strong>
-              <p>Small logo used in the Project card.</p>
-              <div className="site-admin-actions">
-                <button className="site-admin-btn secondary small" type="button" onClick={() => projectLogoRef.current?.click()} disabled={uploading === 'logo'}><Upload size={13}/>{uploading === 'logo' ? 'Uploading…' : 'Upload Logo'}</button>
-                {draft.featuredImage && <button className="site-admin-btn secondary small" type="button" onClick={() => update('featuredImage', '')}>Remove</button>}
-              </div>
-              <input ref={projectLogoRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadProjectLogo}/>
-            </div>
-          </div>
+          <ProjectMediaFields
+            accessToken={accessToken}
+            draft={draft}
+            update={update}
+            updateSection={updateSection}
+            uploading={uploading}
+            setUploading={setUploading}
+            setError={setError}
+            setMessage={setMessage}
+            postLabel="AI Post"
+          />
         </div>
 
         <div className="site-admin-card work-post-panel">
