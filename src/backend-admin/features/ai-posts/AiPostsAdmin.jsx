@@ -370,7 +370,8 @@ export default function AiPostsAdmin() {
         <div className="site-admin-card site-admin-side-card">
           <h2>Project details</h2>
           <label>Technology tags<textarea rows="5" value={(draft.tags || []).join(', ')} onChange={event => update('tags', tagsFrom(event.target.value))}/></label>
-          <label>Secondary project URL<input value={draft.secondaryUrl} onChange={event => update('secondaryUrl', event.target.value)} placeholder="YouTube, GitHub, demo…"/></label>
+          <label>GitHub repository URL<input value={sections.githubUrl || ''} onChange={event => updateSection('githubUrl', event.target.value)} placeholder="https://github.com/username/repository"/></label>
+          <label>Secondary project URL<input value={draft.secondaryUrl} onChange={event => update('secondaryUrl', event.target.value)} placeholder="YouTube, demo, documentation…"/></label>
         </div>
 
         <CaseStudyButtonFields
