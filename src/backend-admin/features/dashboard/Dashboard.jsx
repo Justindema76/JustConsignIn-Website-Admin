@@ -14,6 +14,7 @@ import {
   Video,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getAdminSiteKey } from '../../services/siteAdminService';
 import './dashboard.css';
 
 const groups = [
@@ -42,22 +43,32 @@ const groups = [
     copy: 'Capture leads and manage beta partnerships.',
     modules: [
       {
+        to: '/admin/service-requests',
+        icon: Inbox,
+        title: 'Service Requests',
+        copy: 'Review website, WordPress, Shopify, AI automation, integration, and custom-development enquiries.',
+        sites: ['justindematteis'],
+      },
+      {
         to: '/admin/demo-requests',
         icon: Inbox,
         title: 'Demo Requests',
         copy: 'Review free-demo leads, contact stores, schedule walkthroughs, and manage follow-up.',
+        sites: ['justconsignin'],
       },
       {
         to: '/admin/beta-partners',
         icon: Handshake,
         title: 'Beta Partners',
         copy: 'Manage Founding Partner applications, tracked links, outreach, and active testing.',
+        sites: ['justconsignin'],
       },
       {
         to: '/admin/outreach',
         icon: MapPinned,
         title: 'Outreach Map',
         copy: 'Work through Facebook groups and consignment-shop leads while tracking every contact.',
+        sites: ['justconsignin'],
       },
     ],
   },
@@ -126,6 +137,7 @@ function initialOpenGroups() {
 }
 
 export default function Dashboard() {
+  const siteKey = getAdminSiteKey();
   const location = useLocation();
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState(initialOpenGroups);
@@ -169,7 +181,7 @@ export default function Dashboard() {
           </button>
 
           {open && <div className="dashboard-module-grid" id={`dashboard-group-${group.id}`}>
-            {group.modules.map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
+            {group.modules.filter(module => !module.sites || module.sites.includes(siteKey)).map(({ to, icon: Icon, title, copy }) => <Link className="dashboard-module-link" to={to} key={to}>
               <span className="site-admin-module-icon"><Icon size={20}/></span>
               <span className="dashboard-module-copy">
                 <strong>{title}</strong>
