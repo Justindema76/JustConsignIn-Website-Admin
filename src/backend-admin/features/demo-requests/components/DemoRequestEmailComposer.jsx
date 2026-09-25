@@ -2,25 +2,38 @@ import { useEffect, useState } from 'react';
 import { Send, X } from 'lucide-react';
 import { sendDemoRequestEmail } from '../demoRequests.service';
 
-function starterMessage(firstName) {
+function demoStarterMessage(firstName) {
   return `Hi ${firstName || 'there'},\n\nThanks for requesting a demo of JustConsignIn.\n\n`;
 }
 
-export default function DemoRequestEmailComposer({ request, accessToken, onCancel, onSent }) {
-  const [subject, setSubject] = useState('Your JustConsignIn demo request');
-  const [message, setMessage] = useState(starterMessage(request?.first_name));
+export default function DemoRequestEmailComposer({
+  request,
+  accessToken,
+  onCancel,
+  onSent,
+  sendEmail = sendDemoRequestEmail,
+  subjectText = 'Your JustConsignIn demo request',
+  starterMessage = demoStarterMessage,
+  recipientName,
+  savedToLabel = 'this demo request',
+  eyebrow = 'Email customer',
+  heading = 'Send from Website Admin',
+}) {
+  const name = recipientName ?? request?.first_name;
+  const [subject, setSubject] = useState(subjectText);
+  const [message, setMessage] = useState(() => starterMessage(name, request));
   const [cc, setCc] = useState('');
   const [bcc, setBcc] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setSubject('Your JustConsignIn demo request');
-    setMessage(starterMessage(request?.first_name));
+    setSubject(subjectText);
+    setMessage(starterMessage(name, request));
     setCc('');
     setBcc('');
     setError('');
-  }, [request?.id, request?.first_name]);
+  }, [request?.id, name, subjectText, starterMessage]);
 
   const submit = async event => {
     event.preventDefault();
@@ -28,7 +41,7 @@ export default function DemoRequestEmailComposer({ request, accessToken, onCance
     setSending(true);
     setError('');
     try {
-      const payload = await sendDemoRequestEmail(accessToken, {
+      const payload = await sendEmail(accessToken, {
         requestId: request.id,
         subject,
         message,
@@ -46,8 +59,8 @@ export default function DemoRequestEmailComposer({ request, accessToken, onCance
   return <form className="demo-email-composer" onSubmit={submit}>
     <div className="demo-email-composer-head">
       <div>
-        <p className="site-admin-eyebrow">Email customer</p>
-        <h3>Send from Website Admin</h3>
+        <p className="site-admin-eyebrow">{eyebrow}</p>
+        <h3>{heading}</h3>
       </div>
       <button type="button" className="demo-email-close" onClick={onCancel} aria-label="Close email form"><X size={18}/></button>
     </div>
@@ -78,7 +91,7 @@ export default function DemoRequestEmailComposer({ request, accessToken, onCance
     </div>
 
     <div className="demo-email-composer-foot">
-      <p>This sends through the mailbox configured in <strong>Settings → Email</strong>. The sent message is saved to this demo request automatically.</p>
+      <p>This sends through the mailbox configured in <strong>Settings → Email</strong>. The sent message is saved to {savedToLabel} automatically.</p>
       <div className="demo-email-actions">
         <button type="button" className="site-admin-btn secondary" onClick={onCancel} disabled={sending}>Cancel</button>
         <button type="submit" className="site-admin-btn" disabled={sending}><Send size={15}/>{sending ? 'Sending…' : 'Send Email'}</button>
