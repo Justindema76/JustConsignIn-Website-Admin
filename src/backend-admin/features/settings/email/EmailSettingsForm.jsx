@@ -1,15 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, Eye, EyeOff, MailCheck, Plus, Save, Send, ShieldCheck, Trash2 } from 'lucide-react';
 import { useAuth } from '../../../auth/AdminAuthContext';
+import { getAdminSiteKey } from '../../../services/siteAdminService';
 import { loadEmailSettings, saveEmailSettings, sendEmailSettingsTest } from './emailSettings.service';
 
-const EVENT_OPTIONS = [
-  ['demo_request', 'Demo Requests'],
-  ['service_request', 'Service Requests'],
-  ['beta_application', 'Beta Applications'],
-  ['contact', 'Contact Form'],
-  ['all', 'All website notifications'],
-];
+const SITE_PROFILES = {
+  justconsignin: {
+    label: 'JustConsignIn',
+    smtpHost: 'mail.justconsignin.com',
+    smtpUsername: 'support@justconsignin.com',
+    fromEmail: 'support@justconsignin.com',
+    fromName: 'JustConsignIn',
+    primaryEvent: 'demo_request',
+    primaryEventLabel: 'Demo Requests',
+    routeId: 'demo-primary',
+    events: [
+      ['demo_request', 'Demo Requests'],
+      ['beta_application', 'Beta Applications'],
+      ['contact', 'Contact Form'],
+      ['all', 'All website notifications'],
+    ],
+  },
+  justindematteis: {
+    label: 'Justin DeMatteis',
+    smtpHost: 'mail.justindematteis.com',
+    smtpUsername: 'justin@justindematteis.com',
+    fromEmail: 'justin@justindematteis.com',
+    fromName: 'Justin DeMatteis',
+    primaryEvent: 'service_request',
+    primaryEventLabel: 'Service Requests',
+    routeId: 'service-primary',
+    events: [
+      ['service_request', 'Service Requests'],
+      ['contact', 'Contact Form'],
+      ['all', 'All website notifications'],
+    ],
+  },
+};
 
 const RECIPIENT_OPTIONS = [
   ['to', 'To'],
@@ -19,60 +46,86 @@ const RECIPIENT_OPTIONS = [
 
 const newRouteId = () => globalThis.crypto?.randomUUID?.() || `route-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-const defaultRoute = () => ({
-  id: newRouteId(),
-  eventKey: 'demo_request',
-  recipientType: 'to',
-  email: '',
-  enabled: true,
-});
+function profileFor(siteKey) {
+  return SITE_PROFILES[siteKey] || SITE_PROFILES.justconsignin;
+}
 
-const EMPTY = {
-  enabled: true,
-  provider: 'smtp',
-  smtpHost: 'mail.justconsignin.com',
-  smtpPort: 465,
-  smtpSecure: true,
-  smtpUsername: 'support@justconsignin.com',
-  fromEmail: 'support@justconsignin.com',
-  fromName: 'JustConsignIn',
-  notificationEmail: 'support@justconsignin.com',
-  notificationRoutes: [{ id: 'demo-primary', eventKey: 'demo_request', recipientType: 'to', email: 'support@justconsignin.com', enabled: true }],
-  password: '',
-  hasPassword: false,
-  updatedAt: null,
-};
+function defaultRoute(siteKey) {
+  const profile = profileFor(siteKey);
+  return {
+    id: newRouteId(),
+    eventKey: profile.primaryEvent,
+    recipientType: 'to',
+    email: '',
+    enabled: true,
+  };
+}
 
-function normalizeRoute(route, index) {
+function emptyForSite(siteKey) {
+  const profile = profileFor(siteKey);
+  return {
+    enabled: true,
+    provider: 'smtp',
+    smtpHost: profile.smtpHost,
+    smtpPort: 465,
+    smtpSecure: true,
+    smtpUsername: profile.smtpUsername,
+    fromEmail: profile.fromEmail,
+    fromName: profile.fromName,
+    notificationEmail: profile.fromEmail,
+    notificationRoutes: [{
+      id: profile.routeId,
+      eventKey: profile.primaryEvent,
+      recipientType: 'to',
+      email: profile.fromEmail,
+      enabled: true,
+    }],
+    password: '',
+    hasPassword: false,
+    updatedAt: null,
+  };
+}
+
+function normalizeRoute(route, index, siteKey) {
+  const profile = profileFor(siteKey);
   return {
     id: route?.id || `route-${index + 1}`,
-    eventKey: route?.eventKey || 'demo_request',
+    eventKey: route?.eventKey || profile.primaryEvent,
     recipientType: route?.recipientType || 'to',
     email: route?.email || '',
     enabled: route?.enabled !== false,
   };
 }
 
-function normalize(settings) {
-  if (!settings) return EMPTY;
+function normalize(settings, siteKey) {
+  const profile = profileFor(siteKey);
+  const empty = emptyForSite(siteKey);
+  if (!settings) return empty;
+
   const storedRoutes = Array.isArray(settings.notification_routes) ? settings.notification_routes : [];
   const fallbackEmail = settings.notification_email || '';
   const notificationRoutes = storedRoutes.length
-    ? storedRoutes.map(normalizeRoute)
+    ? storedRoutes.map((route, index) => normalizeRoute(route, index, siteKey))
     : fallbackEmail
-      ? [{ id: 'demo-primary', eventKey: 'demo_request', recipientType: 'to', email: fallbackEmail, enabled: true }]
-      : [defaultRoute()];
+      ? [{
+          id: profile.routeId,
+          eventKey: profile.primaryEvent,
+          recipientType: 'to',
+          email: fallbackEmail,
+          enabled: true,
+        }]
+      : [defaultRoute(siteKey)];
 
   return {
     enabled: settings.enabled !== false,
     provider: settings.provider || 'smtp',
-    smtpHost: settings.smtp_host || 'mail.justconsignin.com',
+    smtpHost: settings.smtp_host || profile.smtpHost,
     smtpPort: settings.smtp_port || 465,
     smtpSecure: settings.smtp_secure !== false,
-    smtpUsername: settings.smtp_username || '',
-    fromEmail: settings.smtp_from_email || '',
-    fromName: settings.smtp_from_name || 'JustConsignIn',
-    notificationEmail: fallbackEmail,
+    smtpUsername: settings.smtp_username || profile.smtpUsername,
+    fromEmail: settings.smtp_from_email || profile.fromEmail,
+    fromName: settings.smtp_from_name || profile.fromName,
+    notificationEmail: fallbackEmail || profile.fromEmail,
     notificationRoutes,
     password: '',
     hasPassword: Boolean(settings.has_password),
@@ -82,7 +135,10 @@ function normalize(settings) {
 
 export default function EmailSettingsForm() {
   const { accessToken } = useAuth();
-  const [form, setForm] = useState(EMPTY);
+  const siteKey = getAdminSiteKey();
+  const profile = profileFor(siteKey);
+  const eventOptions = profile.events;
+  const [form, setForm] = useState(() => emptyForSite(siteKey));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -91,20 +147,37 @@ export default function EmailSettingsForm() {
   const [success, setSuccess] = useState('');
 
   const configured = useMemo(() => {
-    const hasDemoTo = form.notificationRoutes.some(route => route.enabled && route.eventKey === 'demo_request' && route.recipientType === 'to' && route.email);
-    return Boolean(form.smtpHost && form.smtpPort && form.smtpUsername && form.fromEmail && (form.hasPassword || form.password) && hasDemoTo);
-  }, [form]);
+    const hasPrimaryTo = form.notificationRoutes.some(
+      route => route.enabled
+        && route.eventKey === profile.primaryEvent
+        && route.recipientType === 'to'
+        && route.email,
+    );
+    return Boolean(
+      form.smtpHost
+      && form.smtpPort
+      && form.smtpUsername
+      && form.fromEmail
+      && (form.hasPassword || form.password)
+      && hasPrimaryTo
+    );
+  }, [form, profile.primaryEvent]);
 
   useEffect(() => {
     if (!accessToken) return;
     let active = true;
     setLoading(true);
-    loadEmailSettings(accessToken)
-      .then(settings => { if (active) setForm(normalize(settings)); })
+    setError('');
+    setSuccess('');
+    setForm(emptyForSite(siteKey));
+
+    loadEmailSettings(accessToken, siteKey)
+      .then(settings => { if (active) setForm(normalize(settings, siteKey)); })
       .catch(err => { if (active) setError(err?.message || 'Unable to load email settings.'); })
       .finally(() => { if (active) setLoading(false); });
+
     return () => { active = false; };
-  }, [accessToken]);
+  }, [accessToken, siteKey]);
 
   const update = (key, value) => setForm(current => ({ ...current, [key]: value }));
 
@@ -115,7 +188,7 @@ export default function EmailSettingsForm() {
 
   const addRoute = () => setForm(current => ({
     ...current,
-    notificationRoutes: [...current.notificationRoutes, defaultRoute()],
+    notificationRoutes: [...current.notificationRoutes, defaultRoute(siteKey)],
   }));
 
   const removeRoute = id => setForm(current => ({
@@ -124,8 +197,8 @@ export default function EmailSettingsForm() {
   }));
 
   const saveCurrent = async () => {
-    const saved = await saveEmailSettings(accessToken, form);
-    const normalized = normalize(saved);
+    const saved = await saveEmailSettings(accessToken, form, siteKey);
+    const normalized = normalize(saved, siteKey);
     setForm(normalized);
     return normalized;
   };
@@ -137,7 +210,7 @@ export default function EmailSettingsForm() {
     setSuccess('');
     try {
       await saveCurrent();
-      setSuccess('Email settings and routing saved securely.');
+      setSuccess(`${profile.label} email settings and routing saved securely.`);
     } catch (err) {
       setError(err?.message || 'Unable to save email settings.');
     } finally {
@@ -151,8 +224,8 @@ export default function EmailSettingsForm() {
     setSuccess('');
     try {
       await saveCurrent();
-      await sendEmailSettingsTest(accessToken);
-      setSuccess('Test email sent using the saved Demo Requests routing.');
+      await sendEmailSettingsTest(accessToken, siteKey);
+      setSuccess(`Test email sent using the saved ${profile.primaryEventLabel} routing.`);
     } catch (err) {
       setError(err?.message || 'Unable to send test email.');
     } finally {
@@ -160,7 +233,7 @@ export default function EmailSettingsForm() {
     }
   };
 
-  if (loading) return <div className="site-admin-card email-settings-loading">Loading email settings…</div>;
+  if (loading) return <div className="site-admin-card email-settings-loading">Loading {profile.label} email settings…</div>;
 
   return <div className="email-settings-layout">
     <form className="site-admin-card email-settings-form" onSubmit={submit}>
@@ -168,7 +241,7 @@ export default function EmailSettingsForm() {
         <div>
           <p className="site-admin-eyebrow">Outgoing mail</p>
           <h2>SMTP connection</h2>
-          <p>Configure the mailbox this website uses to send notifications.</p>
+          <p>Configure the mailbox {profile.label} uses to send notifications.</p>
         </div>
         <label className="email-settings-enabled">
           <input type="checkbox" checked={form.enabled} onChange={event => update('enabled', event.target.checked)} />
@@ -232,7 +305,7 @@ export default function EmailSettingsForm() {
       <div className="email-settings-fields">
         <label>
           <span>From name</span>
-          <input required value={form.fromName} onChange={event => update('fromName', event.target.value)} placeholder="JustConsignIn" />
+          <input required value={form.fromName} onChange={event => update('fromName', event.target.value)} placeholder={profile.fromName} />
         </label>
         <label>
           <span>From email</span>
@@ -252,13 +325,13 @@ export default function EmailSettingsForm() {
       </div>
 
       <div className="email-routing-list">
-        {form.notificationRoutes.length === 0 && <div className="site-admin-note">Add at least one Demo Requests recipient using To.</div>}
+        {form.notificationRoutes.length === 0 && <div className="site-admin-note">Add at least one {profile.primaryEventLabel} recipient using To.</div>}
         {form.notificationRoutes.map((route, index) => <div className="email-routing-row" key={route.id}>
           <span className="email-routing-number">{index + 1}</span>
           <label>
             <span>Receives</span>
             <select value={route.eventKey} onChange={event => updateRoute(route.id, 'eventKey', event.target.value)}>
-              {EVENT_OPTIONS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+              {eventOptions.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
             </select>
           </label>
           <label>
@@ -269,7 +342,7 @@ export default function EmailSettingsForm() {
           </label>
           <label className="email-routing-address">
             <span>Email address</span>
-            <input required type="email" value={route.email} onChange={event => updateRoute(route.id, 'email', event.target.value)} placeholder="name@example.com" autoCapitalize="none" autoCorrect="off" />
+            <input type="email" value={route.email} onChange={event => updateRoute(route.id, 'email', event.target.value)} placeholder="name@example.com" autoCapitalize="none" autoCorrect="off" />
           </label>
           <label className="email-routing-active"><span>Active</span><input type="checkbox" checked={route.enabled} onChange={event => updateRoute(route.id, 'enabled', event.target.checked)} /></label>
           <button className="email-routing-remove" type="button" onClick={() => removeRoute(route.id)} aria-label={`Remove recipient ${index + 1}`}><Trash2 size={17}/></button>
@@ -286,17 +359,19 @@ export default function EmailSettingsForm() {
       <div className="site-admin-card email-settings-status-card">
         <span className={`email-settings-status-icon ${configured ? 'ready' : ''}`}>{configured ? <MailCheck size={22}/> : <ShieldCheck size={22}/>}</span>
         <h3>{configured ? 'Email is configured' : 'Finish email setup'}</h3>
-        <p>{configured ? 'SMTP and at least one Demo Requests To recipient are configured.' : 'Enter the mailbox password and add an enabled Demo Requests To recipient.'}</p>
+        <p>{configured
+          ? `SMTP and at least one ${profile.primaryEventLabel} To recipient are configured.`
+          : `Enter the mailbox password and add an enabled ${profile.primaryEventLabel} To recipient.`}</p>
         <div className="email-settings-status-list">
-          <span><CheckCircle2 size={15}/> SMTP settings managed in the admin</span>
+          <span><CheckCircle2 size={15}/> SMTP settings managed separately for {profile.label}</span>
           <span><CheckCircle2 size={15}/> Password protected by Supabase Vault</span>
           <span><CheckCircle2 size={15}/> Multiple To / CC / BCC recipients supported</span>
-          <span><CheckCircle2 size={15}/> Routing is reusable for future website forms</span>
+          <span><CheckCircle2 size={15}/> Routing stays separate from the other website</span>
         </div>
       </div>
       <div className="site-admin-note">
-        <strong>Template rule</strong><br/>
-        For another website, configure the sending mailbox and routing here. The form and mail-delivery code do not need to be rewritten.
+        <strong>{profile.label} mailbox</strong><br/>
+        These settings apply only while the {profile.label} website is selected in Website Admin.
       </div>
     </aside>
   </div>;
