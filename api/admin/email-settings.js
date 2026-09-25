@@ -5,6 +5,21 @@ const ROUTE_TYPES = new Set(['to', 'cc', 'bcc']);
 const EVENT_KEY = /^[a-z0-9_-]{1,60}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const SITE_CONFIG = {
+  justconsignin: {
+    requiredEvent: 'demo_request',
+    requiredLabel: 'Demo Requests',
+    fallbackRouteId: 'demo-primary',
+    defaultFromName: 'JustConsignIn',
+  },
+  justindematteis: {
+    requiredEvent: 'service_request',
+    requiredLabel: 'Service Requests',
+    fallbackRouteId: 'service-primary',
+    defaultFromName: 'Justin DeMatteis',
+  },
+};
+
 function readBody(req) {
   if (!req.body) return {};
   if (typeof req.body === 'string') {
@@ -18,30 +33,55 @@ function clean(value, max = 1000) {
   return String(value).trim().slice(0, max);
 }
 
-function normalizeRoutes(value, fallbackEmail = '') {
-  const source = Array.isArray(value) ? value : [];
-  const routes = source.slice(0, 50).map((route, index) => {
-    const eventKey = clean(route?.eventKey, 60).toLowerCase();
-    const recipientType = clean(route?.recipientType, 10).toLowerCase();
-    const email = clean(route?.email, 320).toLowerCase();
-    if (!EVENT_KEY.test(eventKey) || !ROUTE_TYPES.has(recipientType) || !EMAIL.test(email)) {
-      throw new Error(`Invalid notification route ${index + 1}.`);
-    }
-    return {
-      id: clean(route?.id, 100) || `route-${index + 1}`,
-      eventKey,
-      recipientType,
-      email,
-      enabled: route?.enabled !== false,
-    };
-  });
+function siteKeyFromRequest(req) {
+  const siteKey = clean(req.query?.site, 80).toLowerCase() || 'justconsignin';
+  return SITE_CONFIG[siteKey] ? siteKey : '';
+}
 
-  if (!routes.length && EMAIL.test(clean(fallbackEmail, 320))) {
-    routes.push({ id: 'demo-primary', eventKey: 'demo_request', recipientType: 'to', email: clean(fallbackEmail, 320).toLowerCase(), enabled: true });
+function normalizeRoutes(value, fallbackEmail = '', siteKey = 'justconsignin') {
+  const site = SITE_CONFIG[siteKey] || SITE_CONFIG.justconsignin;
+  const source = Array.isArray(value) ? value : [];
+
+  // A newly-added row with no address is an unfinished UI row, not a broken route.
+  // Ignore it until an address is entered so "Add recipient" does not make Save fail.
+  const routes = source
+    .slice(0, 50)
+    .filter(route => clean(route?.email, 320))
+    .map((route, index) => {
+      const eventKey = clean(route?.eventKey, 60).toLowerCase();
+      const recipientType = clean(route?.recipientType, 10).toLowerCase();
+      const email = clean(route?.email, 320).toLowerCase();
+      if (!EVENT_KEY.test(eventKey) || !ROUTE_TYPES.has(recipientType) || !EMAIL.test(email)) {
+        throw new Error(`Invalid notification route ${index + 1}.`);
+      }
+      return {
+        id: clean(route?.id, 100) || `route-${index + 1}`,
+        eventKey,
+        recipientType,
+        email,
+        enabled: route?.enabled !== false,
+      };
+    });
+
+  const fallback = clean(fallbackEmail, 320).toLowerCase();
+  if (!routes.length && EMAIL.test(fallback)) {
+    routes.push({
+      id: site.fallbackRouteId,
+      eventKey: site.requiredEvent,
+      recipientType: 'to',
+      email: fallback,
+      enabled: true,
+    });
   }
 
-  const hasDemoTo = routes.some(route => route.enabled && route.eventKey === 'demo_request' && route.recipientType === 'to');
-  if (!hasDemoTo) throw new Error('Add at least one enabled Demo Requests recipient using To.');
+  const hasRequiredTo = routes.some(
+    route => route.enabled && route.eventKey === site.requiredEvent && route.recipientType === 'to' && route.email,
+  );
+
+  if (!hasRequiredTo) {
+    throw new Error(`Add at least one enabled ${site.requiredLabel} recipient using To.`);
+  }
+
   return routes;
 }
 
@@ -63,10 +103,19 @@ export default async function handler(req, res) {
   const owner = await requireWebsiteOwner(req, res);
   if (!owner) return;
 
+  const siteKey = siteKeyFromRequest(req);
+  if (!siteKey) return res.status(400).json({ error: 'Unknown website.' });
+  const site = SITE_CONFIG[siteKey];
+
   if (req.method === 'GET') {
     try {
-      const rows = await callOwnerRpc(owner.accessToken, 'admin_get_email_settings');
-      return res.status(200).json({ settings: Array.isArray(rows) ? rows[0] || null : rows || null });
+      const rows = await callOwnerRpc(owner.accessToken, 'admin_get_email_settings', {
+        p_site_key: siteKey,
+      });
+      return res.status(200).json({
+        siteKey,
+        settings: Array.isArray(rows) ? rows[0] || null : rows || null,
+      });
     } catch (error) {
       console.error('Email settings GET failed', error);
       return res.status(500).json({ error: 'Unable to load email settings.' });
@@ -90,11 +139,14 @@ export default async function handler(req, res) {
 
     let routes;
     try {
-      routes = normalizeRoutes(body.notificationRoutes, body.notificationEmail);
+      routes = normalizeRoutes(body.notificationRoutes, body.notificationEmail, siteKey);
     } catch (error) {
       return res.status(400).json({ error: error?.message || 'Check notification routing.' });
     }
-    const primaryDemoEmail = routes.find(route => route.enabled && route.eventKey === 'demo_request' && route.recipientType === 'to')?.email || '';
+
+    const primaryEmail = routes.find(
+      route => route.enabled && route.eventKey === site.requiredEvent && route.recipientType === 'to',
+    )?.email || '';
 
     try {
       const rows = await callOwnerRpc(owner.accessToken, 'admin_save_email_settings', {
@@ -105,12 +157,16 @@ export default async function handler(req, res) {
         p_smtp_secure: body.smtpSecure !== false,
         p_smtp_username: smtpUsername,
         p_smtp_from_email: fromEmail,
-        p_smtp_from_name: clean(body.fromName, 160) || 'JustConsignIn',
-        p_notification_email: primaryDemoEmail,
+        p_smtp_from_name: clean(body.fromName, 160) || site.defaultFromName,
+        p_notification_email: primaryEmail,
         p_password: clean(body.password, 1000) || null,
         p_notification_routes: routes,
+        p_site_key: siteKey,
       });
-      return res.status(200).json({ settings: Array.isArray(rows) ? rows[0] || null : rows || null });
+      return res.status(200).json({
+        siteKey,
+        settings: Array.isArray(rows) ? rows[0] || null : rows || null,
+      });
     } catch (error) {
       console.error('Email settings PUT failed', error);
       return res.status(500).json({ error: error?.message || 'Unable to save email settings.' });
@@ -129,7 +185,7 @@ export default async function handler(req, res) {
           Authorization: `Bearer ${owner.accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action: 'test' }),
+        body: JSON.stringify({ action: 'test', siteKey }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) return res.status(502).json({ error: payload?.error || 'Test email failed.' });
