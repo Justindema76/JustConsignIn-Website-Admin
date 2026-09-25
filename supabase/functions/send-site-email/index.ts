@@ -91,7 +91,7 @@ function recipientsFor(settings: any, eventKey: string) {
   let to = unique('to');
   const cc = unique('cc').filter(email => !to.includes(email));
   const bcc = unique('bcc').filter(email => !to.includes(email) && !cc.includes(email));
-  if (!to.length && clean(settings.notification_email, 320)) to = [clean(settings.notification_email, 320).toLowerCase()];
+  if (!to.length && eventKey === 'demo_request' && clean(settings.notification_email, 320)) to = [clean(settings.notification_email, 320).toLowerCase()];
   if (!to.length) throw new Error(`No To recipient is configured for ${eventKey}.`);
   return { to, cc, bcc };
 }
@@ -411,6 +411,174 @@ async function sendSchedule(req: Request, body: any) {
   }
 }
 
+
+function serviceRequestMessage(record: any, settings: any) {
+  const display = (value: unknown) => clean(value, 3000) || 'Not provided';
+  const company = clean(record.company, 160) || 'Individual project';
+  const requestedService = clean(record.requested_service, 100).replace(/_/g, ' ') || 'Not specified';
+  const primaryService = clean(record.ai_primary_service, 100).replace(/_/g, ' ') || 'Not classified';
+  const secondary = Array.isArray(record.ai_secondary_services) ? record.ai_secondary_services.map((item: unknown) => clean(item, 100).replace(/_/g, ' ')).filter(Boolean).join(', ') : '';
+  const campaign = [record.utm_source, record.utm_medium, record.utm_campaign].filter(Boolean).join(' / ') || 'Direct / unknown';
+  const row = (label: string, value: unknown) => `<tr><td style="padding:8px 12px;color:#6d7175;font-weight:700;vertical-align:top;width:150px">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#202223;vertical-align:top">${escapeHtml(display(value))}</td></tr>`;
+
+  const text = [
+    'New JustinDeMatteis.com service request', '',
+    `Name: ${display(record.name)}`,
+    `Company: ${company}`,
+    `Email: ${display(record.email)}`,
+    `Phone: ${display(record.phone)}`,
+    `Requested service: ${requestedService}`,
+    `AI primary service: ${primaryService}`,
+    `AI secondary services: ${secondary || 'None'}`,
+    `Priority: ${display(record.ai_priority)}`,
+    `AI summary: ${display(record.ai_summary)}`,
+    `Budget: ${display(record.budget_range)}`,
+    `Timeline: ${display(record.timeline)}`, '',
+    'Project request:', display(record.message), '',
+    `Source page: ${display(record.source_path)}`,
+    `Campaign: ${campaign}`, '',
+    'This request is saved in Website Admin → Service Requests.',
+  ].join('\n');
+
+  const html = `<div style="font-family:Arial,sans-serif;background:#f5f6f8;padding:24px;color:#202223"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #dfe3e8;border-radius:14px;overflow:hidden"><div style="background:#1f67b2;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85">Justin DeMatteis</div><h1 style="margin:5px 0 0;font-size:24px">New Service Request</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Company', company)}${row('Email', record.email)}${row('Phone', record.phone)}${row('Requested service', requestedService)}${row('AI route', primaryService)}${row('Secondary', secondary)}${row('Priority', record.ai_priority)}${row('Budget', record.budget_range)}${row('Timeline', record.timeline)}${row('Source', campaign)}</table><div style="margin:16px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">AI summary</strong><div style="line-height:1.55">${escapeHtml(display(record.ai_summary))}</div></div><div style="margin:10px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">Project request</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#6d7175;font-size:13px">Reply directly to ${escapeHtml(display(record.name))} at ${escapeHtml(display(record.email))}. The request is also saved in Website Admin → Service Requests.</p></div></div></div>`;
+
+  return {
+    from: fromAddress(settings),
+    ...recipientsFor(settings, 'service_request'),
+    replyTo: record.email,
+    subject: `New Service Request — ${company} — ${display(record.name)}`,
+    text,
+    html,
+  };
+}
+
+async function sendServiceRequestNotification(body: any) {
+  const requestId = clean(body.requestId, 80);
+  const notificationToken = clean(body.notificationToken, 80);
+  if (!validUuid(requestId) || !validUuid(notificationToken)) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  const { data: record, error } = await admin
+    .from('service_requests')
+    .select('id,site_key,name,email,phone,company,requested_service,budget_range,timeline,message,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,source_path,utm_source,utm_medium,utm_campaign,notification_token,email_notified_at')
+    .eq('id', requestId)
+    .eq('site_key', 'justindematteis')
+    .maybeSingle();
+
+  if (error) {
+    console.error('Service request notification lookup failed', error.message);
+    return Response.json({ error: 'Unable to load service request.' }, { status: 500 });
+  }
+  if (!record || String(record.notification_token) !== notificationToken) return Response.json({ error: 'Not found' }, { status: 404 });
+  if (record.email_notified_at) return Response.json({ ok: true, alreadySent: true });
+
+  await admin.from('service_requests').update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
+
+  try {
+    const settings = await loadSettings();
+    await transportFor(settings).sendMail(serviceRequestMessage(record, settings));
+    await admin.from('service_requests').update({ email_notified_at: new Date().toISOString(), email_notification_error: null }).eq('id', requestId);
+    return Response.json({ ok: true, sent: true });
+  } catch (error) {
+    const message = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await admin.from('service_requests').update({ email_notification_error: message }).eq('id', requestId);
+    console.error('Service request notification failed', message);
+    return Response.json({ error: message }, { status: 502 });
+  }
+}
+
+async function saveServiceRequestEmailHistory(values: any) {
+  const { data, error } = await admin
+    .from('service_request_emails')
+    .insert(values)
+    .select('id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id')
+    .single();
+  if (error) console.error('Unable to save service request email history', error.message);
+  return { data, error };
+}
+
+async function sendServiceRequestReply(req: Request, body: any) {
+  const ownerAuth = await requireOwner(req);
+  if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  const requestId = clean(body.requestId, 80);
+  const subject = clean(body.subject, 240);
+  const message = clean(body.message, 12000);
+  const cc = normalizeEmailList(body.ccEmails);
+  const bcc = normalizeEmailList(body.bccEmails);
+
+  if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
+  if (!subject) return Response.json({ error: 'Subject is required.' }, { status: 400 });
+  if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
+  if ([...cc, ...bcc].some(email => !validEmail(email))) return Response.json({ error: 'CC and BCC must contain valid email addresses.' }, { status: 400 });
+
+  const { data: record, error } = await admin
+    .from('service_requests')
+    .select('id,site_key,name,company,email,status,contacted_at')
+    .eq('id', requestId)
+    .eq('site_key', 'justindematteis')
+    .maybeSingle();
+
+  if (error) {
+    console.error('Owner service request lookup failed', error.message);
+    return Response.json({ error: 'Unable to load service request.' }, { status: 500 });
+  }
+  if (!record) return Response.json({ error: 'Service request not found.' }, { status: 404 });
+
+  const to = clean(record.email, 320).toLowerCase();
+  if (!validEmail(to)) return Response.json({ error: 'The service request does not have a valid email address.' }, { status: 400 });
+
+  const settings = await loadSettings();
+  const fromEmail = clean(settings.smtp_from_email, 320).toLowerCase();
+  const sentAt = new Date().toISOString();
+  const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
+
+  try {
+    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html });
+    const history = await saveServiceRequestEmailHistory({
+      service_request_id: requestId,
+      sent_at: sentAt,
+      to_email: to,
+      cc_emails: cc,
+      bcc_emails: bcc,
+      from_email: fromEmail,
+      subject,
+      body_text: message,
+      delivery_status: 'sent',
+      provider_message_id: clean(info?.messageId, 1000) || null,
+      created_by: ownerAuth.user.id,
+    });
+
+    const patch: Record<string, unknown> = { updated_at: sentAt };
+    if (record.status === 'new' || record.status === 'reviewing') patch.status = 'contacted';
+    if (!record.contacted_at) patch.contacted_at = sentAt;
+    const { data: updatedRequest } = await admin
+      .from('service_requests')
+      .update(patch)
+      .eq('id', requestId)
+      .eq('site_key', 'justindematteis')
+      .select('id,status,contacted_at,updated_at')
+      .maybeSingle();
+
+    return Response.json({ ok: true, sent: true, email: history.data || null, request: updatedRequest || null, historySaved: !history.error });
+  } catch (error) {
+    const errorMessage = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await saveServiceRequestEmailHistory({
+      service_request_id: requestId,
+      to_email: to,
+      cc_emails: cc,
+      bcc_emails: bcc,
+      from_email: fromEmail,
+      subject,
+      body_text: message,
+      delivery_status: 'failed',
+      delivery_error: errorMessage,
+      created_by: ownerAuth.user.id,
+    });
+    console.error('Service request reply failed', errorMessage);
+    return Response.json({ error: errorMessage }, { status: 502 });
+  }
+}
+
 async function sendTest(req: Request) {
   const ownerAuth = await requireOwner(req);
   if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
@@ -438,7 +606,9 @@ Deno.serve(async (req: Request) => {
   let body: any = {};
   try { body = await req.json(); } catch { return Response.json({ error: 'Invalid request' }, { status: 400 }); }
   if (body.action === 'demo') return sendDemo(body);
+  if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
+  if (body.action === 'service_reply') return sendServiceRequestReply(req, body);
   if (body.action === 'schedule') return sendSchedule(req, body);
   if (body.action === 'test') return sendTest(req);
   return Response.json({ error: 'Invalid action' }, { status: 400 });
