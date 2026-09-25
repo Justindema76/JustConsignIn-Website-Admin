@@ -206,6 +206,17 @@ export default function CaseStudyButtonFields({
           placeholder={draft?.projectUrl || 'https://...'}
         />
       </label>
+      <label>CTA background
+        <select
+          value={sections.footerCtaTheme || 'dark'}
+          onChange={event => updateSection('footerCtaTheme', event.target.value)}
+        >
+          <option value="dark">Dark surface</option>
+          <option value="primary">Primary colour</option>
+          <option value="light">Light surface</option>
+          <option value="white">White / surface</option>
+        </select>
+      </label>
     </div>
 
     <div className="case-study-control-section">
