@@ -37,3 +37,12 @@ export async function sendServiceRequestEmail(accessToken, email) {
     body: JSON.stringify(email),
   }, accessToken));
 }
+
+
+export async function assignServiceRequestDepartment(accessToken, values) {
+  return parseResponse(await adminFetch('/api/admin/service-request-assignment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(values),
+  }, accessToken));
+}
