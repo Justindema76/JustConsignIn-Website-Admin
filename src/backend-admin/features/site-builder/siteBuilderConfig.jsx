@@ -1253,19 +1253,23 @@ export const siteBuilderConfig = {
           primaryButtonText: rawProps.primaryButtonText ?? rawProps.buttonText ?? '',
           primaryButtonUrl: rawProps.primaryButtonUrl ?? rawProps.buttonUrl ?? '',
         };
+        const hasActions = Boolean(props.primaryButtonText || props.secondaryButtonText);
+        const actions = hasActions ? <div className="shared-showcase-actions jci-builder-hero-actions">
+          {props.primaryButtonText && <a className="shared-btn shared-btn-primary" href={props.primaryButtonUrl || '#'} onClick={previewClick}>{props.primaryButtonText}</a>}
+          {props.secondaryButtonText && <a className="shared-btn shared-btn-secondary" href={props.secondaryButtonUrl || '#'} onClick={previewClick}>{props.secondaryButtonText}</a>}
+        </div> : null;
+
         return <section className={`jci-builder-section jci-builder-hero showcase-style-hero theme-${props.background || 'light'} ${props.image ? 'with-media' : 'without-media'}`}>
           <div className="jci-builder-hero-copy">
             {props.eyebrow && <p className="jci-builder-eyebrow">{props.eyebrow}</p>}
             <BlockHeading level={props.headingLevel || 'h1'} className="jci-builder-hero-heading">{props.heading}{props.accent ? <> <span>{props.accent}</span></> : null}</BlockHeading>
             {props.text && <p>{props.text}</p>}
-            {(props.primaryButtonText || props.secondaryButtonText) && <div className="shared-showcase-actions">
-              {props.primaryButtonText && <a className="shared-btn shared-btn-primary" href={props.primaryButtonUrl || '#'} onClick={previewClick}>{props.primaryButtonText}</a>}
-              {props.secondaryButtonText && <a className="shared-btn shared-btn-secondary" href={props.secondaryButtonUrl || '#'} onClick={previewClick}>{props.secondaryButtonText}</a>}
-            </div>}
+            {!props.image && actions}
             {props.note && <div className="shared-showcase-note">{props.note}</div>}
           </div>
           {props.image && <div className="jci-builder-hero-media">
             <img src={props.image} alt={props.imageAlt || ''}/>
+            {actions}
           </div>}
         </section>;
       },
