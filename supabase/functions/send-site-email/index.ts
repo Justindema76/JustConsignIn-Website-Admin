@@ -453,6 +453,98 @@ function serviceRequestMessage(record: any, settings: any) {
   };
 }
 
+async function submitServiceRequest(body: any) {
+  const name = clean(body.name, 120);
+  const email = clean(body.email, 254).toLowerCase();
+  const message = clean(body.message, 6000);
+
+  if (!name || !validEmail(email) || message.length < 20) {
+    return Response.json({ error: 'Please complete the required fields.' }, { status: 400 });
+  }
+
+  const secondaryServices = Array.isArray(body.ai_secondary_services)
+    ? body.ai_secondary_services.map((item: unknown) => clean(item, 100)).filter(Boolean).slice(0, 3)
+    : [];
+
+  const confidence = Math.max(0, Math.min(1, Number(body.ai_confidence) || 0));
+
+  const record = {
+    site_key: 'justindematteis',
+    name,
+    email,
+    phone: clean(body.phone, 60),
+    company: clean(body.company, 160),
+    website: clean(body.website, 500),
+    requested_service: clean(body.requested_service, 80) || 'not_sure',
+    budget_range: clean(body.budget_range, 80),
+    timeline: clean(body.timeline, 80),
+    message,
+    contact_consent: body.contact_consent === true,
+    status: 'new',
+    routed_queue: clean(body.routed_queue, 100) || 'other',
+    ai_primary_service: clean(body.ai_primary_service, 100) || 'other',
+    ai_secondary_services: secondaryServices,
+    ai_priority: ['low', 'normal', 'high'].includes(clean(body.ai_priority, 20)) ? clean(body.ai_priority, 20) : 'normal',
+    ai_summary: clean(body.ai_summary, 160),
+    ai_confidence: confidence,
+    ai_provider: clean(body.ai_provider, 80) || 'rules',
+    ai_model: clean(body.ai_model, 120) || null,
+    source_path: clean(body.source_path, 500),
+    referrer: clean(body.referrer, 1000),
+    utm_source: clean(body.utm_source, 200),
+    utm_medium: clean(body.utm_medium, 200),
+    utm_campaign: clean(body.utm_campaign, 300),
+    utm_content: clean(body.utm_content, 300),
+    utm_term: clean(body.utm_term, 300),
+    metadata: {
+      submitted_via: 'portfolio_service_request',
+    },
+  };
+
+  const { data: saved, error: insertError } = await admin
+    .from('service_requests')
+    .insert(record)
+    .select('id,site_key,name,email,phone,company,website,requested_service,budget_range,timeline,message,status,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,ai_confidence,ai_provider,ai_model,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,notification_token,email_notified_at')
+    .single();
+
+  if (insertError || !saved) {
+    console.error('Service request insert failed', insertError?.message || 'No saved row returned');
+    return Response.json({ error: 'Unable to save service request.' }, { status: 500 });
+  }
+
+  let emailSent = false;
+  let emailError = '';
+
+  try {
+    await admin.from('service_requests')
+      .update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null })
+      .eq('id', saved.id);
+
+    const settings = await loadSettings('justindematteis');
+    await transportFor(settings).sendMail(serviceRequestMessage(saved, settings));
+
+    await admin.from('service_requests')
+      .update({ email_notified_at: new Date().toISOString(), email_notification_error: null })
+      .eq('id', saved.id);
+
+    emailSent = true;
+  } catch (error) {
+    emailError = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await admin.from('service_requests')
+      .update({ email_notification_error: emailError })
+      .eq('id', saved.id);
+    console.error('Service request saved but notification failed', emailError);
+  }
+
+  return Response.json({
+    ok: true,
+    saved: true,
+    emailSent,
+    emailError: emailSent ? null : emailError,
+    request: saved,
+  });
+}
+
 async function sendServiceRequestNotification(body: any) {
   const requestId = clean(body.requestId, 80);
   const notificationToken = clean(body.notificationToken, 80);
@@ -613,6 +705,7 @@ Deno.serve(async (req: Request) => {
   let body: any = {};
   try { body = await req.json(); } catch { return Response.json({ error: 'Invalid request' }, { status: 400 }); }
   if (body.action === 'demo') return sendDemo(body);
+  if (body.action === 'service_submit') return submitServiceRequest(body);
   if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'service_reply') return sendServiceRequestReply(req, body);
