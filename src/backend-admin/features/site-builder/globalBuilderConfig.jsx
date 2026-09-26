@@ -95,6 +95,34 @@ export const justinFooterDefaults = {
   background: 'dark',
 };
 
+export const justinProjectRequestDefaults = {
+  id: 'project-request',
+  tabLabel: 'Start a Project',
+  mobileLabel: 'Start a Project',
+  eyebrow: 'Project request',
+  title: 'Send a project request.',
+  description: 'Share the problem, the systems involved, your timeline, and what you want the finished solution to do.',
+  websiteLabel: 'Website',
+  serviceLabel: 'Service needed',
+  budgetLabel: 'Budget range',
+  timelineLabel: 'Timeline',
+  messageLabel: 'Project details',
+  messagePlaceholder: 'What are you doing manually now? What systems are involved? What do you want the finished solution to do?',
+  consentLabel: 'You can contact me about this request.',
+  submitLabel: 'Send Service Request',
+  submittingLabel: 'Sending request…',
+  successTitle: 'Request received.',
+  successMessage: 'I have your project details and will review the right next step.',
+  nextStepTitle: 'What happens next?',
+  nextStepText: 'Your request is saved, organized by service type, and sent to me for review.',
+  privacyText: 'By submitting, you are asking Justin DeMatteis to contact you about this project request.',
+  errorMessage: 'Unable to submit your request right now.',
+  closeLabel: 'Close',
+  primary: '#2F6BFF',
+  primaryHover: '#2458D8',
+  primaryDark: '#1748BE',
+};
+
 const backgroundOptions = [
   { label: 'White', value: 'white' },
   { label: 'Light', value: 'light' },
@@ -130,6 +158,77 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
     .map(key => SOCIAL_NETWORKS.find(network => network.key === key))
     .filter(Boolean)
     .filter(network => socialLinks?.[network.key]?.url && socialLinks?.[network.key]?.enabled !== false);
+
+  if (type === 'project-request') {
+    const defaults = justinProjectRequestDefaults;
+    return {
+      categories: { global: { title: 'Global Project Request Drawer', components: ['ProjectRequestBlock'] } },
+      components: {
+        ProjectRequestBlock: {
+          label: 'Project Request Drawer',
+          fields: {
+            tabLabel: { type: 'text', label: 'Desktop tab label' },
+            mobileLabel: { type: 'text', label: 'Mobile button label' },
+            eyebrow: { type: 'text', label: 'Eyebrow' },
+            title: { type: 'text', label: 'Drawer heading' },
+            description: { type: 'textarea', label: 'Drawer description' },
+            websiteLabel: { type: 'text', label: 'Website field label' },
+            serviceLabel: { type: 'text', label: 'Service field label' },
+            budgetLabel: { type: 'text', label: 'Budget field label' },
+            timelineLabel: { type: 'text', label: 'Timeline field label' },
+            messageLabel: { type: 'text', label: 'Project details field label' },
+            messagePlaceholder: { type: 'textarea', label: 'Project details placeholder' },
+            consentLabel: { type: 'text', label: 'Consent checkbox text' },
+            nextStepTitle: { type: 'text', label: 'Next step heading' },
+            nextStepText: { type: 'textarea', label: 'Next step text' },
+            submitLabel: { type: 'text', label: 'Submit button text' },
+            submittingLabel: { type: 'text', label: 'Submitting button text' },
+            successTitle: { type: 'text', label: 'Success heading' },
+            successMessage: { type: 'textarea', label: 'Success text' },
+            privacyText: { type: 'textarea', label: 'Privacy / consent footer' },
+            errorMessage: { type: 'text', label: 'Error message' },
+            closeLabel: { type: 'text', label: 'Close button text' },
+            primary: cssColorField('Primary colour'),
+            primaryHover: cssColorField('Primary hover colour'),
+            primaryDark: cssColorField('Primary dark colour'),
+          },
+          defaultProps: defaults,
+          render: raw => {
+            const p = { ...defaults, ...raw };
+            return <div style={{
+              '--drawer-primary': p.primary || '#2F6BFF',
+              maxWidth:'760px',
+              margin:'0 auto',
+              border:'1px solid #dce4ec',
+              borderRadius:'18px',
+              overflow:'hidden',
+              background:'#fff',
+              boxShadow:'0 16px 40px rgba(18,40,60,.08)',
+            }}>
+              <div style={{padding:'24px 26px',borderBottom:'1px solid #e4e9ee'}}>
+                <span style={{display:'inline-flex',padding:'7px 12px',borderRadius:'999px',background:'#eaf2ff',color:'var(--drawer-primary)',fontSize:'11px',fontWeight:900,letterSpacing:'.08em',textTransform:'uppercase'}}>{p.eyebrow}</span>
+                <h2 style={{margin:'14px 0 8px',fontSize:'36px',lineHeight:1.05}}>{p.title}</h2>
+                <p style={{margin:0,color:'#66727e',lineHeight:1.55}}>{p.description}</p>
+              </div>
+              <div style={{padding:'22px 26px',display:'grid',gap:'12px'}}>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+                  <div style={{height:'48px',border:'1px solid #d7dce1',borderRadius:'10px',background:'#f8fafc'}} />
+                  <div style={{height:'48px',border:'1px solid #d7dce1',borderRadius:'10px',background:'#f8fafc'}} />
+                </div>
+                <div style={{height:'48px',border:'1px solid #d7dce1',borderRadius:'10px',background:'#f8fafc'}} />
+                <div style={{height:'120px',border:'1px solid #d7dce1',borderRadius:'10px',background:'#f8fafc'}} />
+                <div style={{padding:'13px 14px',border:'1px solid #dfe5ea',borderRadius:'10px',background:'#f7f9fb'}}>
+                  <strong style={{display:'block',fontSize:'12px'}}>{p.nextStepTitle}</strong>
+                  <span style={{display:'block',marginTop:'4px',color:'#6d7782',fontSize:'11px'}}>{p.nextStepText}</span>
+                </div>
+                <button type="button" style={{height:'48px',border:0,borderRadius:'10px',background:'var(--drawer-primary)',color:'#fff',fontWeight:900}}>{p.submitLabel}</button>
+              </div>
+            </div>;
+          },
+        },
+      },
+    };
+  }
 
   if (type === 'header') {
     return {
@@ -256,6 +355,12 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
 
 export function defaultGlobalData(type, siteKey = 'justconsignin') {
   const isJustin = siteKey === 'justindematteis';
+  if (type === 'project-request') {
+    return {
+      content: [{ type: 'ProjectRequestBlock', props: { id: 'project-request', ...justinProjectRequestDefaults } }],
+      root: { props: {} },
+    };
+  }
   const defaults = type === 'header'
     ? (isJustin ? justinHeaderDefaults : headerDefaults)
     : (isJustin ? justinFooterDefaults : footerDefaults);
