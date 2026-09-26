@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BriefcaseBusiness, ExternalLink, Mail, Phone, RefreshCw, Search, ShieldAlert, Trash2 } from 'lucide-react';
+import { BriefcaseBusiness, ChevronRight, ExternalLink, Mail, Phone, RefreshCw, Search, ShieldAlert, Trash2, X } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteHiringContact, loadHiringContacts, updateHiringContact } from './hiringContacts.service';
 
@@ -25,12 +25,27 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
 }
 
+function shortDate(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function statusLabel(value) {
   return STATUS_OPTIONS.find(([key]) => key === value)?.[1] || value || 'New';
 }
 
 function reasonLabel(value) {
   return REASON_LABELS[value] || value || 'Employment';
+}
+
+function reasonClass(value) {
+  return {
+    interview: 'hiring-reason-interview',
+    job_opportunity: 'hiring-reason-job',
+    recruiter: 'hiring-reason-recruiter',
+    other_employment: 'hiring-reason-other',
+  }[value] || 'hiring-reason-other';
 }
 
 export default function HiringContactsAdmin() {
@@ -47,14 +62,14 @@ export default function HiringContactsAdmin() {
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
 
+  const selected = contacts.find(contact => contact.id === selectedId) || null;
+
   const refresh = useCallback(async () => {
     if (!accessToken) return;
     setLoading(true);
     setError('');
     try {
-      const rows = await loadHiringContacts(accessToken);
-      setContacts(rows);
-      setSelectedId(current => current && rows.some(row => row.id === current) ? current : (rows.find(row => row.status !== 'spam')?.id || rows[0]?.id || ''));
+      setContacts(await loadHiringContacts(accessToken));
     } catch (err) {
       setError(err?.message || 'Unable to load hiring contacts.');
     } finally {
@@ -64,26 +79,44 @@ export default function HiringContactsAdmin() {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  useEffect(() => {
+    if (!selected) return;
+    setDraftStatus(selected.status || 'new');
+    setDraftNotes(selected.admin_notes || '');
+    setSuccess('');
+  }, [selected?.id]);
+
+  useEffect(() => {
+    if (!selectedId) return undefined;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = event => {
+      if (event.key === 'Escape') setSelectedId('');
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [selectedId]);
+
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return contacts.filter(contact => {
       if (statusFilter === 'active' && ['closed','spam'].includes(contact.status)) return false;
       if (statusFilter !== 'all' && statusFilter !== 'active' && contact.status !== statusFilter) return false;
       if (!needle) return true;
-      return [contact.name,contact.company,contact.email,contact.phone,contact.role_title,contact.message]
-        .filter(Boolean).join(' ').toLowerCase().includes(needle);
+      return [
+        contact.name,
+        contact.company,
+        contact.email,
+        contact.phone,
+        contact.role_title,
+        contact.message,
+        contact.reason,
+      ].filter(Boolean).join(' ').toLowerCase().includes(needle);
     });
   }, [contacts, query, statusFilter]);
-
-  const selected = contacts.find(contact => contact.id === selectedId) || filtered[0] || null;
-
-  useEffect(() => {
-    if (!selected) return;
-    setSelectedId(selected.id);
-    setDraftStatus(selected.status || 'new');
-    setDraftNotes(selected.admin_notes || '');
-    setSuccess('');
-  }, [selected?.id, selected?.status, selected?.admin_notes]);
 
   const counts = useMemo(() => ({
     new: contacts.filter(item => item.status === 'new').length,
@@ -91,6 +124,10 @@ export default function HiringContactsAdmin() {
     interview: contacts.filter(item => item.status === 'interview').length,
     spam: contacts.filter(item => item.status === 'spam').length,
   }), [contacts]);
+
+  function closeDrawer() {
+    setSelectedId('');
+  }
 
   async function save() {
     if (!selected || !accessToken) return;
@@ -117,11 +154,11 @@ export default function HiringContactsAdmin() {
     if (!window.confirm(`Permanently delete ${selected.company || selected.name}?\n\nThis cannot be undone.`)) return;
     setDeleting(true);
     setError('');
+    setSuccess('');
     try {
       await deleteHiringContact(accessToken, selected.id);
-      const remaining = contacts.filter(row => row.id !== selected.id);
-      setContacts(remaining);
-      setSelectedId(remaining.find(row => row.status !== 'spam')?.id || remaining[0]?.id || '');
+      setContacts(rows => rows.filter(row => row.id !== selected.id));
+      closeDrawer();
       setSuccess('Hiring contact deleted.');
     } catch (err) {
       setError(err?.message || 'Unable to delete hiring contact.');
@@ -135,84 +172,124 @@ export default function HiringContactsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Employment</p>
         <h1>Hiring Contacts</h1>
-        <p>Interview requests, job opportunities and recruiter messages from JustinDeMatteis.com.</p>
+        <p>Review interview requests, job opportunities and recruiter messages, then open a contact only when you need the full details.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
 
     {error && <div className="site-admin-alert error">{error}</div>}
-    {success && <div className="site-admin-alert success">{success}</div>}
+    {success && !selected && <div className="site-admin-alert success">{success}</div>}
 
-    <div className="demo-request-stats">
-      <div className="site-admin-card"><span>New</span><strong>{counts.new}</strong></div>
-      <div className="site-admin-card"><span>Active</span><strong>{counts.active}</strong></div>
-      <div className="site-admin-card"><span>Interview</span><strong>{counts.interview}</strong></div>
-      <div className="site-admin-card"><span>Filtered Spam</span><strong>{counts.spam}</strong></div>
+    <div className="demo-request-stats service-request-stats">
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('new')}><span>New</span><strong>{counts.new}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('active')}><span>Open / Active</span><strong>{counts.active}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('interview')}><span>Interview</span><strong>{counts.interview}</strong></button>
+      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('spam')}><span>Filtered Spam</span><strong>{counts.spam}</strong></button>
     </div>
 
-    <div className="site-admin-toolbar demo-request-toolbar hiring-contact-toolbar">
+    <div className="site-admin-toolbar demo-request-toolbar service-request-toolbar">
       <label className="site-admin-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search name, company, role, email or message" /></label>
       <select value={statusFilter} onChange={event => setStatusFilter(event.target.value)} aria-label="Filter hiring contacts">
         <option value="active">Open / active</option>
-        <option value="all">All</option>
+        <option value="all">All contacts</option>
         {STATUS_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}
       </select>
     </div>
 
-    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading hiring contacts…</p></div> : contacts.length === 0 ? <div className="site-admin-card site-admin-empty large"><BriefcaseBusiness size={30}/><h2>No hiring contacts yet</h2><p>Employment and interview enquiries from the Contact page will appear here.</p></div> : <div className="demo-request-admin-grid">
-      <section className="site-admin-card demo-request-list" aria-label="Hiring contact list">
-        {filtered.length === 0 ? <div className="site-admin-empty">No contacts match this filter.</div> : filtered.map(contact => <button key={contact.id} type="button" className={`demo-request-row${contact.id === selected?.id ? ' selected' : ''}`} onClick={() => setSelectedId(contact.id)}>
-          <div className="demo-request-row-main">
-            <strong>{contact.company || contact.name}</strong>
-            <span>{contact.name}</span>
-            <small>{reasonLabel(contact.reason)} · {contact.role_title || contact.email}</small>
-          </div>
-          <div className="demo-request-row-meta">
-            {contact.is_spam && <span className="hiring-spam-pill">Filtered</span>}
-            <span className={`demo-request-status ${contact.status || 'new'}`}>{statusLabel(contact.status)}</span>
-            <small>{formatDate(contact.created_at)}</small>
-          </div>
-        </button>)}
+    {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading hiring contacts…</p></div> :
+      contacts.length === 0 ? <div className="site-admin-card site-admin-empty large"><BriefcaseBusiness size={30}/><h2>No hiring contacts yet</h2><p>Employment and interview enquiries from the Contact page will appear here.</p></div> :
+      <section className="site-admin-card hiring-contact-queue" aria-label="Hiring contact queue">
+        <div className="hiring-contact-queue-head">
+          <span>Company / Contact</span>
+          <span>Reason</span>
+          <span>Role</span>
+          <span>Status</span>
+          <span>Received</span>
+          <span aria-hidden="true"></span>
+        </div>
+
+        {filtered.length === 0 ? <div className="site-admin-empty service-request-empty">No contacts match these filters.</div> :
+          filtered.map(contact => <button key={contact.id} type="button" className="hiring-contact-queue-row" onClick={() => setSelectedId(contact.id)}>
+            <span className="service-request-customer">
+              <strong>{contact.company || contact.name}</strong>
+              <small>{contact.name} · {contact.email}</small>
+            </span>
+            <span><span className={`hiring-reason-badge ${reasonClass(contact.reason)}`}>{reasonLabel(contact.reason)}</span></span>
+            <span className="hiring-contact-role">{contact.role_title || '—'}</span>
+            <span><span className={`demo-request-status ${contact.status || 'new'}`}>{statusLabel(contact.status)}</span></span>
+            <span className="service-request-date">{shortDate(contact.created_at)}</span>
+            <ChevronRight className="service-request-open-icon" size={18}/>
+          </button>)
+        }
       </section>
+    }
 
-      <section className="site-admin-card demo-request-detail">
-        {!selected ? <div className="site-admin-empty">Choose a contact.</div> : <>
-          <div className="demo-request-detail-head">
-            <div>
-              <p className="site-admin-eyebrow">{reasonLabel(selected.reason)}</p>
-              <h2>{selected.company}</h2>
-              <p>{selected.name} · {selected.role_title}</p>
+    {selected && <>
+      <div className="service-request-drawer-overlay" onClick={closeDrawer} />
+      <aside className="service-request-drawer hiring-contact-drawer" role="dialog" aria-modal="true" aria-label={`Hiring contact from ${selected.company || selected.name}`}>
+        <header className="service-request-drawer-head">
+          <div>
+            <p className="site-admin-eyebrow">{reasonLabel(selected.reason)}</p>
+            <div className="service-request-drawer-title">
+              <h2>{selected.company || selected.name}</h2>
+              <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
             </div>
-            <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
+            <p>{selected.name}{selected.role_title ? ` · ${selected.role_title}` : ''} · {formatDate(selected.created_at)}</p>
           </div>
+          <button className="service-request-drawer-close" type="button" onClick={closeDrawer} aria-label="Close hiring contact"><X size={20}/></button>
+        </header>
 
-          <div className="demo-request-contact-actions">
+        <div className="service-request-drawer-body">
+          {success && <div className="site-admin-alert success">{success}</div>}
+          {error && <div className="site-admin-alert error">{error}</div>}
+
+          <div className="service-request-quick-actions">
             <a className="site-admin-btn" href={`mailto:${selected.email}`}><Mail size={14}/> Email {selected.name?.split(/\s+/)[0] || 'Contact'}</a>
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call</a>}
             {selected.website_or_linkedin && <a className="site-admin-btn secondary" href={selected.website_or_linkedin} target="_blank" rel="noreferrer">LinkedIn / Website <ExternalLink size={14}/></a>}
-            <button className="site-admin-btn danger demo-request-delete" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete'}</button>
           </div>
 
           {selected.is_spam && <div className="hiring-spam-warning"><ShieldAlert size={18}/><div><strong>Automatically filtered</strong><span>Spam score {selected.spam_score}. {(selected.spam_reasons || []).join(' · ') || 'Matched spam rules.'}</span></div></div>}
 
-          <dl className="demo-request-details">
-            <div><dt>Email</dt><dd>{selected.email}</dd></div>
-            <div><dt>Phone</dt><dd>{selected.phone || '—'}</dd></div>
-            <div><dt>Reason</dt><dd>{reasonLabel(selected.reason)}</dd></div>
-            <div><dt>Position / Role</dt><dd>{selected.role_title}</dd></div>
-            <div><dt>Submitted</dt><dd>{formatDate(selected.created_at)}</dd></div>
-            <div><dt>Notification</dt><dd>{selected.email_notified_at ? `Sent ${formatDate(selected.email_notified_at)}` : (selected.email_notification_error || (selected.is_spam ? 'Suppressed as spam' : 'Not sent yet'))}</dd></div>
-            <div className="wide"><dt>LinkedIn / Company Website</dt><dd>{selected.website_or_linkedin || '—'}</dd></div>
-            <div className="wide"><dt>Message</dt><dd>{selected.message}</dd></div>
-          </dl>
+          <section className="service-request-drawer-section primary-section">
+            <div className="service-request-section-head">
+              <div>
+                <p className="site-admin-eyebrow">Hiring workflow</p>
+                <h3>{statusLabel(selected.status)}</h3>
+              </div>
+              <BriefcaseBusiness size={20}/>
+            </div>
+            <div className="service-request-workflow-compact">
+              <label>Status<select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+              <label>Private notes<textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Interview details, recruiter notes, follow-up, role information…" /></label>
+              <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</button>
+            </div>
+          </section>
 
-          <div className="demo-request-workflow">
-            <label>Status<select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label className="wide">Private notes<textarea rows="5" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Interview details, recruiter notes, follow-up, role information…" /></label>
-            <div className="wide demo-request-save"><button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Contact'}</button></div>
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Message</p>
+            <p className="service-request-message">{selected.message}</p>
+          </section>
+
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Contact & opportunity</p>
+            <dl className="service-request-compact-details">
+              <div><dt>Email</dt><dd>{selected.email}</dd></div>
+              <div><dt>Phone</dt><dd>{selected.phone || '—'}</dd></div>
+              <div><dt>Reason</dt><dd>{reasonLabel(selected.reason)}</dd></div>
+              <div><dt>Position / Role</dt><dd>{selected.role_title || '—'}</dd></div>
+              <div><dt>Submitted</dt><dd>{formatDate(selected.created_at)}</dd></div>
+              <div><dt>Notification</dt><dd>{selected.email_notified_at ? `Sent ${formatDate(selected.email_notified_at)}` : (selected.email_notification_error || (selected.is_spam ? 'Suppressed as spam' : 'Not sent yet'))}</dd></div>
+              <div><dt>Company</dt><dd>{selected.company || '—'}</dd></div>
+              <div><dt>LinkedIn / Website</dt><dd>{selected.website_or_linkedin || '—'}</dd></div>
+            </dl>
+          </section>
+
+          <div className="service-request-danger-zone">
+            <button className="site-admin-btn danger" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete Contact'}</button>
           </div>
-        </>}
-      </section>
-    </div>}
+        </div>
+      </aside>
+    </>}
   </>;
 }
