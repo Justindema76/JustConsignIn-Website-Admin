@@ -1,4 +1,4 @@
-import { MailCheck, MailWarning } from 'lucide-react';
+import { MailCheck, MailWarning, Paperclip } from 'lucide-react';
 
 function formatDate(value) {
   if (!value) return '—';
@@ -28,7 +28,7 @@ export default function DemoRequestEmailHistory({ emails, loading }) {
             <span className="demo-email-history-icon">{failed ? <MailWarning size={16}/> : <MailCheck size={16}/>}</span>
             <span className="demo-email-history-summary">
               <strong>{email.subject}</strong>
-              <small>{failed ? 'Failed' : 'Sent'} · {formatDate(email.sent_at || email.created_at)}</small>
+              <small>{failed ? 'Failed' : 'Sent'} · {formatDate(email.sent_at || email.created_at)}{Array.isArray(email.attachments) && email.attachments.length ? ` · ${email.attachments.length} attachment${email.attachments.length === 1 ? '' : 's'}` : ''}</small>
             </span>
           </summary>
           <div className="demo-email-history-body">
@@ -39,6 +39,13 @@ export default function DemoRequestEmailHistory({ emails, loading }) {
               {email.from_email && <div><dt>From</dt><dd>{email.from_email}</dd></div>}
             </dl>
             <p>{email.body_text}</p>
+            {Array.isArray(email.attachments) && email.attachments.length > 0 && <div className="demo-email-history-attachments">
+              <strong><Paperclip size={14}/> Attachments</strong>
+              {email.attachments.map((attachment, index) => <div key={attachment.path || `${attachment.name}-${index}`}>
+                <span>{attachment.name || 'Attachment'}</span>
+                {attachment.size ? <small>{Math.max(1, Math.round(Number(attachment.size) / 1024))} KB</small> : null}
+              </div>)}
+            </div>}
             {failed && email.delivery_error && <div className="site-admin-alert error">{email.delivery_error}</div>}
           </div>
         </details>;
