@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, ChevronRight, ExternalLink, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
+import { Building2, ChevronRight, ExternalLink, Mail, Phone, RefreshCw, Search, Trash2, Workflow, X } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import DemoRequestEmailHistory from '../demo-requests/components/DemoRequestEmailHistory';
 import ServiceRequestEmailComposer from './components/ServiceRequestEmailComposer';
@@ -99,7 +99,6 @@ export default function ServiceRequestsAdmin() {
   const [draftStatus, setDraftStatus] = useState('new');
   const [draftNotes, setDraftNotes] = useState('');
   const [selectedDepartmentId, setSelectedDepartmentId] = useState('');
-  const [assignmentNote, setAssignmentNote] = useState('');
   const [emailOpen, setEmailOpen] = useState(false);
   const [emails, setEmails] = useState([]);
   const [emailsLoading, setEmailsLoading] = useState(false);
@@ -135,7 +134,6 @@ export default function ServiceRequestsAdmin() {
     setDraftStatus(selected.status || 'new');
     setDraftNotes(selected.admin_notes || '');
     setSelectedDepartmentId(selected.assigned_department_id || '');
-    setAssignmentNote('');
     setSuccess('');
     setEmailOpen(false);
   }, [selected?.id]);
@@ -214,7 +212,6 @@ export default function ServiceRequestsAdmin() {
   function closeDrawer() {
     setSelectedId('');
     setEmailOpen(false);
-    setAssignmentNote('');
   }
 
   async function save() {
@@ -246,16 +243,13 @@ export default function ServiceRequestsAdmin() {
       const payload = await assignServiceRequestDepartment(accessToken, {
         requestId: selected.id,
         departmentId: selectedDepartmentId,
-        note: assignmentNote,
       });
       if (payload?.request) {
         setRequests(rows => rows.map(row => row.id === selected.id ? { ...row, ...payload.request } : row));
         setDraftStatus(payload.request.status || 'needs_quote');
       }
       const departmentName = payload?.department?.name || 'department';
-      setSuccess(payload?.emailSent
-        ? `Assigned to ${departmentName} and quote-request email sent.`
-        : `Assigned to ${departmentName}, but the email failed: ${payload?.emailError || 'unknown email error'}`);
+      setSuccess(`Assigned to ${departmentName}.`);
     } catch (err) {
       setError(err?.message || 'Unable to assign department.');
     } finally {
@@ -398,22 +392,16 @@ export default function ServiceRequestsAdmin() {
                 <span>Department</span>
                 <select value={selectedDepartmentId} onChange={event => setSelectedDepartmentId(event.target.value)}>
                   <option value="">Select department</option>
-                  {departments.filter(item => item.active !== false).map(department => <option key={department.id} value={department.id}>{department.name} — {department.email}</option>)}
+                  {departments.filter(item => item.active !== false).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}
                 </select>
               </label>
-              <label className="wide">
-                <span>Assignment note <small>(optional)</small></span>
-                <textarea rows="3" value={assignmentNote} onChange={event => setAssignmentNote(event.target.value)} placeholder="What should this department review or include in the quote?" />
-              </label>
               <button className="site-admin-btn" type="button" onClick={assignDepartment} disabled={!selectedDepartmentId || assigning}>
-                <Send size={15}/>{assigning ? 'Assigning & sending…' : 'Assign Department & Send'}
+                {assigning ? 'Assigning…' : 'Assign Department'}
               </button>
             </div>
             {selected.assigned_department_name && <div className="service-request-assignment-summary">
               <div><span>Department</span><strong>{selected.assigned_department_name}</strong></div>
-              <div><span>Department email</span><strong>{selected.assigned_department_email}</strong></div>
               <div><span>Assigned</span><strong>{formatDate(selected.assigned_at)}</strong></div>
-              <div><span>Email status</span><strong>{selected.assignment_email_sent_at ? 'Sent' : (selected.assignment_email_error || 'Not sent')}</strong></div>
             </div>}
           </section>
 
