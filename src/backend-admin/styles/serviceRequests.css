@@ -511,3 +511,193 @@
   color:#a92d2d;
   border-color:#efc1c1;
 }
+
+
+/* Preview-parity service workflow styling */
+.service-request-page{
+  width:100%;
+  max-width:1520px;
+  margin:0 auto;
+}
+.service-request-page>.site-admin-page-head{
+  align-items:flex-start;
+  margin-bottom:16px;
+}
+.service-request-page>.site-admin-page-head h1{
+  font-size:31px;
+  line-height:1.08;
+  letter-spacing:-.025em;
+}
+.service-request-page>.site-admin-page-head p:last-child{
+  max-width:840px;
+  margin-top:7px;
+  color:#6d7175;
+  font-size:13px;
+  line-height:1.45;
+}
+.service-request-page .service-request-stats{
+  gap:10px;
+  margin-bottom:14px;
+}
+.service-request-page .service-request-stat{
+  min-height:72px;
+  padding:12px 14px;
+  border:1px solid #dfe3e8;
+  border-radius:11px;
+  background:#fff;
+  box-shadow:none;
+}
+.service-request-page .service-request-stat span{
+  color:#737a81;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.service-request-page .service-request-stat strong{
+  margin-top:4px;
+  font-size:24px;
+  line-height:1;
+}
+.service-request-page .service-request-toolbar{
+  gap:9px;
+  margin-bottom:10px;
+}
+.service-request-page .service-request-toolbar .site-admin-search,
+.service-request-page .service-request-toolbar>select{
+  min-height:40px;
+  border-color:#d7dce1;
+  border-radius:8px;
+  background:#fff;
+  box-shadow:none;
+}
+.service-request-page .service-request-toolbar input,
+.service-request-page .service-request-toolbar select{
+  font-size:12px;
+}
+.service-request-page .service-request-queue{
+  border:1px solid #dfe3e8;
+  border-radius:12px;
+  background:#fff;
+  box-shadow:none;
+}
+.service-request-page .service-request-queue-head{
+  padding:10px 13px;
+  background:#f7f9fb;
+  color:#71787f;
+  font-size:8.5px;
+  letter-spacing:.07em;
+}
+.service-request-page .service-request-queue-row{
+  min-height:70px;
+  padding:11px 13px;
+  border-bottom-color:#edf0f2;
+}
+.service-request-page .service-request-queue-row:hover{
+  background:#fafcff;
+  box-shadow:inset 3px 0 0 #1f67b2;
+}
+.service-request-page .service-request-customer strong{
+  font-size:12.5px;
+  line-height:1.25;
+}
+.service-request-page .service-request-customer small{
+  margin-top:3px;
+  color:#7a8289;
+  font-size:9.5px;
+}
+.service-request-page .service-request-service{
+  font-size:11px;
+  font-weight:800;
+}
+.service-request-page .service-request-department,
+.service-request-page .service-request-priority,
+.service-request-page .demo-request-status{
+  padding:5px 8px;
+  font-size:9px;
+  line-height:1.15;
+}
+.service-request-page .service-request-date{
+  color:#7c848b;
+  font-size:9.5px;
+}
+.service-request-page .service-request-open-icon{
+  color:#87919a;
+}
+.service-request-drawer{
+  width:min(960px,96vw);
+  background:#f5f7f9;
+  box-shadow:-26px 0 70px rgba(14,29,43,.24);
+}
+.service-request-drawer-head{
+  padding:20px 22px;
+}
+.service-request-drawer-title h2{
+  font-size:27px;
+  letter-spacing:-.02em;
+}
+.service-request-drawer-head>div>p:last-child{
+  margin-top:6px;
+  font-size:10px;
+}
+.service-request-drawer-body{
+  padding:14px 16px 24px;
+}
+.service-request-quick-actions{
+  margin-bottom:12px;
+  gap:8px;
+}
+.service-request-drawer-section{
+  margin-bottom:12px;
+  padding:16px;
+  border-radius:11px;
+  box-shadow:none;
+}
+.service-request-drawer-section.primary-section{
+  background:#fbfdff;
+}
+.service-request-section-head h3{
+  font-size:16px;
+}
+.service-request-message{
+  padding:12px;
+  font-size:12px;
+  line-height:1.55;
+}
+.service-request-compact-details{
+  gap:9px;
+}
+.service-request-compact-details>div{
+  padding:10px;
+  border-radius:8px;
+}
+.service-request-compact-details dt{
+  font-size:8px;
+}
+.service-request-compact-details dd{
+  font-size:11px;
+}
+.service-request-assignment-summary{
+  gap:9px 14px;
+  margin-top:13px;
+  padding-top:12px;
+}
+.service-request-workflow-compact{
+  gap:9px;
+}
+.service-request-collapsible{
+  margin-bottom:10px;
+  border-radius:11px;
+}
+.service-request-collapsible>summary{
+  padding:12px 14px;
+  font-size:11px;
+}
+@media(max-width:760px){
+  .service-request-page>.site-admin-page-head h1{font-size:26px}
+  .service-request-page .service-request-stat{min-height:66px}
+  .service-request-page .service-request-stat strong{font-size:21px}
+  .service-request-drawer-head{padding:15px}
+  .service-request-drawer-title h2{font-size:23px}
+  .service-request-drawer-body{padding:10px}
+}
