@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Mail, Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { Building2, Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { createDepartment, deleteDepartment, loadDepartments, updateDepartment } from './departments.service';
 
 export default function DepartmentsAdmin() {
   const { accessToken } = useAuth();
   const [departments, setDepartments] = useState([]);
-  const [draft, setDraft] = useState({ name: '', email: '', active: true });
+  const [draft, setDraft] = useState({ name: '', active: true });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState('');
   const [error, setError] = useState('');
@@ -35,7 +35,7 @@ export default function DepartmentsAdmin() {
     try {
       const created = await createDepartment(accessToken, draft);
       setDepartments(rows => [...rows, created].sort((a,b) => (a.sort_order || 0) - (b.sort_order || 0) || a.name.localeCompare(b.name)));
-      setDraft({ name: '', email: '', active: true });
+      setDraft({ name: '', active: true });
       setSuccess('Department added.');
     } catch (err) {
       setError(err?.message || 'Unable to add department.');
@@ -52,7 +52,6 @@ export default function DepartmentsAdmin() {
       const updated = await updateDepartment(accessToken, {
         id: department.id,
         name: department.name,
-        email: department.email,
         active: department.active,
         sortOrder: department.sort_order || 0,
       });
@@ -66,7 +65,7 @@ export default function DepartmentsAdmin() {
   }
 
   async function removeDepartment(department) {
-    if (!window.confirm(`Delete ${department.name}? Existing requests keep their saved department name/email, but it will no longer be available for new assignments.`)) return;
+    if (!window.confirm(`Delete ${department.name}? Existing requests keep the saved department name, but it will no longer be available for new assignments.`)) return;
     setSaving(department.id);
     setError('');
     try {
@@ -89,7 +88,7 @@ export default function DepartmentsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Routing</p>
         <h1>Departments</h1>
-        <p>Departments are the only assignment target for now. Each department has one notification email. No employee accounts or individual assignment yet.</p>
+        <p>Departments are the assignment target for quote requests. No department emails or individual employee assignments are used.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
@@ -103,15 +102,13 @@ export default function DepartmentsAdmin() {
         <h2>New routing destination</h2>
       </div>
       <label><span>Department name</span><input required value={draft.name} onChange={e => setDraft(v => ({...v,name:e.target.value}))} placeholder="Development" /></label>
-      <label><span>Department email</span><input required type="email" value={draft.email} onChange={e => setDraft(v => ({...v,email:e.target.value}))} placeholder="development@company.com" /></label>
       <button className="site-admin-btn" type="submit" disabled={saving === 'new'}><Plus size={15}/>{saving === 'new' ? 'Adding…' : 'Add Department'}</button>
     </form>
 
     <div className="department-list">
       {loading ? <div className="site-admin-card site-admin-empty">Loading departments…</div> : departments.map(department => <article className="site-admin-card department-row" key={department.id}>
-        <div className="department-icon"><Mail size={18}/></div>
+        <div className="department-icon"><Building2 size={18}/></div>
         <label className="department-name"><span>Name</span><input value={department.name} onChange={e => change(department.id,'name',e.target.value)} /></label>
-        <label className="department-email"><span>Email</span><input type="email" value={department.email} onChange={e => change(department.id,'email',e.target.value)} /></label>
         <label className="department-active"><span>Active</span><input type="checkbox" checked={department.active !== false} onChange={e => change(department.id,'active',e.target.checked)} /></label>
         <button className="site-admin-btn secondary small" type="button" onClick={() => saveDepartment(department)} disabled={saving === department.id}><Save size={14}/>{saving === department.id ? 'Saving…' : 'Save'}</button>
         <button className="department-delete" type="button" onClick={() => removeDepartment(department)} disabled={saving === department.id} aria-label={`Delete ${department.name}`}><Trash2 size={16}/></button>
