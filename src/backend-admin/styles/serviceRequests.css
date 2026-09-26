@@ -86,8 +86,13 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.service-request-department.assigned{background:#eaf2fb;color:#164f88}
-.service-request-department.unassigned{background:#f1f3f5;color:#72777c}
+.service-request-department{border:1px solid transparent}
+.service-request-department.development{background:#e8f1ff;color:#1d4ed8;border-color:#bfd6ff}
+.service-request-department.ecommerce{background:#eaf8ef;color:#18794e;border-color:#b8e2c8}
+.service-request-department.ai-automation{background:#f3eaff;color:#6f42c1;border-color:#d9c3f6}
+.service-request-department.seo-digital{background:#fff2e3;color:#b45309;border-color:#f6d3aa}
+.service-request-department.management-review{background:#eef1f4;color:#4f5963;border-color:#d7dde2}
+.service-request-department.unassigned{background:#f5f6f7;color:#777f87;border-color:#e1e5e8}
 .service-request-date{
   color:#777e85;
   font-size:11px;
@@ -432,4 +437,77 @@
   .service-request-compact-details{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
+}
+
+
+/* Service request status palette */
+.service-request-queue .demo-request-status,
+.service-request-drawer .demo-request-status{
+  border:1px solid transparent;
+}
+.service-request-queue .demo-request-status.new,
+.service-request-drawer .demo-request-status.new{
+  background:#e8f1ff;
+  color:#1d4ed8;
+  border-color:#bfd6ff;
+}
+.service-request-queue .demo-request-status.reviewing,
+.service-request-drawer .demo-request-status.reviewing{
+  background:#fff4d6;
+  color:#8a5b00;
+  border-color:#f0d79c;
+}
+.service-request-queue .demo-request-status.needs_quote,
+.service-request-drawer .demo-request-status.needs_quote{
+  background:#f3eaff;
+  color:#6f42c1;
+  border-color:#d9c3f6;
+}
+.service-request-queue .demo-request-status.contacted,
+.service-request-drawer .demo-request-status.contacted{
+  background:#e8f7f5;
+  color:#0f766e;
+  border-color:#b9dfda;
+}
+.service-request-queue .demo-request-status.discovery,
+.service-request-drawer .demo-request-status.discovery{
+  background:#eef0ff;
+  color:#4f46a5;
+  border-color:#cfd3f7;
+}
+.service-request-queue .demo-request-status.proposal_sent,
+.service-request-drawer .demo-request-status.proposal_sent{
+  background:#fff2e3;
+  color:#b45309;
+  border-color:#f6d3aa;
+}
+.service-request-queue .demo-request-status.accepted,
+.service-request-drawer .demo-request-status.accepted{
+  background:#eaf8ef;
+  color:#18794e;
+  border-color:#b8e2c8;
+}
+.service-request-queue .demo-request-status.in_progress,
+.service-request-drawer .demo-request-status.in_progress{
+  background:#e9f7fb;
+  color:#0f6f8c;
+  border-color:#b8dfe9;
+}
+.service-request-queue .demo-request-status.complete,
+.service-request-drawer .demo-request-status.complete{
+  background:#e4f5e9;
+  color:#146c3c;
+  border-color:#afd7bd;
+}
+.service-request-queue .demo-request-status.declined,
+.service-request-drawer .demo-request-status.declined{
+  background:#f0f2f4;
+  color:#5f6770;
+  border-color:#d7dde2;
+}
+.service-request-queue .demo-request-status.spam,
+.service-request-drawer .demo-request-status.spam{
+  background:#fff0f0;
+  color:#a92d2d;
+  border-color:#efc1c1;
 }
