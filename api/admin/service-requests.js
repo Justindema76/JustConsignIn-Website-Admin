@@ -3,7 +3,7 @@ import { supabaseUserRest } from '../_lib/supabase.js';
 
 const SITE_KEY = 'justindematteis';
 const STATUSES = new Set(['new', 'reviewing', 'needs_quote', 'contacted', 'discovery', 'proposal_sent', 'accepted', 'in_progress', 'complete', 'declined', 'spam']);
-const SELECT = 'id,site_key,created_at,updated_at,name,email,phone,company,website,requested_service,budget_range,timeline,message,contact_consent,status,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,ai_confidence,ai_provider,ai_model,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,metadata,admin_notes,contacted_at,email_notification_attempted_at,email_notified_at,email_notification_error,assigned_department_id,assigned_department_name,assigned_department_email,assigned_at,quote_requested_at,assignment_email_sent_at,assignment_email_error';
+const SELECT = 'id,site_key,created_at,updated_at,name,email,phone,company,website,requested_service,budget_range,timeline,message,contact_consent,status,status_changed_at,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,ai_confidence,ai_provider,ai_model,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,metadata,admin_notes,contacted_at,email_notification_attempted_at,email_notified_at,email_notification_error,assigned_department_id,assigned_department_name,assigned_department_email,assigned_at,quote_requested_at,assignment_email_sent_at,assignment_email_error,quote_number,quote_amount,last_activity,last_activity_at,next_action,next_action_due_at';
 
 function readBody(req) {
   if (!req.body) return {};
@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       const status = clean(body.status, 30).toLowerCase();
       if (!STATUSES.has(status)) return res.status(400).json({ error: 'Invalid request status.' });
       patch.status = status;
+      patch.status_changed_at = new Date().toISOString();
       if (status === 'contacted') patch.contacted_at = new Date().toISOString();
     }
     if (Object.prototype.hasOwnProperty.call(body, 'adminNotes')) patch.admin_notes = clean(body.adminNotes, 8000) || null;
