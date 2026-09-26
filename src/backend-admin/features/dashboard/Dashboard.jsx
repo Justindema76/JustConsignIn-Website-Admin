@@ -22,13 +22,20 @@ import './dashboard.css';
 
 const justinSections = [
   {
-    id: 'leads',
-    title: 'Leads & Workflow',
-    copy: 'Incoming work, hiring enquiries and internal routing.',
+    id: 'projects',
+    title: 'Project Workflow',
+    copy: 'Project enquiries, quote routing and department ownership.',
     items: [
-      { to: '/admin/service-requests', icon: Inbox, title: 'Service Requests', copy: 'Review project enquiries, assign departments, track status and prepare quotes.' },
-      { to: '/admin/hiring-contacts', icon: BriefcaseBusiness, title: 'Hiring Contacts', copy: 'Review job opportunities, recruiter messages and interview requests.' },
+      { to: '/admin/service-requests', icon: Inbox, title: 'Service Requests', copy: 'Review project enquiries, track stages and prepare quotes.' },
       { to: '/admin/departments', icon: Building2, title: 'Departments', copy: 'Manage the departments used to route incoming project requests.' },
+    ],
+  },
+  {
+    id: 'recruitment',
+    title: 'Recruitment',
+    copy: 'Job opportunities, recruiter messages and interview requests.',
+    items: [
+      { to: '/admin/hiring-contacts', icon: BriefcaseBusiness, title: 'Hiring Contacts', copy: 'Review employment enquiries separately from project work.' },
     ],
   },
   {
