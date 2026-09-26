@@ -638,126 +638,6 @@ async function submitHiringContact(body: any) {
   });
 }
 
-function departmentAssignmentMessage(record: any, department: any, settings: any, note = '') {
-  const display = (value: unknown) => clean(value, 4000) || 'Not provided';
-  const service = clean(record.ai_primary_service || record.requested_service, 100).replace(/_/g, ' ') || 'Service request';
-  const company = clean(record.company, 160) || clean(record.name, 120) || 'New request';
-  const assignmentNote = clean(note, 4000);
-
-  const text = [
-    'QUOTE REQUEST ASSIGNED', '',
-    `Department: ${display(department.name)}`,
-    `Customer / Company: ${company}`,
-    `Contact: ${display(record.name)}`,
-    `Email: ${display(record.email)}`,
-    `Phone: ${display(record.phone)}`,
-    `Service: ${service}`,
-    `Priority: ${display(record.ai_priority)}`,
-    `AI summary: ${display(record.ai_summary)}`, '',
-    'Customer request:',
-    display(record.message),
-    ...(assignmentNote ? ['', 'Assignment note:', assignmentNote] : []),
-    '',
-    'Action required: Review this request and prepare a quote.',
-    'The request remains stored in Website Admin → Service Requests.',
-  ].join('\n');
-
-  const row = (label: string, value: unknown) => `<tr><td style="padding:8px 12px;color:#6d7175;font-weight:700;vertical-align:top;width:150px">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#202223;vertical-align:top">${escapeHtml(display(value))}</td></tr>`;
-  const html = `<div style="font-family:Arial,sans-serif;background:#f5f6f8;padding:24px;color:#202223"><div style="max-width:700px;margin:0 auto;background:#fff;border:1px solid #dfe3e8;border-radius:14px;overflow:hidden"><div style="background:#0b1f33;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.85">Justin DeMatteis · Internal Assignment</div><h1 style="margin:5px 0 0;font-size:24px">Quote Request Assigned</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Department',department.name)}${row('Customer / Company',company)}${row('Contact',record.name)}${row('Email',record.email)}${row('Phone',record.phone)}${row('Service',service)}${row('Priority',record.ai_priority)}${row('AI summary',record.ai_summary)}</table><div style="margin:16px 12px 4px;padding:16px;background:#f7f9fb;border-radius:10px"><strong style="display:block;margin-bottom:8px">Customer request</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div>${assignmentNote ? `<div style="margin:10px 12px 4px;padding:16px;background:#eef5ff;border-radius:10px"><strong style="display:block;margin-bottom:8px">Assignment note</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(assignmentNote)}</div></div>` : ''}<p style="margin:18px 12px 4px;color:#202223;font-size:13px;font-weight:700">Action required: Review this request and prepare a quote.</p><p style="margin:8px 12px 4px;color:#6d7175;font-size:12px">The original request remains stored in Website Admin → Service Requests.</p></div></div></div>`;
-
-  return {
-    from: fromAddress(settings),
-    to: clean(department.email, 320).toLowerCase(),
-    subject: `Quote Request Assigned — ${company} — ${service}`,
-    text,
-    html,
-  };
-}
-
-async function assignServiceRequestDepartment(req: Request, body: any) {
-  const ownerAuth = await requireOwner(req);
-  if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
-
-  const requestId = clean(body.requestId, 80);
-  const departmentId = clean(body.departmentId, 80);
-  const note = clean(body.note, 4000);
-
-  if (!validUuid(requestId) || !validUuid(departmentId)) {
-    return Response.json({ error: 'A valid request and department are required.' }, { status: 400 });
-  }
-
-  const [{ data: record, error: requestError }, { data: department, error: departmentError }] = await Promise.all([
-    admin.from('service_requests')
-      .select('id,site_key,name,email,phone,company,requested_service,message,status,ai_primary_service,ai_priority,ai_summary')
-      .eq('id', requestId)
-      .eq('site_key', 'justindematteis')
-      .maybeSingle(),
-    admin.from('agency_departments')
-      .select('id,site_key,name,email,active')
-      .eq('id', departmentId)
-      .eq('site_key', 'justindematteis')
-      .maybeSingle(),
-  ]);
-
-  if (requestError || !record) return Response.json({ error: 'Service request not found.' }, { status: 404 });
-  if (departmentError || !department || department.active === false || !validEmail(clean(department.email, 320))) {
-    return Response.json({ error: 'Department is not available for assignment.' }, { status: 400 });
-  }
-
-  const now = new Date().toISOString();
-  const basePatch = {
-    status: 'needs_quote',
-    assigned_department_id: department.id,
-    assigned_department_name: clean(department.name, 120),
-    assigned_department_email: clean(department.email, 320).toLowerCase(),
-    assigned_at: now,
-    quote_requested_at: now,
-    assignment_email_sent_at: null,
-    assignment_email_error: null,
-    updated_at: now,
-  };
-
-  const { error: assignError } = await admin.from('service_requests').update(basePatch).eq('id', requestId);
-  if (assignError) {
-    console.error('Department assignment save failed', assignError.message);
-    return Response.json({ error: 'Unable to save department assignment.' }, { status: 500 });
-  }
-
-  let emailSent = false;
-  let emailError = '';
-  try {
-    const settings = await loadSettings('justindematteis');
-    await transportFor(settings).sendMail(departmentAssignmentMessage(record, department, settings, note));
-    await admin.from('service_requests').update({
-      assignment_email_sent_at: new Date().toISOString(),
-      assignment_email_error: null,
-      updated_at: new Date().toISOString(),
-    }).eq('id', requestId);
-    emailSent = true;
-  } catch (error) {
-    emailError = clean(error instanceof Error ? error.message : error, 1000) || 'Assignment email failed.';
-    await admin.from('service_requests').update({
-      assignment_email_error: emailError,
-      updated_at: new Date().toISOString(),
-    }).eq('id', requestId);
-    console.error('Department assignment email failed', emailError);
-  }
-
-  const { data: updated } = await admin.from('service_requests')
-    .select('id,status,assigned_department_id,assigned_department_name,assigned_department_email,assigned_at,quote_requested_at,assignment_email_sent_at,assignment_email_error,updated_at')
-    .eq('id', requestId)
-    .maybeSingle();
-
-  return Response.json({
-    ok: true,
-    assigned: true,
-    emailSent,
-    emailError: emailSent ? null : emailError,
-    request: updated || { id: requestId, ...basePatch },
-    department: { id: department.id, name: department.name, email: department.email },
-  });
-}
-
 async function submitServiceRequest(body: any) {
   const name = clean(body.name, 120);
   const email = clean(body.email, 254).toLowerCase();
@@ -1011,7 +891,6 @@ Deno.serve(async (req: Request) => {
   try { body = await req.json(); } catch { return Response.json({ error: 'Invalid request' }, { status: 400 }); }
   if (body.action === 'demo') return sendDemo(body);
   if (body.action === 'service_submit') return submitServiceRequest(body);
-  if (body.action === 'service_assign_department') return assignServiceRequestDepartment(req, body);
   if (body.action === 'hiring_contact_submit') return submitHiringContact(body);
   if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
