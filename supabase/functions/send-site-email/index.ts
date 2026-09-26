@@ -187,12 +187,6 @@ async function sendReply(req: Request, body: any) {
   const message = clean(body.message, 12000);
   const cc = normalizeEmailList(body.ccEmails);
   const bcc = normalizeEmailList(body.bccEmails);
-  let attachmentMeta: any[] = [];
-  try {
-    attachmentMeta = normalizeServiceRequestAttachments(body.attachments, requestId);
-  } catch (error) {
-    return Response.json({ error: clean(error instanceof Error ? error.message : error, 500) || 'Invalid attachments.' }, { status: 400 });
-  }
   if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
   if (!subject) return Response.json({ error: 'Subject is required.' }, { status: 400 });
   if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
@@ -211,8 +205,7 @@ async function sendReply(req: Request, body: any) {
   const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
 
   try {
-    const preparedAttachments = await prepareServiceRequestAttachments(attachmentMeta);
-    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html, attachments: preparedAttachments });
+    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html });
     const history = await saveEmailHistory({
       demo_request_id: requestId,
       sent_at: sentAt,
@@ -222,7 +215,6 @@ async function sendReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
-      attachments: attachmentMeta,
       delivery_status: 'sent',
       provider_message_id: clean(info?.messageId, 1000) || null,
       created_by: ownerAuth.user.id,
@@ -245,7 +237,6 @@ async function sendReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
-      attachments: attachmentMeta,
       delivery_status: 'failed',
       delivery_error: errorMessage,
       created_by: ownerAuth.user.id,
@@ -848,6 +839,13 @@ async function sendServiceRequestReply(req: Request, body: any) {
   if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
   if ([...cc, ...bcc].some(email => !validEmail(email))) return Response.json({ error: 'CC and BCC must contain valid email addresses.' }, { status: 400 });
 
+  let attachmentMeta: any[] = [];
+  try {
+    attachmentMeta = normalizeServiceRequestAttachments(body.attachments, requestId);
+  } catch (error) {
+    return Response.json({ error: clean(error instanceof Error ? error.message : error, 500) || 'Invalid attachments.' }, { status: 400 });
+  }
+
   const { data: record, error } = await admin
     .from('service_requests')
     .select('id,site_key,name,company,email,status,contacted_at')
@@ -870,7 +868,18 @@ async function sendServiceRequestReply(req: Request, body: any) {
   const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
 
   try {
-    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html });
+    const preparedAttachments = await prepareServiceRequestAttachments(attachmentMeta);
+    const info = await transportFor(settings).sendMail({
+      from: fromAddress(settings),
+      to,
+      cc,
+      bcc,
+      subject,
+      text: message,
+      html,
+      attachments: preparedAttachments,
+    });
+
     const history = await saveServiceRequestEmailHistory({
       service_request_id: requestId,
       sent_at: sentAt,
@@ -880,6 +889,7 @@ async function sendServiceRequestReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
+      attachments: attachmentMeta,
       delivery_status: 'sent',
       provider_message_id: clean(info?.messageId, 1000) || null,
       created_by: ownerAuth.user.id,
@@ -907,6 +917,7 @@ async function sendServiceRequestReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
+      attachments: attachmentMeta,
       delivery_status: 'failed',
       delivery_error: errorMessage,
       created_by: ownerAuth.user.id,
