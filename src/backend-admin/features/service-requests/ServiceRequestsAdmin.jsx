@@ -297,12 +297,12 @@ export default function ServiceRequestsAdmin() {
     }
   }
 
-  return <>
+  return <div className="service-request-page">
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Leads</p>
+        <p className="site-admin-eyebrow">Projects & Quotes</p>
         <h1>Service Requests</h1>
-        <p>Review new enquiries, route quote requests to a department, and open a request only when you need the full details.</p>
+        <p>Track project enquiries from request through quote, follow-up, acceptance and delivery.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
@@ -469,5 +469,5 @@ export default function ServiceRequestsAdmin() {
         </div>
       </aside>
     </>}
-  </>;
+  </div>;
 }
