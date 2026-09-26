@@ -100,6 +100,8 @@
   background:#fff;
   box-shadow:0 8px 24px rgba(24,42,64,.035);
 }
+.dashboard-section-card.projects{border-top:3px solid #2b78c5}
+.dashboard-section-card.recruitment{border-top:3px solid #7a4bb7}
 .dashboard-section-card.leads{border-top:3px solid #2b78c5}
 .dashboard-section-card.content{border-top:3px solid #2d8a57}
 .dashboard-section-card.website{border-top:3px solid #6b66d8}
@@ -134,6 +136,8 @@
   background:#f0f4f7;
   color:#526576;
 }
+.dashboard-section-card.projects .dashboard-row-icon{background:#eaf2fb;color:#1763a8}
+.dashboard-section-card.recruitment .dashboard-row-icon{background:#f3eaff;color:#6f42c1}
 .dashboard-section-card.leads .dashboard-row-icon{background:#eaf2fb;color:#1763a8}
 .dashboard-section-card.content .dashboard-row-icon{background:#eaf7ef;color:#177245}
 .dashboard-section-card.website .dashboard-row-icon{background:#f0edff;color:#6257bd}
