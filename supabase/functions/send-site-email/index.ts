@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import nodemailer from 'npm:nodemailer@^9';
+import { Buffer } from 'node:buffer';
 
 const OWNER_EMAIL = 'justindema76@gmail.com';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -186,6 +187,12 @@ async function sendReply(req: Request, body: any) {
   const message = clean(body.message, 12000);
   const cc = normalizeEmailList(body.ccEmails);
   const bcc = normalizeEmailList(body.bccEmails);
+  let attachmentMeta: any[] = [];
+  try {
+    attachmentMeta = normalizeServiceRequestAttachments(body.attachments, requestId);
+  } catch (error) {
+    return Response.json({ error: clean(error instanceof Error ? error.message : error, 500) || 'Invalid attachments.' }, { status: 400 });
+  }
   if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
   if (!subject) return Response.json({ error: 'Subject is required.' }, { status: 400 });
   if (!message) return Response.json({ error: 'Message is required.' }, { status: 400 });
@@ -204,7 +211,8 @@ async function sendReply(req: Request, body: any) {
   const html = `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#202223">${escapeHtml(message).replace(/\n/g, '<br>')}</div>`;
 
   try {
-    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html });
+    const preparedAttachments = await prepareServiceRequestAttachments(attachmentMeta);
+    const info = await transportFor(settings).sendMail({ from: fromAddress(settings), to, cc, bcc, subject, text: message, html, attachments: preparedAttachments });
     const history = await saveEmailHistory({
       demo_request_id: requestId,
       sent_at: sentAt,
@@ -214,6 +222,7 @@ async function sendReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
+      attachments: attachmentMeta,
       delivery_status: 'sent',
       provider_message_id: clean(info?.messageId, 1000) || null,
       created_by: ownerAuth.user.id,
@@ -236,6 +245,7 @@ async function sendReply(req: Request, body: any) {
       from_email: fromEmail,
       subject,
       body_text: message,
+      attachments: attachmentMeta,
       delivery_status: 'failed',
       delivery_error: errorMessage,
       created_by: ownerAuth.user.id,
@@ -764,11 +774,60 @@ async function sendServiceRequestNotification(body: any) {
   }
 }
 
+const SERVICE_REQUEST_ATTACHMENT_BUCKET = 'service-request-attachments';
+const SERVICE_REQUEST_ATTACHMENT_MAX_COUNT = 5;
+const SERVICE_REQUEST_ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
+const SERVICE_REQUEST_ATTACHMENT_MAX_TOTAL_BYTES = 20 * 1024 * 1024;
+
+function normalizeServiceRequestAttachments(value: unknown, requestId: string) {
+  const input = Array.isArray(value) ? value.slice(0, SERVICE_REQUEST_ATTACHMENT_MAX_COUNT) : [];
+  const normalized = input.map((item: any) => ({
+    bucket: clean(item?.bucket, 120) || SERVICE_REQUEST_ATTACHMENT_BUCKET,
+    path: clean(item?.path, 1000),
+    name: clean(item?.name, 260) || 'attachment',
+    size: Math.max(0, Number(item?.size) || 0),
+    type: clean(item?.type, 200) || 'application/octet-stream',
+  }));
+
+  for (const attachment of normalized) {
+    if (attachment.bucket !== SERVICE_REQUEST_ATTACHMENT_BUCKET) throw new Error('Invalid attachment storage bucket.');
+    if (!attachment.path || !attachment.path.startsWith(`${requestId}/`) || attachment.path.includes('..')) throw new Error('Invalid attachment path.');
+    if (attachment.size > SERVICE_REQUEST_ATTACHMENT_MAX_BYTES) throw new Error('Each attachment must be 10 MB or smaller.');
+  }
+
+  const total = normalized.reduce((sum, item) => sum + item.size, 0);
+  if (total > SERVICE_REQUEST_ATTACHMENT_MAX_TOTAL_BYTES) throw new Error('Attachments must be 20 MB or less in total.');
+  return normalized;
+}
+
+async function prepareServiceRequestAttachments(items: any[]) {
+  let totalBytes = 0;
+  const attachments = [];
+
+  for (const item of items) {
+    const { data, error } = await admin.storage.from(SERVICE_REQUEST_ATTACHMENT_BUCKET).download(item.path);
+    if (error || !data) throw new Error(`Unable to load attachment ${item.name}.`);
+
+    const bytes = new Uint8Array(await data.arrayBuffer());
+    totalBytes += bytes.byteLength;
+    if (bytes.byteLength > SERVICE_REQUEST_ATTACHMENT_MAX_BYTES) throw new Error(`${item.name} is larger than 10 MB.`);
+    if (totalBytes > SERVICE_REQUEST_ATTACHMENT_MAX_TOTAL_BYTES) throw new Error('Attachments are larger than 20 MB in total.');
+
+    attachments.push({
+      filename: item.name,
+      content: Buffer.from(bytes),
+      contentType: item.type || data.type || 'application/octet-stream',
+    });
+  }
+
+  return attachments;
+}
+
 async function saveServiceRequestEmailHistory(values: any) {
   const { data, error } = await admin
     .from('service_request_emails')
     .insert(values)
-    .select('id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id')
+    .select('id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,attachments,delivery_status,delivery_error,provider_message_id')
     .single();
   if (error) console.error('Unable to save service request email history', error.message);
   return { data, error };
