@@ -42,7 +42,7 @@ function validatePublishData(page, data, siteKey) {
 
   if (siteKey === 'justindematteis') {
     const allowed = new Set([
-      'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock',
+      'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock', 'HiringContactBlock',
       'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
       'WorkExperiencePreviewBlock',
       'ResumeHeroBlock', 'ResumeSkillsBlock', 'ResumeWorkBlock', 'ResumeProjectsBlock', 'ResumeAiBlock', 'ResumeEducationBlock', 'ResumeAboutBlock', 'ResumeContactBlock'
@@ -99,7 +99,7 @@ export default function SiteBuilder() {
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const builderConfig = useMemo(() => {
-    const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock', 'ProjectCardBlock'];
+    const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock', 'ProjectCardBlock', 'HiringContactBlock'];
     const justConsignInBlocks = [
       'HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock',
       'FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock',
@@ -393,7 +393,7 @@ export default function SiteBuilder() {
           },
           standardMarketing: {
             title: 'STANDARD — Shared Marketing',
-            components: ['HeroBlock', 'CtaBlock'],
+            components: ['HeroBlock', 'CtaBlock', 'HiringContactBlock'],
           },
           standardProjects: {
             title: 'STANDARD — Projects / Work',
