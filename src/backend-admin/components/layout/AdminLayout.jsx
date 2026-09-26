@@ -30,12 +30,24 @@ import { getAdminSiteKey, loadAdminSites, loadAdminSocial, setAdminSiteKey } fro
 
 const navGroups = [
   {
+    id: 'projects',
+    label: 'Projects & Quotes',
+    items: [
+      { to: '/admin/service-requests', label: 'Service Requests', icon: Inbox, sites: ['justindematteis'] },
+      { to: '/admin/departments', label: 'Departments', icon: Building2, sites: ['justindematteis'] },
+    ],
+  },
+  {
+    id: 'recruitment',
+    label: 'Recruitment',
+    items: [
+      { to: '/admin/hiring-contacts', label: 'Hiring Contacts', icon: BriefcaseBusiness, sites: ['justindematteis'] },
+    ],
+  },
+  {
     id: 'leads',
     label: 'Leads & Growth',
     items: [
-      { to: '/admin/service-requests', label: 'Service Requests', icon: Inbox, sites: ['justindematteis'] },
-      { to: '/admin/hiring-contacts', label: 'Hiring Contacts', icon: BriefcaseBusiness, sites: ['justindematteis'] },
-      { to: '/admin/departments', label: 'Departments', icon: Building2, sites: ['justindematteis'] },
       { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox, sites: ['justconsignin'] },
       { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake, sites: ['justconsignin'] },
       { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned, sites: ['justconsignin'] },
@@ -79,7 +91,7 @@ const navGroups = [
       { to: '/admin/settings', label: 'Website Settings', icon: Settings },
     ],
   },
-];
+]
 
 const desktopDefaults = Object.fromEntries(navGroups.map(group => [group.id, true]));
 
@@ -103,9 +115,19 @@ export default function AdminLayout() {
     return desktopDefaults;
   });
 
+  const visibleNavGroups = useMemo(
+    () => navGroups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(item => !item.sites || item.sites.includes(siteKey)),
+      }))
+      .filter(group => group.items.length),
+    [siteKey],
+  );
+
   const activeGroupId = useMemo(
-    () => navGroups.find(group => isPathInGroup(location.pathname, group))?.id || '',
-    [location.pathname],
+    () => visibleNavGroups.find(group => isPathInGroup(location.pathname, group))?.id || '',
+    [location.pathname, visibleNavGroups],
   );
 
   useEffect(() => {
@@ -160,7 +182,7 @@ export default function AdminLayout() {
           <Home size={17}/><span>Dashboard</span>
         </NavLink>
 
-        {navGroups.map(group => {
+        {visibleNavGroups.map(group => {
           const open = Boolean(openGroups[group.id]);
           const active = group.id === activeGroupId;
           return <section className={`site-admin-nav-group ${group.id === 'settings' ? 'settings-group' : ''}`} key={group.id}>
@@ -174,7 +196,7 @@ export default function AdminLayout() {
               <ChevronDown size={15} className={open ? 'open' : ''}/>
             </button>
             <div className={`site-admin-nav-group-links ${open ? 'open' : ''}`}>
-              {group.items.filter(item => !item.sites || item.sites.includes(siteKey)).map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
+              {group.items.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)}>
                 <Icon size={17}/><span>{label}</span>
               </NavLink>)}
             </div>
