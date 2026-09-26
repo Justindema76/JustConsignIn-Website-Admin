@@ -60,6 +60,7 @@ const navGroups = [
       { to: '/admin/website/blocks', label: 'Block Library', icon: LibraryBig },
       { to: '/admin/website/styles', label: 'Global Styles', icon: Palette },
       { to: '/admin/website/global/header', label: 'Header', icon: PanelTop },
+      { to: '/admin/website/global/project-request', label: 'Project Request Drawer', icon: Inbox, sites: ['justindematteis'] },
       { to: '/admin/website/global/footer', label: 'Footer', icon: PanelBottom },
     ],
   },
