@@ -251,7 +251,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET' && resource === 'global') {
       const key = String(req.query?.key || '').trim().toLowerCase();
-      if (!['header', 'footer'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
+      if (!['header', 'footer', 'project-request'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
       const response = await supabaseUserRest(user.accessToken, `site_settings?${siteFilter}&key=eq.${encodeURIComponent(`global_${key}`)}&select=site_key,key,value,updated_at&limit=1`, { method: 'GET' });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Unable to load global website section');
@@ -261,7 +261,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST' && resource === 'global') {
       const key = String(req.body?.key || '').trim().toLowerCase();
       const value = req.body?.value;
-      if (!['header', 'footer'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
+      if (!['header', 'footer', 'project-request'].includes(key)) return res.status(400).json({ error: 'Invalid global section' });
       if (!value || typeof value !== 'object') return res.status(400).json({ error: 'Invalid global section value' });
 
       const response = await supabaseUserRest(user.accessToken, 'site_settings?on_conflict=site_key,key', {
