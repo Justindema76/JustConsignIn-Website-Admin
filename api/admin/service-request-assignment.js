@@ -46,11 +46,15 @@ export default async function handler(req, res) {
     const now = new Date().toISOString();
     const patch = {
       status: 'needs_quote',
+      status_changed_at: now,
       assigned_department_id: department.id,
       assigned_department_name: department.name,
       assigned_department_email: '',
       assigned_at: now,
       quote_requested_at: now,
+      last_activity: `Assigned to ${department.name}`,
+      last_activity_at: now,
+      next_action: 'Prepare quote',
       assignment_email_sent_at: null,
       assignment_email_error: null,
       updated_at: now,
