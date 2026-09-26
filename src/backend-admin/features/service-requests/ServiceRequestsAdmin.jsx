@@ -50,6 +50,78 @@ function shortDate(value) {
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function shortDateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
+function money(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) return '—';
+  return amount.toLocaleString(undefined, { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 });
+}
+
+function compactMoney(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) return '$0';
+  if (amount >= 1000) return `${(amount / 1000).toFixed(amount >= 10000 ? 1 : 1)}K`;
+  return `${Math.round(amount)}`;
+}
+
+function stageTimestamp(request) {
+  return request.status_changed_at || request.assigned_at || request.updated_at || request.created_at;
+}
+
+function lastActivityText(request) {
+  if (request.last_activity) return request.last_activity;
+  if (request.status === 'proposal_sent') return 'Proposal sent';
+  if (request.status === 'accepted') return 'Quote accepted';
+  if (request.assigned_department_name) return `Assigned to ${request.assigned_department_name}`;
+  return 'Request submitted';
+}
+
+function nextActionText(request) {
+  if (request.next_action) return request.next_action;
+  return {
+    new: 'Review request',
+    reviewing: 'Assign department',
+    needs_quote: 'Prepare quote',
+    contacted: 'Review response',
+    discovery: 'Complete discovery',
+    proposal_sent: 'Follow up',
+    accepted: 'Convert to project',
+    in_progress: 'Continue work',
+    complete: 'Complete',
+    declined: 'Closed',
+    spam: 'No action',
+  }[request.status] || 'Review request';
+}
+
+function activityEvents(request) {
+  const events = [];
+  const push = (label, at, detail = '') => {
+    if (!at || events.some(item => item.label === label && item.at === at)) return;
+    events.push({ label, at, detail });
+  };
+
+  if (request.last_activity_at) push(lastActivityText(request), request.last_activity_at, request.quote_number ? `${request.quote_number}${request.quote_amount ? ` · ${money(request.quote_amount)}` : ''}` : '');
+  if (request.status === 'proposal_sent' && stageTimestamp(request)) push('Proposal sent', stageTimestamp(request), request.quote_number || '');
+  if (request.quote_requested_at) push('Quote requested', request.quote_requested_at);
+  if (request.assigned_at && request.assigned_department_name) push(`Assigned to ${request.assigned_department_name}`, request.assigned_at);
+  if (request.contacted_at) push('Client contacted', request.contacted_at);
+  push('Request submitted', request.created_at);
+
+  return events
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, 8);
+}
+
 function statusLabel(status) {
   return STATUS_OPTIONS.find(([key]) => key === status)?.[1] || status || 'New';
 }
@@ -99,7 +171,7 @@ export default function ServiceRequestsAdmin() {
   const [selectedId, setSelectedId] = useState('');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
-  const [serviceFilter, setServiceFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -186,7 +258,7 @@ export default function ServiceRequestsAdmin() {
     return requests.filter(request => {
       if (statusFilter === 'active' && ['complete', 'declined', 'spam'].includes(request.status)) return false;
       if (statusFilter !== 'all' && statusFilter !== 'active' && request.status !== statusFilter) return false;
-      if (serviceFilter !== 'all' && request.ai_primary_service !== serviceFilter && request.requested_service !== serviceFilter) return false;
+      if (departmentFilter !== 'all' && request.assigned_department_name !== departmentFilter) return false;
       if (!needle) return true;
       return [
         request.name,
@@ -201,22 +273,24 @@ export default function ServiceRequestsAdmin() {
         request.assigned_department_name,
       ].filter(Boolean).join(' ').toLowerCase().includes(needle);
     });
-  }, [requests, query, statusFilter, serviceFilter]);
+  }, [requests, query, statusFilter, departmentFilter]);
 
-  const counts = useMemo(() => ({
-    new: requests.filter(item => item.status === 'new').length,
-    active: requests.filter(item => !['complete', 'declined', 'spam'].includes(item.status)).length,
-    high: requests.filter(item => item.ai_priority === 'high' && !['complete', 'declined', 'spam'].includes(item.status)).length,
-    needsQuote: requests.filter(item => item.status === 'needs_quote').length,
-  }), [requests]);
+  const counts = useMemo(() => {
+    const now = Date.now();
+    const acceptedValue = requests
+      .filter(item => item.status === 'accepted')
+      .reduce((sum, item) => sum + (Number(item.quote_amount) || 0), 0);
 
-  const availableServices = useMemo(() => {
-    const values = new Set();
-    requests.forEach(request => {
-      if (request.ai_primary_service) values.add(request.ai_primary_service);
-      else if (request.requested_service) values.add(request.requested_service);
-    });
-    return [...values].sort((a, b) => serviceLabel(a).localeCompare(serviceLabel(b)));
+    return {
+      new: requests.filter(item => item.status === 'new').length,
+      needsQuote: requests.filter(item => item.status === 'needs_quote').length,
+      proposalSent: requests.filter(item => item.status === 'proposal_sent').length,
+      followUpDue: requests.filter(item => {
+        if (!item.next_action_due_at || ['complete','declined','spam'].includes(item.status)) return false;
+        return new Date(item.next_action_due_at).getTime() <= now;
+      }).length,
+      acceptedValue,
+    };
   }, [requests]);
 
   function closeDrawer() {
@@ -302,7 +376,7 @@ export default function ServiceRequestsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Projects & Quotes</p>
         <h1>Service Requests</h1>
-        <p>Track project enquiries from request through quote, follow-up, acceptance and delivery.</p>
+        <p>The queue should let you understand every open opportunity without opening it.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
