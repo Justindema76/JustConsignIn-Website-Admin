@@ -170,9 +170,9 @@ export default function HiringContactsAdmin() {
   return <>
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Employment</p>
+        <p className="site-admin-eyebrow">Recruitment</p>
         <h1>Hiring Contacts</h1>
-        <p>Review interview requests, job opportunities and recruiter messages, then open a contact only when you need the full details.</p>
+        <p>Review recruiter messages, interview requests and job opportunities separately from project enquiries.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
