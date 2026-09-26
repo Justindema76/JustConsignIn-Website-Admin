@@ -54,6 +54,16 @@ function statusLabel(status) {
   return STATUS_OPTIONS.find(([key]) => key === status)?.[1] || status || 'New';
 }
 
+function departmentClass(name) {
+  return {
+    Development: 'development',
+    Ecommerce: 'ecommerce',
+    'AI / Automation': 'ai-automation',
+    'SEO / Digital': 'seo-digital',
+    'Management / Review': 'management-review',
+  }[name] || 'unassigned';
+}
+
 function serviceLabel(value) {
   return SERVICE_LABELS[value] || String(value || 'Other').replace(/_/g, ' ');
 }
@@ -340,7 +350,7 @@ export default function ServiceRequestsAdmin() {
               <small>{request.name}{request.company ? ` · ${request.email}` : ''}</small>
             </span>
             <span className="service-request-service">{serviceLabel(request.ai_primary_service || request.requested_service)}</span>
-            <span className={`service-request-department ${request.assigned_department_name ? 'assigned' : 'unassigned'}`}>
+            <span className={`service-request-department ${departmentClass(request.assigned_department_name)}`}>
               {request.assigned_department_name || 'Unassigned'}
             </span>
             <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
