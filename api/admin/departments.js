@@ -2,7 +2,7 @@ import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 import { supabaseUserRest } from '../_lib/supabase.js';
 
 const SITE_KEY = 'justindematteis';
-const SELECT = 'id,site_key,name,email,active,sort_order,created_at,updated_at';
+const SELECT = 'id,site_key,name,active,sort_order,created_at,updated_at';
 
 function readBody(req) {
   if (!req.body) return {};
@@ -18,10 +18,6 @@ function clean(value, max = 1000) {
 
 function validUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-}
-
-function validEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 async function parseSupabase(response, fallback) {
@@ -51,13 +47,10 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const body = readBody(req);
     const name = clean(body.name, 120);
-    const email = clean(body.email, 320).toLowerCase();
     const active = body.active !== false;
     const sortOrder = Number.isFinite(Number(body.sortOrder)) ? Number(body.sortOrder) : 0;
 
-    if (!name || !validEmail(email)) {
-      return res.status(400).json({ error: 'Department name and valid email are required.' });
-    }
+    if (!name) return res.status(400).json({ error: 'Department name is required.' });
 
     try {
       const query = `agency_departments?select=${encodeURIComponent(SELECT)}`;
@@ -65,7 +58,7 @@ export default async function handler(req, res) {
         await supabaseUserRest(owner.accessToken, query, {
           method: 'POST',
           headers: { Prefer: 'return=representation' },
-          body: JSON.stringify({ site_key: SITE_KEY, name, email, active, sort_order: sortOrder }),
+          body: JSON.stringify({ site_key: SITE_KEY, name, email: '', active, sort_order: sortOrder }),
         }),
         'Unable to create department.',
       );
@@ -86,11 +79,6 @@ export default async function handler(req, res) {
       const name = clean(body.name, 120);
       if (!name) return res.status(400).json({ error: 'Department name is required.' });
       patch.name = name;
-    }
-    if (Object.prototype.hasOwnProperty.call(body, 'email')) {
-      const email = clean(body.email, 320).toLowerCase();
-      if (!validEmail(email)) return res.status(400).json({ error: 'A valid department email is required.' });
-      patch.email = email;
     }
     if (Object.prototype.hasOwnProperty.call(body, 'active')) patch.active = body.active !== false;
     if (Object.prototype.hasOwnProperty.call(body, 'sortOrder')) patch.sort_order = Number(body.sortOrder) || 0;
