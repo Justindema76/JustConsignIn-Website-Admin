@@ -112,7 +112,7 @@
   z-index:120;
   top:0;
   right:0;
-  width:min(650px,94vw);
+  width:min(920px,96vw);
   height:100dvh;
   overflow:hidden;
   display:flex;
@@ -131,7 +131,7 @@
   align-items:flex-start;
   justify-content:space-between;
   gap:16px;
-  padding:18px 20px;
+  padding:22px 26px;
   border-bottom:1px solid #dfe5ea;
   background:#fff;
 }
@@ -168,17 +168,17 @@
 .service-request-drawer-body{
   flex:1 1 auto;
   overflow:auto;
-  padding:16px;
+  padding:22px 24px 28px;
 }
 .service-request-quick-actions{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:12px;
+  gap:10px;
+  margin-bottom:16px;
 }
 .service-request-drawer-section{
-  margin-bottom:12px;
-  padding:15px;
+  margin-bottom:16px;
+  padding:20px;
   border:1px solid #dfe5ea;
   border-radius:12px;
   background:#fff;
@@ -195,7 +195,7 @@
 }
 .service-request-section-head h3{
   margin:2px 0 0;
-  font-size:17px;
+  font-size:19px;
 }
 .service-request-message{
   margin:8px 0 0;
@@ -210,9 +210,9 @@
 .service-request-assignment-summary{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:9px 14px;
-  margin-top:13px;
-  padding-top:12px;
+  gap:12px 18px;
+  margin-top:16px;
+  padding-top:14px;
   border-top:1px solid #e1e8ee;
 }
 .service-request-assignment-summary div{
@@ -240,11 +240,11 @@
   margin:9px 0 0;
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:9px;
+  gap:12px;
 }
 .service-request-compact-details>div{
   min-width:0;
-  padding:10px;
+  padding:13px;
   border:1px solid #edf0f2;
   border-radius:9px;
   background:#f8fafc;
@@ -403,5 +403,33 @@
   .service-request-workflow-compact .site-admin-btn{
     width:100%;
     justify-content:center;
+  }
+}
+
+/* Roomier desktop service-request drawer */
+@media(min-width:901px){
+  .service-request-assignment-controls{
+    grid-template-columns:minmax(260px,1fr) minmax(340px,1.45fr);
+    gap:14px 18px;
+    align-items:start;
+  }
+  .service-request-assignment-controls .wide{
+    grid-column:auto;
+  }
+  .service-request-assignment-controls .site-admin-btn{
+    grid-column:1/-1;
+    justify-self:start;
+    min-width:290px;
+    min-height:44px;
+    white-space:nowrap;
+  }
+  .service-request-assignment-controls select{
+    min-height:46px;
+  }
+  .service-request-assignment-controls textarea{
+    min-height:92px;
+  }
+  .service-request-compact-details{
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
