@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     if (!validUuid(requestId)) return res.status(400).json({ error: 'A valid request ID is required.' });
 
     try {
-      const select = 'id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,delivery_status,delivery_error,provider_message_id';
+      const select = 'id,service_request_id,created_at,sent_at,to_email,cc_emails,bcc_emails,from_email,subject,body_text,attachments,delivery_status,delivery_error,provider_message_id';
       const query = `service_request_emails?service_request_id=eq.${encodeURIComponent(requestId)}&select=${encodeURIComponent(select)}&order=created_at.desc&limit=200`;
       const emails = await parseSupabase(await supabaseUserRest(owner.accessToken, query, { method: 'GET' }), 'Unable to load email history.');
       return res.status(200).json({ emails: Array.isArray(emails) ? emails : [] });
@@ -63,6 +63,7 @@ export default async function handler(req, res) {
           message: clean(body.message, 12000),
           ccEmails: body.ccEmails || '',
           bccEmails: body.bccEmails || '',
+          attachments: Array.isArray(body.attachments) ? body.attachments.slice(0, 5) : [],
         }),
       });
       const payload = await response.json().catch(() => ({}));
