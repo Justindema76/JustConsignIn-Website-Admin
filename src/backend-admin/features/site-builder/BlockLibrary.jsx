@@ -15,6 +15,7 @@ const groups = [
       { name: 'Image', icon: Image, description: 'Standalone responsive image from Media, upload or URL.' },
       { name: 'Call to Action', icon: MousePointerClick, description: 'Headline, copy and button for conversion sections.' },
       { name: 'Project Card', icon: BriefcaseBusiness, description: 'Reusable work/project card with logo, semantic H1–H4 heading control, SEO summary, role, audience, technology tags, case-study link and left/right alternating dark panel.' },
+      { name: 'Project Request Drawer', icon: MousePointerClick, description: 'Global slide-out service request form. Edit the heading, copy, field labels, next-step text, submit button, success message and colours from Website → Project Request Drawer.' },
     ],
   },
   {
