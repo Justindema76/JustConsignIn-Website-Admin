@@ -43,9 +43,15 @@ const money = value => {
 };
 
 function marginText(item) {
-  const buy = Number(item.target_offer ?? item.buy_price);
-  const low = Number(item.estimated_resale_low);
-  const high = Number(item.estimated_resale_high);
+  const rawBuy = item.target_offer ?? item.buy_price;
+  const rawLow = item.estimated_resale_low;
+  const rawHigh = item.estimated_resale_high;
+  if (rawBuy === null || rawBuy === undefined || rawBuy === '') return 'Not estimated yet';
+  const buy = Number(rawBuy);
+  const hasLow = rawLow !== null && rawLow !== undefined && rawLow !== '';
+  const hasHigh = rawHigh !== null && rawHigh !== undefined && rawHigh !== '';
+  const low = hasLow ? Number(rawLow) : null;
+  const high = hasHigh ? Number(rawHigh) : null;
   if (!Number.isFinite(buy) || (!Number.isFinite(low) && !Number.isFinite(high))) return 'Not estimated yet';
   if (Number.isFinite(low) && Number.isFinite(high)) return `${money(low - buy)}–${money(high - buy)} gross spread`;
   const resale = Number.isFinite(low) ? low : high;
@@ -100,7 +106,6 @@ export default function InventoryIntel() {
     });
   }, [items, query, category, platform, status, signal]);
 
-  const activeCount = items.filter(item => !['passed', 'sold'].includes(item.admin_status)).length;
   const localCount = items.filter(item => /hamilton|stoney|ancaster|burlington/i.test(item.location || '')).length;
   const boughtCount = items.filter(item => item.admin_status === 'bought').length;
   const strongCount = items.filter(item => ['STRONG', 'TEST'].includes(item.signal)).length;
