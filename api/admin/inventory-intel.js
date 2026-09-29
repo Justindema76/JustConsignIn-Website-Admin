@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 
 const SIGNALS = new Set(['STRONG', 'TEST', 'WATCH', 'SKIP']);
 const STATUSES = new Set(['researching', 'contacted', 'negotiating', 'bought', 'passed', 'sold']);
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const deals = await parseSupabase(await supabaseRest(
+      const deals = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?select=${encodeURIComponent(SELECT)}&order=priority.desc,checked_at.desc&limit=500`,
         { method: 'GET' },
       ), 'Unable to load Inventory Intel.');
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
     };
 
     try {
-      const deals = await parseSupabase(await supabaseRest(
+      const deals = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?select=${encodeURIComponent(SELECT)}`,
         {
           method: 'POST',
@@ -142,7 +142,7 @@ export default async function handler(req, res) {
     if (Object.prototype.hasOwnProperty.call(body, 'lastSeenAt')) patch.last_seen_at = body.lastSeenAt ? new Date(body.lastSeenAt).toISOString() : new Date().toISOString();
 
     try {
-      const deals = await parseSupabase(await supabaseRest(
+      const deals = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?id=eq.${id}&select=${encodeURIComponent(SELECT)}`,
         {
           method: 'PATCH',
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
     if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'A valid item ID is required.' });
 
     try {
-      const rows = await parseSupabase(await supabaseRest(
+      const rows = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?id=eq.${id}&select=id`,
         { method: 'DELETE', headers: { Prefer: 'return=representation' } },
       ), 'Unable to delete Inventory Intel item.');
