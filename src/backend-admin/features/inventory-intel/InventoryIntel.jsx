@@ -83,7 +83,7 @@ export default function InventoryIntel() {
     try {
       setItems(await loadInventoryIntel(accessToken));
     } catch (err) {
-      setError(err.message || 'Unable to load Inventory Intel.');
+      setError(err.message || 'Unable to load Inventory Opportunities.');
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ export default function InventoryIntel() {
   };
 
   const removeItem = async item => {
-    if (!window.confirm(`Delete "${item.title}" from Inventory Intel?`)) return;
+    if (!window.confirm(`Delete "${item.title}" from Inventory Opportunities?`)) return;
     setSavingId(item.id);
     try {
       await deleteInventoryIntelItem(accessToken, item.id);
@@ -153,8 +153,8 @@ export default function InventoryIntel() {
     <div className="site-admin-page-head inventory-intel-head">
       <div>
         <p className="site-admin-eyebrow">Inventory Research</p>
-        <h1>Inventory Intel</h1>
-        <p>One place to collect Marketplace, Kijiji, liquidation and wholesale opportunities while we build real inventory for the test store.</p>
+        <h1>Inventory Opportunities</h1>
+        <p>Specific listings, lots and deals we may buy for resale. This is the shortlist of actual inventory opportunities, not the general list of places we source from.</p>
       </div>
       <div className="inventory-intel-head-actions">
         <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
@@ -230,7 +230,7 @@ export default function InventoryIntel() {
 
     {showAdd && <div className="inventory-intel-modal-backdrop" onMouseDown={() => setShowAdd(false)}>
       <form className="inventory-intel-modal" onSubmit={submit} onMouseDown={event => event.stopPropagation()}>
-        <div className="inventory-intel-modal-head"><div><span>Manual lead</span><h2>Add inventory candidate</h2></div><button type="button" onClick={() => setShowAdd(false)} aria-label="Close"><X size={20}/></button></div>
+        <div className="inventory-intel-modal-head"><div><span>Manual lead</span><h2>Add inventory opportunity</h2></div><button type="button" onClick={() => setShowAdd(false)} aria-label="Close"><X size={20}/></button></div>
         <div className="inventory-intel-form-grid">
           <label className="wide">Listing title<input required value={form.title} onChange={event => setForm({ ...form, title: event.target.value })}/></label>
           <label>Source<select value={form.sourcePlatform} onChange={event => setForm({ ...form, sourcePlatform: event.target.value })}><option>Facebook Marketplace</option><option>Kijiji</option><option>Liquidation</option><option>Wholesale</option><option>Other</option></select></label>
@@ -248,7 +248,7 @@ export default function InventoryIntel() {
           <label className="wide">Why it might work / resale strategy<textarea rows="3" value={form.strategy} onChange={event => setForm({ ...form, strategy: event.target.value })}/></label>
           <label className="inventory-intel-checkbox wide"><input type="checkbox" checked={form.isBundle} onChange={event => setForm({ ...form, isBundle: event.target.checked })}/> Bundle / lot</label>
         </div>
-        <div className="inventory-intel-modal-actions"><button className="site-admin-btn secondary" type="button" onClick={() => setShowAdd(false)}>Cancel</button><button className="site-admin-btn" type="submit">Add to Inventory Intel</button></div>
+        <div className="inventory-intel-modal-actions"><button className="site-admin-btn secondary" type="button" onClick={() => setShowAdd(false)}>Cancel</button><button className="site-admin-btn" type="submit">Add Inventory Opportunity</button></div>
       </form>
     </div>}
   </div>;
