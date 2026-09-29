@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 
 const PRIORITIES = new Set(['STRONG', 'ACTIVE', 'WATCH']);
 const STATUSES = new Set(['new', 'contacted', 'interested', 'passed', 'sold']);
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const leads = await parseSupabase(await supabaseRest(
+      const leads = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `buyer_leads?select=${encodeURIComponent(SELECT)}&order=checked_at.desc&limit=500`,
         { method: 'GET' },
       ), 'Unable to load Buyer Leads.');
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
     };
 
     try {
-      const leads = await parseSupabase(await supabaseRest(
+      const leads = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `buyer_leads?select=${encodeURIComponent(SELECT)}`,
         {
           method: 'POST',
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
     if (Object.prototype.hasOwnProperty.call(body, 'notes')) patch.notes = clean(body.notes, 5000) || null;
 
     try {
-      const leads = await parseSupabase(await supabaseRest(
+      const leads = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `buyer_leads?id=eq.${id}&select=${encodeURIComponent(SELECT)}`,
         {
           method: 'PATCH',
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
     if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'A valid lead ID is required.' });
 
     try {
-      const rows = await parseSupabase(await supabaseRest(
+      const rows = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `buyer_leads?id=eq.${id}&select=id`,
         { method: 'DELETE', headers: { Prefer: 'return=representation' } },
       ), 'Unable to delete Buyer Lead.');
