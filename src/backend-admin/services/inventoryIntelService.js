@@ -1,6 +1,6 @@
 import { adminFetch, parseJsonResponse } from './apiClient';
 
-const parseResponse = response => parseJsonResponse(response, 'Inventory Intel request failed');
+const parseResponse = response => parseJsonResponse(response, 'Inventory Opportunities request failed');
 
 export async function loadInventoryIntel(accessToken) {
   const payload = await parseResponse(await adminFetch('/api/admin/inventory-intel', {}, accessToken));
