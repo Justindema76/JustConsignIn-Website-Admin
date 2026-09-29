@@ -345,7 +345,7 @@ export const siteBuilderConfig = {
     },
     showcase: {
       title: 'Showcase',
-      components: ['ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock'],
+      components: ['ShowcaseHeroBlock', 'ProofStripBlock', 'ProjectShowcaseBlock', 'CaseStudyBlock', 'CardGridBlock', 'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock'],
     },
   },
   components: {
@@ -725,6 +725,48 @@ export const siteBuilderConfig = {
       },
       render: p => <section className="shared-proof-strip"><div className="shared-wrap shared-proof-grid">
         {[[p.item1Title,p.item1Text],[p.item2Title,p.item2Text],[p.item3Title,p.item3Text]].map(([title,copy],i)=><div className="shared-proof" key={i}><BlockHeading level={p.itemHeadingLevel || 'h3'} className="shared-proof-title">{title}</BlockHeading><span>{copy}</span></div>)}
+      </div></section>,
+    },
+
+    ProjectShowcaseBlock: {
+      label: 'JUSTIN · Project Showcase',
+      fields: {
+        eyebrow:{type:'text',label:'Section eyebrow'},
+        heading:{type:'text',label:'Section heading'},
+        headingLevel:{...headingLevelField,label:'Section heading level'},
+        projectHeadingLevel:{...headingLevelField,label:'Project title level'},
+
+        project1Image:{...imageField,label:'Project 1 image'},project1ImageAlt:{type:'text',label:'Project 1 image alt text'},project1Title:{type:'text',label:'Project 1 title'},project1Text:{type:'textarea',label:'Project 1 description'},project1ButtonText:{type:'text',label:'Project 1 button text'},project1ButtonUrl:{type:'text',label:'Project 1 page URL'},project1LiveButtonText:{type:'text',label:'Project 1 live button text'},project1LiveUrl:{type:'text',label:'Project 1 live website URL'},
+        project2Image:{...imageField,label:'Project 2 image'},project2ImageAlt:{type:'text',label:'Project 2 image alt text'},project2Title:{type:'text',label:'Project 2 title'},project2Text:{type:'textarea',label:'Project 2 description'},project2ButtonText:{type:'text',label:'Project 2 button text'},project2ButtonUrl:{type:'text',label:'Project 2 page URL'},project2LiveButtonText:{type:'text',label:'Project 2 live button text'},project2LiveUrl:{type:'text',label:'Project 2 live website URL'},
+        project3Image:{...imageField,label:'Project 3 image'},project3ImageAlt:{type:'text',label:'Project 3 image alt text'},project3Title:{type:'text',label:'Project 3 title'},project3Text:{type:'textarea',label:'Project 3 description'},project3ButtonText:{type:'text',label:'Project 3 button text'},project3ButtonUrl:{type:'text',label:'Project 3 page URL'},project3LiveButtonText:{type:'text',label:'Project 3 live button text'},project3LiveUrl:{type:'text',label:'Project 3 live website URL'},
+      },
+      defaultProps: {
+        eyebrow:'SELECTED WORDPRESS PROJECTS',
+        heading:'WordPress work',
+        headingLevel:'h2',
+        projectHeadingLevel:'h3',
+        project1Image:'',project1ImageAlt:'Sunluna Vacations website',project1Title:'Sunluna Vacations',project1Text:'Responsive WordPress website for a travel business, with structured content, customer contact paths and SEO foundations.',project1ButtonText:'View Project →',project1ButtonUrl:'/work/wordpress-websites/sunluna-vacations',project1LiveButtonText:'Visit Live Website ↗',project1LiveUrl:'https://sunlunavacations.com/',
+        project2Image:'',project2ImageAlt:'Kingscrest Property Management website',project2Title:'Kingscrest Property Management',project2Text:'WordPress business website focused on property-management services, responsive presentation and clear customer contact.',project2ButtonText:'View Project →',project2ButtonUrl:'/work/wordpress-websites/kingscrest-property-management',project2LiveButtonText:'Visit Live Website ↗',project2LiveUrl:'https://kingscrestpm.ca/',
+        project3Image:'',project3ImageAlt:'Sunwings Transport website',project3Title:'Sunwings Transport',project3Text:'Responsive WordPress website presenting transportation services with clear service information and customer inquiry paths.',project3ButtonText:'View Project →',project3ButtonUrl:'/work/wordpress-websites/sunwings-transport',project3LiveButtonText:'Visit Live Website ↗',project3LiveUrl:'https://sunwingstransport.ca/',
+      },
+      render: p => <section className="shared-section shared-project-showcase"><div className="shared-wrap">
+        <div className="shared-eyebrow">{p.eyebrow}</div>
+        <BlockHeading level={p.headingLevel || 'h2'} className="shared-section-title">{p.heading}</BlockHeading>
+        <div className="shared-project-showcase-list">
+          {[1,2,3].filter(i=>p['project'+i+'Title'] || p['project'+i+'Text']).map(i=><article className="shared-project-showcase-card" key={i}>
+            <div className="shared-project-showcase-image">
+              {p['project'+i+'Image'] ? <img src={p['project'+i+'Image']} alt={p['project'+i+'ImageAlt'] || p['project'+i+'Title'] || ''}/> : <div className="shared-project-showcase-placeholder">Project image /<br/>screenshot</div>}
+            </div>
+            <div className="shared-project-showcase-copy">
+              <BlockHeading level={p.projectHeadingLevel || 'h3'} className="shared-project-showcase-heading">{p['project'+i+'Title']}</BlockHeading>
+              <p>{p['project'+i+'Text']}</p>
+              <div className="shared-project-showcase-actions">
+                {p['project'+i+'ButtonText'] && p['project'+i+'ButtonUrl'] && <a className="shared-btn shared-btn-primary" href={p['project'+i+'ButtonUrl']} onClick={previewClick}>{p['project'+i+'ButtonText']}</a>}
+                {p['project'+i+'LiveButtonText'] && p['project'+i+'LiveUrl'] && <a className="shared-btn shared-btn-secondary" href={p['project'+i+'LiveUrl']} onClick={previewClick}>{p['project'+i+'LiveButtonText']}</a>}
+              </div>
+            </div>
+          </article>)}
+        </div>
       </div></section>,
     },
 
