@@ -52,11 +52,11 @@ export default async function handler(req, res) {
       const deals = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?select=${encodeURIComponent(SELECT)}&order=priority.desc,checked_at.desc&limit=500`,
         { method: 'GET' },
-      ), 'Unable to load Inventory Intel.');
+      ), 'Unable to load Inventory Opportunities.');
       return res.status(200).json({ deals: Array.isArray(deals) ? deals : [] });
     } catch (error) {
-      console.error('Inventory Intel GET failed', error);
-      return res.status(500).json({ error: 'Unable to load Inventory Intel.' });
+      console.error('Inventory Opportunities GET failed', error);
+      return res.status(500).json({ error: 'Unable to load Inventory Opportunities.' });
     }
   }
 
@@ -110,11 +110,11 @@ export default async function handler(req, res) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify(row),
         },
-      ), 'Unable to add Inventory Intel item.');
+      ), 'Unable to add Inventory Opportunities item.');
       return res.status(201).json({ deal: deals?.[0] || null });
     } catch (error) {
-      console.error('Inventory Intel POST failed', error);
-      return res.status(500).json({ error: 'Unable to add Inventory Intel item.' });
+      console.error('Inventory Opportunities POST failed', error);
+      return res.status(500).json({ error: 'Unable to add Inventory Opportunities item.' });
     }
   }
 
@@ -149,12 +149,12 @@ export default async function handler(req, res) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify(patch),
         },
-      ), 'Unable to update Inventory Intel item.');
-      if (!deals?.[0]) return res.status(404).json({ error: 'Inventory Intel item not found.' });
+      ), 'Unable to update Inventory Opportunities item.');
+      if (!deals?.[0]) return res.status(404).json({ error: 'Inventory Opportunities item not found.' });
       return res.status(200).json({ deal: deals[0] });
     } catch (error) {
-      console.error('Inventory Intel PATCH failed', error);
-      return res.status(500).json({ error: 'Unable to update Inventory Intel item.' });
+      console.error('Inventory Opportunities PATCH failed', error);
+      return res.status(500).json({ error: 'Unable to update Inventory Opportunities item.' });
     }
   }
 
@@ -167,12 +167,12 @@ export default async function handler(req, res) {
       const rows = await parseSupabase(await supabaseUserRest(owner.accessToken, 
         `resale_deals?id=eq.${id}&select=id`,
         { method: 'DELETE', headers: { Prefer: 'return=representation' } },
-      ), 'Unable to delete Inventory Intel item.');
-      if (!rows?.[0]) return res.status(404).json({ error: 'Inventory Intel item not found.' });
+      ), 'Unable to delete Inventory Opportunities item.');
+      if (!rows?.[0]) return res.status(404).json({ error: 'Inventory Opportunities item not found.' });
       return res.status(200).json({ ok: true, id });
     } catch (error) {
-      console.error('Inventory Intel DELETE failed', error);
-      return res.status(500).json({ error: 'Unable to delete Inventory Intel item.' });
+      console.error('Inventory Opportunities DELETE failed', error);
+      return res.status(500).json({ error: 'Unable to delete Inventory Opportunities item.' });
     }
   }
 
