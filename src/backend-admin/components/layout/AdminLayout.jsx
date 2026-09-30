@@ -53,6 +53,12 @@ const navGroups = [
       { to: '/admin/demo-requests', label: 'Demo Requests', icon: Inbox, sites: ['justconsignin'] },
       { to: '/admin/beta-partners', label: 'Beta Partners', icon: Handshake, sites: ['justconsignin'] },
       { to: '/admin/outreach', label: 'Outreach Map', icon: MapPinned, sites: ['justconsignin'] },
+    ],
+  },
+  {
+    id: 'inventory',
+    label: 'Resale Inventory',
+    items: [
       { to: '/admin/inventory-sources', label: 'Inventory Sources', icon: Globe2, sites: ['justconsignin'] },
       { to: '/admin/inventory-intel', label: 'Inventory Opportunities', icon: LibraryBig, sites: ['justconsignin'] },
       { to: '/admin/buyer-leads', label: 'Buyer Leads', icon: Users, sites: ['justconsignin'] },
