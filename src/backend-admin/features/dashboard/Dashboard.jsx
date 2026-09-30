@@ -3,7 +3,6 @@ import {
   BriefcaseBusiness,
   Building2,
   Handshake,
-  Globe2,
   Image,
   Inbox,
   LibraryBig,
@@ -16,7 +15,6 @@ import {
   Settings,
   Sparkles,
   Video,
-  Users,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getAdminSiteKey } from '../../services/siteAdminService';
@@ -86,16 +84,6 @@ const justConsignInSections = [
       { to: '/admin/demo-requests', icon: Inbox, title: 'Demo Requests', copy: 'Review demo leads, contact stores and manage follow-up.' },
       { to: '/admin/beta-partners', icon: Handshake, title: 'Beta Partners', copy: 'Manage Founding Partner applications and active testing.' },
       { to: '/admin/outreach', icon: MapPinned, title: 'Outreach Map', copy: 'Track consignment-shop leads and outreach activity.' },
-    ],
-  },
-  {
-    id: 'inventory',
-    title: 'Resale Inventory',
-    copy: 'Inventory sources, actual buying opportunities and buyers are kept separate from outreach.',
-    items: [
-      { to: '/admin/inventory-sources', icon: Globe2, title: 'Inventory Sources', copy: 'Permanent list of liquidation, wholesale and local sourcing websites.' },
-      { to: '/admin/inventory-intel', icon: LibraryBig, title: 'Inventory Opportunities', copy: 'Actual lots and listings being evaluated or tracked for resale.' },
-      { to: '/admin/buyer-leads', icon: Users, title: 'Buyer Leads', copy: 'People, shops and communities looking for inventory we can sell.' },
     ],
   },
   {
