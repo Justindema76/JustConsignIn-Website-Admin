@@ -11,9 +11,6 @@ import HiringContactsAdmin from '../features/hiring-contacts/HiringContactsAdmin
 import DepartmentsAdmin from '../features/departments/DepartmentsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
 import OutreachMap from '../features/outreach/OutreachMap';
-import InventoryIntel from '../features/inventory-intel/InventoryIntel';
-import BuyerLeads from '../features/buyer-leads/BuyerLeads';
-import InventorySources from '../features/inventory-sources/InventorySources';
 import SocialImageStudio from '../features/media/SocialImageStudio';
 import SettingsAdmin from '../features/settings/SettingsAdmin';
 import SiteBuilder from '../features/site-builder/SiteBuilder';
@@ -39,9 +36,6 @@ export default function AdminApp() {
         <Route path="/admin/departments" element={<DepartmentsAdmin />} />
         <Route path="/admin/beta-partners" element={<BetaApplicationsAdmin />} />
         <Route path="/admin/outreach" element={<OutreachMap />} />
-        <Route path="/admin/inventory-sources" element={<InventorySources />} />
-        <Route path="/admin/inventory-intel" element={<InventoryIntel />} />
-        <Route path="/admin/buyer-leads" element={<BuyerLeads />} />
         <Route path="/admin/blog" element={<BlogAdmin />} />
         <Route path="/admin/blog/:id" element={<BlogAdmin />} />
         <Route path="/admin/work-posts" element={<WorkPostsAdmin />} />
