@@ -5,11 +5,7 @@ const required = (name) => {
 };
 
 export const supabaseUrl = () => process.env.SUPABASE_URL || 'https://nowsajdmbpxvlvrhopjg.supabase.co';
-export const supabaseSecret = () =>
-  process.env.SUPABASE_SECRET_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_KEY ||
-  '';
+export const supabaseSecret = () => required('SUPABASE_SECRET_KEY');
 export const supabaseAnon = () => process.env.SUPABASE_ANON_KEY || 'sb_publishable_AZbVouJ6gN00dQGdZwPjog_GTQR0J-w';
 
 export function customerAppEnabled() {
