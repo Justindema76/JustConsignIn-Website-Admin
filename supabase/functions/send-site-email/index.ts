@@ -928,6 +928,86 @@ async function sendServiceRequestReply(req: Request, body: any) {
   }
 }
 
+async function sendQuoteRequest(body: any) {
+  const requestId = clean(body.requestId, 80);
+  const notificationToken = clean(body.notificationToken, 80);
+  if (!validUuid(requestId) || !validUuid(notificationToken)) {
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  const { data: record, error } = await admin
+    .from('sunwings_quote_requests')
+    .select('id,name,phone,email,service,move_from,move_to,preferred_date,move_size,message,notification_token,email_notified_at')
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings')
+    .maybeSingle();
+
+  if (error) {
+    console.error('Sunwings quote notification lookup failed', error.message);
+    return Response.json({ error: 'Unable to load quote request.' }, { status: 500 });
+  }
+  if (!record || String(record.notification_token) !== notificationToken) {
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
+  if (record.email_notified_at) return Response.json({ ok: true, alreadySent: true });
+
+  await admin
+    .from('sunwings_quote_requests')
+    .update({ email_notification_attempted_at: new Date().toISOString(), email_notification_error: null })
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings');
+
+  const display = (value: unknown) => clean(value, 3000) || 'Not provided';
+  const row = (label: string, value: unknown) =>
+    `<tr><td style="padding:8px 12px;color:#5B6B82;font-weight:700;vertical-align:top;width:150px">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#14213D;vertical-align:top">${escapeHtml(display(value))}</td></tr>`;
+
+  const text = [
+    'New Sunwings Transport quote request', '',
+    `Name: ${display(record.name)}`,
+    `Phone: ${display(record.phone)}`,
+    `Email: ${display(record.email)}`,
+    `Service: ${display(record.service)}`,
+    `Moving from: ${display(record.move_from)}`,
+    `Moving to: ${display(record.move_to)}`,
+    `Preferred date: ${display(record.preferred_date)}`,
+    `Move size: ${display(record.move_size)}`, '',
+    'Message:', display(record.message), '',
+    'This request is saved in Website Admin → Quote Requests.',
+  ].join('\n');
+
+  const html = `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div><h1 style="margin:5px 0 0;font-size:24px">New Quote Request</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Phone', record.phone)}${row('Email', record.email)}${row('Service', record.service)}${row('Moving from', record.move_from)}${row('Moving to', record.move_to)}${row('Preferred date', record.preferred_date)}${row('Move size', record.move_size)}</table><div style="margin:16px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Message</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#5B6B82;font-size:13px">This request is also saved in Website Admin → Quote Requests.</p></div></div></div>`;
+
+  try {
+    const settings = await loadSettings('sunwings');
+    const transport = transportFor(settings);
+    await transport.sendMail({
+      from: fromAddress(settings),
+      ...recipientsFor(settings, 'quote_request'),
+      replyTo: validEmail(clean(record.email, 320)) ? clean(record.email, 320) : undefined,
+      subject: `New Sunwings Quote Request — ${display(record.name)}`,
+      text,
+      html,
+    });
+
+    await admin
+      .from('sunwings_quote_requests')
+      .update({ email_notified_at: new Date().toISOString(), email_notification_error: null })
+      .eq('id', requestId)
+      .eq('site_key', 'sunwings');
+
+    return Response.json({ ok: true, sent: true });
+  } catch (error) {
+    const message = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    await admin
+      .from('sunwings_quote_requests')
+      .update({ email_notification_error: message })
+      .eq('id', requestId)
+      .eq('site_key', 'sunwings');
+    console.error('Sunwings quote email failed', message);
+    return Response.json({ error: message }, { status: 502 });
+  }
+}
+
 async function sendTest(req: Request, body: any) {
   const ownerAuth = await requireOwner(req);
   if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
@@ -964,6 +1044,7 @@ Deno.serve(async (req: Request) => {
   if (body.action === 'demo') return sendDemo(body);
   if (body.action === 'service_submit') return submitServiceRequest(body);
   if (body.action === 'hiring_contact_submit') return submitHiringContact(body);
+  if (body.action === 'quote_request') return sendQuoteRequest(body);
   if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'service_reply') return sendServiceRequestReply(req, body);
