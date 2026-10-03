@@ -28,6 +28,7 @@ import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
+import PagesAdmin from '../sites/sunwings/PagesAdmin';
 import { getAdminSiteKey } from '../services/siteAdminService';
 
 const JUSTIN = ['justindematteis'];
@@ -87,6 +88,7 @@ export default function AdminApp() {
         <Route path="/admin/website/global/:section" element={<GlobalSectionRoute />} />
         <Route path="/admin/settings" element={only(STANDARD_SITES, <SettingsAdmin />)} />
 
+        <Route path="/admin/sunwings/pages" element={only(SUNWINGS, <PagesAdmin />)} />
         <Route path="/admin/sunwings/services" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/services/:id" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/locations" element={only(SUNWINGS, <LocationPostsAdmin />)} />
