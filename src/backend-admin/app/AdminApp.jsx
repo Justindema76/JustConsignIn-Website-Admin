@@ -91,6 +91,8 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/pages" element={only(SUNWINGS, <WebsitePages />)} />
         <Route path="/admin/sunwings/pages/:pageId" element={only(SUNWINGS, <SiteBuilder />)} />
         <Route path="/admin/sunwings/blocks" element={only(SUNWINGS, <BlockLibrary />)} />
+        <Route path="/admin/sunwings/blog" element={only(SUNWINGS, <BlogAdmin />)} />
+        <Route path="/admin/sunwings/blog/:id" element={only(SUNWINGS, <BlogAdmin />)} />
         <Route path="/admin/sunwings/services" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/services/:id" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/locations" element={only(SUNWINGS, <LocationPostsAdmin />)} />
