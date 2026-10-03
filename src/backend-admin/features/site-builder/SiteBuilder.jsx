@@ -13,7 +13,7 @@ import {
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
 import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePages';
-import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
+import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
 function storageKey(siteKey, pageId) {
@@ -477,7 +477,7 @@ export default function SiteBuilder() {
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState('');
-  const [globalStyles, setGlobalStyles] = useState(DEFAULT_GLOBAL_STYLES);
+  const [globalStyles, setGlobalStyles] = useState(() => globalStylesForSite(siteKey));
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -494,7 +494,7 @@ export default function SiteBuilder() {
           loadAdminGlobalStyles(accessToken).catch(() => ({ value: null })),
         ]);
         if (!active) return;
-        setGlobalStyles(normalizeGlobalStyles(styleState.value));
+        setGlobalStyles(normalizeGlobalStyles(styleState.value, siteKey));
 
         let data = state.draft?.content || null;
         let migratedLocal = false;
@@ -653,7 +653,7 @@ export default function SiteBuilder() {
     {error && <div className="jci-builder-message error"><span>{error}</span></div>}
     {publishing && <div className="jci-builder-message publishing"><LoaderCircle className="jci-spin" size={17}/><span>Publishing {page.title}…</span></div>}
 
-    <div className="jci-puck-editor" style={globalStyleVars(globalStyles)}>
+    <div className="jci-puck-editor" style={globalStyleVars(globalStyles, siteKey)}>
       <Puck
         key={`${siteKey}-${page.id}-${editorKey}`}
         config={builderConfig}
