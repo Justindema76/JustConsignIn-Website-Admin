@@ -260,7 +260,7 @@ export default function SocialAutomation() {
   if (!editing) return <>
     <div className="site-admin-page-head">
       <div><p className="site-admin-eyebrow">Social & Marketing · {siteName}</p><h1>Social Posts</h1><p>Create Facebook, Instagram, TikTok and YouTube content for {siteName}, save drafts, and send approved posts to its own Metricool connection.</p></div>
-      <button className="site-admin-btn" type="button" onClick={() => navigate(`${socialBasePath}/new`)}><Plus size={15}/> Create Campaign</button>
+      <button className="site-admin-btn" type="button" onClick={() => navigate(`${socialBasePath}/new`)}><Plus size={15}/> Create Social Post</button>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success">{message}</div>}
