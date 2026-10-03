@@ -2,7 +2,7 @@ import { ExternalLink, WandSparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MediaPreview from '../../../components/media/MediaPreview';
 
-export default function CampaignList({ campaigns, loading, busy, onDelete }) {
+export default function CampaignList({ campaigns, loading, busy, onDelete, basePath = '/admin/social-automation' }) {
   const navigate = useNavigate();
 
   return <div className="site-admin-card social-campaign-list">
@@ -20,7 +20,7 @@ export default function CampaignList({ campaigns, loading, busy, onDelete }) {
         </div>
         <span className={`site-admin-status ${statusClass}`}>{statusLabel}</span>
         <div className="site-admin-actions right">
-          <button className="site-admin-btn secondary small" onClick={() => navigate(`/admin/social-automation/${item.id}`)}>Edit</button>
+          <button className="site-admin-btn secondary small" onClick={() => navigate(`${basePath}/${item.id}`)}>Edit</button>
           {item.metricoolPosts?.[0]?.response?.plannerUrl && <a className="site-admin-btn secondary small" href={item.metricoolPosts[0].response.plannerUrl} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
           <button className="site-admin-btn danger small" onClick={() => onDelete(item)} disabled={busy}>Delete</button>
         </div>
