@@ -4,7 +4,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import MediaPreview from '../../components/media/MediaPreview';
 import NetworkSelector from '../../components/social/NetworkSelector';
-import { ensureTikTokCompatibleImage, loadAdminMedia, uploadSocialImage } from '../../services/siteAdminService';
+import { ensureTikTokCompatibleImage, getAdminSiteKey, loadAdminMedia, uploadSocialImage } from '../../services/siteAdminService';
+import { getSiteConfig } from '../../sites/registry';
 import {
   deleteSocialCampaign,
   disconnectMetricool,
@@ -26,6 +27,15 @@ const IMMEDIATE_PUBLISH_BUFFER_MS = 2 * 60 * 1000;
 export default function SocialAutomation() {
   const { accessToken } = useAuth();
   const { id } = useParams();
+  const siteKey = getAdminSiteKey();
+  const siteConfig = getSiteConfig(siteKey);
+  const siteName = siteConfig?.name || 'Website';
+  const socialBasePath = siteKey === 'sunwings' ? '/admin/sunwings/social-posts' : '/admin/social-automation';
+  const campaignPlaceholder = siteKey === 'sunwings'
+    ? 'Residential move, furniture delivery, warehouse job…'
+    : siteKey === 'justindematteis'
+      ? 'Website launch, SEO project, automation workflow…'
+      : 'Create Shopify products from your phone';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const editing = Boolean(id);
@@ -98,7 +108,7 @@ export default function SocialAutomation() {
       });
       setCampaign(saved);
       setMessage('Campaign saved.');
-      if (id === 'new') navigate(`/admin/social-automation/${saved.id}`, { replace: true });
+      if (id === 'new') navigate(`${socialBasePath}/${saved.id}`, { replace: true });
       await refresh();
       return saved;
     } catch (err) {
@@ -144,7 +154,7 @@ export default function SocialAutomation() {
       }
       const saved = await saveSocialCampaign(accessToken, prepared);
       setCampaign(saved);
-      if (id === 'new') navigate(`/admin/social-automation/${saved.id}`, { replace: true });
+      if (id === 'new') navigate(`${socialBasePath}/${saved.id}`, { replace: true });
       const result = await sendCampaignToMetricool(accessToken, saved.id);
       setCampaign(result.campaign);
       setMessage(result.errors?.length
@@ -232,8 +242,8 @@ export default function SocialAutomation() {
 
   if (!editing) return <>
     <div className="site-admin-page-head">
-      <div><p className="site-admin-eyebrow">Social Automation</p><h1>Create here. Send to Metricool.</h1><p>Build posts with your own media, save campaigns in Supabase, and hand approved content to Metricool for publishing.</p></div>
-      <button className="site-admin-btn" type="button" onClick={() => navigate('/admin/social-automation/new')}><Plus size={15}/> Create Campaign</button>
+      <div><p className="site-admin-eyebrow">Social & Marketing · {siteName}</p><h1>Social Posts</h1><p>Create Facebook, Instagram, TikTok and YouTube content for {siteName}, save drafts, and send approved posts to its own Metricool connection.</p></div>
+      <button className="site-admin-btn" type="button" onClick={() => navigate(`${socialBasePath}/new`)}><Plus size={15}/> Create Campaign</button>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success">{message}</div>}
@@ -246,7 +256,7 @@ export default function SocialAutomation() {
     </div>
 
     <div className="social-connect-card site-admin-card">
-      <div><div className={`social-connection-dot ${integration?.connected ? 'ok' : ''}`}/><div><strong>Metricool backend connection</strong><small>Brand {integration?.brandId || '6893759'} · America/Toronto</small></div></div>
+      <div><div className={`social-connection-dot ${integration?.connected ? 'ok' : ''}`}/><div><strong>Metricool connection for {siteName}</strong><small>{integration?.brandId ? `Brand ${integration.brandId}` : 'Brand not configured'} · America/Toronto</small></div></div>
       <div className="site-admin-actions">
         {integration?.connected
           ? <><button className="site-admin-btn secondary small" onClick={testMetricool} disabled={busy}><RefreshCw size={13}/> Test</button><button className="site-admin-btn secondary small" onClick={disconnect} disabled={busy}>Disconnect</button></>
@@ -267,15 +277,15 @@ export default function SocialAutomation() {
 
   return <>
     <div className="site-admin-page-head">
-      <div><p className="site-admin-eyebrow">Social Automation</p><h1>{campaign.id ? 'Edit Campaign' : 'Create Campaign'}</h1><p>Choose the media and networks, build the content, then hand the approved campaign to Metricool.</p></div>
-      <button className="site-admin-btn secondary" type="button" onClick={() => navigate('/admin/social-automation')}><ArrowLeft size={14}/> Back</button>
+      <div><p className="site-admin-eyebrow">Social & Marketing · {siteName}</p><h1>{campaign.id ? 'Edit Social Post' : 'Create Social Post'}</h1><p>Choose the media and networks, build the {siteName} content, then save it or send it to Metricool.</p></div>
+      <button className="site-admin-btn secondary" type="button" onClick={() => navigate(socialBasePath)}><ArrowLeft size={14}/> Back</button>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success">{message}</div>}
 
     <div className="social-editor-grid">
       <section className="site-admin-card social-editor">
-        <label className="social-field"><span>Campaign / topic</span><input value={campaign.title} onChange={e => setField('title', e.target.value)} placeholder="Create Shopify products from your phone"/></label>
+        <label className="social-field"><span>Campaign / topic</span><input value={campaign.title} onChange={e => setField('title', e.target.value)} placeholder={campaignPlaceholder}/></label>
         <div className="social-field"><span>Publish to</span><NetworkSelector value={campaign.platforms} onChange={platforms => setField('platforms', platforms)}/></div>
 
         <CampaignMediaEditor
@@ -294,7 +304,7 @@ export default function SocialAutomation() {
           onActivePlatform={setActivePreview}
           onChange={setField}
           onStarterCopy={() => {
-            const copy = starterCopy(campaign.title);
+            const copy = starterCopy(campaign.title, siteKey, siteName);
             setCampaign(current => ({
               ...current,
               instagramCaption: copy.instagram,
@@ -320,16 +330,16 @@ export default function SocialAutomation() {
         <div className="site-admin-card social-live-card">
           <h2>Live preview</h2>
           <div className="social-phone-preview">
-            <div className="social-phone-head"><span>J</span><div><strong>JustConsignIn</strong><small>{activePreview}</small></div></div>
+            <div className="social-phone-head"><span>{siteName.slice(0,1).toUpperCase()}</span><div><strong>{siteName}</strong><small>{activePreview}</small></div></div>
             <div className={`social-phone-media ratio-${campaign.aspectRatio.replace(':','')}`}><MediaPreview url={campaign.mediaUrl} type={campaign.mediaType}/></div>
-            <div className="social-phone-copy"><strong>JustConsignIn</strong> {previewText || 'Your caption will appear here.'}</div>
+            <div className="social-phone-copy"><strong>{siteName}</strong> {previewText || 'Your caption will appear here.'}</div>
           </div>
           {campaign.audioUrl && <div className="site-admin-note" style={{marginTop:10}}>Music attached: <b>{campaign.audioName || 'Uploaded audio'}</b>{campaign.mediaType === 'video' ? ' · embedded in Reel' : ''}</div>}
         </div>
         <div className="site-admin-card social-live-card">
           <h2>Metricool</h2>
           {integration?.connected
-            ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>Brand {integration.brandId} · America/Toronto</p><button className="site-admin-btn secondary small" type="button" onClick={testMetricool}>Test connection</button></>
+            ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>{integration.brandId ? `Brand ${integration.brandId}` : 'Metricool connected — brand ID still needs configuration'} · America/Toronto</p><button className="site-admin-btn secondary small" type="button" onClick={testMetricool}>Test connection</button></>
             : <><p>The admin needs its own OAuth connection to Metricool. Your ChatGPT connection remains separate.</p><button className="site-admin-btn small" type="button" onClick={connectMetricool}>Connect Metricool</button></>}
         </div>
       </aside>
