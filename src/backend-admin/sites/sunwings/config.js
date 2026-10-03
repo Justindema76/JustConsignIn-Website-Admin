@@ -3,7 +3,7 @@ export default {
   name: 'Sunwings Transport',
   adminLabel: 'Sunwings Transport',
   domain: 'sunwingstransport.ca',
-  showSocialSidebar: false,
+  showSocialSidebar: true,
   navGroups: [
     {
       id: 'content',
@@ -24,6 +24,13 @@ export default {
         { to: '/admin/sunwings/styles', label: 'Global Styles', icon: 'palette' },
         { to: '/admin/sunwings/global/header', label: 'Header', icon: 'panelTop' },
         { to: '/admin/sunwings/global/footer', label: 'Footer', icon: 'panelBottom' },
+      ],
+    },
+    {
+      id: 'social',
+      label: 'Social & Marketing',
+      items: [
+        { to: '/admin/sunwings/social', label: 'Social Links', icon: 'link' },
       ],
     },
     {
@@ -71,6 +78,14 @@ export default {
           { to: '/admin/sunwings/styles', icon: 'palette', title: 'Global Styles', copy: 'Control colours, typography, spacing, cards and buttons.' },
           { to: '/admin/sunwings/global/header', icon: 'panelTop', title: 'Header', copy: 'Edit the global Sunwings header.' },
           { to: '/admin/sunwings/global/footer', icon: 'panelBottom', title: 'Footer', copy: 'Edit the global Sunwings footer.' },
+        ],
+      },
+      {
+        id: 'social',
+        title: 'Social & Marketing',
+        copy: 'Manage the social profiles used by Sunwings and shown in the admin and public footer.',
+        items: [
+          { to: '/admin/sunwings/social', icon: 'link', title: 'Social Links', copy: 'Manage Facebook, Instagram, LinkedIn, YouTube, TikTok and other social profile links.' },
         ],
       },
       {
