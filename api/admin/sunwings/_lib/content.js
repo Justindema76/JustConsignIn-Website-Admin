@@ -4,7 +4,7 @@ export const SITE_KEY = 'sunwings';
 
 export const SERVICE_FIELDS = [
   'site_key','id','slug','title','eyebrow','hero_title','hero_description','banner_image','banner_alt',
-  'intro','body_html','bullets','cta_title','cta_text','seo_title','seo_description','og_image',
+  'intro','body_html','bullets','faq','cta_title','cta_text','seo_title','seo_description','og_image',
   'status','sort_order','published_at','created_at','updated_at',
 ].join(',');
 
@@ -40,6 +40,12 @@ function publishing(body = {}) {
 }
 
 export function cleanService(body = {}) {
+  const faq = Array.isArray(body.faq)
+    ? body.faq
+      .map(item => ({ question: text(item?.question, 500), answer: text(item?.answer, 3000) }))
+      .filter(item => item.question && item.answer)
+    : [];
+
   return {
     slug: text(body.slug, 180),
     title: text(body.title, 240),
@@ -51,6 +57,7 @@ export function cleanService(body = {}) {
     intro: text(body.intro, 3000),
     body_html: String(body.bodyHtml ?? body.body_html ?? ''),
     bullets: textArray(body.bullets),
+    faq,
     cta_title: text(body.ctaTitle ?? body.cta_title, 300),
     cta_text: text(body.ctaText ?? body.cta_text, 1000),
     seo_title: text(body.seoTitle ?? body.seo_title, 300),
