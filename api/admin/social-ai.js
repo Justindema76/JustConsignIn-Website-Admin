@@ -5,6 +5,44 @@ const COPY_MODEL = process.env.OPENAI_TEXT_MODEL || 'gpt-5.6-terra';
 const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
 const MAX_TRANSCRIBE_BYTES = 24 * 1024 * 1024;
 
+const SITE_PROFILES = {
+  justconsignin: {
+    label: 'JustConsignIn',
+    website: 'https://www.justconsignin.com',
+    context: [
+      'JustConsignIn is a Shopify consignment management app.',
+      'It manages consignors and consignment inventory.',
+      'It tracks items from intake through sale and payout.',
+      'It can create Shopify products, including from a phone.',
+      'It supports Shopify POS workflows.',
+      'It tracks sales, commissions and payouts.',
+      'It offers a 14-day free trial.',
+    ],
+  },
+  justindematteis: {
+    label: 'Justin DeMatteis',
+    website: 'https://www.justindematteis.com',
+    context: [
+      'Justin DeMatteis provides web development, ecommerce, SEO, automation and digital technology services.',
+      'Use only claims supported by the supplied media or user direction.',
+    ],
+  },
+  sunwings: {
+    label: 'Sunwings Transport',
+    website: 'https://sunwingstransport.ca',
+    context: [
+      'Sunwings Transport provides moving, delivery and commercial transport services.',
+      'Core services include residential moving, furniture delivery, commercial transport, packing and protection, warehouse/container unloading and junk removal.',
+      'Use only locations, prices, guarantees or service details that are visible in the supplied media or explicitly provided in the user direction.',
+    ],
+  },
+};
+
+function siteKeyFromRequest(req) {
+  const key = String(req.query?.site || 'justconsignin').trim().toLowerCase();
+  return SITE_PROFILES[key] ? key : '';
+}
+
 function apiKey() {
   return String(process.env.OPENAI_API_KEY || '').trim();
 }
@@ -95,7 +133,8 @@ async function transcribeVideo(mediaUrl) {
   return { text: clean(data?.text, 12000), warning: '' };
 }
 
-async function analyzeMedia(body = {}) {
+async function analyzeMedia(body = {}, siteKey = 'justconsignin') {
+  const profile = SITE_PROFILES[siteKey] || SITE_PROFILES.justconsignin;
   const mediaUrl = clean(body.mediaUrl, 12000);
   const mediaType = body.mediaType === 'video' ? 'video' : 'image';
   const platforms = [...new Set((Array.isArray(body.platforms) ? body.platforms : []).map(String).filter(Boolean))];
@@ -124,7 +163,8 @@ async function analyzeMedia(body = {}) {
       ? 'YouTube type: SHORT. Write a concise short-form title and compact description suited to a YouTube Short. Use #Shorts only when it reads naturally.'
       : 'YouTube type: VIDEO. Write a searchable tutorial/demo title and a fuller YouTube description that explains what the viewer will learn, includes a clear JustConsignIn call to action, and uses the website when relevant.'
     : '';
-  const prompt = `You are the social-media content assistant for JustConsignIn, a Shopify consignment management app. Analyze the supplied ${mediaType} itself and figure out what product feature, workflow, benefit, or message it is actually showing. Then create the social campaign from that evidence.\n\nFacts you may use when they are relevant to what the media shows:\n- JustConsignIn manages consignors and consignment inventory.\n- It tracks items from intake through sale and payout.\n- It can create Shopify products, including from a phone.\n- It supports Shopify POS workflows.\n- It tracks sales, commissions and payouts.\n- It offers a 14-day free trial.\n- Website: https://www.justconsignin.com\n\nSelected networks to create content for: ${selected}.\nOnly create copy for the selected networks. Leave all unselected network fields as empty strings.\n${youtubeDirection ? `${youtubeDirection}\n` : ''}${direction ? `Additional user direction: ${direction}\n` : ''}${transcript ? `Video speech/transcript:\n${transcript}\n` : ''}\nDo not invent app features, statistics, testimonials, or claims that are not visible in the media or listed in the facts above. The campaign title should be concise and based on what the media actually shows. Instagram can use relevant hashtags. Facebook should read naturally. TikTok should be concise and punchy. Follow the selected YouTube type exactly when YouTube is selected.\n\nReturn ONLY valid JSON with exactly these keys:\n{\n  "title": "...",\n  "mediaSummary": "...",\n  "instagram": "...",\n  "facebook": "...",\n  "tiktok": "...",\n  "youtubeTitle": "...",\n  "youtubeDescription": "..."\n}`;
+  const facts = profile.context.map(item => `- ${item}`).join('\n');
+  const prompt = `You are the social-media content assistant for ${profile.label}. Analyze the supplied ${mediaType} itself and determine what service, product, workflow, benefit, or message it is actually showing. Then create the social campaign from that evidence.\n\nBusiness context you may use when relevant:\n${facts}\n- Website: ${profile.website}\n\nSelected networks to create content for: ${selected}.\nOnly create copy for the selected networks. Leave all unselected network fields as empty strings.\n${youtubeDirection ? `${youtubeDirection}\n` : ''}${direction ? `Additional user direction: ${direction}\n` : ''}${transcript ? `Video speech/transcript:\n${transcript}\n` : ''}\nDo not invent features, prices, statistics, testimonials, locations, guarantees or claims that are not visible in the media, listed in the business context, or explicitly provided by the user. The campaign title should be concise and based on what the media actually shows. Instagram can use relevant hashtags. Facebook should read naturally. TikTok should be concise and punchy. Follow the selected YouTube type exactly when YouTube is selected.\n\nReturn ONLY valid JSON with exactly these keys:\n{\n  "title": "...",\n  "mediaSummary": "...",\n  "instagram": "...",\n  "facebook": "...",\n  "tiktok": "...",\n  "youtubeTitle": "...",\n  "youtubeDescription": "..."\n}`;
 
   const visualInputs = mediaType === 'image'
     ? [{ type: 'input_image', image_url: mediaUrl, detail: 'high' }]
@@ -161,6 +201,8 @@ export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const user = await requireWebsiteOwner(req, res);
   if (!user) return;
+  const siteKey = siteKeyFromRequest(req);
+  if (!siteKey) return res.status(400).json({ error: 'Unknown website.' });
 
   try {
     if (req.method === 'GET') {
@@ -168,7 +210,7 @@ export default async function handler(req, res) {
     }
 
     const action = String(req.body?.action || '').toLowerCase();
-    if (action === 'analyze') return res.status(200).json(await analyzeMedia(req.body || {}));
+    if (action === 'analyze') return res.status(200).json(await analyzeMedia(req.body || {}, siteKey));
     return res.status(400).json({ error: 'Unknown AI action' });
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Social AI request failed' });
