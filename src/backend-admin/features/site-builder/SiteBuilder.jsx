@@ -44,7 +44,7 @@ function validatePublishData(page, data, siteKey) {
     const allowed = new Set([
       'HeadingBlock','TextBlock','ImageBlock','ImageTextBlock','HeroBlock','CtaBlock',
       'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
-      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingCardsBlock',
+      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingFactorsBlock','SunwingsPricingCardsBlock',
       'SunwingsLocationsGridBlock','SunwingsReviewsBlock','SunwingsBlogGridBlock',
       'SunwingsFaqBlock','SunwingsContactBlock','SunwingsQuoteFormBlock','SunwingsRichTextBlock'
     ]);
