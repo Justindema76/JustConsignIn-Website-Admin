@@ -207,10 +207,86 @@ export const JUSTINDEMATTEIS_PAGES = [
   },
 ];
 
+
+export const SUNWINGS_PAGES = [
+  {
+    id: 'home',
+    title: 'Home',
+    path: '/',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/home',
+    description: 'Sunwings homepage. Services and locations are pulled from their post types.',
+  },
+  {
+    id: 'services',
+    title: 'Services',
+    path: '/services',
+    source: 'shared page builder + Service Posts',
+    kind: 'marketing',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/services',
+    description: 'Main services index page. Individual services stay in Service Posts.',
+  },
+  {
+    id: 'locations',
+    title: 'Service Areas',
+    path: '/locations',
+    source: 'shared page builder + Location Posts',
+    kind: 'marketing',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/locations',
+    description: 'Main service-area index page. Individual areas stay in Location Posts.',
+  },
+  {
+    id: 'pricing',
+    title: 'Pricing',
+    path: '/pricing',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/pricing',
+    description: 'Pricing, quote guidance and price-match messaging.',
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    path: '/contact',
+    source: 'shared page builder + quote form',
+    kind: 'form',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/contact',
+    description: 'Contact information and the Sunwings quote-request form.',
+  },
+  {
+    id: 'blog',
+    title: 'Moving Tips',
+    path: '/blog',
+    source: 'shared page builder',
+    kind: 'content',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/blog',
+    description: 'Moving Tips index page.',
+  },
+  {
+    id: 'privacy',
+    title: 'Privacy Policy',
+    path: '/privacy',
+    source: 'shared page builder',
+    kind: 'legal',
+    editor: 'visual',
+    editorTarget: '/admin/sunwings/pages/privacy',
+    description: 'Sunwings privacy policy.',
+  },
+];
+
 export const WEBSITE_PAGES = JUSTCONSIGNIN_PAGES;
 
 export function getWebsitePages(siteKey = 'justconsignin') {
-  return siteKey === 'justindematteis' ? JUSTINDEMATTEIS_PAGES : JUSTCONSIGNIN_PAGES;
+  if (siteKey === 'justindematteis') return JUSTINDEMATTEIS_PAGES;
+  if (siteKey === 'sunwings') return SUNWINGS_PAGES;
+  return JUSTCONSIGNIN_PAGES;
 }
 
 export function getWebsitePage(id, siteKey = 'justconsignin') {
@@ -218,8 +294,13 @@ export function getWebsitePage(id, siteKey = 'justconsignin') {
 }
 
 export function livePageUrl(path, siteKey = 'justconsignin') {
-  const domain = siteKey === 'justindematteis' ? 'justindematteis.com' : 'justconsignin.com';
-  return `https://www.${domain}${path === '/' ? '' : path}`;
+  const domain = siteKey === 'justindematteis'
+    ? 'justindematteis.com'
+    : siteKey === 'sunwings'
+      ? 'sunwingstransport.ca'
+      : 'justconsignin.com';
+  const prefix = siteKey === 'sunwings' ? 'https://' : 'https://www.';
+  return `${prefix}${domain}${path === '/' ? '' : path}`;
 }
 
 
@@ -689,7 +770,207 @@ const JUSTIN_PAGE_EDITOR_DATA = {
   },
 };
 
+
+const SUNWINGS_PAGE_EDITOR_DATA = {
+  home: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-home-hero', {
+        eyebrow: 'Reliable • On-Time • Professional',
+        heading: 'Moving & delivery,',
+        accent: 'done right.',
+        text: 'Residential moves, furniture delivery, junk removal and commercial transport across Toronto, the GTA, Hamilton and Niagara. Careful crews, upfront pricing, no surprises.',
+        primaryButtonText: 'Get a Free Quote →',
+        primaryButtonUrl: '/contact',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: 'Sunwings Transport moving truck and crew',
+      }),
+      block('SunwingsTrustBlock', 'sw-home-trust', {}),
+      block('SunwingsServicesGridBlock', 'sw-home-services', {
+        eyebrow: 'What we do',
+        heading: 'One call for every move.',
+        text: 'From a single couch to a full warehouse transfer, Sunwings brings the truck, the crew and the care.',
+      }),
+      block('SunwingsStepsBlock', 'sw-home-steps', {
+        eyebrow: 'How it works',
+        heading: 'Booked in three steps.',
+      }),
+      block('ImageTextBlock', 'sw-home-business', {
+        image: 'https://sunwingstransport.ca/wp-content/uploads/2026/02/van-loading-file-cabinet.jpg',
+        alt: 'Sunwings commercial transport',
+        heading: 'A transport partner you can schedule on.',
+        headingLevel: 'h2',
+        text: 'Retailers, warehouses, contractors and property managers use Sunwings for one-off projects and recurring routes.',
+        imagePosition: 'left',
+        background: 'white',
+      }),
+      block('SunwingsPricingCardsBlock', 'sw-home-pricing', {
+        eyebrow: 'Pricing',
+        heading: 'Straight answers on price.',
+        text: 'Every quote is based on crew size, truck time and distance. Found a lower written quote? We’ll match it.',
+      }),
+      block('SunwingsLocationsGridBlock', 'sw-home-locations', {
+        eyebrow: 'Service areas',
+        heading: 'From Toronto to Niagara.',
+        text: 'Local crews who know the buildings, highways and condo elevator rules.',
+      }),
+      block('SunwingsReviewsBlock', 'sw-home-reviews', {
+        eyebrow: 'Reviews',
+        heading: 'What customers say.',
+      }),
+      block('SunwingsBlogGridBlock', 'sw-home-blog', {
+        eyebrow: 'Moving tips',
+        heading: 'From the Sunwings blog.',
+      }),
+    ],
+    root: { props: {} },
+  },
+  services: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-services-hero', {
+        eyebrow: 'Services',
+        heading: 'Moving, delivery & transport services',
+        accent: '',
+        text: 'Residential, commercial and warehouse services across Toronto, the GTA, Hamilton and Niagara.',
+        primaryButtonText: 'Get a Free Quote →',
+        primaryButtonUrl: '/contact',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: '',
+      }),
+      block('SunwingsServicesGridBlock', 'sw-services-grid', {
+        eyebrow: 'All services',
+        heading: 'What Sunwings can do for you.',
+        text: 'Choose a service to see details, coverage and what is included.',
+      }),
+      block('SunwingsStepsBlock', 'sw-services-steps', {
+        eyebrow: 'How it works',
+        heading: 'Booked in three steps.',
+      }),
+    ],
+    root: { props: {} },
+  },
+  locations: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-locations-hero', {
+        eyebrow: 'Service Areas',
+        heading: 'Service areas: Toronto to Niagara',
+        accent: '',
+        text: 'Pick your city to see local services, neighbourhoods we cover and answers to local questions.',
+        primaryButtonText: 'Get a Free Quote →',
+        primaryButtonUrl: '/contact',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: '',
+      }),
+      block('SunwingsLocationsGridBlock', 'sw-locations-grid', {
+        eyebrow: 'Coverage',
+        heading: 'Find your service area.',
+        text: 'Published Location Posts appear here automatically.',
+        detailed: true,
+      }),
+      block('SunwingsQuoteFormBlock', 'sw-locations-quote', {
+        eyebrow: 'Not listed?',
+        heading: 'Moving somewhere else in Ontario?',
+        text: 'Tell us the route and we’ll quote it.',
+      }),
+    ],
+    root: { props: {} },
+  },
+  pricing: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-pricing-hero', {
+        eyebrow: 'Pricing',
+        heading: 'Straight answers on price',
+        accent: '',
+        text: 'Upfront quotes based on crew size, truck time and distance, backed by our price-match guarantee.',
+        primaryButtonText: 'Get a Free Quote →',
+        primaryButtonUrl: '/contact',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: '',
+      }),
+      block('SunwingsPricingCardsBlock', 'sw-pricing-cards', {
+        eyebrow: 'Pricing',
+        heading: 'Choose the job type.',
+        text: 'Final pricing is based on the details of your move or delivery.',
+      }),
+      cta('sw-pricing-cta', 'Found a lower written quote?', 'Show us a comparable written quote for the same job and we’ll match it.', 'Get a quote →', '/contact'),
+    ],
+    root: { props: {} },
+  },
+  contact: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-contact-hero', {
+        eyebrow: 'Contact',
+        heading: 'Get your free quote',
+        accent: '',
+        text: 'Tell us what’s moving and where. We reply fast, usually the same day.',
+        primaryButtonText: '',
+        primaryButtonUrl: '',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: '',
+      }),
+      block('SunwingsQuoteFormBlock', 'sw-contact-form', {
+        eyebrow: 'Free quote',
+        heading: 'Tell us about the job.',
+        text: 'Two minutes. No obligation. We reply fast.',
+      }),
+    ],
+    root: { props: {} },
+  },
+  blog: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-blog-hero', {
+        eyebrow: 'Moving Tips',
+        heading: 'Moving tips & guides',
+        accent: '',
+        text: 'Straight advice on pricing, condo moves, deliveries and planning your move.',
+        primaryButtonText: '',
+        primaryButtonUrl: '',
+        secondaryButtonText: '',
+        secondaryButtonUrl: '',
+        image: '',
+        imageAlt: '',
+      }),
+      block('SunwingsBlogGridBlock', 'sw-blog-grid', {
+        eyebrow: 'Latest',
+        heading: 'Moving tips from Sunwings.',
+      }),
+    ],
+    root: { props: {} },
+  },
+  privacy: {
+    content: [
+      block('SunwingsHeroBlock', 'sw-privacy-hero', {
+        eyebrow: 'Legal',
+        heading: 'Privacy Policy',
+        accent: '',
+        text: '',
+        primaryButtonText: '',
+        primaryButtonUrl: '',
+        secondaryButtonText: '',
+        secondaryButtonUrl: '',
+        image: '',
+        imageAlt: '',
+      }),
+      text('sw-privacy-copy', 'Sunwings Transport uses information submitted through this website to respond to quote requests and service enquiries. Additional privacy terms can be maintained here before production launch.'),
+    ],
+    root: { props: {} },
+  },
+};
+
 export function getInitialPageBuilderData(id, siteKey = 'justconsignin') {
-  const source = siteKey === 'justindematteis' ? JUSTIN_PAGE_EDITOR_DATA : PAGE_EDITOR_DATA;
+  const source = siteKey === 'justindematteis'
+    ? JUSTIN_PAGE_EDITOR_DATA
+    : siteKey === 'sunwings'
+      ? SUNWINGS_PAGE_EDITOR_DATA
+      : PAGE_EDITOR_DATA;
   return source[id] || { content: [], root: { props: {} } };
 }
