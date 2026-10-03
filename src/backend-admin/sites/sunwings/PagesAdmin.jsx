@@ -27,6 +27,34 @@ const STATIC_PAGES = [
     source: 'Location Posts index',
     edit: '/admin/sunwings/locations',
   },
+  {
+    id: 'pricing',
+    title: 'Pricing',
+    path: '/pricing',
+    source: 'Static page',
+    edit: '/admin/sunwings/settings',
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    path: '/contact',
+    source: 'Quote form',
+    edit: '/admin/sunwings/settings',
+  },
+  {
+    id: 'blog',
+    title: 'Moving Tips',
+    path: '/blog',
+    source: 'Static blog index',
+    edit: '/admin/sunwings/settings',
+  },
+  {
+    id: 'privacy',
+    title: 'Privacy Policy',
+    path: '/privacy',
+    source: 'Static page',
+    edit: '/admin/sunwings/settings',
+  },
 ];
 
 export default function PagesAdmin() {
