@@ -1257,6 +1257,174 @@ export const siteBuilderConfig = {
       },
     },
 
+
+    SunwingsHeroBlock: {
+      label: 'Sunwings Hero',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        accent: { type: 'text', label: 'Accent text' },
+        text: { type: 'textarea', label: 'Description' },
+        primaryButtonText: { type: 'text', label: 'Primary button text' },
+        primaryButtonUrl: { type: 'text', label: 'Primary button URL' },
+        secondaryButtonText: { type: 'text', label: 'Secondary button text' },
+        secondaryButtonUrl: { type: 'text', label: 'Secondary button URL' },
+        image: imageField,
+        imageAlt: { type: 'text', label: 'Image alt text' },
+      },
+      defaultProps: {
+        eyebrow: 'Reliable • On-Time • Professional',
+        heading: 'Moving & delivery,',
+        accent: 'done right.',
+        text: '',
+        primaryButtonText: 'Get a Free Quote →',
+        primaryButtonUrl: '/contact',
+        secondaryButtonText: 'Call 647-526-5132',
+        secondaryButtonUrl: 'tel:+16475265132',
+        image: '',
+        imageAlt: '',
+      },
+      render: p => <section style={{background:'linear-gradient(160deg,#0B2545,#13315C)',color:'#fff',padding:'58px 44px',borderRadius:18}}>
+        <div style={{fontSize:12,fontWeight:800,letterSpacing:'.12em',textTransform:'uppercase',color:'#FDB833',marginBottom:12}}>{p.eyebrow}</div>
+        <h1 style={{fontSize:44,lineHeight:1.05,margin:'0 0 16px'}}>{p.heading} {p.accent && <span style={{color:'#FDB833'}}>{p.accent}</span>}</h1>
+        <p style={{maxWidth:760,color:'#d6e4f5',fontSize:17}}>{p.text}</p>
+        <div style={{display:'flex',gap:10,marginTop:22,flexWrap:'wrap'}}>
+          {p.primaryButtonText && <span style={{background:'#F7931E',color:'#1b1300',padding:'11px 16px',borderRadius:10,fontWeight:800}}>{p.primaryButtonText}</span>}
+          {p.secondaryButtonText && <span style={{border:'1px solid rgba(255,255,255,.4)',padding:'11px 16px',borderRadius:10,fontWeight:700}}>{p.secondaryButtonText}</span>}
+        </div>
+      </section>,
+    },
+
+    SunwingsTrustBlock: {
+      label: 'Sunwings Trust Strip',
+      fields: {},
+      defaultProps: {},
+      render: () => <section style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,padding:18,background:'#fff',border:'1px solid #E3E9F2',borderRadius:16}}>
+        {['Google reviews','Price-match guarantee','Flexible scheduling','Toronto to Niagara'].map(item => <div key={item} style={{padding:14,border:'1px solid #E3E9F2',borderRadius:12,fontWeight:800,color:'#0B2545'}}>{item}</div>)}
+      </section>,
+    },
+
+    SunwingsServicesGridBlock: {
+      label: 'Service Posts Grid',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Description' },
+      },
+      defaultProps: { eyebrow:'What we do',heading:'One call for every move.',text:'' },
+      render: p => <section style={{padding:'36px 8px'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase',letterSpacing:'.12em'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:34,margin:'6px 0'}}>{p.heading}</h2>
+        <p style={{color:'#5B6B82',maxWidth:700}}>{p.text}</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginTop:20}}>
+          {['Residential Moving','Furniture Delivery','Commercial Transport','Packing & Protection','Warehouse & Container Unloading','Junk Removal'].map(item => <div key={item} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff',fontWeight:800}}>{item}<small style={{display:'block',marginTop:6,color:'#64748b',fontWeight:500}}>Pulled from Service Posts</small></div>)}
+        </div>
+      </section>,
+    },
+
+    SunwingsStepsBlock: {
+      label: 'How It Works',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+      },
+      defaultProps: { eyebrow:'How it works',heading:'Booked in three steps.' },
+      render: p => <section style={{padding:'36px 8px'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:34,margin:'6px 0 22px'}}>{p.heading}</h2>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14}}>
+          {['Tell us the job','Get your price','We move it'].map((item,index)=><div key={item} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff'}}><b>{index+1}. {item}</b></div>)}
+        </div>
+      </section>,
+    },
+
+    SunwingsPricingCardsBlock: {
+      label: 'Pricing Cards',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Description' },
+      },
+      defaultProps: { eyebrow:'Pricing',heading:'Straight answers on price.',text:'' },
+      render: p => <section style={{padding:28,background:'#0B2545',color:'#fff',borderRadius:18}}>
+        <div style={{color:'#FDB833',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:32,margin:'6px 0'}}>{p.heading}</h2>
+        <p style={{color:'#c9d9ee'}}>{p.text}</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginTop:18}}>
+          {['Small moves & delivery','Truck + 2 movers','Larger moves'].map(item=><div key={item} style={{padding:18,background:'rgba(255,255,255,.08)',borderRadius:12}}><b>{item}</b><span style={{display:'block',marginTop:8}}>Upfront quote</span></div>)}
+        </div>
+      </section>,
+    },
+
+    SunwingsLocationsGridBlock: {
+      label: 'Location Posts Grid',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Description' },
+        detailed: {
+          type: 'radio',
+          label: 'Layout',
+          options: [{label:'Compact',value:false},{label:'Detailed',value:true}],
+        },
+      },
+      defaultProps: { eyebrow:'Service areas',heading:'From Toronto to Niagara.',text:'',detailed:false },
+      render: p => <section style={{padding:'36px 8px'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:34,margin:'6px 0'}}>{p.heading}</h2>
+        <p style={{color:'#5B6B82'}}>{p.text}</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginTop:18}}>
+          {['Toronto','GTA','Halton & Hamilton','Niagara'].map(item=><div key={item} style={{padding:18,border:'1px solid #E3E9F2',borderRadius:12,background:'#fff'}}><b>{item}</b><small style={{display:'block',marginTop:6,color:'#64748b'}}>Pulled from Location Posts</small></div>)}
+        </div>
+      </section>,
+    },
+
+    SunwingsReviewsBlock: {
+      label: 'Reviews',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+      },
+      defaultProps: { eyebrow:'Reviews',heading:'What customers say.' },
+      render: p => <section style={{padding:'36px 8px'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:34,margin:'6px 0 18px'}}>{p.heading}</h2>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>{[1,2,3].map(i=><div key={i} style={{padding:18,border:'1px dashed #c9d6e8',borderRadius:12}}>★★★★★<small style={{display:'block',marginTop:8,color:'#64748b'}}>Google review slot</small></div>)}</div>
+      </section>,
+    },
+
+    SunwingsBlogGridBlock: {
+      label: 'Moving Tips Grid',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+      },
+      defaultProps: { eyebrow:'Moving tips',heading:'From the Sunwings blog.' },
+      render: p => <section style={{padding:'36px 8px'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:34,margin:'6px 0 18px'}}>{p.heading}</h2>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>{[1,2,3].map(i=><div key={i} style={{padding:18,border:'1px solid #E3E9F2',borderRadius:12}}>Moving tip article {i}</div>)}</div>
+      </section>,
+    },
+
+    SunwingsQuoteFormBlock: {
+      label: 'Quote Form',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        text: { type: 'textarea', label: 'Description' },
+      },
+      defaultProps: { eyebrow:'Free quote',heading:'Tell us about the job.',text:'Two minutes. No obligation. We reply fast.' },
+      render: p => <section style={{padding:28,border:'1px solid #E3E9F2',borderRadius:18,background:'#fff'}}>
+        <div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div>
+        <h2 style={{fontSize:30,margin:'6px 0'}}>{p.heading}</h2>
+        <p style={{color:'#5B6B82'}}>{p.text}</p>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:18}}>
+          {['Name','Phone','Email','Service','Moving from','Moving to'].map(item=><div key={item} style={{height:42,border:'1px solid #D5DEEA',borderRadius:9,background:'#FBFCFE',padding:'10px 12px',color:'#94a3b8'}}>{item}</div>)}
+        </div>
+      </section>,
+    },
+
     HeroBlock: {
       label: 'Hero',
       fields: {
