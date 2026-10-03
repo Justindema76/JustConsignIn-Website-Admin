@@ -964,29 +964,35 @@ async function sendQuoteRequest(body: any) {
 
   const pickup = [record.pickup_address, record.pickup_city, record.pickup_postal_code].filter(Boolean).join(', ');
   const dropoff = [record.dropoff_address, record.dropoff_city, record.dropoff_postal_code].filter(Boolean).join(', ');
-  const requestLabel = record.request_type === 'contact' ? 'Contact Request' : 'Quote Request';
+  const isContact = record.request_type === 'contact';
+  const isQuickQuote = record.request_type === 'quick_quote';
+  const requestLabel = isContact ? 'Contact Request' : isQuickQuote ? 'Quick Quote' : 'Full Quote Request';
 
   const text = [
     `New Sunwings Transport ${requestLabel.toLowerCase()}`, '',
     `Name: ${display(record.name)}`,
     `Phone: ${display(record.phone)}`,
-    `Email: ${display(record.email)}`,
+    ...(record.email ? [`Email: ${display(record.email)}`] : []),
     `Service: ${display(record.service)}`,
-    `Preferred date: ${display(record.preferred_date)}`,
-    `Preferred time: ${display(record.preferred_time)}`,
-    `Move size: ${display(record.move_size)}`,
-    `Pickup: ${display(pickup)}`,
-    `Pickup elevator: ${yesNo(record.pickup_elevator)}`,
-    `Pickup stairs: ${yesNo(record.pickup_stairs)}`,
-    `Drop-off: ${display(dropoff)}`,
-    `Drop-off elevator: ${yesNo(record.dropoff_elevator)}`,
-    `Drop-off stairs: ${yesNo(record.dropoff_stairs)}`, '',
-    'Item list:', display(record.item_list), '',
-    'Additional details:', display(record.message), '',
+    ...(isContact ? [] : [
+      `Preferred date: ${display(record.preferred_date)}`,
+      `Preferred time: ${display(record.preferred_time)}`,
+    ]),
+    ...(isContact || isQuickQuote ? [] : [
+      `Move size: ${display(record.move_size)}`,
+      `Pickup: ${display(pickup)}`,
+      `Pickup elevator: ${yesNo(record.pickup_elevator)}`,
+      `Pickup stairs: ${yesNo(record.pickup_stairs)}`,
+      `Drop-off: ${display(dropoff)}`,
+      `Drop-off elevator: ${yesNo(record.dropoff_elevator)}`,
+      `Drop-off stairs: ${yesNo(record.dropoff_stairs)}`, '',
+      'Item list:', display(record.item_list), '',
+    ]),
+    isContact ? 'Message:' : 'Additional details:', display(record.message), '',
     'This request is saved in Website Admin → Quote Requests.',
   ].join('\n');
 
-  const html = `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div><h1 style="margin:5px 0 0;font-size:24px">New ${requestLabel}</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Phone', record.phone)}${row('Email', record.email)}${row('Service', record.service)}${row('Preferred date', record.preferred_date)}${row('Preferred time', record.preferred_time)}${row('Move size', record.move_size)}${row('Pickup', pickup)}${row('Pickup elevator', yesNo(record.pickup_elevator))}${row('Pickup stairs', yesNo(record.pickup_stairs))}${row('Drop-off', dropoff)}${row('Drop-off elevator', yesNo(record.dropoff_elevator))}${row('Drop-off stairs', yesNo(record.dropoff_stairs))}</table><div style="margin:16px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Item list</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.item_list))}</div></div><div style="margin:12px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Additional details</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#5B6B82;font-size:13px">This request is also saved in Website Admin → Quote Requests.</p></div></div></div>`;
+  const html = `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div><h1 style="margin:5px 0 0;font-size:24px">New ${requestLabel}</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Phone', record.phone)}${record.email ? row('Email', record.email) : ''}${row('Service', record.service)}${isContact ? '' : row('Preferred date', record.preferred_date)}${isContact ? '' : row('Preferred time', record.preferred_time)}${isContact || isQuickQuote ? '' : row('Move size', record.move_size)}${isContact || isQuickQuote ? '' : row('Pickup', pickup)}${isContact || isQuickQuote ? '' : row('Pickup elevator', yesNo(record.pickup_elevator))}${isContact || isQuickQuote ? '' : row('Pickup stairs', yesNo(record.pickup_stairs))}${isContact || isQuickQuote ? '' : row('Drop-off', dropoff)}${isContact || isQuickQuote ? '' : row('Drop-off elevator', yesNo(record.dropoff_elevator))}${isContact || isQuickQuote ? '' : row('Drop-off stairs', yesNo(record.dropoff_stairs))}</table>${isContact || isQuickQuote ? '' : `<div style="margin:16px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Item list</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.item_list))}</div></div>`}<div style="margin:12px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">${isContact ? 'Message' : 'Additional details'}</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div><p style="margin:18px 12px 4px;color:#5B6B82;font-size:13px">This request is also saved in Website Admin → Quote Requests.</p></div></div></div>`;
 
   try {
     const settings = await loadSettings('sunwings');
