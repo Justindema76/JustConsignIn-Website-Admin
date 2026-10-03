@@ -40,6 +40,21 @@ function writeLocalDraft(siteKey, pageId, data) {
 function validatePublishData(page, data, siteKey) {
   const blocks = Array.isArray(data?.content) ? data.content : [];
 
+  if (siteKey === 'sunwings') {
+    const allowed = new Set([
+      'HeadingBlock','TextBlock','ImageBlock','ImageTextBlock','HeroBlock','CtaBlock',
+      'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
+      'SunwingsPricingCardsBlock','SunwingsLocationsGridBlock','SunwingsReviewsBlock',
+      'SunwingsBlogGridBlock','SunwingsQuoteFormBlock'
+    ]);
+    const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
+    if (!blocks.length) throw new Error('This page needs at least one block before publishing.');
+    if (unsupported.length) {
+      throw new Error(`Sunwings publish blocked: remove unsupported blocks (${[...new Set(unsupported)].join(', ')}).`);
+    }
+    return;
+  }
+
   if (siteKey === 'justindematteis') {
     const allowed = new Set([
       'HeroBlock', 'HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'CtaBlock', 'ProjectCardBlock', 'HiringContactBlock',
@@ -94,8 +109,9 @@ export default function SiteBuilder() {
   );
   const { accessToken } = useAuth();
 
-  if (!page) return <Navigate to="/admin/website/pages" replace />;
-  if (page.editor !== 'visual') return <Navigate to="/admin/website/pages" replace />;
+  const pagesRoute = siteKey === 'sunwings' ? '/admin/sunwings/pages' : '/admin/website/pages';
+  if (!page) return <Navigate to={pagesRoute} replace />;
+  if (page.editor !== 'visual') return <Navigate to={pagesRoute} replace />;
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const builderConfig = useMemo(() => {
@@ -107,6 +123,11 @@ export default function SiteBuilder() {
     const justinBlocks = [
       'ShowcaseHeroBlock', 'ProofStripBlock', 'CaseStudyBlock', 'CardGridBlock',
       'StorySplitBlock', 'ProcessRowsBlock', 'SkillsGridBlock', 'LargeCtaBlock',
+    ];
+    const sunwingsBlocks = [
+      'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
+      'SunwingsPricingCardsBlock','SunwingsLocationsGridBlock','SunwingsReviewsBlock',
+      'SunwingsBlogGridBlock','SunwingsQuoteFormBlock',
     ];
 
     const resumeBlocks = [
@@ -286,11 +307,14 @@ export default function SiteBuilder() {
 
     const allowedBlocks = siteKey === 'justindematteis'
       ? [...standardBlocks, ...justinBlocks, ...resumeBlocks]
-      : [...standardBlocks, ...justConsignInBlocks];
+      : siteKey === 'sunwings'
+        ? [...standardBlocks.filter(name => !['ProjectCardBlock','HiringContactBlock'].includes(name)), ...sunwingsBlocks]
+        : [...standardBlocks, ...justConsignInBlocks];
 
     const allowedSet = new Set(allowedBlocks);
     const justConsignInSet = new Set(justConsignInBlocks);
     const justinSet = new Set(justinBlocks);
+    const sunwingsSet = new Set(sunwingsBlocks);
     const standardSet = new Set(standardBlocks);
 
     const components = Object.fromEntries(
@@ -301,9 +325,11 @@ export default function SiteBuilder() {
             ? 'JUSTIN'
             : justConsignInSet.has(name)
               ? 'JUSTCONSIGNIN'
-              : standardSet.has(name)
-                ? 'STANDARD'
-                : '';
+              : sunwingsSet.has(name)
+                ? 'SUNWINGS'
+                : standardSet.has(name)
+                  ? 'STANDARD'
+                  : '';
           return [name, {
             ...definition,
             label: prefix ? `${prefix} · ${definition.label || name}` : (definition.label || name),
@@ -400,28 +426,43 @@ export default function SiteBuilder() {
             components: ['ProjectCardBlock'],
           },
         }
-      : {
-          justConsignInHome: {
-            title: 'JUSTCONSIGNIN — Homepage Blocks',
-            components: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
-          },
-          justConsignInFeatures: {
-            title: 'JUSTCONSIGNIN — Features Blocks',
-            components: ['FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock'],
-          },
-          standardContent: {
-            title: 'STANDARD — Shared Content',
-            components: ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock'],
-          },
-          standardMarketing: {
-            title: 'STANDARD — Shared Marketing',
-            components: ['HeroBlock', 'CtaBlock'],
-          },
-          standardProjects: {
-            title: 'STANDARD — Projects / Work',
-            components: ['ProjectCardBlock'],
-          },
-        };
+      : siteKey === 'sunwings'
+        ? {
+            sunwingsDynamic: {
+              title: 'SUNWINGS — Dynamic Website Blocks',
+              components: sunwingsBlocks,
+            },
+            standardContent: {
+              title: 'STANDARD — Shared Content',
+              components: ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock'],
+            },
+            standardMarketing: {
+              title: 'STANDARD — Shared Marketing',
+              components: ['HeroBlock', 'CtaBlock'],
+            },
+          }
+        : {
+            justConsignInHome: {
+              title: 'JUSTCONSIGNIN — Homepage Blocks',
+              components: ['HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock'],
+            },
+            justConsignInFeatures: {
+              title: 'JUSTCONSIGNIN — Features Blocks',
+              components: ['FeaturesHeroBlock', 'FeaturesGridBlock', 'FeaturesAudienceBlock', 'FeaturesCtaBlock'],
+            },
+            standardContent: {
+              title: 'STANDARD — Shared Content',
+              components: ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock'],
+            },
+            standardMarketing: {
+              title: 'STANDARD — Shared Marketing',
+              components: ['HeroBlock', 'CtaBlock'],
+            },
+            standardProjects: {
+              title: 'STANDARD — Projects / Work',
+              components: ['ProjectCardBlock'],
+            },
+          };
 
     return { ...siteBuilderConfig, categories, components };
   }, [siteKey]);
