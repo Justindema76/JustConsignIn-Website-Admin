@@ -12,6 +12,7 @@ import {
   loadSocialAutomation,
   saveSocialCampaign,
   sendCampaignToMetricool,
+  saveMetricoolBrand,
   startMetricoolConnection,
   testMetricoolConnection,
 } from '../../services/socialAutomationService';
@@ -49,6 +50,7 @@ export default function SocialAutomation() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [activePreview, setActivePreview] = useState('instagram');
+  const [metricoolBrandId, setMetricoolBrandId] = useState('');
 
   const refresh = async () => {
     if (!accessToken) return;
@@ -62,6 +64,7 @@ export default function SocialAutomation() {
       const nextCampaigns = social.campaigns || [];
       setCampaigns(nextCampaigns);
       setIntegration(social.integration || null);
+      setMetricoolBrandId(social.integration?.brandId || '');
       setMedia(items || []);
       if (editing) {
         const found = nextCampaigns.find(item => item.id === id);
@@ -194,6 +197,20 @@ export default function SocialAutomation() {
     }
   };
 
+  const saveBrandId = async () => {
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const result = await saveMetricoolBrand(accessToken, metricoolBrandId);
+      setIntegration(result.integration || null);
+      setMetricoolBrandId(result.integration?.brandId || metricoolBrandId);
+      setMessage(`Metricool brand saved for ${siteName}.`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const disconnect = async () => {
     if (!window.confirm('Disconnect Metricool from this admin?')) return;
     setBusy(true); setError('');
@@ -258,6 +275,14 @@ export default function SocialAutomation() {
     <div className="social-connect-card site-admin-card">
       <div><div className={`social-connection-dot ${integration?.connected ? 'ok' : ''}`}/><div><strong>Metricool connection for {siteName}</strong><small>{integration?.brandId ? `Brand ${integration.brandId}` : 'Brand not configured'} · America/Toronto</small></div></div>
       <div className="site-admin-actions">
+        <input
+          className="social-brand-id-input"
+          value={metricoolBrandId}
+          onChange={event => setMetricoolBrandId(event.target.value)}
+          placeholder="Metricool brand ID"
+          aria-label="Metricool brand ID"
+        />
+        <button className="site-admin-btn secondary small" type="button" onClick={saveBrandId} disabled={busy || !metricoolBrandId.trim()}>Save Brand</button>
         {integration?.connected
           ? <><button className="site-admin-btn secondary small" onClick={testMetricool} disabled={busy}><RefreshCw size={13}/> Test</button><button className="site-admin-btn secondary small" onClick={disconnect} disabled={busy}>Disconnect</button></>
           : <button className="site-admin-btn small" onClick={connectMetricool} disabled={busy}>{busy ? <Loader2 className="spin" size={14}/> : <Link2 size={14}/>} Connect Metricool</button>}
@@ -339,8 +364,8 @@ export default function SocialAutomation() {
         <div className="site-admin-card social-live-card">
           <h2>Metricool</h2>
           {integration?.connected
-            ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>{integration.brandId ? `Brand ${integration.brandId}` : 'Metricool connected — brand ID still needs configuration'} · America/Toronto</p><button className="site-admin-btn secondary small" type="button" onClick={testMetricool}>Test connection</button></>
-            : <><p>The admin needs its own OAuth connection to Metricool. Your ChatGPT connection remains separate.</p><button className="site-admin-btn small" type="button" onClick={connectMetricool}>Connect Metricool</button></>}
+            ? <><div className="social-connected"><CheckCircle2 size={18}/> Backend connected</div><p>{integration.brandId ? `Brand ${integration.brandId}` : 'Metricool connected — enter the brand ID above before publishing'} · America/Toronto</p><button className="site-admin-btn secondary small" type="button" onClick={testMetricool}>Test connection</button></>
+            : <><p>Connect {siteName} to its own Metricool account/brand before publishing. Draft creation works without it.</p><button className="site-admin-btn small" type="button" onClick={connectMetricool}>Connect Metricool</button></>}
         </div>
       </aside>
     </div>
