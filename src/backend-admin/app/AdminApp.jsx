@@ -45,7 +45,7 @@ function GlobalSectionRoute() {
     ? ['header', 'footer', 'project-request']
     : ['header', 'footer'];
 
-  if (!STANDARD_SITES.includes(siteKey) || !allowed.includes(section)) {
+  if (!PAGE_BUILDER_SITES.includes(siteKey) || !allowed.includes(section)) {
     return <Navigate to="/admin" replace />;
   }
   return <GlobalBuilder />;
@@ -84,13 +84,16 @@ export default function AdminApp() {
         <Route path="/admin/website/pages" element={only(PAGE_BUILDER_SITES, <WebsitePages />)} />
         <Route path="/admin/website/pages/:pageId" element={only(PAGE_BUILDER_SITES, <SiteBuilder />)} />
         <Route path="/admin/website/blocks" element={only(PAGE_BUILDER_SITES, <BlockLibrary />)} />
-        <Route path="/admin/website/styles" element={only(STANDARD_SITES, <GlobalStylesAdmin />)} />
+        <Route path="/admin/website/styles" element={only(PAGE_BUILDER_SITES, <GlobalStylesAdmin />)} />
         <Route path="/admin/website/global/:section" element={<GlobalSectionRoute />} />
         <Route path="/admin/settings" element={only(STANDARD_SITES, <SettingsAdmin />)} />
 
         <Route path="/admin/sunwings/pages" element={only(SUNWINGS, <WebsitePages />)} />
         <Route path="/admin/sunwings/pages/:pageId" element={only(SUNWINGS, <SiteBuilder />)} />
         <Route path="/admin/sunwings/blocks" element={only(SUNWINGS, <BlockLibrary />)} />
+        <Route path="/admin/sunwings/media" element={only(SUNWINGS, <MediaAdmin />)} />
+        <Route path="/admin/sunwings/styles" element={only(SUNWINGS, <GlobalStylesAdmin />)} />
+        <Route path="/admin/sunwings/global/:section" element={only(SUNWINGS, <GlobalSectionRoute />)} />
         <Route path="/admin/sunwings/blog" element={only(SUNWINGS, <BlogAdmin />)} />
         <Route path="/admin/sunwings/blog/:id" element={only(SUNWINGS, <BlogAdmin />)} />
         <Route path="/admin/sunwings/services" element={only(SUNWINGS, <ServicePostsAdmin />)} />
