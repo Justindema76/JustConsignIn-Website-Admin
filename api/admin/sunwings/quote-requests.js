@@ -3,7 +3,7 @@ import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const FIELDS = [
-  'site_key','id','name','phone','email','service','move_from','move_to',
+  'site_key','id','request_type','name','phone','email','service','move_from','move_to',
   'preferred_date','preferred_time','move_size',
   'pickup_address','pickup_city','pickup_postal_code','pickup_elevator','pickup_stairs',
   'dropoff_address','dropoff_city','dropoff_postal_code','dropoff_elevator','dropoff_stairs',
