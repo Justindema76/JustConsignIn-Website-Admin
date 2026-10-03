@@ -28,13 +28,13 @@ import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
-import PagesAdmin from '../sites/sunwings/PagesAdmin';
 import { getAdminSiteKey } from '../services/siteAdminService';
 
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
 const SUNWINGS = ['sunwings'];
+const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings'];
 
 const only = (sites, element) => <SiteOnly sites={sites}>{element}</SiteOnly>;
 
@@ -80,15 +80,17 @@ export default function AdminApp() {
         <Route path="/admin/social-automation" element={only(STANDARD_SITES, <SocialAutomation />)} />
         <Route path="/admin/social-automation/:id" element={only(STANDARD_SITES, <SocialAutomation />)} />
 
-        <Route path="/admin/site-builder" element={only(STANDARD_SITES, <Navigate to="/admin/website/pages" replace />)} />
-        <Route path="/admin/website/pages" element={only(STANDARD_SITES, <WebsitePages />)} />
-        <Route path="/admin/website/pages/:pageId" element={only(STANDARD_SITES, <SiteBuilder />)} />
-        <Route path="/admin/website/blocks" element={only(STANDARD_SITES, <BlockLibrary />)} />
+        <Route path="/admin/site-builder" element={only(PAGE_BUILDER_SITES, <Navigate to="/admin/website/pages" replace />)} />
+        <Route path="/admin/website/pages" element={only(PAGE_BUILDER_SITES, <WebsitePages />)} />
+        <Route path="/admin/website/pages/:pageId" element={only(PAGE_BUILDER_SITES, <SiteBuilder />)} />
+        <Route path="/admin/website/blocks" element={only(PAGE_BUILDER_SITES, <BlockLibrary />)} />
         <Route path="/admin/website/styles" element={only(STANDARD_SITES, <GlobalStylesAdmin />)} />
         <Route path="/admin/website/global/:section" element={<GlobalSectionRoute />} />
         <Route path="/admin/settings" element={only(STANDARD_SITES, <SettingsAdmin />)} />
 
-        <Route path="/admin/sunwings/pages" element={only(SUNWINGS, <PagesAdmin />)} />
+        <Route path="/admin/sunwings/pages" element={only(SUNWINGS, <WebsitePages />)} />
+        <Route path="/admin/sunwings/pages/:pageId" element={only(SUNWINGS, <SiteBuilder />)} />
+        <Route path="/admin/sunwings/blocks" element={only(SUNWINGS, <BlockLibrary />)} />
         <Route path="/admin/sunwings/services" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/services/:id" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/locations" element={only(SUNWINGS, <LocationPostsAdmin />)} />
