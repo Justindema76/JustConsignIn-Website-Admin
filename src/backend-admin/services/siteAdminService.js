@@ -184,6 +184,7 @@ export async function uploadBlogImage(accessToken, file) {
     allowedTypes: ALLOWED_IMAGE_TYPES,
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+    prefix: getAdminSiteKey(),
   });
 }
 
@@ -193,6 +194,7 @@ export async function uploadSiteImage(accessToken, file) {
     allowedTypes: ALLOWED_IMAGE_TYPES,
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+    prefix: getAdminSiteKey(),
   });
 }
 
