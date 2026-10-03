@@ -232,14 +232,26 @@ export async function uploadSocialImage(accessToken, file) {
   const type = String(file.type || '').toLowerCase();
   if (!ALLOWED_IMAGE_TYPES.has(type)) throw new Error('Use a JPG, PNG, WebP, or GIF image.');
   const prepared = type === 'image/jpeg' ? file : await imageToJpegFile(file, file.name || 'social-image.jpg');
-  return uploadBlogImage(accessToken, prepared);
+  return uploadPublicAsset(accessToken, prepared, {
+    bucket: BLOG_IMAGE_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+    prefix: getAdminSiteKey(),
+  });
 }
 
 export async function ensureTikTokCompatibleImage(accessToken, url) {
   const clean = String(url || '').split('?')[0].toLowerCase();
   if (/\.jpe?g$/.test(clean)) return url;
   const file = await imageToJpegFile(url, `tiktok-${Date.now()}.jpg`);
-  return uploadBlogImage(accessToken, file);
+  return uploadPublicAsset(accessToken, file, {
+    bucket: BLOG_IMAGE_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+    prefix: getAdminSiteKey(),
+  });
 }
 
 export async function uploadSocialAudio(accessToken, file) {
@@ -248,6 +260,7 @@ export async function uploadSocialAudio(accessToken, file) {
     allowedTypes: ALLOWED_AUDIO_TYPES,
     maxBytes: MAX_AUDIO_BYTES,
     invalidTypeMessage: 'Use an MP3, M4A/MP4 audio, WAV, AAC, or OGG file.',
+    prefix: getAdminSiteKey(),
   });
 }
 
@@ -258,6 +271,7 @@ export async function uploadSocialVideo(accessToken, file) {
     allowedTypes: ALLOWED_VIDEO_TYPES,
     maxBytes: MAX_VIDEO_BYTES,
     invalidTypeMessage: 'Use an MP4, MOV, or M4V video.',
+    prefix: getAdminSiteKey(),
   });
 }
 
