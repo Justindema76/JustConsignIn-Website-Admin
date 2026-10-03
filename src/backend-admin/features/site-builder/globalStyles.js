@@ -21,24 +21,52 @@ export const DEFAULT_GLOBAL_STYLES = {
   buttonHeight: 40,
 };
 
-export function normalizeGlobalStyles(value = {}) {
+export const SUNWINGS_GLOBAL_STYLES = {
+  primary: '#F7931E',
+  primaryDark: '#D97706',
+  text: '#14213D',
+  muted: '#5B6B82',
+  pageBackground: '#F6F8FB',
+  surface: '#FFFFFF',
+  lightSurface: '#E8F1FB',
+  border: '#E3E9F2',
+  darkSurface: '#0B2545',
+  headingFont: '"Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  bodyFont: '"Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  h1Size: 64,
+  h2Size: 42,
+  h3Size: 30,
+  h4Size: 20,
+  contentWidth: 1200,
+  sectionSpacing: 88,
+  cardRadius: 18,
+  buttonRadius: 12,
+  buttonHeight: 48,
+};
+
+export function globalStylesForSite(siteKey = 'justconsignin') {
+  return siteKey === 'sunwings' ? SUNWINGS_GLOBAL_STYLES : DEFAULT_GLOBAL_STYLES;
+}
+
+export function normalizeGlobalStyles(value = {}, siteKey = 'justconsignin') {
+  const defaults = globalStylesForSite(siteKey);
   return {
-    ...DEFAULT_GLOBAL_STYLES,
+    ...defaults,
     ...(value || {}),
-    h1Size: Number(value?.h1Size || DEFAULT_GLOBAL_STYLES.h1Size),
-    h2Size: Number(value?.h2Size || DEFAULT_GLOBAL_STYLES.h2Size),
-    h3Size: Number(value?.h3Size || DEFAULT_GLOBAL_STYLES.h3Size),
-    h4Size: Number(value?.h4Size || DEFAULT_GLOBAL_STYLES.h4Size),
-    contentWidth: Number(value?.contentWidth || DEFAULT_GLOBAL_STYLES.contentWidth),
-    sectionSpacing: Number(value?.sectionSpacing || DEFAULT_GLOBAL_STYLES.sectionSpacing),
-    cardRadius: Number(value?.cardRadius || DEFAULT_GLOBAL_STYLES.cardRadius),
-    buttonRadius: Number(value?.buttonRadius || DEFAULT_GLOBAL_STYLES.buttonRadius),
-    buttonHeight: Number(value?.buttonHeight || DEFAULT_GLOBAL_STYLES.buttonHeight),
+    h1Size: Number(value?.h1Size || defaults.h1Size),
+    h2Size: Number(value?.h2Size || defaults.h2Size),
+    h3Size: Number(value?.h3Size || defaults.h3Size),
+    h4Size: Number(value?.h4Size || defaults.h4Size),
+    contentWidth: Number(value?.contentWidth || defaults.contentWidth),
+    sectionSpacing: Number(value?.sectionSpacing || defaults.sectionSpacing),
+    cardRadius: Number(value?.cardRadius || defaults.cardRadius),
+    buttonRadius: Number(value?.buttonRadius || defaults.buttonRadius),
+    buttonHeight: Number(value?.buttonHeight || defaults.buttonHeight),
   };
 }
 
-export function globalStyleVars(value = {}) {
-  const styles = normalizeGlobalStyles(value);
+export function globalStyleVars(value = {}, siteKey = 'justconsignin') {
+  const styles = normalizeGlobalStyles(value, siteKey);
   return {
     '--site-primary': styles.primary,
     '--site-primary-dark': styles.primaryDark,
