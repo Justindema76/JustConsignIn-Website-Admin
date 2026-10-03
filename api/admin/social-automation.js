@@ -14,6 +14,18 @@ const ALLOWED_RATIO = new Set(['1:1', '4:5', '9:16', 'original']);
 const ALLOWED_AUDIO_MODE = new Set(['none', 'uploaded', 'add-later']);
 const ALLOWED_YOUTUBE_FORMAT = new Set(['video', 'short']);
 const CALLBACK_COOKIE = 'jci_metricool_callback_session';
+const CALLBACK_SITE_COOKIE = 'jci_metricool_callback_site';
+
+const SITE_CONFIG = {
+  justconsignin: { label: 'JustConsignIn', mediaAlt: 'JustConsignIn social media graphic' },
+  justindematteis: { label: 'Justin DeMatteis', mediaAlt: 'Justin DeMatteis social media graphic' },
+  sunwings: { label: 'Sunwings Transport', mediaAlt: 'Sunwings Transport social media graphic' },
+};
+
+function siteKeyFromRequest(req) {
+  const key = String(req.query?.site || 'justconsignin').trim().toLowerCase();
+  return SITE_CONFIG[key] ? key : '';
+}
 
 function normalizeCampaign(row = {}) {
   return {
@@ -26,15 +38,17 @@ function normalizeCampaign(row = {}) {
     aiImagePrompt: row.ai_image_prompt || '',
     scheduledAt: row.scheduled_at || '', autoPublish: Boolean(row.auto_publish),
     metricoolPosts: Array.isArray(row.metricool_posts) ? row.metricool_posts : [], lastError: row.last_error || '',
+    siteKey: row.site_key || 'justconsignin',
     createdAt: row.created_at || '', updatedAt: row.updated_at || '',
   };
 }
 
-function cleanCampaign(input = {}) {
+function cleanCampaign(input = {}, siteKey = 'justconsignin') {
   const platforms = [...new Set((Array.isArray(input.platforms) ? input.platforms : []).map(String).filter(x => ALLOWED_PLATFORMS.has(x)))];
   const mediaType = ['image', 'video', 'none'].includes(input.mediaType) ? input.mediaType : 'image';
   const scheduled = input.scheduledAt ? new Date(input.scheduledAt) : null;
   return {
+    site_key: siteKey,
     title: String(input.title || '').trim(),
     status: ALLOWED_STATUS.has(input.status) ? input.status : 'draft',
     platforms,
@@ -57,32 +71,38 @@ function cleanCampaign(input = {}) {
   };
 }
 
-async function readIntegration(userToken) {
-  const response = await supabaseUserRest(userToken, 'social_integrations?provider=eq.metricool&select=*&limit=1', { method: 'GET' });
+async function readIntegration(userToken, siteKey) {
+  const response = await supabaseUserRest(userToken, `social_integrations?site_key=eq.${encodeURIComponent(siteKey)}&provider=eq.metricool&select=*&limit=1`, { method: 'GET' });
   const rows = await response.json();
   if (!response.ok) throw new Error(rows?.message || 'Unable to load Metricool connection');
   return rows[0] || null;
 }
 
-function publicIntegration(row) {
+function publicIntegration(row, siteKey) {
   return {
-    provider: 'metricool', connected: Boolean(row?.connected), accountLabel: row?.account_label || 'JustConsignIn',
-    userId: row?.external_user_id || '5309805', brandId: row?.external_brand_id || '6893759',
-    connectedAt: row?.connected_at || '', updatedAt: row?.updated_at || '', metadata: row?.metadata || {},
+    provider: 'metricool',
+    siteKey,
+    connected: Boolean(row?.connected),
+    accountLabel: row?.account_label || SITE_CONFIG[siteKey]?.label || siteKey,
+    userId: row?.external_user_id || '',
+    brandId: row?.external_brand_id || '',
+    connectedAt: row?.connected_at || '',
+    updatedAt: row?.updated_at || '',
+    metadata: row?.metadata || {},
   };
 }
 
-async function writeIntegration(userToken, payload) {
-  const response = await supabaseUserRest(userToken, 'social_integrations?on_conflict=provider', {
-    method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify(payload),
+async function writeIntegration(userToken, siteKey, payload) {
+  const response = await supabaseUserRest(userToken, 'social_integrations?on_conflict=site_key,provider', {
+    method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ ...payload, site_key: siteKey }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data?.message || 'Unable to save Metricool connection');
   return data?.[0] || payload;
 }
 
-async function loadCampaign(userToken, id) {
-  const response = await supabaseUserRest(userToken, `social_campaigns?id=eq.${encodeURIComponent(id)}&select=*&limit=1`, { method: 'GET' });
+async function loadCampaign(userToken, id, siteKey) {
+  const response = await supabaseUserRest(userToken, `social_campaigns?site_key=eq.${encodeURIComponent(siteKey)}&id=eq.${encodeURIComponent(id)}&select=*&limit=1`, { method: 'GET' });
   const rows = await response.json();
   if (!response.ok) throw new Error(rows?.message || 'Unable to load campaign');
   if (!rows[0]) throw new Error('Campaign not found');
@@ -107,12 +127,13 @@ function toolName(tools = []) {
     || names.find(name => /schedule.*post/i.test(name) && !/review/i.test(name));
 }
 
-function networkInfo(campaign, network) {
+function networkInfo(campaign, network, siteKey) {
+  const site = SITE_CONFIG[siteKey] || SITE_CONFIG.justconsignin;
   const base = {
     autoPublish: Boolean(campaign.auto_publish), draft: !campaign.auto_publish,
     descendants: [], firstCommentText: '', hasNotReadNotes: false,
     media: campaign.media_url ? [campaign.media_url] : [],
-    mediaAltText: campaign.media_url ? ['JustConsignIn social media graphic'] : [],
+    mediaAltText: campaign.media_url ? [site.mediaAlt] : [],
     providers: [{ network }],
     publicationDate: { dateTime: torontoLocal(campaign.scheduled_at), timezone: 'America/Toronto' },
     shortener: false, smartLinkData: { ids: [] },
@@ -120,7 +141,7 @@ function networkInfo(campaign, network) {
   if (network === 'instagram') return { ...base, text: campaign.instagram_caption, instagramData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', collaborators: [], showReelOnFeed: true, isAiGenerated: false } };
   if (network === 'facebook') return { ...base, text: campaign.facebook_caption || campaign.instagram_caption, facebookData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', title: '' } };
   if (network === 'tiktok') return { ...base, text: campaign.tiktok_caption, tiktokData: { disableComment: false, disableDuet: false, disableStitch: false, privacyOption: 'PUBLIC_TO_EVERYONE', commercialContentThirdParty: false, commercialContentOwnBrand: true, title: campaign.title, autoAddMusic: false, photoCoverIndex: 0, isAigc: false } };
-  if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: campaign.youtube_format === 'short' ? 'short' : 'video', privacy: 'public', tags: ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
+  if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: campaign.youtube_format === 'short' ? 'short' : 'video', privacy: 'public', tags: siteKey === 'sunwings' ? ['Sunwings Transport', 'Moving', 'Delivery'] : siteKey === 'justindematteis' ? ['Justin DeMatteis', 'Web Development'] : ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
   return base;
 }
 
@@ -132,10 +153,12 @@ function validateForNetwork(campaign, network) {
   if (network === 'tiktok' && !campaign.tiktok_caption) throw new Error('TikTok caption is empty');
 }
 
-async function saveCredentials(userToken, row, credentials) {
-  return writeIntegration(userToken, {
+async function saveCredentials(userToken, siteKey, row, credentials) {
+  return writeIntegration(userToken, siteKey, {
     provider: 'metricool', connected: true,
-    account_label: row?.account_label || 'JustConsignIn', external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
+    account_label: row?.account_label || SITE_CONFIG[siteKey]?.label || siteKey,
+    external_user_id: row?.external_user_id || '',
+    external_brand_id: row?.external_brand_id || '',
     credentials,
     secret_ciphertext: '', secret_iv: '', secret_tag: '',
     metadata: { ...(row?.metadata || {}), timezone: 'America/Toronto', mcp_url: 'https://ai.metricool.com/mcp', oauth: true },
@@ -143,30 +166,37 @@ async function saveCredentials(userToken, row, credentials) {
   });
 }
 
-function callbackCookie(token, secure) {
-  return `${CALLBACK_COOKIE}=${encodeURIComponent(token)}; Max-Age=1200; Path=/api/admin/metricool-callback; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`;
+function callbackCookies(token, siteKey, secure) {
+  const suffix = `; Max-Age=1200; Path=/api/admin/metricool-callback; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`;
+  return [
+    `${CALLBACK_COOKIE}=${encodeURIComponent(token)}${suffix}`,
+    `${CALLBACK_SITE_COOKIE}=${encodeURIComponent(siteKey)}${suffix}`,
+  ];
 }
 
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const user = await requireWebsiteOwner(req, res);
   if (!user) return;
+  const siteKey = siteKeyFromRequest(req);
+  if (!siteKey) return res.status(400).json({ error: 'Unknown website.' });
+  const site = SITE_CONFIG[siteKey];
 
   try {
     if (req.method === 'GET') {
       const [campaignResponse, integration] = await Promise.all([
-        supabaseUserRest(user.accessToken, 'social_campaigns?select=*&order=scheduled_at.asc.nullslast,created_at.desc', { method: 'GET' }),
-        readIntegration(user.accessToken),
+        supabaseUserRest(user.accessToken, `social_campaigns?site_key=eq.${encodeURIComponent(siteKey)}&select=*&order=scheduled_at.asc.nullslast,created_at.desc`, { method: 'GET' }),
+        readIntegration(user.accessToken, siteKey),
       ]);
       const campaigns = await campaignResponse.json();
       if (!campaignResponse.ok) throw new Error(campaigns?.message || 'Unable to load social campaigns');
-      return res.status(200).json({ campaigns: campaigns.map(normalizeCampaign), integration: publicIntegration(integration) });
+      return res.status(200).json({ siteKey, siteLabel: site.label, campaigns: campaigns.map(normalizeCampaign), integration: publicIntegration(integration, siteKey) });
     }
 
     if (req.method === 'DELETE') {
       const id = String(req.query?.id || '').trim();
       if (!id) return res.status(400).json({ error: 'Missing campaign id' });
-      const response = await supabaseUserRest(user.accessToken, `social_campaigns?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+      const response = await supabaseUserRest(user.accessToken, `social_campaigns?site_key=eq.${encodeURIComponent(siteKey)}&id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
       if (!response.ok) throw new Error('Unable to delete campaign');
       return res.status(200).json({ ok: true });
     }
@@ -175,10 +205,10 @@ export default async function handler(req, res) {
 
     if (action === 'save') {
       const input = req.body?.campaign || {};
-      const payload = cleanCampaign(input);
+      const payload = cleanCampaign(input, siteKey);
       if (!payload.title) return res.status(400).json({ error: 'Campaign title is required' });
       const id = String(input.id || '').trim();
-      const response = await supabaseUserRest(user.accessToken, id ? `social_campaigns?id=eq.${encodeURIComponent(id)}` : 'social_campaigns', {
+      const response = await supabaseUserRest(user.accessToken, id ? `social_campaigns?site_key=eq.${encodeURIComponent(siteKey)}&id=eq.${encodeURIComponent(id)}` : 'social_campaigns', {
         method: id ? 'PATCH' : 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -192,38 +222,40 @@ export default async function handler(req, res) {
       if (!host) throw new Error('Unable to determine admin hostname');
       const callbackUrl = `${proto}://${host}/api/admin/metricool-callback`;
       const { authUrl, transaction } = await beginMetricoolOAuth({ callbackUrl });
-      const row = await readIntegration(user.accessToken);
-      await writeIntegration(user.accessToken, {
+      const row = await readIntegration(user.accessToken, siteKey);
+      await writeIntegration(user.accessToken, siteKey, {
         provider: 'metricool', connected: false,
-        account_label: row?.account_label || 'JustConsignIn', external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
+        account_label: row?.account_label || site.label,
+        external_user_id: row?.external_user_id || '',
+        external_brand_id: row?.external_brand_id || '',
         credentials: { oauthTransaction: transaction },
         secret_ciphertext: '', secret_iv: '', secret_tag: '',
         metadata: { ...(row?.metadata || {}), timezone: 'America/Toronto', mcp_url: 'https://ai.metricool.com/mcp', oauth_state: transaction.state },
         connected_at: null, updated_at: new Date().toISOString(),
       });
-      res.setHeader('Set-Cookie', callbackCookie(user.accessToken, proto === 'https'));
+      res.setHeader('Set-Cookie', callbackCookies(user.accessToken, siteKey, proto === 'https'));
       return res.status(200).json({ authUrl });
     }
 
     if (action === 'metricool-disconnect') {
-      const row = await readIntegration(user.accessToken);
-      const saved = await writeIntegration(user.accessToken, {
-        provider: 'metricool', connected: false, account_label: row?.account_label || 'JustConsignIn',
-        external_user_id: row?.external_user_id || '5309805', external_brand_id: row?.external_brand_id || '6893759',
+      const row = await readIntegration(user.accessToken, siteKey);
+      const saved = await writeIntegration(user.accessToken, siteKey, {
+        provider: 'metricool', connected: false, account_label: row?.account_label || site.label,
+        external_user_id: row?.external_user_id || '', external_brand_id: row?.external_brand_id || '',
         credentials: {}, secret_ciphertext: '', secret_iv: '', secret_tag: '',
         metadata: { ...(row?.metadata || {}), oauth_state: null }, connected_at: null, updated_at: new Date().toISOString(),
       });
-      return res.status(200).json({ integration: publicIntegration(saved) });
+      return res.status(200).json({ integration: publicIntegration(saved, siteKey) });
     }
 
     if (action === 'metricool-test') {
-      const row = await readIntegration(user.accessToken);
+      const row = await readIntegration(user.accessToken, siteKey);
       if (!row?.connected) return res.status(400).json({ error: 'Metricool is not connected to this admin yet' });
       let credentials = row.credentials || {};
       if (!credentials.accessToken) return res.status(400).json({ error: 'Metricool authorization is incomplete. Reconnect Metricool.' });
       if (credentials.expiresAt && credentials.expiresAt < Date.now() + 60000 && credentials.refreshToken) {
         credentials = await refreshMetricoolOAuth(credentials);
-        await saveCredentials(user.accessToken, row, credentials);
+        await saveCredentials(user.accessToken, siteKey, row, credentials);
       }
       const { tools } = await getMetricoolTools(credentials.accessToken);
       return res.status(200).json({ ok: true, toolCount: tools.length, tools: tools.map(tool => tool.name) });
@@ -232,7 +264,7 @@ export default async function handler(req, res) {
     if (action === 'send') {
       const id = String(req.body?.id || '').trim();
       if (!id) return res.status(400).json({ error: 'Missing campaign id' });
-      const [campaign, row] = await Promise.all([loadCampaign(user.accessToken, id), readIntegration(user.accessToken)]);
+      const [campaign, row] = await Promise.all([loadCampaign(user.accessToken, id, siteKey), readIntegration(user.accessToken, siteKey)]);
       if (!row?.connected) return res.status(400).json({ error: 'Connect Metricool to the backend first.' });
       if (!campaign.platforms?.length) return res.status(400).json({ error: 'Choose at least one social network' });
       if (!campaign.scheduled_at) return res.status(400).json({ error: 'Choose a schedule date and time' });
@@ -241,19 +273,20 @@ export default async function handler(req, res) {
       if (!credentials.accessToken) return res.status(400).json({ error: 'Metricool authorization is incomplete. Reconnect Metricool.' });
       if (credentials.expiresAt && credentials.expiresAt < Date.now() + 60000 && credentials.refreshToken) {
         credentials = await refreshMetricoolOAuth(credentials);
-        await saveCredentials(user.accessToken, row, credentials);
+        await saveCredentials(user.accessToken, siteKey, row, credentials);
       }
       const { tools } = await getMetricoolTools(credentials.accessToken);
       const createTool = toolName(tools);
       if (!createTool) throw new Error('Metricool scheduling tool was not found');
-      const brandId = row.external_brand_id || '6893759';
+      const brandId = String(row.external_brand_id || '').trim();
+      if (!brandId) return res.status(400).json({ error: `Connect/configure the Metricool brand for ${site.label} before publishing.` });
       const results = [];
       const errors = [];
 
       for (const network of campaign.platforms) {
         try {
           validateForNetwork(campaign, network);
-          const info = networkInfo(campaign, network);
+          const info = networkInfo(campaign, network, siteKey);
           const tool = tools.find(item => item.name === createTool) || {};
           const props = tool.inputSchema?.properties || {};
           const args = {
@@ -270,7 +303,7 @@ export default async function handler(req, res) {
       }
 
       const status = results.length ? (campaign.auto_publish ? 'active' : 'scheduled') : 'failed';
-      const update = await supabaseUserRest(user.accessToken, `social_campaigns?id=eq.${encodeURIComponent(id)}`, {
+      const update = await supabaseUserRest(user.accessToken, `social_campaigns?site_key=eq.${encodeURIComponent(siteKey)}&id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH', headers: { Prefer: 'return=representation' },
         body: JSON.stringify({ status, metricool_posts: results, last_error: errors.map(e => `${e.network}: ${e.error}`).join(' | '), updated_at: new Date().toISOString() }),
       });
