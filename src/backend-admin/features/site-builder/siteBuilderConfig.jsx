@@ -326,6 +326,19 @@ const featuresCtaDefaults = {
 
 
 export const siteBuilderConfig = {
+  root: {
+    fields: {
+      seoTitle: { type: 'text', label: 'SEO title' },
+      seoDescription: { type: 'textarea', label: 'SEO description' },
+      ogImage: { ...imageField, label: 'Social / OG image' },
+    },
+    defaultProps: {
+      seoTitle: '',
+      seoDescription: '',
+      ogImage: '',
+    },
+    render: ({ children }) => <>{children}</>,
+  },
   categories: {
     homepage: {
       title: 'Homepage',
