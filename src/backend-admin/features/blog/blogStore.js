@@ -79,14 +79,17 @@ export function slugify(value = '') {
 }
 
 export function normalizeBlogPost(row = {}) {
+  const siteKey = row.site_key || row.siteKey || getAdminSiteKey();
+  const defaultCategory = siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Guides' : 'Shopify Consignment';
+  const defaultAuthor = siteKey === 'justindematteis' ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn';
   return {
     ...EMPTY_POST,
     id: row.id || '', title: row.title || '', slug: row.slug || '', excerpt: row.excerpt || '',
     seoTitle: row.seo_title ?? row.seoTitle ?? '', seoDescription: row.seo_description ?? row.seoDescription ?? '',
-    category: row.category || 'Shopify Consignment', tags: Array.isArray(row.tags) ? row.tags : [],
+    category: row.category || defaultCategory, tags: Array.isArray(row.tags) ? row.tags : [],
     featuredImage: row.featured_image ?? row.featuredImage ?? '', body: row.body || '',
     status: row.status === BLOG_STATUS.PUBLISHED ? BLOG_STATUS.PUBLISHED : BLOG_STATUS.DRAFT,
-    authorName: row.author_name ?? row.authorName ?? 'JustConsignIn',
+    authorName: row.author_name ?? row.authorName ?? defaultAuthor,
     publishedAt: row.published_at ?? row.publishedAt ?? '', createdAt: row.created_at ?? row.createdAt ?? '', updatedAt: row.updated_at ?? row.updatedAt ?? '',
   };
 }
