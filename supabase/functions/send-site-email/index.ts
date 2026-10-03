@@ -60,7 +60,8 @@ function userClient(token: string) {
 }
 
 async function loadSettings(siteKey = 'justconsignin') {
-  const safeSiteKey = siteKey === 'justindematteis' ? 'justindematteis' : 'justconsignin';
+  const requested = clean(siteKey, 80).toLowerCase();
+  const safeSiteKey = ['justconsignin','justindematteis','sunwings'].includes(requested) ? requested : 'justconsignin';
   const { data, error } = await admin.rpc('service_get_email_settings', { p_site_key: safeSiteKey });
   if (error) throw new Error(`Unable to load email settings: ${error.message}`);
   const settings = Array.isArray(data) ? data[0] : data;
@@ -931,10 +932,11 @@ async function sendTest(req: Request, body: any) {
   const ownerAuth = await requireOwner(req);
   if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
 
-  const siteKey = clean(body?.siteKey, 80).toLowerCase() === 'justindematteis' ? 'justindematteis' : 'justconsignin';
-  const eventKey = siteKey === 'justindematteis' ? 'service_request' : 'demo_request';
-  const siteLabel = siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn';
-  const eventLabel = siteKey === 'justindematteis' ? 'Service Requests' : 'Demo Requests';
+  const requested = clean(body?.siteKey, 80).toLowerCase();
+  const siteKey = ['justconsignin','justindematteis','sunwings'].includes(requested) ? requested : 'justconsignin';
+  const eventKey = siteKey === 'justindematteis' ? 'service_request' : siteKey === 'sunwings' ? 'quote_request' : 'demo_request';
+  const siteLabel = siteKey === 'justindematteis' ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn';
+  const eventLabel = siteKey === 'justindematteis' ? 'Service Requests' : siteKey === 'sunwings' ? 'Quote Requests' : 'Demo Requests';
 
   try {
     const settings = await loadSettings(siteKey);
