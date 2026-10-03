@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, ExternalLink, Plus, Save, Trash2, Upload, X } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Library, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { uploadSunwingsImage } from '../../services/siteAdminService';
+import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
+import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
 import {
   POST_STATUS,
   createEmptyLocationPost,
@@ -77,6 +78,9 @@ export default function SunwingsPostEditor({ type }) {
   const [draft, setDraft] = useState(() => config.create());
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [media, setMedia] = useState([]);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -166,6 +170,33 @@ export default function SunwingsPostEditor({ type }) {
     }
   };
 
+  const chooseMedia = async () => {
+    setMediaOpen(true);
+    if (media.length) return;
+    setMediaLoading(true);
+    setError('');
+    try {
+      const items = await loadAdminMedia(accessToken);
+      setMedia(items.filter(item => (item.mediaType || 'image') === 'image'));
+    } catch (err) {
+      setError(err.message || 'Unable to load media.');
+    } finally {
+      setMediaLoading(false);
+    }
+  };
+
+  const selectBannerMedia = item => {
+    const url = item?.url || '';
+    if (!url) return;
+    setDraft(current => ({
+      ...current,
+      bannerImage: url,
+      ogImage: current.ogImage || url,
+    }));
+    setMediaOpen(false);
+    setMessage('Banner image selected. Save the post to keep it.');
+  };
+
   if (!editing) {
     return <>
       <div className="site-admin-page-head">
@@ -195,6 +226,11 @@ export default function SunwingsPostEditor({ type }) {
   }
 
   return <>
+    {mediaOpen && <MediaPickerModal
+      items={media}
+      onClose={() => setMediaOpen(false)}
+      onSelect={selectBannerMedia}
+    />}
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">{config.eyebrow} · {config.singular}</p>
@@ -232,7 +268,10 @@ export default function SunwingsPostEditor({ type }) {
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head">
             <div><span>2</span><div><h2>Banner</h2><p>Uses the Sunwings full-width image banner template.</p></div></div>
-            <button className="site-admin-btn secondary small" type="button" onClick={() => imageRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Banner'}</button>
+            <div className="site-admin-actions">
+              <button className="site-admin-btn secondary small" type="button" onClick={chooseMedia} disabled={mediaLoading}><Library size={13}/>{mediaLoading ? 'Loading…' : 'Choose Media'}</button>
+              <button className="site-admin-btn secondary small" type="button" onClick={() => imageRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Banner'}</button>
+            </div>
           </div>
           <input ref={imageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadBanner}/>
           {draft.bannerImage && <div className="work-post-hero-image-preview" style={{maxWidth: '520px', marginBottom: '14px'}}><img src={draft.bannerImage} alt=""/></div>}
