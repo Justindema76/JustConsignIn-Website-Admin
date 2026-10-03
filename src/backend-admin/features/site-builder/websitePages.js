@@ -1030,25 +1030,11 @@ const SUNWINGS_PAGE_EDITOR_DATA = {
 
   contact: {
     content: [
-      block('SunwingsHeroBlock', 'sw-contact-hero', {
-        eyebrow:'Contact',
-        heading:'Get your free quote',
-        accent:'',
-        text:'Tell us what’s moving and where. We reply fast, usually the same day.',
-        image:'https://sunwingstransport.ca/wp-content/uploads/elementor/thumbs/happy-couple-move-rjw992tbb61z2n9hhbnvscs9srjnmxwvlts7dp1qbi.jpg',
-        imageAlt:'Sunwings Transport contact',
-        primaryButtonText:'',
-        primaryButtonUrl:'',
-        secondaryButtonText:'',
-        secondaryButtonUrl:'',
-        showCallButton:true,
-        breadcrumbLabel:'Contact',
-        showBreadcrumbs:true,
-        background:'white',
-      }),
       block('SunwingsContactBlock', 'sw-contact-panel', {
+        formTitle:'Contact Sunwings',
+        formText:'Send us a message and we’ll get back to you.',
         callTitle:'Call or text',
-        emailTitle:'Email',
+        hoursTitle:'Hours',
         hours:'',
         areaTitle:'Service area',
         areaText:'Toronto, the GTA, Halton, Hamilton & Niagara',
