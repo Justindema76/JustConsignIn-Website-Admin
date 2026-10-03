@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import AdminLogin from '../auth/AdminLogin';
 import RequireAdmin from '../auth/RequireAdmin';
 import AdminLayout from '../components/layout/AdminLayout';
@@ -28,6 +28,7 @@ import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
+import { getAdminSiteKey } from '../services/siteAdminService';
 
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
@@ -35,6 +36,19 @@ const STANDARD_SITES = ['justindematteis', 'justconsignin'];
 const SUNWINGS = ['sunwings'];
 
 const only = (sites, element) => <SiteOnly sites={sites}>{element}</SiteOnly>;
+
+function GlobalSectionRoute() {
+  const { section } = useParams();
+  const siteKey = getAdminSiteKey();
+  const allowed = siteKey === 'justindematteis'
+    ? ['header', 'footer', 'project-request']
+    : ['header', 'footer'];
+
+  if (!STANDARD_SITES.includes(siteKey) || !allowed.includes(section)) {
+    return <Navigate to="/admin" replace />;
+  }
+  return <GlobalBuilder />;
+}
 
 export default function AdminApp() {
   return <Routes>
@@ -70,9 +84,7 @@ export default function AdminApp() {
         <Route path="/admin/website/pages/:pageId" element={only(STANDARD_SITES, <SiteBuilder />)} />
         <Route path="/admin/website/blocks" element={only(STANDARD_SITES, <BlockLibrary />)} />
         <Route path="/admin/website/styles" element={only(STANDARD_SITES, <GlobalStylesAdmin />)} />
-        <Route path="/admin/website/global/header" element={only(STANDARD_SITES, <GlobalBuilder />)} />
-        <Route path="/admin/website/global/footer" element={only(STANDARD_SITES, <GlobalBuilder />)} />
-        <Route path="/admin/website/global/project-request" element={only(JUSTIN, <GlobalBuilder />)} />
+        <Route path="/admin/website/global/:section" element={<GlobalSectionRoute />} />
         <Route path="/admin/settings" element={only(STANDARD_SITES, <SettingsAdmin />)} />
 
         <Route path="/admin/sunwings/services" element={only(SUNWINGS, <ServicePostsAdmin />)} />
