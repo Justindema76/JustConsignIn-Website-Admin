@@ -106,7 +106,7 @@ export default function SunwingsSettingsAdmin() {
           <div className="site-admin-form work-post-fields">
             <label>Business name<input value={settings.site_name} onChange={event => update('site_name', event.target.value)}/></label>
             <label>Phone<input value={settings.phone} onChange={event => update('phone', event.target.value)}/></label>
-            <label>Email<input type="email" value={settings.email} onChange={event => update('email', event.target.value)}/></label>
+            <label>Business email (not shown publicly)<input type="email" value={settings.email} onChange={event => update('email', event.target.value)}/><small>Kept for internal website use only. The public site does not display this address.</small></label>
             <label>Quote reply time (hours)<input inputMode="numeric" value={settings.quote_reply_hours} onChange={event => update('quote_reply_hours', event.target.value.replace(/[^0-9]/g, '').slice(0,3))} placeholder="Example: 4"/><small>Used in the quote-form success message. Leave blank to say “as soon as possible.”</small></label>
           </div>
         </div>
