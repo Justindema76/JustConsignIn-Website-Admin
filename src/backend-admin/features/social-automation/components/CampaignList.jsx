@@ -6,8 +6,8 @@ export default function CampaignList({ campaigns, loading, busy, onDelete, baseP
   const navigate = useNavigate();
 
   return <div className="site-admin-card social-campaign-list">
-    <div className="social-list-head"><strong>Campaigns</strong><span>Instagram · Facebook · TikTok · YouTube</span></div>
-    {loading && !campaigns.length ? <div className="site-admin-empty">Loading campaigns…</div> : campaigns.map(item => {
+    <div className="social-list-head"><strong>Social Posts</strong><span>Instagram · Facebook · TikTok · YouTube</span></div>
+    {loading && !campaigns.length ? <div className="site-admin-empty">Loading social posts…</div> : campaigns.map(item => {
       const isActive = item.status === 'active' || (item.status === 'scheduled' && item.autoPublish);
       const statusLabel = isActive ? 'Active' : item.status;
       const statusClass = isActive ? 'published' : item.status;
@@ -26,6 +26,6 @@ export default function CampaignList({ campaigns, loading, busy, onDelete, baseP
         </div>
       </div>;
     })}
-    {!loading && !campaigns.length && <div className="site-admin-empty large"><WandSparkles size={30}/><h2>No campaigns yet</h2><p>Create the first campaign and choose media from the shared library.</p></div>}
+    {!loading && !campaigns.length && <div className="site-admin-empty large"><WandSparkles size={30}/><h2>No social posts yet</h2><p>Create the first post and choose media from the library.</p></div>}
   </div>;
 }
