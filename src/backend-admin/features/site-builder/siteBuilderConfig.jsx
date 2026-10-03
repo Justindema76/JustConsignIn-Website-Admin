@@ -1583,13 +1583,13 @@ export const siteBuilderConfig = {
     },
 
     SunwingsQuoteFormBlock: {
-      label: 'Quote Form',
+      label: 'Quick Quote Form',
       fields: {
         eyebrow:{type:'text',label:'Eyebrow'},heading:{type:'text',label:'Heading'},text:{type:'textarea',label:'Description'},buttonText:{type:'text',label:'Optional button text'},buttonAction:{type:'select',label:'Optional button action',options:[{label:'Open quote drawer',value:'quote'},{label:'Go to URL',value:'link'}]},buttonUrl:{type:'text',label:'Optional button URL'},
         compact:{type:'radio',label:'Compact form',options:[{label:'Yes',value:true},{label:'No',value:false}]},
         background:{type:'select',label:'Section background',options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}]},
       },
-      defaultProps:{eyebrow:'Free quote',heading:'Tell us about the job.',text:'Two minutes. No obligation. We reply fast.',buttonText:'',buttonAction:'quote',buttonUrl:'#quote',compact:true,background:'soft'},
+      defaultProps:{eyebrow:'Quick quote',heading:'Tell us the basics.',text:'Send the essentials and we’ll follow up for anything else.',buttonText:'',buttonAction:'quote',buttonUrl:'#quote',compact:true,background:'soft'},
       render:p=><section style={{padding:28,border:'1px solid #E3E9F2',borderRadius:18,background:p.background==='soft'?'#F6F8FB':'#fff'}}><div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div><h2 style={{fontSize:30}}>{p.heading}</h2><p style={{color:'#5B6B82'}}>{p.text}</p><div style={{display:'grid',gridTemplateColumns:p.compact?'1fr':'1fr 1fr',gap:10,marginTop:18}}>{['Name','Phone','Email','Service','Moving from','Moving to'].map(item=><div key={item} style={{height:42,border:'1px solid #D5DEEA',borderRadius:9,background:'#FBFCFE',padding:'10px 12px',color:'#94a3b8'}}>{item}</div>)}</div></section>,
     },
 
