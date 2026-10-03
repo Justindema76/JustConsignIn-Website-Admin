@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { SOCIAL_NETWORKS, emptySocialLinks } from '../../config/siteContent';
-import { loadAdminSocial, saveAdminSocial } from '../../services/siteAdminService';
+import { getAdminSiteKey, loadAdminSocial, saveAdminSocial } from '../../services/siteAdminService';
 
 export default function SocialAdmin() {
   const { accessToken } = useAuth();
+  const siteKey = getAdminSiteKey();
+  const isSunwings = siteKey === 'sunwings';
   const [social, setSocial] = useState(emptySocialLinks());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +47,7 @@ export default function SocialAdmin() {
       </div>)}
     </div>
     <div className="site-admin-footer-preview">
-      <div><strong>JustConsignIn</strong><p>Consignment management for Shopify stores.</p></div>
+      <div><strong>{isSunwings ? 'Sunwings Transport' : 'JustConsignIn'}</strong><p>{isSunwings ? 'Moving, delivery and commercial transport from Toronto to Niagara.' : 'Consignment management for Shopify stores.'}</p></div>
       <div className="site-admin-social-icons">{SOCIAL_NETWORKS.filter(network => social[network.key]?.enabled !== false).map(network => <span key={network.key} className={!social[network.key]?.url ? 'disabled' : ''}><img src={network.icon} alt={network.label}/></span>)}</div>
     </div>
   </>;
