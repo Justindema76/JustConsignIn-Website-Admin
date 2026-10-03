@@ -44,8 +44,9 @@ function validatePublishData(page, data, siteKey) {
     const allowed = new Set([
       'HeadingBlock','TextBlock','ImageBlock','ImageTextBlock','HeroBlock','CtaBlock',
       'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
-      'SunwingsPricingCardsBlock','SunwingsLocationsGridBlock','SunwingsReviewsBlock',
-      'SunwingsBlogGridBlock','SunwingsQuoteFormBlock'
+      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingCardsBlock',
+      'SunwingsLocationsGridBlock','SunwingsReviewsBlock','SunwingsBlogGridBlock',
+      'SunwingsFaqBlock','SunwingsContactBlock','SunwingsQuoteFormBlock','SunwingsRichTextBlock'
     ]);
     const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
     if (!blocks.length) throw new Error('This page needs at least one block before publishing.');
@@ -126,8 +127,9 @@ export default function SiteBuilder() {
     ];
     const sunwingsBlocks = [
       'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
-      'SunwingsPricingCardsBlock','SunwingsLocationsGridBlock','SunwingsReviewsBlock',
-      'SunwingsBlogGridBlock','SunwingsQuoteFormBlock',
+      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingCardsBlock',
+      'SunwingsLocationsGridBlock','SunwingsReviewsBlock','SunwingsBlogGridBlock',
+      'SunwingsFaqBlock','SunwingsContactBlock','SunwingsQuoteFormBlock','SunwingsRichTextBlock',
     ];
 
     const resumeBlocks = [
