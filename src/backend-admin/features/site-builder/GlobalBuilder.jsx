@@ -18,7 +18,11 @@ export default function GlobalBuilder() {
   const [socialLinks,setSocialLinks] = useState({});
   const config = useMemo(() => globalConfigFor(type, siteKey, socialLinks), [type, siteKey, socialLinks]);
   const fallback = useMemo(() => defaultGlobalData(type, siteKey), [type, siteKey]);
-  const liveUrl = siteKey === 'justindematteis' ? 'https://www.justindematteis.com' : 'https://www.justconsignin.com';
+  const liveUrl = siteKey === 'justindematteis'
+    ? 'https://www.justindematteis.com'
+    : siteKey === 'sunwings'
+      ? (import.meta.env.VITE_SUNWINGS_PREVIEW_URL || 'https://sunwingstransport.ca')
+      : 'https://www.justconsignin.com';
   const sectionLabel = type === 'header' ? 'Header' : type === 'footer' ? 'Footer' : 'Project Request Drawer';
   const [data,setData] = useState(null);
   const [savedAt,setSavedAt] = useState('');
