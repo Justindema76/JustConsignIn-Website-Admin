@@ -13,6 +13,7 @@ export default {
         { to: '/admin/sunwings/blocks', label: 'Block Library', icon: 'panels' },
         { to: '/admin/sunwings/services', label: 'Service Posts', icon: 'truck' },
         { to: '/admin/sunwings/locations', label: 'Location Posts', icon: 'map' },
+        { to: '/admin/sunwings/blog', label: 'Moving Tips Posts', icon: 'panels' },
       ],
     },
     {
@@ -36,6 +37,7 @@ export default {
       { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'Edit main pages with the shared block editor' },
       { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Add and edit Sunwings services' },
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
+      { to: '/admin/sunwings/blog', icon: 'panels', title: 'Moving Tips Posts', copy: 'Create and publish moving articles' },
       { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming transport leads' },
       { to: '/admin/sunwings/settings', icon: 'settings', title: 'Sunwings Settings', copy: 'Homepage banner and contact details' },
     ],
@@ -49,6 +51,7 @@ export default {
           { to: '/admin/sunwings/blocks', icon: 'panels', title: 'Block Library', copy: 'See the reusable blocks available to Sunwings pages.' },
           { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Create, edit, draft and publish services.' },
           { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Create, edit, draft and publish locations.' },
+          { to: '/admin/sunwings/blog', icon: 'panels', title: 'Moving Tips Posts', copy: 'Create, edit, draft and publish articles shown on the Moving Tips page.' },
         ],
       },
       {
