@@ -41,3 +41,8 @@ export async function testMetricoolConnection(accessToken) {
 export async function sendCampaignToMetricool(accessToken, id) {
   return parseResponse(await adminFetch(siteUrl('/api/admin/social-automation'), json({ action: 'send', id }), accessToken));
 }
+
+
+export async function saveMetricoolBrand(accessToken, brandId) {
+  return parseResponse(await adminFetch(siteUrl('/api/admin/social-automation'), json({ action: 'metricool-brand', brandId }), accessToken));
+}
