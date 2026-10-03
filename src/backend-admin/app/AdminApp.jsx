@@ -92,6 +92,7 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/pages/:pageId" element={only(SUNWINGS, <SiteBuilder />)} />
         <Route path="/admin/sunwings/blocks" element={only(SUNWINGS, <BlockLibrary />)} />
         <Route path="/admin/sunwings/media" element={only(SUNWINGS, <MediaAdmin />)} />
+        <Route path="/admin/sunwings/social" element={only(SUNWINGS, <SocialAdmin />)} />
         <Route path="/admin/sunwings/styles" element={only(SUNWINGS, <GlobalStylesAdmin />)} />
         <Route path="/admin/sunwings/global/:section" element={only(SUNWINGS, <GlobalSectionRoute />)} />
         <Route path="/admin/sunwings/blog" element={only(SUNWINGS, <BlogAdmin />)} />
