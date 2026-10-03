@@ -1429,6 +1429,34 @@ export const siteBuilderConfig = {
       render: p => <section style={{background:'#0B2545',color:'#fff',padding:30,borderRadius:18}}><div style={{color:'#FDB833',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div><h2 style={{fontSize:32}}>{p.heading}</h2><p style={{color:'#c9d9ee'}}>{p.text}</p><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginTop:18}}>{[1,2].map(n=><div key={n} style={{padding:16,background:'rgba(255,255,255,.08)',borderRadius:12}}><small>{p[`card${n}Label`]}</small><b style={{display:'block',fontSize:22}}>{p[`card${n}Value`]}</b><small>{p[`card${n}Note`]}</small></div>)}</div></section>,
     },
 
+    SunwingsPricingFactorsBlock: {
+      label: 'Pricing Factors + Guarantee',
+      fields: {
+        eyebrow:{type:'text',label:'Eyebrow'},
+        heading:{type:'text',label:'Heading'},
+        text:{type:'textarea',label:'Description'},
+        checklist:{type:'textarea',label:'Pricing factors (one per line)'},
+        guaranteeEyebrow:{type:'text',label:'Guarantee eyebrow'},
+        guaranteeHeading:{type:'text',label:'Guarantee heading'},
+        guaranteeText:{type:'textarea',label:'Guarantee text'},
+        background:{type:'select',label:'Section background',options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}]},
+      },
+      defaultProps:{
+        eyebrow:'What affects your price',
+        heading:'No surprises on the bill.',
+        text:'',
+        checklist:'Crew size and hours on the job\nDistance between pickup and drop-off\nStairs, long carries and elevator wait times\nPacking, wrapping and specialty items',
+        guaranteeEyebrow:'Price-match guarantee',
+        guaranteeHeading:'Found a lower written quote?',
+        guaranteeText:'Show us a lower written quote for the same job and we’ll match it.',
+        background:'soft',
+      },
+      render:p=><section style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,padding:28,background:p.background==='soft'?'#F6F8FB':'#fff'}}>
+        <div><div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div><h2>{p.heading}</h2>{p.text&&<p style={{color:'#64748b'}}>{p.text}</p>}<ul>{String(p.checklist||'').split('\n').filter(Boolean).map(item=><li key={item}>{item}</li>)}</ul></div>
+        <div style={{background:'#0B2545',color:'#fff',padding:28,borderRadius:18}}><div style={{color:'#FDB833',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.guaranteeEyebrow}</div><h2 style={{fontSize:30}}>{p.guaranteeHeading}</h2><p style={{color:'#c9d9ee'}}>{p.guaranteeText}</p></div>
+      </section>,
+    },
+
     SunwingsPricingCardsBlock: {
       label: 'Pricing Cards',
       fields: {
