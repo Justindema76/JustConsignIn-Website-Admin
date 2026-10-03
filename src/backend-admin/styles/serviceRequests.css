@@ -511,6 +511,36 @@
   color:#a92d2d;
   border-color:#efc1c1;
 }
+.service-request-queue .demo-request-status.quote_sent,
+.service-request-drawer .demo-request-status.quote_sent{
+  background:#fff2e3;
+  color:#b45309;
+  border-color:#f6d3aa;
+}
+.service-request-queue .demo-request-status.booked,
+.service-request-drawer .demo-request-status.booked{
+  background:#e8f7f5;
+  color:#0f766e;
+  border-color:#b9dfda;
+}
+.service-request-queue .demo-request-status.cancelled,
+.service-request-drawer .demo-request-status.cancelled{
+  background:#f0f2f4;
+  color:#5f6770;
+  border-color:#d7dde2;
+}
+.service-request-workflow-compact .service-request-compact-details input,
+.service-request-workflow-compact .service-request-compact-details select{
+  width:100%;
+  min-height:38px;
+  margin:0;
+  border:1px solid #d7dce1;
+  border-radius:8px;
+  background:#fff;
+  color:#202223;
+  padding:8px 10px;
+  font:inherit;
+}
 
 
 /* Preview-parity service workflow styling */
