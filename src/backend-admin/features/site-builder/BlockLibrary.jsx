@@ -1,5 +1,6 @@
 import { ArrowRight, BriefcaseBusiness, Boxes, ExternalLink, Image, LayoutGrid, ListChecks, Megaphone, MonitorPlay, MousePointerClick, PanelTop, Rows3, Type } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getAdminSiteKey } from '../../services/siteAdminService';
 import './blockLibrary.css';
 
 const groups = [
@@ -33,6 +34,28 @@ const groups = [
 ];
 
 export default function BlockLibrary() {
+  const siteKey = getAdminSiteKey();
+  const sunwingsGroups = [
+    groups[0],
+    {
+      title: 'Sunwings designed blocks',
+      description: 'Dynamic blocks used by the Sunwings website. Service and location grids stay connected to their post types.',
+      blocks: [
+        { name: 'Sunwings Hero', icon: PanelTop, description: 'Navy/orange Sunwings hero with heading, accent text, image and quote/call buttons.' },
+        { name: 'Trust Strip', icon: ListChecks, description: 'Trust signals for reviews, pricing, scheduling and service coverage.' },
+        { name: 'Service Posts Grid', icon: LayoutGrid, description: 'Automatically renders the published Service Posts.' },
+        { name: 'How It Works', icon: Rows3, description: 'Three-step booking process.' },
+        { name: 'Pricing Cards', icon: LayoutGrid, description: 'Sunwings pricing and quote guidance block.' },
+        { name: 'Location Posts Grid', icon: LayoutGrid, description: 'Automatically renders published Location Posts by region.' },
+        { name: 'Reviews', icon: Rows3, description: 'Customer review section.' },
+        { name: 'Moving Tips Grid', icon: LayoutGrid, description: 'Moving Tips / blog cards.' },
+        { name: 'Quote Form', icon: MousePointerClick, description: 'Sunwings quote-request form connected to Quote Requests.' },
+      ],
+    },
+  ];
+  const visibleGroups = siteKey === 'sunwings' ? sunwingsGroups : groups;
+  const pagesUrl = siteKey === 'sunwings' ? '/admin/sunwings/pages' : '/admin/website/pages';
+
   return <div className="jci-block-library">
     <div className="site-admin-page-head">
       <div>
@@ -40,10 +63,10 @@ export default function BlockLibrary() {
         <h1>Block Library</h1>
         <p>Design once, reuse everywhere. These are the pre-designed components available in the page builder.</p>
       </div>
-      <div className="site-admin-actions"><Link className="site-admin-btn" to="/admin/website/pages">Open Pages <ExternalLink size={13}/></Link></div>
+      <div className="site-admin-actions"><Link className="site-admin-btn" to={pagesUrl}>Open Pages <ExternalLink size={13}/></Link></div>
     </div>
     <div className="jci-block-library-note"><strong>This is the system going forward.</strong> New designs get added here once, then become reusable blocks in the page editor.</div>
-    {groups.map(group => <section className="jci-block-group" key={group.title}>
+    {visibleGroups.map(group => <section className="jci-block-group" key={group.title}>
       <div className="jci-block-group-head"><h2>{group.title}</h2><p>{group.description}</p></div>
       <div className="jci-block-grid">{group.blocks.map(({name,icon:Icon,description}) => <article className="site-admin-card jci-block-card" key={name}><span className="jci-block-icon"><Icon size={22}/></span><h3>{name}</h3><p>{description}</p><span className="jci-block-ready">Available in builder</span></article>)}</div>
     </section>)}
