@@ -1515,9 +1515,10 @@ export const siteBuilderConfig = {
         eyebrow: { type:'text', label:'Eyebrow' },
         heading: { type:'text', label:'Heading' },
         limit: { type:'text', label:'Maximum posts' },
+        showCategories: { type:'radio', label:'Show category filters', options:[{label:'Yes',value:true},{label:'No',value:false}] },
         background: { type:'select', label:'Section background', options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}] },
       },
-      defaultProps: { eyebrow:'Moving tips',heading:'From the Sunwings blog.',limit:'3',background:'white' },
+      defaultProps: { eyebrow:'Moving tips',heading:'From the Sunwings blog.',limit:'3',showCategories:false,background:'white' },
       render: p => <section style={{padding:'36px 8px',background:p.background==='soft'?'#F6F8FB':'#fff'}}><div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase'}}>{p.eyebrow}</div><h2 style={{fontSize:34}}>{p.heading}</h2><div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginTop:18}}>{Array.from({length:Math.min(3,Number(p.limit||3))},(_,i)=><div key={i} style={{padding:18,border:'1px solid #E3E9F2',borderRadius:12}}>Published Moving Tip {i+1}</div>)}</div></section>,
     },
 
