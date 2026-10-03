@@ -300,26 +300,30 @@ export default function SunwingsPostEditor({ type }) {
           </>}
         </div>
 
-        {type === 'location' && <div className="site-admin-card work-post-panel">
+        <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head">
-            <div><span>4</span><div><h2>Local FAQs</h2><p>Questions and answers unique to this service area.</p></div></div>
+            <div><span>4</span><div>
+              <h2>{type === 'service' ? 'Service FAQs' : 'Local FAQs'}</h2>
+              <p>{type === 'service' ? 'Questions and answers specific to this service.' : 'Questions and answers unique to this service area.'}</p>
+            </div></div>
             <button className="site-admin-btn secondary small" type="button" onClick={() => update('faq', [...(draft.faq || []), { question: '', answer: '' }])}><Plus size={13}/> Add FAQ</button>
           </div>
           <div className="work-post-step-editor">
             {(draft.faq || []).map((item, index) => <div className="work-post-repeat-card" key={index}>
               <div className="work-post-repeat-card-head"><strong>FAQ {index + 1}</strong><button type="button" onClick={() => update('faq', draft.faq.filter((_, itemIndex) => itemIndex !== index))}><X size={14}/></button></div>
               <label>Question<input value={item.question || ''} onChange={event => {
-                const next=[...draft.faq]; next[index]={...next[index],question:event.target.value}; update('faq',next);
+                const next=[...(draft.faq || [])]; next[index]={...next[index],question:event.target.value}; update('faq',next);
               }}/></label>
               <label>Answer<textarea rows="4" value={item.answer || ''} onChange={event => {
-                const next=[...draft.faq]; next[index]={...next[index],answer:event.target.value}; update('faq',next);
+                const next=[...(draft.faq || [])]; next[index]={...next[index],answer:event.target.value}; update('faq',next);
               }}/></label>
             </div>)}
+            {!(draft.faq || []).length && <div className="site-admin-empty">No FAQs yet. Add the questions customers actually ask about this {type}.</div>}
           </div>
-        </div>}
+        </div>
 
         <div className="site-admin-card work-post-panel">
-          <div className="work-post-panel-head"><div><span>{type === 'location' ? '5' : '4'}</span><div><h2>Call to action</h2><p>Closing conversion section for this page.</p></div></div></div>
+          <div className="work-post-panel-head"><div><span>5</span><div><h2>Call to action</h2><p>Closing conversion section for this page.</p></div></div></div>
           <label>CTA heading<input value={draft.ctaTitle} onChange={event => update('ctaTitle', event.target.value)}/></label>
           <label>CTA text<textarea rows="4" value={draft.ctaText} onChange={event => update('ctaText', event.target.value)}/></label>
         </div>
