@@ -11,6 +11,8 @@ const ALLOWED_KEYS = new Set([
   'seo_description',
   'seo_image',
   'google_site_verification',
+  'ga4_measurement_id',
+  'meta_pixel_id',
   'hero_title',
   'hero_description',
   'hero_image',
