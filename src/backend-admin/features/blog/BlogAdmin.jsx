@@ -154,8 +154,8 @@ export default function BlogAdmin() {
         <label className="wide">URL slug<input value={draft.slug} onChange={event => update('slug', slugify(event.target.value))} placeholder="article-url-slug"/><small>Public URL: /blog/{draft.slug || 'article-slug'}</small></label>
         <label className="wide">Excerpt<textarea rows="4" value={draft.excerpt} onChange={event => update('excerpt', event.target.value)} placeholder="Short summary used on the blog card."/></label>
         {isSunwings
-          ? <label>Category<select value={draft.category || 'Moving Tips'} onChange={event => update('category', event.target.value)}>
-              {['Moving Tips','Pricing','Guides','Delivery','Business'].map(category => <option value={category} key={category}>{category}</option>)}
+          ? <label>Category<select value={draft.category || 'Guides'} onChange={event => update('category', event.target.value)}>
+              {['Pricing','Guides','Delivery','Business'].map(category => <option value={category} key={category}>{category}</option>)}
             </select></label>
           : <label>Category<input value={draft.category} onChange={event => update('category', event.target.value)}/></label>}
         <label>Tags<input value={(draft.tags || []).join(', ')} onChange={event => update('tags', toTags(event.target.value))} placeholder={isSunwings ? 'Toronto movers, condo moving, furniture delivery' : 'Shopify, POS, consignors'}/></label>
