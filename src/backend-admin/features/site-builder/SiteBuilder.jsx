@@ -127,7 +127,7 @@ export default function SiteBuilder() {
     ];
     const sunwingsBlocks = [
       'SunwingsHeroBlock','SunwingsTrustBlock','SunwingsServicesGridBlock','SunwingsStepsBlock',
-      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingCardsBlock',
+      'SunwingsSplitFeatureBlock','SunwingsPriceBandBlock','SunwingsPricingFactorsBlock','SunwingsPricingCardsBlock',
       'SunwingsLocationsGridBlock','SunwingsReviewsBlock','SunwingsBlogGridBlock',
       'SunwingsFaqBlock','SunwingsContactBlock','SunwingsQuoteFormBlock','SunwingsRichTextBlock',
     ];
