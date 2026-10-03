@@ -8,16 +8,25 @@ export async function loadSunwingsQuotes(accessToken) {
   return Array.isArray(payload.requests) ? payload.requests : [];
 }
 
-export async function updateSunwingsQuote(accessToken, id, status) {
+export async function updateSunwingsQuote(accessToken, request) {
   const payload = await parseJsonResponse(
     await adminFetch('/api/admin/sunwings/quote-requests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status }),
+      body: JSON.stringify(request),
     }, accessToken),
     'Unable to update Sunwings quote request.',
   );
   return payload.request || null;
+}
+
+export async function deleteSunwingsQuote(accessToken, id) {
+  await parseJsonResponse(
+    await adminFetch(`/api/admin/sunwings/quote-requests?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }, accessToken),
+    'Unable to delete Sunwings quote request.',
+  );
 }
 
 export async function loadSunwingsSettings(accessToken) {
