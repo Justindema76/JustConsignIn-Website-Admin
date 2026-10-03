@@ -143,8 +143,8 @@ export function createEmptyPost(siteKey = getAdminSiteKey()) {
   return {
     ...EMPTY_POST,
     tags: [],
-    category: siteKey === 'justindematteis' ? 'Development' : 'Shopify Consignment',
-    authorName: siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn',
+    category: siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Moving Tips' : 'Shopify Consignment',
+    authorName: siteKey === 'justindematteis' ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn',
   };
 }
 
