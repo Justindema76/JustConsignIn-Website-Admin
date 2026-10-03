@@ -24,6 +24,7 @@ export function createEmptyServicePost() {
     intro: '',
     bodyHtml: '',
     bullets: [],
+    faq: [],
     ctaTitle: '',
     ctaText: '',
     seoTitle: '',
@@ -96,6 +97,7 @@ export function normalizeServicePost(row = {}) {
   return {
     ...common(row, createEmptyServicePost()),
     bullets: Array.isArray(row.bullets) ? row.bullets : [],
+    faq: Array.isArray(row.faq) ? row.faq : [],
   };
 }
 
