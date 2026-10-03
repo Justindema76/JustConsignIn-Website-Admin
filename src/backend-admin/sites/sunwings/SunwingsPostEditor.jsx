@@ -297,6 +297,33 @@ export default function SunwingsPostEditor({ type }) {
             <label>Service slugs <small>Comma-separated; connects this location to published Service Posts.</small>
               <textarea rows="4" value={(draft.serviceSlugs || []).join(', ')} onChange={event => update('serviceSlugs', event.target.value.split(',').map(value => value.trim()).filter(Boolean))}/>
             </label>
+
+            <div className="work-post-panel-head" style={{marginTop:'18px'}}>
+              <div><div><h3>Local details</h3><p>Unique facts for this city. These become the “Moving in [city]: what to know” cards.</p></div></div>
+              <button className="site-admin-btn secondary small" type="button" onClick={() => update('localNotes', [...(draft.localNotes || []), { icon:'map', title:'', text:'' }])}><Plus size={13}/> Add local detail</button>
+            </div>
+            <div className="work-post-step-editor">
+              {(draft.localNotes || []).map((item, index) => <div className="work-post-repeat-card" key={index}>
+                <div className="work-post-repeat-card-head"><strong>Local detail {index + 1}</strong><button type="button" onClick={() => update('localNotes', draft.localNotes.filter((_, itemIndex) => itemIndex !== index))}><X size={14}/></button></div>
+                <label>Icon<select value={item.icon || 'map'} onChange={event => {
+                  const next=[...(draft.localNotes || [])]; next[index]={...next[index],icon:event.target.value}; update('localNotes',next);
+                }}>
+                  <option value="map">Map pin</option>
+                  <option value="building">Building</option>
+                  <option value="route">Route</option>
+                  <option value="mountain">Mountain</option>
+                  <option value="graduation">Student / school</option>
+                  <option value="truck">Truck</option>
+                </select></label>
+                <label>Title<input value={item.title || ''} onChange={event => {
+                  const next=[...(draft.localNotes || [])]; next[index]={...next[index],title:event.target.value}; update('localNotes',next);
+                }}/></label>
+                <label>Local detail<textarea rows="4" value={item.text || ''} onChange={event => {
+                  const next=[...(draft.localNotes || [])]; next[index]={...next[index],text:event.target.value}; update('localNotes',next);
+                }}/></label>
+              </div>)}
+            </div>
+            <label>Recent local job example<textarea rows="4" value={draft.recentJob || ''} onChange={event => update('recentJob', event.target.value)} placeholder="2-bedroom move from Westdale to Stoney Creek, 2 movers + cargo van, 4 hours"/></label>
           </>}
         </div>
 
