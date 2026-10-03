@@ -47,9 +47,9 @@ function redirect(res, siteKey, ok, message = '') {
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  const requestedSite = cookieValue(req, CALLBACK_SITE_COOKIE) || 'justconsignin';
+  const siteKey = SITE_LABELS[requestedSite] ? requestedSite : 'justconsignin';
   try {
-    const requestedSite = cookieValue(req, CALLBACK_SITE_COOKIE) || 'justconsignin';
-    const siteKey = SITE_LABELS[requestedSite] ? requestedSite : 'justconsignin';
     if (req.query?.error) return redirect(res, siteKey, false, req.query.error_description || req.query.error);
     const code = String(req.query?.code || '');
     const state = String(req.query?.state || '');
