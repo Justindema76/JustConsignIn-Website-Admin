@@ -47,6 +47,7 @@ export default function BlockLibrary() {
         { name: 'How It Works', icon: Rows3, description: 'Three-step booking process with editable titles and descriptions.' },
         { name: 'Image + Checklist Feature', icon: Image, description: 'Business/commercial split section with media picker, checklist and button.' },
         { name: 'Price Band', icon: LayoutGrid, description: 'Dark homepage pricing band with two summary cards and CTA.' },
+        { name: 'Pricing Factors + Guarantee', icon: ListChecks, description: 'Pricing factors checklist beside the price-match guarantee panel.' },
         { name: 'Pricing Cards', icon: LayoutGrid, description: 'Three fully editable pricing cards with featured-card control.' },
         { name: 'Location Posts Grid', icon: LayoutGrid, description: 'Automatically renders published Location Posts by region.' },
         { name: 'Reviews', icon: Rows3, description: 'Customer review section.' },
