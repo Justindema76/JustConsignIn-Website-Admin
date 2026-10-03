@@ -12,6 +12,12 @@ const SITE_CONFIG = {
     fallbackRouteId: 'demo-primary',
     defaultFromName: 'JustConsignIn',
   },
+  sunwings: {
+    requiredEvent: 'quote_request',
+    requiredLabel: 'Quote Requests',
+    fallbackRouteId: 'quote-primary',
+    defaultFromName: 'Sunwings Transport',
+  },
   justindematteis: {
     requiredEvent: 'service_request',
     requiredLabel: 'Service Requests',
