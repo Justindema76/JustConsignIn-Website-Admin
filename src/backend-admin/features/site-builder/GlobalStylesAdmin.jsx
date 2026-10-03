@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, LoaderCircle, Palette, RotateCcw, Save, Type, LayoutGrid, Square } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminGlobalStyles, saveAdminGlobalStyles } from '../../services/siteAdminService';
-import { DEFAULT_GLOBAL_STYLES, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
+import { getAdminSiteKey, loadAdminGlobalStyles, saveAdminGlobalStyles } from '../../services/siteAdminService';
+import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './globalStylesAdmin.css';
 
 const colorFields = [
@@ -39,7 +39,9 @@ function NumberField({ label, value, min, max, step = 1, suffix = 'px', onChange
 
 export default function GlobalStylesAdmin() {
   const { accessToken } = useAuth();
-  const [styles, setStyles] = useState(DEFAULT_GLOBAL_STYLES);
+  const siteKey = getAdminSiteKey();
+  const defaults = useMemo(() => globalStylesForSite(siteKey), [siteKey]);
+  const [styles, setStyles] = useState(defaults);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -52,7 +54,7 @@ export default function GlobalStylesAdmin() {
     loadAdminGlobalStyles(accessToken)
       .then(result => {
         if (!active) return;
-        setStyles(normalizeGlobalStyles(result.value));
+        setStyles(normalizeGlobalStyles(result.value, siteKey));
         setUpdatedAt(result.updatedAt || '');
       })
       .catch(err => {
@@ -62,7 +64,7 @@ export default function GlobalStylesAdmin() {
     return () => { active = false; };
   }, [accessToken]);
 
-  const vars = useMemo(() => globalStyleVars(styles), [styles]);
+  const vars = useMemo(() => globalStyleVars(styles, siteKey), [styles, siteKey]);
   const update = (key, value) => setStyles(current => ({ ...current, [key]: value }));
 
   const save = async () => {
@@ -70,8 +72,8 @@ export default function GlobalStylesAdmin() {
     setMessage('');
     setError('');
     try {
-      const result = await saveAdminGlobalStyles(accessToken, normalizeGlobalStyles(styles));
-      setStyles(normalizeGlobalStyles(result.value || styles));
+      const result = await saveAdminGlobalStyles(accessToken, normalizeGlobalStyles(styles, siteKey));
+      setStyles(normalizeGlobalStyles(result.value || styles, siteKey));
       setUpdatedAt(result.updatedAt || new Date().toISOString());
       setMessage('Global styles saved. The public website and shared block previews will use these values.');
     } catch (err) {
@@ -82,7 +84,7 @@ export default function GlobalStylesAdmin() {
   };
 
   const reset = () => {
-    setStyles(DEFAULT_GLOBAL_STYLES);
+    setStyles(defaults);
     setMessage('Defaults restored in the editor. Save to apply them to the website.');
     setError('');
   };
