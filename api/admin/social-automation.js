@@ -237,6 +237,27 @@ export default async function handler(req, res) {
       return res.status(200).json({ authUrl });
     }
 
+    if (action === 'metricool-brand') {
+      const brandId = String(req.body?.brandId || '').trim().slice(0, 100);
+      if (!brandId) return res.status(400).json({ error: 'Enter the Metricool brand ID.' });
+      const row = await readIntegration(user.accessToken, siteKey);
+      const saved = await writeIntegration(user.accessToken, siteKey, {
+        provider: 'metricool',
+        connected: Boolean(row?.connected),
+        account_label: row?.account_label || site.label,
+        external_user_id: row?.external_user_id || '',
+        external_brand_id: brandId,
+        credentials: row?.credentials || {},
+        secret_ciphertext: row?.secret_ciphertext || '',
+        secret_iv: row?.secret_iv || '',
+        secret_tag: row?.secret_tag || '',
+        metadata: { ...(row?.metadata || {}), timezone: 'America/Toronto' },
+        connected_at: row?.connected_at || null,
+        updated_at: new Date().toISOString(),
+      });
+      return res.status(200).json({ integration: publicIntegration(saved, siteKey) });
+    }
+
     if (action === 'metricool-disconnect') {
       const row = await readIntegration(user.accessToken, siteKey);
       const saved = await writeIntegration(user.accessToken, siteKey, {
