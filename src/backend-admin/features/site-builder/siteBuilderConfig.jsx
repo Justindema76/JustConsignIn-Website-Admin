@@ -1554,13 +1554,28 @@ export const siteBuilderConfig = {
     },
 
     SunwingsContactBlock: {
-      label: 'Contact + Quote Panel',
+      label: 'Contact Form + Details',
       fields: {
-        callTitle:{type:'text',label:'Call title'},emailTitle:{type:'text',label:'Email title'},hours:{type:'textarea',label:'Hours'},areaTitle:{type:'text',label:'Area title'},areaText:{type:'textarea',label:'Area text'},
+        formTitle:{type:'text',label:'Form heading'},
+        formText:{type:'textarea',label:'Form description'},
+        callTitle:{type:'text',label:'Call title'},
+        hoursTitle:{type:'text',label:'Hours title'},
+        hours:{type:'textarea',label:'Hours'},
+        areaTitle:{type:'text',label:'Area title'},
+        areaText:{type:'textarea',label:'Area text'},
         background:{type:'select',label:'Section background',options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}]},
       },
-      defaultProps:{callTitle:'Call or text',emailTitle:'Email',hours:'',areaTitle:'Service area',areaText:'Toronto, the GTA, Halton, Hamilton & Niagara',background:'white'},
-      render:p=><section style={{display:'grid',gridTemplateColumns:'1.2fr .8fr',gap:18,padding:28,background:p.background==='soft'?'#F6F8FB':'#fff'}}><div style={{padding:22,border:'1px solid #E3E9F2',borderRadius:14}}>Quote form</div><div style={{display:'grid',gap:10}}><div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.callTitle}</b></div><div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.emailTitle}</b></div><div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.areaTitle}</b><p>{p.areaText}</p></div></div></section>,
+      defaultProps:{
+        formTitle:'Contact Sunwings',
+        formText:'Send us a message and we’ll get back to you.',
+        callTitle:'Call or text',
+        hoursTitle:'Hours',
+        hours:'',
+        areaTitle:'Service area',
+        areaText:'Toronto, the GTA, Halton, Hamilton & Niagara',
+        background:'white',
+      },
+      render:p=><section style={{display:'grid',gridTemplateColumns:'1.2fr .8fr',gap:18,padding:28,background:p.background==='soft'?'#F6F8FB':'#fff'}}><div style={{padding:22,border:'1px solid #E3E9F2',borderRadius:14}}><b style={{fontSize:20}}>{p.formTitle}</b><p style={{color:'#5B6B82'}}>{p.formText}</p><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:16}}>{['Name','Phone'].map(item=><div key={item} style={{height:42,border:'1px solid #D5DEEA',borderRadius:9,padding:'10px 12px',color:'#94a3b8'}}>{item}</div>)}</div><div style={{height:42,border:'1px solid #D5DEEA',borderRadius:9,padding:'10px 12px',color:'#94a3b8',marginTop:10}}>Service</div><div style={{height:100,border:'1px solid #D5DEEA',borderRadius:9,padding:'10px 12px',color:'#94a3b8',marginTop:10}}>Message</div></div><div style={{display:'grid',gap:10}}><div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.callTitle}</b></div>{p.hours?<div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.hoursTitle||'Hours'}</b><p>{p.hours}</p></div>:null}<div style={{padding:16,border:'1px solid #E3E9F2',borderRadius:12}}><b>{p.areaTitle}</b><p>{p.areaText}</p></div></div></section>,
     },
 
     SunwingsQuoteFormBlock: {
