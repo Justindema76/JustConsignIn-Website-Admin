@@ -98,27 +98,30 @@ function publicMediaUrl(bucket, name) {
   return `${supabaseUrl()}/storage/v1/object/public/${bucket}/${String(name || '').split('/').map(encodeURIComponent).join('/')}`;
 }
 
-async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset = false }) {
+async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset = false }, prefix = '') {
   const response = await supabaseUserStorage(accessToken, `object/list/${bucket}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prefix: '', limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
+    body: JSON.stringify({ prefix, limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data?.message || data?.error || `Unable to load ${mediaType} media`);
   return (Array.isArray(data) ? data : [])
     .filter(item => item?.name && item.name !== '.emptyFolderPlaceholder')
-    .map(item => ({
+    .map(item => {
+      const path = prefix ? `${prefix.replace(/\/$/, '')}/${item.name}` : item.name;
+      return {
       name: item.name,
-      path: item.name,
+      path,
       bucket,
       mediaType,
-      url: publicMediaUrl(bucket, item.name),
+      url: publicMediaUrl(bucket, path),
       createdAt: item.created_at || item.updated_at || '',
       updatedAt: item.updated_at || '',
       metadata: item.metadata || {},
       protectedAsset,
-    }));
+    };
+    });
 }
 
 export default async function handler(req, res) {
@@ -383,8 +386,13 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET' && resource === 'media') {
-      const groups = await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config)));
-      const media = groups.flat().sort((a, b) => {
+      const siteGroups = await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config, siteKey)));
+      const legacyGroups = siteKey === 'sunwings'
+        ? []
+        : await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config)));
+      const byKey = new Map();
+      [...siteGroups, ...legacyGroups].flat().forEach(item => byKey.set(`${item.bucket}:${item.path}`, item));
+      const media = [...byKey.values()].sort((a, b) => {
         const left = new Date(a.createdAt || 0).getTime() || 0;
         const right = new Date(b.createdAt || 0).getTime() || 0;
         return right - left;
