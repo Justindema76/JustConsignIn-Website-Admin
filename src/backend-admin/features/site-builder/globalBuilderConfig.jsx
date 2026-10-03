@@ -41,6 +41,22 @@ export const justinHeaderDefaults = {
   background: 'white',
 }
 
+
+export const sunwingsHeaderDefaults = {
+  logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
+  brand: 'Sunwings Transport',
+  nav1Label: 'Services', nav1Url: '/services',
+  nav2Label: 'Service Areas', nav2Url: '/locations',
+  nav3Label: 'Pricing', nav3Url: '/pricing',
+  nav4Label: 'Moving Tips', nav4Url: '/blog',
+  nav5Label: 'Contact', nav5Url: '/contact',
+  nav6Label: '', nav6Url: '',
+  nav7Label: '', nav7Url: '',
+  buttonText: 'Free Quote',
+  buttonUrl: '/contact',
+  background: 'white',
+};
+
 export const footerDefaults = {
   logo: 'https://www.justconsignin.com/images/brand/justconsigin-logo.png',
   brand: 'JustConsignIn',
@@ -92,6 +108,28 @@ export const justinFooterDefaults = {
   socialIconBorder: 'rgba(255,255,255,.18)',
   socialIconHoverColor: '#ffffff',
   socialIconHoverBackground: 'var(--site-primary,#2F6BFF)',
+  background: 'dark',
+};
+
+export const sunwingsFooterDefaults = {
+  logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
+  brand: 'Sunwings Transport',
+  tagline: 'Reliable • On-Time • Professional. Moving, delivery and commercial transport from Toronto to Niagara.',
+  column1Title: 'Services',
+  link1Label: 'Residential Moving', link1Url: '/services/residential-moving',
+  link2Label: 'Furniture Delivery', link2Url: '/services/furniture-delivery',
+  link3Label: 'Commercial Transport', link3Url: '/services/commercial-transport',
+  link4Label: 'All Services', link4Url: '/services',
+  column2Title: 'Service Areas',
+  link5Label: 'Toronto', link5Url: '/locations/toronto',
+  link6Label: 'Hamilton', link6Url: '/locations/hamilton',
+  link7Label: 'Niagara Falls', link7Url: '/locations/niagara-falls',
+  link8Label: 'All Areas', link8Url: '/locations',
+  socialTitle: 'Sunwings Transport',
+  socialText: 'Moving, delivery and transport across Toronto, GTA, Hamilton and Niagara.',
+  copyright: 'Sunwings Transport. All rights reserved.',
+  privacyLabel: 'Privacy', privacyUrl: '/privacy',
+  termsLabel: '', termsUrl: '',
   background: 'dark',
 };
 
@@ -151,8 +189,9 @@ const cssColorField = label => ({
 
 export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {}) {
   const isJustin = siteKey === 'justindematteis';
-  const activeHeaderDefaults = isJustin ? justinHeaderDefaults : headerDefaults;
-  const activeFooterDefaults = isJustin ? justinFooterDefaults : footerDefaults;
+  const isSunwings = siteKey === 'sunwings';
+  const activeHeaderDefaults = isJustin ? justinHeaderDefaults : isSunwings ? sunwingsHeaderDefaults : headerDefaults;
+  const activeFooterDefaults = isJustin ? justinFooterDefaults : isSunwings ? sunwingsFooterDefaults : footerDefaults;
   const socialOrder = ['linkedin','github','instagram','facebook','youtube','tiktok'];
   const activeSocial = socialOrder
     .map(key => SOCIAL_NETWORKS.find(network => network.key === key))
@@ -355,6 +394,7 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
 
 export function defaultGlobalData(type, siteKey = 'justconsignin') {
   const isJustin = siteKey === 'justindematteis';
+  const isSunwings = siteKey === 'sunwings';
   if (type === 'project-request') {
     return {
       content: [{ type: 'ProjectRequestBlock', props: { id: 'project-request', ...justinProjectRequestDefaults } }],
@@ -362,8 +402,8 @@ export function defaultGlobalData(type, siteKey = 'justconsignin') {
     };
   }
   const defaults = type === 'header'
-    ? (isJustin ? justinHeaderDefaults : headerDefaults)
-    : (isJustin ? justinFooterDefaults : footerDefaults);
+    ? (isJustin ? justinHeaderDefaults : isSunwings ? sunwingsHeaderDefaults : headerDefaults)
+    : (isJustin ? justinFooterDefaults : isSunwings ? sunwingsFooterDefaults : footerDefaults);
   return {
     content: [{ type: type === 'header' ? 'HeaderBlock' : 'FooterBlock', props: { id: `global-${type}`, ...defaults } }],
     root: { props: {} },
