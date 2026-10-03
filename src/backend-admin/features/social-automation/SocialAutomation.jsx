@@ -289,7 +289,7 @@ export default function SocialAutomation() {
       </div>
     </div>
 
-    <CampaignList campaigns={campaigns} loading={loading} busy={busy} onDelete={removeCampaign}/>
+    <CampaignList campaigns={campaigns} loading={loading} busy={busy} onDelete={removeCampaign} basePath={socialBasePath}/>
   </>;
 
   const previewText = activePreview === 'instagram'
