@@ -2,7 +2,7 @@ import { requireWebsiteOwner } from '../../_lib/websiteAdmin.js';
 import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
-const FIELDS = 'site_key,id,name,phone,email,service,move_from,move_to,message,status,created_at,updated_at';
+const FIELDS = 'site_key,id,name,phone,email,service,move_from,move_to,preferred_date,move_size,message,status,email_notified_at,email_notification_error,created_at,updated_at';
 
 export default async function handler(req, res) {
   if (!['GET','POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
