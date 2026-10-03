@@ -21,6 +21,21 @@ const SITE_PROFILES = {
       ['all', 'All website notifications'],
     ],
   },
+  sunwings: {
+    label: 'Sunwings Transport',
+    smtpHost: '',
+    smtpUsername: 'dispatch@sunwingstransport.ca',
+    fromEmail: 'dispatch@sunwingstransport.ca',
+    fromName: 'Sunwings Transport',
+    primaryEvent: 'quote_request',
+    primaryEventLabel: 'Quote Requests',
+    routeId: 'quote-primary',
+    events: [
+      ['quote_request', 'Quote Requests'],
+      ['contact', 'Contact Form'],
+      ['all', 'All website notifications'],
+    ],
+  },
   justindematteis: {
     label: 'Justin DeMatteis',
     smtpHost: 'sh-cp11.yyz2.servername.online',
