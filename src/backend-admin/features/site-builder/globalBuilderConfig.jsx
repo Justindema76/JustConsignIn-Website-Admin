@@ -374,15 +374,15 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
               <div><a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a><p>{p.tagline}</p></div>
               <div className="global-footer-links"><strong>{p.column1Title}</strong>{col1.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
               <div className="global-footer-links"><strong>{p.column2Title}</strong>{col2.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}</div>
-              <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p>{isJustin
-                ? (activeSocial.length > 0 ? <div className="global-social-preview" style={{
+              <div><strong>{p.socialTitle}</strong><p>{p.socialText}</p>{activeSocial.length > 0
+                ? <div className="global-social-preview" style={isJustin ? {
                     '--preview-social-color':p.socialIconColor,
                     '--preview-social-background':p.socialIconBackground,
                     '--preview-social-border':p.socialIconBorder,
                     '--preview-social-hover-color':p.socialIconHoverColor,
                     '--preview-social-hover-background':p.socialIconHoverBackground,
-                  }}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div> : <div className="global-social-placeholder">No enabled social links</div>)
-                : <div className="global-social-placeholder">Social icons use your Social Links settings</div>}</div>
+                  } : undefined}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div>
+                : <div className="global-social-placeholder">No enabled social links</div>}</div>
             </div>
             <div className="global-footer-bottom"><span>© {new Date().getFullYear()} {p.copyright}</span><span><a href={p.privacyUrl} onClick={previewClick}>{p.privacyLabel}</a><a href={p.termsUrl} onClick={previewClick}>{p.termsLabel}</a></span></div>
           </footer>;
