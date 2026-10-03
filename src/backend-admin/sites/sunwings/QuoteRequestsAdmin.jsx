@@ -234,7 +234,7 @@ export default function QuoteRequestsAdmin() {
               <strong>{request.name}</strong>
               <small>{request.email || request.phone}</small>
             </span>
-            <span className="service-request-service">{request.service || 'Not specified'}</span>
+            <span className="service-request-service">{request.request_type === 'contact' ? 'Contact' : (request.service || 'Not specified')}</span>
             <span className="service-request-department unassigned">{routeSummary(request)}</span>
             <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
             <span><span className={`service-request-priority ${request.priority || 'normal'}`}>{request.priority || 'normal'}</span></span>
@@ -250,7 +250,7 @@ export default function QuoteRequestsAdmin() {
       <aside className="service-request-drawer" role="dialog" aria-modal="true" aria-label={`Quote request from ${selected.name}`}>
         <header className="service-request-drawer-head">
           <div>
-            <p className="site-admin-eyebrow">{selected.service || 'Quote Request'}</p>
+            <p className="site-admin-eyebrow">{selected.request_type === 'contact' ? 'Contact Request' : (selected.service || 'Quote Request')}</p>
             <div className="service-request-drawer-title">
               <h2>{selected.name}</h2>
               <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
