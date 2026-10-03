@@ -237,10 +237,10 @@ export default function QuoteRequestsAdmin() {
     </div>
 
     {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading quote requests…</p></div> :
-      requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>No quote requests yet</h2><p>Website quote submissions will appear here.</p></div> :
+      requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>No requests yet</h2><p>Full Quote, Quick Quote and Contact submissions will all appear here.</p></div> :
       <section className="site-admin-card service-request-queue" aria-label="Quote request queue">
         <div className="service-request-queue-head">
-          <span>Customer</span><span>Service</span><span>Route</span><span>Status</span><span>Priority</span><span>Received</span><span aria-hidden="true"></span>
+          <span>Customer</span><span>Form / Service</span><span>Route</span><span>Status</span><span>Priority</span><span>Received</span><span aria-hidden="true"></span>
         </div>
         {filtered.length === 0 ? <div className="site-admin-empty service-request-empty">No requests match these filters.</div> :
           filtered.map(request => <button key={request.id} type="button" className="service-request-queue-row" onClick={() => setSelectedId(request.id)}>
