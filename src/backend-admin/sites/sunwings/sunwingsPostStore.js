@@ -53,6 +53,8 @@ export function createEmptyLocationPost() {
     bodyHtml: '',
     neighbourhoods: [],
     serviceSlugs: [],
+    localNotes: [],
+    recentJob: '',
     faq: [],
     ctaTitle: '',
     ctaText: '',
@@ -107,6 +109,8 @@ export function normalizeLocationPost(row = {}) {
     region: row.region || '',
     neighbourhoods: Array.isArray(row.neighbourhoods) ? row.neighbourhoods : [],
     serviceSlugs: Array.isArray(row.service_slugs ?? row.serviceSlugs) ? (row.service_slugs ?? row.serviceSlugs) : [],
+    localNotes: Array.isArray(row.local_notes ?? row.localNotes) ? (row.local_notes ?? row.localNotes) : [],
+    recentJob: row.recent_job ?? row.recentJob ?? '',
     faq: Array.isArray(row.faq) ? row.faq : [],
   };
 }
