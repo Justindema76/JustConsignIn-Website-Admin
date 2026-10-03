@@ -6,8 +6,13 @@ import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminServi
 import '../../features/work-posts/workPosts.css';
 
 const EMPTY = {
+  site_name: 'Sunwings Transport',
   phone: '647-526-5132',
   email: 'dispatch@sunwingstransport.ca',
+  seo_title: 'Sunwings Transport | Moving, Delivery & Commercial Transport',
+  seo_description: 'Residential moving, furniture delivery, commercial transport, warehouse support and general labour across Toronto, the GTA, Hamilton and Niagara.',
+  seo_image: '',
+  google_site_verification: '',
   hero_title: '',
   hero_description: '',
   hero_image: '',
@@ -82,6 +87,7 @@ export default function SunwingsSettingsAdmin() {
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head"><div><span>1</span><div><h2>Contact</h2><p>Contact details used by the Sunwings site.</p></div></div></div>
           <div className="site-admin-form work-post-fields">
+            <label>Business name<input value={settings.site_name} onChange={event => update('site_name', event.target.value)}/></label>
             <label>Phone<input value={settings.phone} onChange={event => update('phone', event.target.value)}/></label>
             <label>Email<input type="email" value={settings.email} onChange={event => update('email', event.target.value)}/></label>
           </div>
@@ -89,7 +95,17 @@ export default function SunwingsSettingsAdmin() {
 
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head">
-            <div><span>2</span><div><h2>Homepage Banner</h2><p>Same full-width banner style used across the new Sunwings frontend.</p></div></div>
+            <div><span>2</span><div><h2>Global SEO</h2><p>Default search and social metadata for the main Sunwings website.</p></div></div>
+          </div>
+          <label>SEO title<input value={settings.seo_title} onChange={event => update('seo_title', event.target.value)}/></label>
+          <label>Meta description<textarea rows="5" value={settings.seo_description} onChange={event => update('seo_description', event.target.value)}/></label>
+          <label>Social / OG image URL<input value={settings.seo_image} onChange={event => update('seo_image', event.target.value)}/></label>
+          <label>Google site verification<input value={settings.google_site_verification} onChange={event => update('google_site_verification', event.target.value)} placeholder="Paste verification token only"/></label>
+        </div>
+
+        <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head">
+            <div><span>3</span><div><h2>Homepage Banner</h2><p>Same full-width banner style used across the new Sunwings frontend.</p></div></div>
             <button className="site-admin-btn secondary small" type="button" onClick={() => imageRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Image'}</button>
           </div>
           <input ref={imageRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadHero}/>
