@@ -3,8 +3,13 @@ import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const ALLOWED_KEYS = new Set([
+  'site_name',
   'phone',
   'email',
+  'seo_title',
+  'seo_description',
+  'seo_image',
+  'google_site_verification',
   'hero_title',
   'hero_description',
   'hero_image',
