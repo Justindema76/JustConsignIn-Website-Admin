@@ -27,6 +27,12 @@ function statusLabel(value) {
   return STATUS_OPTIONS.find(([key]) => key === value)?.[1] || value || 'New';
 }
 
+function requestTypeLabel(value) {
+  if (value === 'quick_quote') return 'Quick Quote';
+  if (value === 'contact') return 'Contact';
+  return 'Full Quote';
+}
+
 function formatDate(value) {
   if (!value) return '—';
   const date = new Date(value);
@@ -65,6 +71,7 @@ export default function QuoteRequestsAdmin() {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
   const [serviceFilter, setServiceFilter] = useState('all');
+  const [requestTypeFilter, setRequestTypeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -130,6 +137,7 @@ export default function QuoteRequestsAdmin() {
       if (statusFilter === 'active' && ['complete','declined','cancelled'].includes(request.status)) return false;
       if (statusFilter !== 'active' && statusFilter !== 'all' && request.status !== statusFilter) return false;
       if (serviceFilter !== 'all' && request.service !== serviceFilter) return false;
+      if (requestTypeFilter !== 'all' && (request.request_type || 'quote') !== requestTypeFilter) return false;
       if (!needle) return true;
       return [
         request.name, request.email, request.phone, request.service,
@@ -138,7 +146,7 @@ export default function QuoteRequestsAdmin() {
         request.item_list, request.message, request.admin_notes, request.quote_number,
       ].filter(Boolean).join(' ').toLowerCase().includes(needle);
     });
-  }, [requests, query, statusFilter, serviceFilter]);
+  }, [requests, query, statusFilter, serviceFilter, requestTypeFilter]);
 
   const counts = useMemo(() => ({
     new: requests.filter(item => item.status === 'new').length,
@@ -211,6 +219,12 @@ export default function QuoteRequestsAdmin() {
 
     <div className="site-admin-toolbar demo-request-toolbar service-request-toolbar">
       <label className="site-admin-search"><Search size={16}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search customer, route, service or quote" /></label>
+      <select value={requestTypeFilter} onChange={event => setRequestTypeFilter(event.target.value)} aria-label="Filter by form type">
+        <option value="all">All forms</option>
+        <option value="quote">Full Quote</option>
+        <option value="quick_quote">Quick Quote</option>
+        <option value="contact">Contact</option>
+      </select>
       <select value={serviceFilter} onChange={event => setServiceFilter(event.target.value)} aria-label="Filter by service">
         <option value="all">All services</option>
         {services.map(service => <option value={service} key={service}>{service}</option>)}
@@ -234,7 +248,10 @@ export default function QuoteRequestsAdmin() {
               <strong>{request.name}</strong>
               <small>{request.email || request.phone}</small>
             </span>
-            <span className="service-request-service">{request.request_type === 'contact' ? 'Contact' : (request.service || 'Not specified')}</span>
+            <span className="service-request-service">
+              <strong>{requestTypeLabel(request.request_type)}</strong>
+              <small>{request.request_type === 'contact' ? 'General Contact' : (request.service || 'Not specified')}</small>
+            </span>
             <span className="service-request-department unassigned">{routeSummary(request)}</span>
             <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
             <span><span className={`service-request-priority ${request.priority || 'normal'}`}>{request.priority || 'normal'}</span></span>
@@ -250,7 +267,7 @@ export default function QuoteRequestsAdmin() {
       <aside className="service-request-drawer" role="dialog" aria-modal="true" aria-label={`Quote request from ${selected.name}`}>
         <header className="service-request-drawer-head">
           <div>
-            <p className="site-admin-eyebrow">{selected.request_type === 'contact' ? 'Contact Request' : (selected.service || 'Quote Request')}</p>
+            <p className="site-admin-eyebrow">{requestTypeLabel(selected.request_type)}{selected.request_type === 'contact' ? '' : selected.service ? ` · ${selected.service}` : ''}</p>
             <div className="service-request-drawer-title">
               <h2>{selected.name}</h2>
               <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
