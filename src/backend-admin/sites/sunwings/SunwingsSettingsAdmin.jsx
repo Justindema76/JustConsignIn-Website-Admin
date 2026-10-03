@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Save, Upload } from 'lucide-react';
+import { CheckCircle2, Globe2, Mail, Save, Settings as SettingsIcon, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { uploadSunwingsImage } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
+import EmailSettingsForm from '../../features/settings/email/EmailSettingsForm';
+import '../../features/settings/settings.css';
 import '../../features/work-posts/workPosts.css';
 
 const EMPTY = {
@@ -23,6 +25,7 @@ const EMPTY = {
 export default function SunwingsSettingsAdmin() {
   const { accessToken } = useAuth();
   const imageRef = useRef(null);
+  const [tab, setTab] = useState('website');
   const [settings, setSettings] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -72,17 +75,28 @@ export default function SunwingsSettingsAdmin() {
   return <>
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Sunwings Transport</p>
-        <h1>Website Settings</h1>
-        <p>These settings belong only to the Sunwings frontend.</p>
+        <p className="site-admin-eyebrow">Configuration</p>
+        <h1>Settings</h1>
+        <p>Sunwings website configuration and email delivery. These settings stay separate from every other website.</p>
       </div>
-      <button className="site-admin-btn" type="button" onClick={save} disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save Settings'}</button>
+      <span className="settings-page-icon" aria-hidden="true"><SettingsIcon size={22}/></span>
     </div>
 
-    {error && <div className="site-admin-alert error">{error}</div>}
-    {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
+    <div className="settings-tabs" role="tablist" aria-label="Sunwings settings">
+      <button className={`settings-tab ${tab === 'website' ? 'active' : ''}`} type="button" role="tab" aria-selected={tab === 'website'} onClick={() => setTab('website')}><Globe2 size={16}/> Website</button>
+      <button className={`settings-tab ${tab === 'email' ? 'active' : ''}`} type="button" role="tab" aria-selected={tab === 'email'} onClick={() => setTab('email')}><Mail size={16}/> Email</button>
+    </div>
 
-    <form className="work-post-editor-grid" onSubmit={save}>
+    {tab === 'email' ? <EmailSettingsForm /> : <>
+      {error && <div className="site-admin-alert error">{error}</div>}
+      {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
+
+      <div className="site-admin-page-head settings-subhead">
+        <div><p className="site-admin-eyebrow">Sunwings Transport</p><h2>Website settings</h2><p>Business contact details, SEO defaults and homepage settings for Sunwings only.</p></div>
+        <button className="site-admin-btn" type="button" onClick={save} disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save Website Settings'}</button>
+      </div>
+
+      <form className="work-post-editor-grid" onSubmit={save}>
       <section className="work-post-editor-main">
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head"><div><span>1</span><div><h2>Contact</h2><p>Contact details used by the Sunwings site.</p></div></div></div>
@@ -127,6 +141,7 @@ export default function SunwingsSettingsAdmin() {
           <button className="site-admin-btn work-post-side-save" type="button" onClick={save} disabled={busy}><Save size={14}/> {busy ? 'Saving…' : 'Save Settings'}</button>
         </div>
       </aside>
-    </form>
+      </form>
+    </>}
   </>;
 }
