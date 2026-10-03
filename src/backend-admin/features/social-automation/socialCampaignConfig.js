@@ -48,8 +48,30 @@ export function torontoIso(local) {
   return Number.isNaN(probe.getTime()) ? '' : probe.toISOString();
 }
 
-export function starterCopy(title) {
-  const topic = title || 'Manage consignment inventory with Shopify';
+export function starterCopy(title, siteKey = 'justconsignin', siteName = '') {
+  const topic = title || (siteKey === 'sunwings' ? 'Reliable moving and delivery service' : siteKey === 'justindematteis' ? 'Web development and digital solutions' : 'Manage consignment inventory with Shopify');
+  const brand = siteName || (siteKey === 'sunwings' ? 'Sunwings Transport' : siteKey === 'justindematteis' ? 'Justin DeMatteis' : 'JustConsignIn');
+
+  if (siteKey === 'sunwings') {
+    return {
+      instagram: `${topic} with ${brand}.\n\nMoving, delivery and commercial transport support when you need it. Contact us for a quote.\n\n#Moving #Delivery #TorontoMovers #HamiltonMovers #SunwingsTransport`,
+      facebook: `${topic} with ${brand}.\n\nNeed moving, delivery or commercial transport help? Send us the details and request a quote.`,
+      tiktok: `${topic}. Moving and delivery with ${brand}. Request a quote at sunwingstransport.ca. #Moving #Delivery #SunwingsTransport`,
+      youtubeTitle: `${topic} | ${brand}`,
+      youtubeDescription: `${topic} with ${brand}.\n\nMoving, delivery and commercial transport services.\n\nLearn more: https://sunwingstransport.ca`,
+    };
+  }
+
+  if (siteKey === 'justindematteis') {
+    return {
+      instagram: `${topic}.\n\nWeb development, ecommerce, SEO and automation work by ${brand}.\n\n#WebDevelopment #SEO #Ecommerce #Automation`,
+      facebook: `${topic}.\n\nWeb development, ecommerce, SEO and automation solutions by ${brand}.`,
+      tiktok: `${topic}. Web development and digital solutions by ${brand}. #WebDevelopment #Automation`,
+      youtubeTitle: `${topic} | ${brand}`,
+      youtubeDescription: `${topic}.\n\nWeb development and digital technology work by ${brand}.\n\nhttps://www.justindematteis.com`,
+    };
+  }
+
   return {
     instagram: `${topic} with JustConsignIn.\n\nKeep consignors, inventory, Shopify products, POS sales and payouts connected in one workflow — without duplicate entry or spreadsheets.\n\nSee the live demo and start a 14-day free trial at justconsignin.com\n\n#Shopify #ShopifyPOS #Consignment #ConsignmentSoftware #RetailTech`,
     facebook: `${topic} with JustConsignIn.\n\nManage consignors, inventory, Shopify products, POS sales and payouts in one connected workflow. No duplicate entry. No spreadsheet juggling.\n\nSee the live demo and start a 14-day free trial at justconsignin.com`,
