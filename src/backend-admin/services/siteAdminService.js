@@ -50,7 +50,7 @@ function publicMediaUrl(bucket, name) {
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${encoded}`;
 }
 
-async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxBytes, invalidTypeMessage }) {
+async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxBytes, invalidTypeMessage, prefix = '' }) {
   if (!accessToken && !currentAccessToken()) throw new Error('Your admin session expired. Sign in again.');
   if (!file) throw new Error('Choose a file first.');
   const type = String(file.type || '').toLowerCase();
@@ -58,7 +58,8 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
   if (!file.size) throw new Error('The selected file is empty.');
   if (file.size > maxBytes) throw new Error(`File must be ${Math.round(maxBytes / 1024 / 1024)} MB or smaller.`);
 
-  const objectName = `${Date.now()}-${safeFilename(file.name)}`;
+  const baseName = `${Date.now()}-${safeFilename(file.name)}`;
+  const objectName = prefix ? `${String(prefix).replace(/^\/+|\/+$/g, '')}/${baseName}` : baseName;
   const encodedName = objectName.split('/').map(encodeURIComponent).join('/');
   const upload = token => fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${encodedName}`, {
     method: 'POST',
@@ -192,6 +193,16 @@ export async function uploadSiteImage(accessToken, file) {
     allowedTypes: ALLOWED_IMAGE_TYPES,
     maxBytes: MAX_IMAGE_BYTES,
     invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+  });
+}
+
+export async function uploadSunwingsImage(accessToken, file) {
+  return uploadPublicAsset(accessToken, file, {
+    bucket: SITE_ASSET_BUCKET,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+    maxBytes: MAX_IMAGE_BYTES,
+    invalidTypeMessage: 'Use a JPG, PNG, WebP, or GIF image.',
+    prefix: 'sunwings',
   });
 }
 
