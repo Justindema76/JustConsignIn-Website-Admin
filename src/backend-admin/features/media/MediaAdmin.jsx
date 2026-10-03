@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Check, Copy, ExternalLink, Image, Music2, Trash2, Upload, Video, WandSparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { deleteAdminMedia, loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
+import { deleteAdminMedia, getAdminSiteKey, loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
 
 export default function MediaAdmin() {
   const { accessToken } = useAuth();
+  const siteKey = getAdminSiteKey();
+  const isSunwings = siteKey === 'sunwings';
   const [items, setItems] = useState([]);
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(false);
@@ -85,8 +87,8 @@ export default function MediaAdmin() {
 
   return <>
     <div className="site-admin-page-head">
-      <div><p className="site-admin-eyebrow">Assets</p><h1>Media</h1><p>Shared Supabase media for blog articles and social campaigns. Store images, MP4 videos and music in one reusable library.</p></div>
-      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to="/admin/social-image"><WandSparkles size={15}/> Image Studio</Link><label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Media'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,.mp4,audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" multiple onChange={upload} disabled={uploading}/></label></div>
+      <div><p className="site-admin-eyebrow">Assets</p><h1>Media</h1><p>{isSunwings ? 'Reusable images and website assets for Sunwings pages, Service Posts, Location Posts and Moving Tips.' : 'Shared Supabase media for blog articles and social campaigns. Store images, MP4 videos and music in one reusable library.'}</p></div>
+      <div className="site-admin-actions">{!isSunwings && <Link className="site-admin-btn secondary" to="/admin/social-image"><WandSparkles size={15}/> Image Studio</Link>}<label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Media'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,.mp4,audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" multiple onChange={upload} disabled={uploading}/></label></div>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     <div className="site-admin-toolbar"><label className="site-admin-search"><input value={q} onChange={event => setQ(event.target.value)} placeholder="Search images, videos or music"/></label></div>
