@@ -1,9 +1,11 @@
 import { adminFetch, parseJsonResponse } from './apiClient';
+import { getAdminSiteKey } from './siteAdminService';
 
 const parseResponse = response => parseJsonResponse(response, 'Social AI request failed');
+const socialAiUrl = () => `/api/admin/social-ai?site=${encodeURIComponent(getAdminSiteKey())}`;
 
 export async function getSocialAiStatus(accessToken) {
-  return parseResponse(await adminFetch('/api/admin/social-ai', {}, accessToken));
+  return parseResponse(await adminFetch(socialAiUrl(), {}, accessToken));
 }
 
 function waitFor(target, event, errorEvent = 'error') {
@@ -65,7 +67,7 @@ export async function analyzeSocialMedia(accessToken, { mediaUrl, mediaType = 'i
   if (!platforms.length) throw new Error('Choose at least one social network to push to.');
   const frames = mediaType === 'video' ? await videoFrames(mediaUrl, 4) : [];
 
-  return parseResponse(await adminFetch('/api/admin/social-ai', {
+  return parseResponse(await adminFetch(socialAiUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'analyze', mediaUrl, mediaType, platforms, youtubeFormat, direction, frames }),
