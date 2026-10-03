@@ -45,6 +45,8 @@ export const justinHeaderDefaults = {
 export const sunwingsHeaderDefaults = {
   logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
   brand: 'Sunwings Transport',
+  topbarEmphasis: 'Reliable • On-Time • Professional',
+  topbarText: 'Moving & delivery from Toronto to Niagara',
   nav1Label: 'Services', nav1Url: '/services',
   nav2Label: 'Service Areas', nav2Url: '/locations',
   nav3Label: 'Pricing', nav3Url: '/pricing',
@@ -114,6 +116,10 @@ export const justinFooterDefaults = {
 export const sunwingsFooterDefaults = {
   logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
   brand: 'Sunwings Transport',
+  ctaTitle: 'Ready when you are.',
+  ctaPrimaryText: 'Get a Free Quote',
+  ctaPrimaryUrl: '/contact',
+  ctaSecondaryText: 'Call',
   tagline: 'Reliable • On-Time • Professional. Moving, delivery and commercial transport from Toronto to Niagara.',
   column1Title: 'Services',
   link1Label: 'Residential Moving', link1Url: '/services/residential-moving',
@@ -277,6 +283,10 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
           label: 'Website Header',
           fields: {
             logo: { ...imageField, label: 'Logo' },
+            ...(isSunwings ? {
+              topbarEmphasis: { type: 'text', label: 'Top bar emphasis' },
+              topbarText: { type: 'text', label: 'Top bar text' },
+            } : {}),
             ...(isJustin ? {
               brandFirst: { type: 'text', label: 'Brand first part' },
               brandFirstColor: { type: 'text', label: 'Brand first colour' },
@@ -340,6 +350,12 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
           logo: { ...imageField, label: 'Logo' },
           brand: { type: 'text', label: 'Brand name' },
           tagline: { type: 'text', label: 'Tagline' },
+          ...(isSunwings ? {
+            ctaTitle: { type: 'text', label: 'CTA band heading' },
+            ctaPrimaryText: { type: 'text', label: 'CTA primary button text' },
+            ctaPrimaryUrl: { type: 'text', label: 'CTA primary button URL' },
+            ctaSecondaryText: { type: 'text', label: 'CTA call button text' },
+          } : {}),
           column1Title: { type: 'text', label: 'Column 1 title' },
           link1Label: { type: 'text', label: 'Link 1 label' }, link1Url: { type: 'text', label: 'Link 1 URL' },
           link2Label: { type: 'text', label: 'Link 2 label' }, link2Url: { type: 'text', label: 'Link 2 URL' },
