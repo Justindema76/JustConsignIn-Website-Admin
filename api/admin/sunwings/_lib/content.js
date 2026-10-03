@@ -10,7 +10,7 @@ export const SERVICE_FIELDS = [
 
 export const LOCATION_FIELDS = [
   'site_key','id','slug','title','region','eyebrow','hero_title','hero_description','banner_image','banner_alt',
-  'intro','body_html','neighbourhoods','service_slugs','faq','cta_title','cta_text','seo_title',
+  'intro','body_html','neighbourhoods','service_slugs','local_notes','recent_job','faq','cta_title','cta_text','seo_title',
   'seo_description','og_image','status','sort_order','published_at','created_at','updated_at',
 ].join(',');
 
@@ -71,6 +71,16 @@ export function cleanService(body = {}) {
 }
 
 export function cleanLocation(body = {}) {
+  const localNotes = Array.isArray(body.localNotes ?? body.local_notes)
+    ? (body.localNotes ?? body.local_notes)
+      .map(item => ({
+        icon: text(item?.icon, 80),
+        title: text(item?.title, 300),
+        text: text(item?.text, 2000),
+      }))
+      .filter(item => item.title && item.text)
+    : [];
+
   const faq = Array.isArray(body.faq)
     ? body.faq
       .map(item => ({ question: text(item?.question, 500), answer: text(item?.answer, 3000) }))
@@ -90,6 +100,8 @@ export function cleanLocation(body = {}) {
     body_html: String(body.bodyHtml ?? body.body_html ?? ''),
     neighbourhoods: textArray(body.neighbourhoods),
     service_slugs: textArray(body.serviceSlugs ?? body.service_slugs),
+    local_notes: localNotes,
+    recent_job: text(body.recentJob ?? body.recent_job, 3000),
     faq,
     cta_title: text(body.ctaTitle ?? body.cta_title, 300),
     cta_text: text(body.ctaText ?? body.cta_text, 1000),
