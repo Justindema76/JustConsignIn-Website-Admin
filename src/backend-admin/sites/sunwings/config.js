@@ -31,6 +31,7 @@ export default {
       label: 'Social & Marketing',
       items: [
         { to: '/admin/sunwings/social', label: 'Social Links', icon: 'link' },
+        { to: '/admin/sunwings/social-posts', label: 'Social Posts', icon: 'sparkles' },
       ],
     },
     {
@@ -83,9 +84,10 @@ export default {
       {
         id: 'social',
         title: 'Social & Marketing',
-        copy: 'Manage the social profiles used by Sunwings and shown in the admin and public footer.',
+        copy: 'Manage Sunwings social profiles and create social media content.',
         items: [
           { to: '/admin/sunwings/social', icon: 'link', title: 'Social Links', copy: 'Manage Facebook, Instagram, LinkedIn, YouTube, TikTok and other social profile links.' },
+          { to: '/admin/sunwings/social-posts', icon: 'sparkles', title: 'Social Posts', copy: 'Create, save, schedule and publish social content for Sunwings.' },
         ],
       },
       {
