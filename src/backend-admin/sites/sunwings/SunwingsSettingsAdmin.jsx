@@ -16,6 +16,8 @@ const EMPTY = {
   seo_description: 'Residential moving, furniture delivery, commercial transport, warehouse support and general labour across Toronto, the GTA, Hamilton and Niagara.',
   seo_image: '',
   google_site_verification: '',
+  ga4_measurement_id: '',
+  meta_pixel_id: '',
   hero_title: '',
   hero_description: '',
   hero_image: '',
@@ -117,6 +119,8 @@ export default function SunwingsSettingsAdmin() {
           <label>Meta description<textarea rows="5" value={settings.seo_description} onChange={event => update('seo_description', event.target.value)}/></label>
           <label>Social / OG image URL<input value={settings.seo_image} onChange={event => update('seo_image', event.target.value)}/></label>
           <label>Google site verification<input value={settings.google_site_verification} onChange={event => update('google_site_verification', event.target.value)} placeholder="Paste verification token only"/></label>
+          <label>GA4 Measurement ID<input value={settings.ga4_measurement_id} onChange={event => update('ga4_measurement_id', event.target.value.trim())} placeholder="G-XXXXXXXXXX"/></label>
+          <label>Meta Pixel ID<input value={settings.meta_pixel_id} onChange={event => update('meta_pixel_id', event.target.value.replace(/[^0-9]/g, ''))} placeholder="Optional"/></label>
         </div>
 
         <div className="site-admin-card work-post-panel">
