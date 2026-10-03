@@ -44,7 +44,7 @@ export default {
       id: 'settings',
       label: 'Settings',
       items: [
-        { to: '/admin/sunwings/settings', label: 'Sunwings Settings', icon: 'settings' },
+        { to: '/admin/sunwings/settings', label: 'Website Settings', icon: 'settings' },
       ],
     },
   ],
@@ -101,7 +101,7 @@ export default {
         title: 'Settings',
         copy: 'Sunwings-specific business and website configuration.',
         items: [
-          { to: '/admin/sunwings/settings', icon: 'settings', title: 'Sunwings Settings', copy: 'Manage phone, email, SEO defaults and other Sunwings settings.' },
+          { to: '/admin/sunwings/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage Sunwings website configuration, SMTP and notification routing.' },
         ],
       },
     ],
