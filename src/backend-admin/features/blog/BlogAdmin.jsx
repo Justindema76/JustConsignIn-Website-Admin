@@ -12,7 +12,12 @@ function toTags(value) {
 export default function BlogAdmin() {
   const { user, accessToken } = useAuth();
   const siteKey = getAdminSiteKey();
-  const liveBaseUrl = siteKey === 'justindematteis' ? 'https://www.justindematteis.com' : 'https://www.justconsignin.com';
+  const liveBaseUrl = siteKey === 'justindematteis'
+    ? 'https://www.justindematteis.com'
+    : siteKey === 'sunwings'
+      ? (import.meta.env.VITE_SUNWINGS_PREVIEW_URL || 'https://sunwingstransport.ca')
+      : 'https://www.justconsignin.com';
+  const blogAdminBase = siteKey === 'sunwings' ? '/admin/sunwings/blog' : '/admin/blog';
   const { id } = useParams();
   const navigate = useNavigate();
   const adminEmails = String(import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
@@ -81,7 +86,7 @@ export default function BlogAdmin() {
     if (current) setDraft({ ...current, tags: current.tags || [] });
   }, [editing, id, posts]);
 
-  if (!isAdmin) return <Navigate to="/admin-login" replace state={{ from: '/admin/blog' }} />;
+  if (!isAdmin) return <Navigate to="/admin-login" replace state={{ from: blogAdminBase }} />;
 
   const update = (key, value) => setDraft(current => ({ ...current, [key]: value }));
 
@@ -96,7 +101,7 @@ export default function BlogAdmin() {
         tags: Array.isArray(draft.tags) ? draft.tags : toTags(draft.tags),
       });
       await refresh();
-      navigate('/admin/blog');
+      navigate(blogAdminBase);
     } catch (err) { setError(err.message); }
     finally { setBusy(false); }
   };
@@ -107,7 +112,7 @@ export default function BlogAdmin() {
     try {
       await deleteAdminBlogPost(accessToken, post.id);
       await refresh();
-      if (editing) navigate('/admin/blog');
+      if (editing) navigate(blogAdminBase);
     } catch (err) { setError(err.message); }
     finally { setBusy(false); }
   };
@@ -136,7 +141,7 @@ export default function BlogAdmin() {
   if (editing) return <>
     <div className="site-admin-page-head">
       <div><p className="site-admin-eyebrow">Blog Editor</p><h1>{id === 'new' ? 'New Article' : 'Edit Article'}</h1><p>Save drafts or publish articles without changing the public URL unless you intentionally change the slug.</p></div>
-      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to="/admin/blog">← Blog Posts</Link><button className="site-admin-btn" type="submit" form="blog-editor-form" disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save'}</button></div>
+      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to={blogAdminBase}>← Blog Posts</Link><button className="site-admin-btn" type="submit" form="blog-editor-form" disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save'}</button></div>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success">{message}</div>}
@@ -196,7 +201,7 @@ export default function BlogAdmin() {
   return <>
     <div className="site-admin-page-head">
       <div><p className="site-admin-eyebrow">Content</p><h1>Blog Posts</h1><p>Every article is listed here first. Open one only when you want to edit it.</p></div>
-      <Link className="site-admin-btn" to="/admin/blog/new"><Plus size={15}/> New Article</Link>
+      <Link className="site-admin-btn" to={`${blogAdminBase}/new`}><Plus size={15}/> New Article</Link>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     <div className="site-admin-toolbar"><label className="site-admin-search"><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search articles"/></label><select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select></div>
@@ -207,7 +212,7 @@ export default function BlogAdmin() {
         <div><strong>{post.title || 'Untitled article'}</strong><small>/blog/{post.slug || 'no-slug'}</small></div>
         <span className={`site-admin-status ${post.status}`}>{post.status}</span>
         <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '—'}</span>
-        <div className="site-admin-actions right"><Link className="site-admin-btn secondary small" to={`/admin/blog/${post.id}`}>Edit</Link>{post.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}<button className="site-admin-btn danger small" type="button" onClick={() => remove(post)} disabled={busy}><Trash2 size={13}/></button></div>
+        <div className="site-admin-actions right"><Link className="site-admin-btn secondary small" to={`${blogAdminBase}/${post.id}`}>Edit</Link>{post.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}<button className="site-admin-btn danger small" type="button" onClick={() => remove(post)} disabled={busy}><Trash2 size={13}/></button></div>
       </div>)}
       {!busy && !filtered.length && <div className="site-admin-empty">No articles found.</div>}
     </div>
