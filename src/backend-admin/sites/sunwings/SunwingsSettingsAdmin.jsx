@@ -11,6 +11,7 @@ const EMPTY = {
   site_name: 'Sunwings Transport',
   phone: '647-526-5132',
   email: 'dispatch@sunwingstransport.ca',
+  quote_reply_hours: '',
   seo_title: 'Sunwings Transport | Moving, Delivery & Commercial Transport',
   seo_description: 'Residential moving, furniture delivery, commercial transport, warehouse support and general labour across Toronto, the GTA, Hamilton and Niagara.',
   seo_image: '',
@@ -104,6 +105,7 @@ export default function SunwingsSettingsAdmin() {
             <label>Business name<input value={settings.site_name} onChange={event => update('site_name', event.target.value)}/></label>
             <label>Phone<input value={settings.phone} onChange={event => update('phone', event.target.value)}/></label>
             <label>Email<input type="email" value={settings.email} onChange={event => update('email', event.target.value)}/></label>
+            <label>Quote reply time (hours)<input inputMode="numeric" value={settings.quote_reply_hours} onChange={event => update('quote_reply_hours', event.target.value.replace(/[^0-9]/g, '').slice(0,3))} placeholder="Example: 4"/><small>Used in the quote-form success message. Leave blank to say “as soon as possible.”</small></label>
           </div>
         </div>
 
