@@ -9,6 +9,7 @@ export default {
       id: 'content',
       label: 'Content Management',
       items: [
+        { to: '/admin/sunwings/pages', label: 'Pages', icon: 'panels' },
         { to: '/admin/sunwings/services', label: 'Service Posts', icon: 'truck' },
         { to: '/admin/sunwings/locations', label: 'Location Posts', icon: 'map' },
       ],
@@ -31,6 +32,7 @@ export default {
   dashboard: {
     intro: 'Manage only the content and leads that belong to Sunwings Transport.',
     quick: [
+      { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'See the entire Sunwings page structure' },
       { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Add and edit Sunwings services' },
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
       { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming transport leads' },
@@ -42,6 +44,7 @@ export default {
         title: 'Sunwings Content',
         copy: 'Services and locations are entered as structured posts and rendered by the Sunwings frontend.',
         items: [
+          { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'Review every static, service and location page in one list.' },
           { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Create, edit, draft and publish services.' },
           { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Create, edit, draft and publish locations.' },
         ],
