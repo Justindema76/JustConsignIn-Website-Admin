@@ -6,6 +6,7 @@ const ALLOWED_KEYS = new Set([
   'site_name',
   'phone',
   'email',
+  'quote_reply_hours',
   'seo_title',
   'seo_description',
   'seo_image',
