@@ -62,6 +62,7 @@ declare
   v_item_list text := left(trim(coalesce(p->>'itemList','')),6000);
   v_move_size text := left(trim(coalesce(p->>'moveSize','')),120);
   v_preferred_time text := left(trim(coalesce(p->>'preferredTime','')),80);
+  v_quick boolean := lower(trim(coalesce(p->>'quickRequest','false'))) in ('true','1','yes');
   v_pickup_elevator boolean := case lower(trim(coalesce(p->>'pickupElevator',''))) when 'yes' then true when 'true' then true when 'no' then false when 'false' then false else null end;
   v_pickup_stairs boolean := case lower(trim(coalesce(p->>'pickupStairs',''))) when 'yes' then true when 'true' then true when 'no' then false when 'false' then false else null end;
   v_dropoff_elevator boolean := case lower(trim(coalesce(p->>'dropoffElevator',''))) when 'yes' then true when 'true' then true when 'no' then false when 'false' then false else null end;
@@ -84,10 +85,12 @@ begin
     raise exception 'date_invalid';
   end;
 
-  if v_pickup_address = '' then raise exception 'pickup_address_required'; end if;
-  if v_pickup_postal = '' then raise exception 'pickup_postal_required'; end if;
-  if v_dropoff_address = '' then raise exception 'dropoff_address_required'; end if;
-  if v_dropoff_postal = '' then raise exception 'dropoff_postal_required'; end if;
+  if not v_quick then
+    if v_pickup_address = '' then raise exception 'pickup_address_required'; end if;
+    if v_pickup_postal = '' then raise exception 'pickup_postal_required'; end if;
+    if v_dropoff_address = '' then raise exception 'dropoff_address_required'; end if;
+    if v_dropoff_postal = '' then raise exception 'dropoff_postal_required'; end if;
+  end if;
 
   if v_from = '' then v_from := concat_ws(', ', nullif(v_pickup_address,''), nullif(v_pickup_city,''), nullif(v_pickup_postal,'')); end if;
   if v_to = '' then v_to := concat_ws(', ', nullif(v_dropoff_address,''), nullif(v_dropoff_city,''), nullif(v_dropoff_postal,'')); end if;
@@ -113,7 +116,7 @@ begin
     v_date,v_preferred_time,v_move_size,
     v_pickup_address,v_pickup_city,v_pickup_postal,v_pickup_elevator,v_pickup_stairs,
     v_dropoff_address,v_dropoff_city,v_dropoff_postal,v_dropoff_elevator,v_dropoff_stairs,
-    v_item_list,v_message,v_ip,'Quote request submitted',now()
+    v_item_list,v_message,v_ip,case when v_quick then 'Quick quote request submitted' else 'Quote request submitted' end,now()
   )
   returning sunwings_quote_requests.id,sunwings_quote_requests.notification_token
   into v_id,v_token;
