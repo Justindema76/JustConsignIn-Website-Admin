@@ -47,6 +47,17 @@ export const sunwingsHeaderDefaults = {
   brand: 'Sunwings Transport',
   topbarEmphasis: 'Reliable • On-Time • Professional',
   topbarText: 'Moving & delivery from Toronto to Niagara',
+  topbarEnabled: 'true',
+  logoDesktopWidth: 140,
+  logoMobileWidth: 170,
+  logoDesktopMaxHeight: 100,
+  logoMobileMaxHeight: 90,
+  logoOffsetX: 0,
+  logoOffsetY: 0,
+  headerDesktopHeight: 110,
+  headerMobileHeight: 105,
+  callButtonEnabled: 'true',
+  callButtonText: 'Call Now',
   nav1Label: 'Services', nav1Url: '/services',
   nav2Label: 'Service Areas', nav2Url: '/locations',
   nav3Label: 'Pricing', nav3Url: '/pricing',
@@ -287,6 +298,17 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
             ...(isSunwings ? {
               topbarEmphasis: { type: 'text', label: 'Top bar emphasis' },
               topbarText: { type: 'text', label: 'Top bar text' },
+              topbarEnabled: { type: 'select', label: 'Show top bar', options: [{label:'Yes',value:'true'},{label:'No',value:'false'}] },
+              logoDesktopWidth: { type: 'number', label: 'Logo width — desktop (px)', min: 40, max: 400 },
+              logoMobileWidth: { type: 'number', label: 'Logo width — mobile (px)', min: 40, max: 300 },
+              logoDesktopMaxHeight: { type: 'number', label: 'Logo max height — desktop (px)', min: 40, max: 220 },
+              logoMobileMaxHeight: { type: 'number', label: 'Logo max height — mobile (px)', min: 40, max: 180 },
+              logoOffsetX: { type: 'number', label: 'Logo horizontal position (px)', min: -100, max: 100 },
+              logoOffsetY: { type: 'number', label: 'Logo vertical position (px)', min: -100, max: 100 },
+              headerDesktopHeight: { type: 'number', label: 'Header height — desktop (px)', min: 70, max: 220 },
+              headerMobileHeight: { type: 'number', label: 'Header height — mobile (px)', min: 70, max: 180 },
+              callButtonEnabled: { type: 'select', label: 'Show Call Now button', options: [{label:'Yes',value:'true'},{label:'No',value:'false'}] },
+              callButtonText: { type: 'text', label: 'Call button text' },
             } : {}),
             ...(isJustin ? {
               brandFirst: { type: 'text', label: 'Brand first part' },
@@ -318,13 +340,14 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
           render: raw => {
             const p = { ...activeHeaderDefaults, ...raw };
             const links = Array.from({ length: 7 }, (_, i) => [p[`nav${i + 1}Label`], p[`nav${i + 1}Url`]]).filter(([label]) => label);
-            return <div className={`global-header-preview global-theme-${p.background || 'white'}`}>
-              <a className="global-preview-brand" href="/" onClick={previewClick}>
-                {p.logo ? <img src={p.logo} alt=""/> : null}
+            return <div style={isSunwings ? {background:'#fff'} : undefined}>
+              {isSunwings && String(p.topbarEnabled) !== 'false' && <div style={{background:'#0b2b50',color:'#fff',textAlign:'center',padding:'8px 12px',fontSize:'13px'}}><strong style={{color:'#ff8a00'}}>{p.topbarEmphasis}</strong>{p.topbarText ? <> — {p.topbarText}</> : null}</div>}
+              <div className={`global-header-preview global-theme-${p.background || 'white'}`} style={isSunwings ? {minHeight:`${Number(p.headerDesktopHeight)||110}px`} : undefined}>
+              <a className="global-preview-brand" href="/" onClick={previewClick} style={isSunwings ? {transform:`translate(${Number(p.logoOffsetX)||0}px,${Number(p.logoOffsetY)||0}px)`} : undefined}>
+                {p.logo ? <img src={p.logo} alt="" style={isSunwings ? {width:`${Number(p.logoDesktopWidth)||140}px`,maxHeight:`${Number(p.logoDesktopMaxHeight)||100}px`,height:'auto',objectFit:'contain'} : undefined}/> : null}
                 {isJustin
                   ? <strong><span style={{color:p.brandFirstColor || '#0B1F33'}}>{p.brandFirst || 'Justin'}</span>{' '}<span style={{color:p.brandSecondColor || '#2F6BFF'}}>{p.brandSecond || 'DeMatteis'}</span></strong>
-                  : <strong>{p.brand}</strong>}
-              </a>
+                  : !isSunwings ? <strong>{p.brand}</strong> : null}
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}{['/work','/ai-development'].includes(url) ? ' ▾' : ''}</a>)}</nav>
               {isJustin && activeSocial.length > 0 && <div className="global-social-preview" style={{
                 '--preview-social-color':p.socialIconColor,
@@ -333,9 +356,11 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                 '--preview-social-hover-color':p.socialIconHoverColor,
                 '--preview-social-hover-background':p.socialIconHoverBackground,
               }}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div>}
-              {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
+              {isSunwings
+                ? String(p.callButtonEnabled) !== 'false' && <a className="global-preview-button" href="#" onClick={previewClick}>{p.callButtonText || 'Call Now'}</a>
+                : p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
-            </div>;
+            </div></div>;
           },
         },
       },
