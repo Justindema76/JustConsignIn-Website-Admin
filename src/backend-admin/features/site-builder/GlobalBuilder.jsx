@@ -38,7 +38,12 @@ export default function GlobalBuilder() {
     ])
       .then(([result,social]) => {
         if (!active) return;
-        setData(result.value || fallback);
+        const loaded = result.value || fallback;
+        if (type === 'header' && siteKey === 'sunwings' && loaded?.content?.[0]?.props) {
+          const defaults = fallback?.content?.[0]?.props || {};
+          loaded.content[0] = { ...loaded.content[0], props: { ...defaults, ...loaded.content[0].props } };
+        }
+        setData(loaded);
         setSavedAt(result.updatedAt || '');
         setSocialLinks(social || {});
       })
@@ -78,6 +83,24 @@ export default function GlobalBuilder() {
     <div className="jci-builder-notice"><strong>Global component.</strong> Puck's <strong>Publish</strong> button updates this {sectionLabel.toLowerCase()} everywhere.{savedAt && <span> Last published {new Date(savedAt).toLocaleString()}.</span>}</div>
     {message && <div className="jci-builder-message success"><CheckCircle2 size={17}/><span>{message}</span></div>}
     {error && <div className="jci-builder-message error"><span>{error}</span></div>}
-    <div className="jci-puck-editor"><Puck config={config} data={data} onPublish={publish}/></div>
+    <div className={`jci-puck-editor jci-puck-editor-${type}`}>
+      <Puck
+        config={config}
+        data={data}
+        onPublish={publish}
+        height="calc(100vh - 250px)"
+        ui={{
+          leftSideBarWidth: type === 'header' ? 176 : 210,
+          rightSideBarWidth: type === 'header' ? 300 : 320,
+          viewports: { current: { width: '100%', height: 'auto' } },
+        }}
+        viewports={[
+          { width: 390, height: 'auto', icon: 'Smartphone', label: 'Mobile' },
+          { width: 768, height: 'auto', icon: 'Tablet', label: 'Tablet' },
+          { width: 1280, height: 'auto', icon: 'Monitor', label: 'Desktop' },
+          { width: '100%', height: 'auto', icon: 'FullWidth', label: 'Fit canvas' },
+        ]}
+      />
+    </div>
   </div>;
 }
