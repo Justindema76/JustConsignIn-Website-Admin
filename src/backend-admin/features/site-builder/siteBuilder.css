@@ -1144,3 +1144,37 @@
   .jci-puck-editor .shared-project-showcase-card{grid-template-columns:1fr}
   .jci-puck-editor .shared-project-showcase-image{min-height:190px}
 }
+
+
+/* Shared visual-editor workspace: keep the canvas primary and controls compact. */
+.jci-puck-editor{
+  --puck-user-sidebar-left-width:210px;
+  --puck-user-sidebar-right-width:320px;
+  min-height:0;
+}
+.jci-puck-editor-header{
+  --puck-user-sidebar-left-width:176px;
+  --puck-user-sidebar-right-width:300px;
+}
+.jci-puck-editor-header .global-header-preview{
+  width:100%;
+  min-width:0;
+}
+@media (min-width: 1200px){
+  .jci-site-builder-page:has(.jci-puck-editor){
+    gap:12px;
+  }
+  .jci-site-builder-page:has(.jci-puck-editor) .site-admin-page-head{
+    margin-bottom:0;
+  }
+  .jci-puck-editor{
+    border-radius:10px;
+  }
+}
+@media (max-width: 1100px){
+  .jci-puck-editor,
+  .jci-puck-editor-header{
+    --puck-user-sidebar-left-width:170px;
+    --puck-user-sidebar-right-width:280px;
+  }
+}
