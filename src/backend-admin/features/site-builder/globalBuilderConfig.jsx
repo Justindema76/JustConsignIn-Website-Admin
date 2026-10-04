@@ -348,6 +348,7 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                 {isJustin
                   ? <strong><span style={{color:p.brandFirstColor || '#0B1F33'}}>{p.brandFirst || 'Justin'}</span>{' '}<span style={{color:p.brandSecondColor || '#2F6BFF'}}>{p.brandSecond || 'DeMatteis'}</span></strong>
                   : !isSunwings ? <strong>{p.brand}</strong> : null}
+              </a>
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}{['/work','/ai-development'].includes(url) ? ' ▾' : ''}</a>)}</nav>
               {isJustin && activeSocial.length > 0 && <div className="global-social-preview" style={{
                 '--preview-social-color':p.socialIconColor,
