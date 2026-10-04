@@ -78,8 +78,12 @@ export default async function handler(req, res) {
       const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
       const protocol = forwardedProto || (String(req.headers.host || '').startsWith('localhost') ? 'http' : 'https');
       const requestOrigin = req.headers.host ? `${protocol}://${req.headers.host}` : '';
-      const appUrl = String(process.env.APP_URL || requestOrigin).replace(/\/$/, '');
-      const redirectTo = `${appUrl}${safeCallback(req.query?.callback)}`;
+      // Admin OAuth must return to the admin host that initiated login. APP_URL belongs to the customer app
+      // and must never override the website-admin callback.
+      const callbackPath = safeCallback(req.query?.callback);
+      const isAdminCallback = callbackPath === '/admin-login';
+      const appUrl = String(isAdminCallback ? requestOrigin : (process.env.APP_URL || requestOrigin)).replace(/\/$/, '');
+      const redirectTo = `${appUrl}${callbackPath}`;
       const googleScopes = [
         'openid',
         'email',
