@@ -20,26 +20,10 @@
 .dispatch-metrics{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  position:relative;
 }
-.dispatch-metrics::before{
-  content:'';
-  position:absolute;
-  left:0;right:0;top:34px;
-  height:1px;
-  background-image:linear-gradient(90deg,#2b2d36 0 7px,transparent 7px 13px);
-  background-size:13px 1px;
-  opacity:.9;
-}
-.dispatch-metric{padding:0 20px 2px 0;position:relative}
+.dispatch-metric{padding:0 20px 2px 0}
 .dispatch-metric:not(:last-child){border-right:1px solid #2b2d36}
 .dispatch-metric:not(:first-child){padding-left:20px}
-.dispatch-metric-node{
-  width:9px;height:9px;border-radius:50%;
-  background:#14151a;
-  border:2px solid var(--dashboard-accent);
-  position:absolute;top:30px;left:0;z-index:1;
-}
 .dispatch-metric-label{
   font-size:10.5px;color:#9b9ca6;
   text-transform:uppercase;letter-spacing:.06em;font-weight:700;

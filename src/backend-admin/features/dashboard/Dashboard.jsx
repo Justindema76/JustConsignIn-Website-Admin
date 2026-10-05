@@ -15,7 +15,6 @@ function BoardStatus({ metrics }) {
     </div>
     <div className="dispatch-metrics">
       {metrics.map(item => <div className={`dispatch-metric ${item.attention ? 'attention' : ''}`} key={item.label}>
-        <span className="dispatch-metric-node"/>
         <div className="dispatch-metric-label">{item.label}</div>
         <div className="dispatch-metric-value">{String(item.value).padStart(2, '0')}</div>
         <div className="dispatch-metric-note">{item.note}</div>
