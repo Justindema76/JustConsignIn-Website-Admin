@@ -5,7 +5,6 @@ import { getAdminSiteKey } from '../../services/siteAdminService';
 import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
 import { loadAdminBlogPosts } from '../blog/blogStore';
-import { loadSunwingsQuotes } from '../../sites/sunwings/sunwingsAdminService';
 import { loadLocationPosts, loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
 import './dashboard.css';
 
@@ -15,12 +14,11 @@ function SunwingsMetrics() {
 
   useEffect(() => {
     if (!accessToken) return;
-    Promise.all([loadServicePosts(accessToken), loadLocationPosts(accessToken), loadAdminBlogPosts(accessToken), loadSunwingsQuotes(accessToken)])
-      .then(([services, locations, blog, quotes]) => setCounts({
+    Promise.all([loadServicePosts(accessToken), loadLocationPosts(accessToken), loadAdminBlogPosts(accessToken)])
+      .then(([services, locations, blog]) => setCounts({
         services: services.length,
         locations: locations.length,
         blog: blog.length,
-        newQuotes: quotes.filter(item => item.status === 'new').length,
       }))
       .catch(() => setCounts(null));
   }, [accessToken]);
@@ -31,7 +29,6 @@ function SunwingsMetrics() {
     { label: 'Service Posts', value: counts.services },
     { label: 'Location Posts', value: counts.locations },
     { label: 'Moving Tips Posts', value: counts.blog },
-    { label: 'New Quote Requests', value: counts.newQuotes },
   ];
 
   return <div className="dashboard-metrics">

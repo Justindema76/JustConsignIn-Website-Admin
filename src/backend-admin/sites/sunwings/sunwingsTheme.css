@@ -41,8 +41,6 @@
 .site-admin-shell.site-sunwings .dashboard-quick-icon,
 .site-admin-shell.site-sunwings .dashboard-row-icon{background:#fff1e6;color:var(--sw-orange-dark)}
 .site-admin-shell.site-sunwings .dashboard-quick-card:hover{border-color:#f3c79e;box-shadow:0 9px 22px rgba(251,105,10,.12)}
-.site-admin-shell.site-sunwings .dashboard-section-card{border-top:3px solid var(--sw-orange)}
-.site-admin-shell.site-sunwings .dashboard-metric-card{border-top:3px solid var(--sw-orange)}
 
 .site-admin-shell.site-sunwings .sunwings-provider-mark{background:#fff1e6;color:var(--sw-orange-dark)}
 .site-admin-shell.site-sunwings .sunwings-social-preview-card a{color:var(--sw-orange-dark)}
