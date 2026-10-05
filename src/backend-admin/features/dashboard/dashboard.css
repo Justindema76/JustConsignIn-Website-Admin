@@ -130,7 +130,7 @@
 }
 .dashboard-section-card.projects{border-top:3px solid #2b78c5}
 .dashboard-section-card.recruitment{border-top:3px solid #7a4bb7}
-.dashboard-section-card.leads{border-top:3px solid #2b78c5}
+.dashboard-section-card.leads{border-top:3px solid #2b78c5;grid-column:1/-1}
 .dashboard-section-card.content{border-top:3px solid #2d8a57}
 .dashboard-section-card.website{border-top:3px solid #6b66d8}
 .dashboard-section-card.tools{border-top:3px solid #8a6a3a}

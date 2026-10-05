@@ -35,18 +35,18 @@ export default {
       ],
     },
     {
-      id: 'leads',
-      label: 'Leads',
-      items: [
-        { to: '/admin/sunwings/quotes', label: 'Quote Requests', icon: 'inbox' },
-      ],
-    },
-    {
       id: 'settings',
       label: 'Settings',
       items: [
         { to: '/admin/sunwings/settings', label: 'Website Settings', icon: 'settings' },
         { to: '/admin/sunwings/integrations', label: 'Integrations', icon: 'plug' },
+      ],
+    },
+    {
+      id: 'leads',
+      label: 'Leads',
+      items: [
+        { to: '/admin/sunwings/quotes', label: 'Quote Requests', icon: 'inbox' },
       ],
     },
   ],
@@ -98,6 +98,14 @@ export default {
         items: [
           { to: '/admin/sunwings/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage Sunwings website configuration, SMTP and notification routing.' },
           { to: '/admin/sunwings/integrations', icon: 'plug', title: 'Integrations', copy: 'Connect Google Reviews and the Facebook Page feed.' },
+        ],
+      },
+      {
+        id: 'leads',
+        title: 'Leads',
+        copy: 'Moving, delivery and commercial enquiries submitted through the Sunwings website.',
+        items: [
+          { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review new leads and update their status.' },
         ],
       },
     ],
