@@ -54,3 +54,8 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
   .site-admin-media-actions{display:grid;grid-template-columns:1fr 1fr}
   .site-admin-media-action.danger{grid-column:1/-1}
 }
+
+.site-admin-header-actions{gap:14px}
+.site-admin-header-divider{width:1px;align-self:stretch;background:#e2e6ea;margin:0 2px}
+.site-admin-site-switcher{align-self:stretch;justify-content:center}
+.site-admin-site-switcher select{height:36px}

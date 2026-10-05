@@ -153,6 +153,7 @@ export default function AdminLayout() {
             </select>
           </label>
           <a className="site-admin-btn secondary small" href={`https://${activeSite.domain}`} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
+          <span className="site-admin-header-divider" aria-hidden="true"/>
           <span className="site-admin-user"><strong>{user?.name || 'Admin'}</strong><small>{user?.email}</small></span>
           <button className="site-admin-btn secondary small" type="button" onClick={logout}><LogOut size={13}/> Log out</button>
         </div>
