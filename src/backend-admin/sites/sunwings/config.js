@@ -56,7 +56,7 @@ export default {
       { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'Edit main pages with the shared block editor' },
       { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Add and edit Sunwings services' },
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
-      { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming moving and transport leads' },
+      { to: '/admin/sunwings/blog', icon: 'book', title: 'Moving Tips Posts', copy: 'Add and edit moving articles' },
     ],
     sections: [
       {
@@ -89,14 +89,6 @@ export default {
         items: [
           { to: '/admin/sunwings/social', icon: 'link', title: 'Social Links', copy: 'Manage Facebook, Instagram, LinkedIn, YouTube, TikTok and other social profile links.' },
           { to: '/admin/sunwings/social-posts', icon: 'sparkles', title: 'Social Posts', copy: 'Create, save, schedule and publish social content for Sunwings.' },
-        ],
-      },
-      {
-        id: 'leads',
-        title: 'Leads',
-        copy: 'Moving, delivery and commercial enquiries submitted through the Sunwings website.',
-        items: [
-          { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review new leads and update their status.' },
         ],
       },
       {
