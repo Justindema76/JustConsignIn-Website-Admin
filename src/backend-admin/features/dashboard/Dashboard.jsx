@@ -4,45 +4,68 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { getAdminSiteKey } from '../../services/siteAdminService';
 import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
-import { loadAdminBlogPosts } from '../blog/blogStore';
-import { loadLocationPosts, loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
+import { loadDashboardData } from './dashboardData';
 import './dashboard.css';
 
-function SunwingsMetrics() {
-  const { accessToken } = useAuth();
-  const [counts, setCounts] = useState(null);
+function BoardStatus({ metrics }) {
+  if (!metrics) return null;
+  return <section className="dispatch-strip">
+    <div className="dispatch-strip-head">
+      <h2>Board Status</h2>
+    </div>
+    <div className="dispatch-metrics">
+      {metrics.map(item => <div className={`dispatch-metric ${item.attention ? 'attention' : ''}`} key={item.label}>
+        <span className="dispatch-metric-node"/>
+        <div className="dispatch-metric-label">{item.label}</div>
+        <div className="dispatch-metric-value">{String(item.value).padStart(2, '0')}</div>
+        <div className="dispatch-metric-note">{item.note}</div>
+      </div>)}
+    </div>
+  </section>;
+}
 
-  useEffect(() => {
-    if (!accessToken) return;
-    Promise.all([loadServicePosts(accessToken), loadLocationPosts(accessToken), loadAdminBlogPosts(accessToken)])
-      .then(([services, locations, blog]) => setCounts({
-        services: services.length,
-        locations: locations.length,
-        blog: blog.length,
-      }))
-      .catch(() => setCounts(null));
-  }, [accessToken]);
-
-  if (!counts) return null;
-
-  const items = [
-    { label: 'Service Posts', value: counts.services },
-    { label: 'Location Posts', value: counts.locations },
-    { label: 'Moving Tips Posts', value: counts.blog },
-  ];
-
-  return <div className="dashboard-metrics">
-    {items.map(item => <div className="dashboard-metric-card" key={item.label}>
-      <span>{item.label}</span>
-      <strong>{item.value}</strong>
-    </div>)}
-  </div>;
+function LeadsPanel({ leads }) {
+  if (!leads) return null;
+  return <section className="site-admin-card dashboard-leads-panel">
+    <div className="dashboard-leads-head">
+      <div>
+        <h2>{leads.title}</h2>
+        <p>{leads.copy}</p>
+      </div>
+      <Link className="dashboard-leads-viewall" to={leads.viewAllTo}>View all →</Link>
+    </div>
+    {!leads.items.length
+      ? <div className="site-admin-empty">Nothing new yet.</div>
+      : <div className="dashboard-leads-list">
+        {leads.items.map(item => <div className="dashboard-leads-row" key={item.id}>
+          <div className="dashboard-leads-who">
+            <strong>{item.title}</strong>
+            <small>{item.meta}</small>
+          </div>
+          <span className="dashboard-leads-chip">{item.chip}</span>
+          <span className="dashboard-leads-time">{item.time}</span>
+        </div>)}
+      </div>}
+  </section>;
 }
 
 export default function Dashboard() {
+  const { accessToken } = useAuth();
   const siteKey = getAdminSiteKey();
   const siteConfig = getSiteConfig(siteKey);
   const { dashboard } = siteConfig;
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    setData(null);
+    loadDashboardData(siteKey, accessToken).then(setData).catch(() => setData(null));
+  }, [accessToken, siteKey]);
+
+  const metrics = data?.metrics?.map(item => ({
+    ...item,
+    attention: item.label.toLowerCase().includes('request') && item.value > 0,
+  }));
 
   return <>
     <div className="site-admin-page-head dashboard-head">
@@ -53,7 +76,7 @@ export default function Dashboard() {
       </div>
     </div>
 
-    {siteKey === 'sunwings' && <SunwingsMetrics />}
+    <BoardStatus metrics={metrics}/>
 
     <section className="dashboard-quick">
       <div className="dashboard-section-heading">
@@ -102,5 +125,7 @@ export default function Dashboard() {
         </div>
       </details>)}
     </div>
+
+    <LeadsPanel leads={data?.leads}/>
   </>;
 }

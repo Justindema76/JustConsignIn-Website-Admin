@@ -59,11 +59,10 @@ export default {
     ],
     sections: [
       {
-        id: 'leads',
-        title: 'Leads & Growth',
-        copy: 'Demo requests, beta partners and outreach.',
+        id: 'growth',
+        title: 'Growth',
+        copy: 'Beta partners and outreach tracking.',
         items: [
-          { to: '/admin/demo-requests', icon: 'inbox', title: 'Demo Requests', copy: 'Review demo leads, contact stores and manage follow-up.' },
           { to: '/admin/beta-partners', icon: 'handshake', title: 'Beta Partners', copy: 'Manage Founding Partner applications and active testing.' },
           { to: '/admin/outreach', icon: 'map', title: 'Outreach Map', copy: 'Track consignment-shop leads and outreach activity.' },
         ],

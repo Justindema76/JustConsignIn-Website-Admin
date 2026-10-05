@@ -100,14 +100,6 @@ export default {
           { to: '/admin/sunwings/integrations', icon: 'plug', title: 'Integrations', copy: 'Connect Google Reviews and the Facebook Page feed.' },
         ],
       },
-      {
-        id: 'leads',
-        title: 'Leads',
-        copy: 'Moving, delivery and commercial enquiries submitted through the Sunwings website.',
-        items: [
-          { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review new leads and update their status.' },
-        ],
-      },
     ],
   },
 };

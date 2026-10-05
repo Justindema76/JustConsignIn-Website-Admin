@@ -7,7 +7,10 @@
   JustinDeMatteis keep the shared light/blue theme untouched.
 */
 
-.site-admin-shell.site-sunwings{--sw-dark:#111;--sw-dark-raised:#28282b;--sw-orange:#fb690a;--sw-orange-dark:#d95700}
+.site-admin-shell.site-sunwings{
+  --sw-dark:#111;--sw-dark-raised:#28282b;--sw-orange:#fb690a;--sw-orange-dark:#d95700;
+  --dashboard-accent:#fb690a;--dashboard-accent-deep:#d95700;--dashboard-accent-wash:#fff1e6;
+}
 
 .site-admin-shell.site-sunwings .site-admin-sidebar{background:var(--sw-dark);border-right:0}
 .site-admin-shell.site-sunwings .site-admin-brand{border-bottom:1px solid #2b2b2e;color:#fff}
@@ -39,9 +42,6 @@
 .site-admin-shell.site-sunwings .site-admin-btn.danger{background:#b42318;color:#fff}
 .site-admin-shell.site-sunwings .site-admin-btn.danger:hover{background:#95190f}
 
-.site-admin-shell.site-sunwings .dashboard-link-arrow{color:var(--sw-orange-dark)}
-.site-admin-shell.site-sunwings .dashboard-quick-icon,
-.site-admin-shell.site-sunwings .dashboard-row-icon{background:#fff1e6;color:var(--sw-orange-dark)}
 .site-admin-shell.site-sunwings .dashboard-quick-card:hover{border-color:#f3c79e;box-shadow:0 9px 22px rgba(251,105,10,.12)}
 
 .site-admin-shell.site-sunwings .sunwings-provider-mark{background:#fff1e6;color:var(--sw-orange-dark)}

@@ -68,19 +68,11 @@ export default {
     ],
     sections: [
       {
-        id: 'projects',
-        title: 'Project Workflow',
-        copy: 'Project enquiries, quote routing and department ownership.',
+        id: 'operations',
+        title: 'Operations',
+        copy: 'Departments and recruiter contacts.',
         items: [
-          { to: '/admin/service-requests', icon: 'inbox', title: 'Service Requests', copy: 'Review project enquiries, track stages and prepare quotes.' },
           { to: '/admin/departments', icon: 'building', title: 'Departments', copy: 'Manage departments used to route project requests.' },
-        ],
-      },
-      {
-        id: 'recruitment',
-        title: 'Recruitment',
-        copy: 'Job opportunities, recruiter messages and interview requests.',
-        items: [
           { to: '/admin/hiring-contacts', icon: 'briefcase', title: 'Hiring Contacts', copy: 'Review employment enquiries separately from project work.' },
         ],
       },
