@@ -46,6 +46,7 @@ export default {
       label: 'Settings',
       items: [
         { to: '/admin/sunwings/settings', label: 'Website Settings', icon: 'settings' },
+        { to: '/admin/sunwings/integrations', label: 'Integrations', icon: 'plug' },
       ],
     },
   ],
@@ -104,6 +105,7 @@ export default {
         copy: 'Sunwings-specific business and website configuration.',
         items: [
           { to: '/admin/sunwings/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage Sunwings website configuration, SMTP and notification routing.' },
+          { to: '/admin/sunwings/integrations', icon: 'plug', title: 'Integrations', copy: 'Connect Google Reviews and the Facebook Page feed.' },
         ],
       },
     ],

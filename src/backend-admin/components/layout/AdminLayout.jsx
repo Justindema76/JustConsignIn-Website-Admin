@@ -13,6 +13,7 @@ import { SOCIAL_NETWORKS, emptySocialLinks } from '../../config/siteContent';
 import { getAdminSiteKey, loadAdminSites, loadAdminSocial, setAdminSiteKey } from '../../services/siteAdminService';
 import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
+import '../../sites/sunwings/sunwingsTheme.css';
 
 function isPathInGroup(pathname, group) {
   return group.items.some(item => pathname === item.to || pathname.startsWith(`${item.to}/`));
@@ -83,7 +84,7 @@ export default function AdminLayout() {
   const logout = () => { signOut(); navigate('/'); };
   const toggleGroup = id => setOpenGroups(current => ({ ...current, [id]: !current[id] }));
 
-  return <div className="site-admin-shell">
+  return <div className={`site-admin-shell site-${siteKey}`}>
     <aside className={`site-admin-sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
       <div className="site-admin-mobile-nav-head">
         <Link to="/admin" className="site-admin-brand compact" onClick={() => setMobileNavOpen(false)}>

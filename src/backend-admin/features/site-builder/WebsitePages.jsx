@@ -11,7 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getWebsitePages, livePageUrl } from './websitePages';
+import { getWebsitePages, livePageUrl } from './websitePagesData';
 import { getAdminSiteKey } from '../../services/siteAdminService';
 import './websitePages.css';
 

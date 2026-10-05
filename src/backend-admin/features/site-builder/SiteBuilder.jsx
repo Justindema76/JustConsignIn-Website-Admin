@@ -12,7 +12,7 @@ import {
   saveAdminSitePageDraft,
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
-import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePages';
+import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePagesData';
 import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
