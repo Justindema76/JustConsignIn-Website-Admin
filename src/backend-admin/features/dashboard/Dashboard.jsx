@@ -78,13 +78,14 @@ export default function Dashboard() {
     </section>
 
     <div className="dashboard-section-grid">
-      {dashboard.sections.map(section => <section className={`dashboard-section-card ${section.id}`} key={section.id}>
-        <div className="dashboard-section-heading">
+      {dashboard.sections.map((section, index) => <details className={`dashboard-section-card ${section.id}`} key={section.id} open={index === 0}>
+        <summary className="dashboard-section-heading">
           <div>
             <h2>{section.title}</h2>
             <p>{section.copy}</p>
           </div>
-        </div>
+          <span className="dashboard-section-toggle">›</span>
+        </summary>
 
         <div className="dashboard-link-list">
           {section.items.map(item => {
@@ -99,7 +100,7 @@ export default function Dashboard() {
             </Link>;
           })}
         </div>
-      </section>)}
+      </details>)}
     </div>
   </>;
 }
