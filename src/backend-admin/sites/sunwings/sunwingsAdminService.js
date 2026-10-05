@@ -48,3 +48,39 @@ export async function saveSunwingsSettings(accessToken, settings) {
   );
   return settings;
 }
+
+export async function loadSunwingsIntegrations(accessToken) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/integrations', {}, accessToken),
+    'Unable to load Sunwings integrations.',
+  );
+  return Array.isArray(payload.integrations) ? payload.integrations : [];
+}
+
+export async function saveSunwingsIntegration(accessToken, input) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/integrations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    }, accessToken),
+    'Unable to save integration.',
+  );
+  return payload;
+}
+
+export async function loadSunwingsFacebookPosts(accessToken) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/facebook-posts', {}, accessToken),
+    'Unable to load Facebook posts.',
+  );
+  return { enabled: Boolean(payload.enabled), posts: Array.isArray(payload.posts) ? payload.posts : [] };
+}
+
+export async function syncSunwingsFacebookPosts(accessToken) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/facebook-posts', { method: 'POST' }, accessToken),
+    'Unable to sync Facebook posts.',
+  );
+  return { count: payload.count || 0, posts: Array.isArray(payload.posts) ? payload.posts : [] };
+}

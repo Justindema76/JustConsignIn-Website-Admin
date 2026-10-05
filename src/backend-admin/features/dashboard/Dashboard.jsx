@@ -1,11 +1,50 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../auth/AdminAuthContext';
 import { getAdminSiteKey } from '../../services/siteAdminService';
 import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
+import { loadAdminBlogPosts } from '../blog/blogStore';
+import { loadSunwingsQuotes } from '../../sites/sunwings/sunwingsAdminService';
+import { loadLocationPosts, loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
 import './dashboard.css';
 
+function SunwingsMetrics() {
+  const { accessToken } = useAuth();
+  const [counts, setCounts] = useState(null);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    Promise.all([loadServicePosts(accessToken), loadLocationPosts(accessToken), loadAdminBlogPosts(accessToken), loadSunwingsQuotes(accessToken)])
+      .then(([services, locations, blog, quotes]) => setCounts({
+        services: services.length,
+        locations: locations.length,
+        blog: blog.length,
+        newQuotes: quotes.filter(item => item.status === 'new').length,
+      }))
+      .catch(() => setCounts(null));
+  }, [accessToken]);
+
+  if (!counts) return null;
+
+  const items = [
+    { label: 'Service Posts', value: counts.services },
+    { label: 'Location Posts', value: counts.locations },
+    { label: 'Moving Tips Posts', value: counts.blog },
+    { label: 'New Quote Requests', value: counts.newQuotes },
+  ];
+
+  return <div className="dashboard-metrics">
+    {items.map(item => <div className="dashboard-metric-card" key={item.label}>
+      <span>{item.label}</span>
+      <strong>{item.value}</strong>
+    </div>)}
+  </div>;
+}
+
 export default function Dashboard() {
-  const siteConfig = getSiteConfig(getAdminSiteKey());
+  const siteKey = getAdminSiteKey();
+  const siteConfig = getSiteConfig(siteKey);
   const { dashboard } = siteConfig;
 
   return <>
@@ -16,6 +55,8 @@ export default function Dashboard() {
         <p>{dashboard.intro}</p>
       </div>
     </div>
+
+    {siteKey === 'sunwings' && <SunwingsMetrics />}
 
     <section className="dashboard-quick">
       <div className="dashboard-section-heading">

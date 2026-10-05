@@ -1,0 +1,40 @@
+.sunwings-integration-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-bottom:18px}
+.sunwings-integration-card{padding:21px;display:grid;gap:16px}
+.sunwings-integration-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.sunwings-integration-head>div{display:flex;align-items:flex-start;gap:12px}
+.sunwings-integration-head h3{margin:1px 0 4px;font-size:16px}
+.sunwings-integration-head p{margin:0;color:#6d7175;font-size:12px;line-height:1.45}
+.sunwings-provider-mark{width:38px;height:38px;border-radius:10px;background:#eaf2fb;color:#164f88;display:grid;place-items:center;flex:0 0 auto}
+.sunwings-connection-badge{white-space:nowrap;border-radius:999px;padding:6px 9px;background:#f1f2f4;color:#666;font-size:10px;font-weight:900}
+.sunwings-connection-badge.connected{background:#eaf7ef;color:#177245}
+.sunwings-connection-badge.failed{background:#fff1f0;color:#9f2119}
+.sunwings-integration-fields label.wide{grid-column:1/-1}
+.sunwings-toggle-row{display:flex!important;flex-direction:row!important;align-items:center;gap:9px;font-size:12px;font-weight:800;color:#444}
+.sunwings-toggle-row input{width:17px;height:17px}
+.sunwings-connection-detail{border-radius:9px;background:#f8f8f9;border:1px solid #dfe3e8;padding:11px 12px;color:#666;font-size:11px;line-height:1.5}
+.sunwings-integration-actions button{flex:1}
+.sunwings-integration-preview{border-top:1px solid #dfe3e8;padding-top:14px}
+.sunwings-integration-preview strong,.sunwings-integration-preview small{display:block}
+.sunwings-integration-preview small{margin-top:4px;color:#6d7175}
+.sunwings-integration-preview p{font-size:11px;line-height:1.5;background:#fafafa;border:1px solid #dfe3e8;border-radius:8px;padding:9px;margin:8px 0 0}
+
+.sunwings-social-sync-card{padding:21px}
+.sunwings-social-sync-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.sunwings-social-sync-head small{display:block;color:#6d7175;margin-top:4px}
+.sunwings-social-feed-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.sunwings-social-preview-card{border:1px solid #dfe3e8;border-radius:12px;overflow:hidden;background:#fff}
+.sunwings-social-preview-card img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.sunwings-social-preview-card>div{padding:12px}
+.sunwings-social-preview-card p{font-size:13px;line-height:1.45;margin:6px 0 10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.sunwings-social-preview-card small{color:#888}
+.sunwings-social-preview-card a{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#1f67b2}
+
+@media(max-width:980px){
+  .sunwings-integration-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .sunwings-integration-head{display:block}
+  .sunwings-connection-badge{display:inline-flex;margin-top:12px}
+  .sunwings-social-sync-head{align-items:stretch;flex-direction:column}
+  .sunwings-social-feed-preview{grid-template-columns:1fr}
+}

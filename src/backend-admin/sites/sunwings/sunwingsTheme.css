@@ -1,0 +1,53 @@
+/*
+  Sunwings admin theme: dark sidebar + orange accent, ported from the
+  standalone Justinnovate sunwings/sunwings.css design.
+
+  Every rule here is scoped under .site-admin-shell.site-sunwings so it can
+  only ever match when the active site is Sunwings — JustConsignIn and
+  JustinDeMatteis keep the shared light/blue theme untouched.
+*/
+
+.site-admin-shell.site-sunwings{--sw-dark:#111;--sw-dark-raised:#28282b;--sw-orange:#fb690a;--sw-orange-dark:#d95700}
+
+.site-admin-shell.site-sunwings .site-admin-sidebar{background:var(--sw-dark);border-right:0}
+.site-admin-shell.site-sunwings .site-admin-brand{border-bottom:1px solid #2b2b2e;color:#fff}
+.site-admin-shell.site-sunwings .site-admin-brand small{color:#9a9a9f}
+.site-admin-shell.site-sunwings .site-admin-brand-mark{background:var(--sw-orange);color:#111}
+
+.site-admin-shell.site-sunwings .site-admin-nav-label{color:#8d8d92}
+.site-admin-shell.site-sunwings .site-admin-nav a{color:#c8c8cc}
+.site-admin-shell.site-sunwings .site-admin-nav a:hover{background:var(--sw-dark-raised);color:#fff}
+.site-admin-shell.site-sunwings .site-admin-nav a.active{background:var(--sw-dark-raised);color:#fff;box-shadow:inset 3px 0 0 var(--sw-orange)}
+.site-admin-shell.site-sunwings .site-admin-dashboard-link{color:#c8c8cc}
+.site-admin-shell.site-sunwings .site-admin-dashboard-link:hover{background:var(--sw-dark-raised);color:#fff}
+
+.site-admin-shell.site-sunwings .site-admin-nav-group{border-top:1px solid #2b2b2e}
+.site-admin-shell.site-sunwings .site-admin-nav-group-toggle{color:#9a9a9f}
+.site-admin-shell.site-sunwings .site-admin-nav-group-toggle:hover,
+.site-admin-shell.site-sunwings .site-admin-nav-group-toggle.active-group{background:var(--sw-dark-raised);color:#fff}
+
+.site-admin-shell.site-sunwings .site-admin-sidebar-social{border-top:1px solid #2b2b2e}
+.site-admin-shell.site-sunwings .site-admin-sidebar-social>small{color:#9a9a9f}
+.site-admin-shell.site-sunwings .site-admin-social-icons a,
+.site-admin-shell.site-sunwings .site-admin-social-icons span{background:var(--sw-dark-raised);border-color:#38383c}
+
+.site-admin-shell.site-sunwings .site-admin-eyebrow{color:var(--sw-orange)}
+.site-admin-shell.site-sunwings .site-admin-btn{background:var(--sw-orange);color:#fff}
+.site-admin-shell.site-sunwings .site-admin-btn:hover{background:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .site-admin-btn.secondary{color:var(--sw-orange-dark);border-color:#f3d3bd}
+.site-admin-shell.site-sunwings .site-admin-btn.secondary:hover{background:#fff6ef}
+
+.site-admin-shell.site-sunwings .dashboard-link-arrow{color:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .dashboard-quick-icon,
+.site-admin-shell.site-sunwings .dashboard-row-icon{background:#fff1e6;color:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .dashboard-quick-card:hover{border-color:#f3c79e;box-shadow:0 9px 22px rgba(251,105,10,.12)}
+.site-admin-shell.site-sunwings .dashboard-section-card{border-top:3px solid var(--sw-orange)}
+.site-admin-shell.site-sunwings .dashboard-metric-card{border-top:3px solid var(--sw-orange)}
+
+.site-admin-shell.site-sunwings .sunwings-provider-mark{background:#fff1e6;color:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .sunwings-social-preview-card a{color:var(--sw-orange-dark)}
+
+@media(max-width:760px){
+  .site-admin-shell.site-sunwings .site-admin-sidebar{background:rgba(17,17,17,.98)}
+  .site-admin-shell.site-sunwings .site-admin-nav a.active{background:var(--sw-dark-raised)}
+}
