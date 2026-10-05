@@ -34,8 +34,10 @@
 .site-admin-shell.site-sunwings .site-admin-eyebrow{color:var(--sw-orange)}
 .site-admin-shell.site-sunwings .site-admin-btn{background:var(--sw-orange);color:#fff}
 .site-admin-shell.site-sunwings .site-admin-btn:hover{background:var(--sw-orange-dark)}
-.site-admin-shell.site-sunwings .site-admin-btn.secondary{color:var(--sw-orange-dark);border-color:#f3d3bd}
+.site-admin-shell.site-sunwings .site-admin-btn.secondary{background:#fff;color:var(--sw-orange-dark);border-color:#f3d3bd}
 .site-admin-shell.site-sunwings .site-admin-btn.secondary:hover{background:#fff6ef}
+.site-admin-shell.site-sunwings .site-admin-btn.danger{background:#b42318;color:#fff}
+.site-admin-shell.site-sunwings .site-admin-btn.danger:hover{background:#95190f}
 
 .site-admin-shell.site-sunwings .dashboard-link-arrow{color:var(--sw-orange-dark)}
 .site-admin-shell.site-sunwings .dashboard-quick-icon,
