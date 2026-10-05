@@ -59,3 +59,4 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
 .site-admin-header-divider{width:1px;align-self:stretch;background:#e2e6ea;margin:0 2px}
 .site-admin-site-switcher{align-self:stretch;justify-content:center}
 .site-admin-site-switcher select{height:36px}
+.site-admin-header-actions .site-admin-btn.small{min-height:36px}

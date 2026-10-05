@@ -8,6 +8,10 @@ import { loadLocationPosts, loadServicePosts } from '../../sites/sunwings/sunwin
 
 const REQUEST_TYPE_LABEL = { quote: 'Full Quote', quick_quote: 'Quick Quote', contact: 'Contact' };
 
+function humanizeStatus(status) {
+  return String(status || '').split('_').filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join(' ') || 'Unknown';
+}
+
 function timeAgo(value) {
   if (!value) return '—';
   const ms = Date.now() - new Date(value).getTime();
@@ -76,7 +80,7 @@ async function loadJustconsigninDashboard(accessToken) {
         id: item.id,
         title: item.business_name || [item.first_name, item.last_name].filter(Boolean).join(' ') || 'Unknown',
         meta: item.interest || 'Demo request',
-        chip: item.status === 'new' ? 'New' : item.status,
+        chip: humanizeStatus(item.status),
         time: timeAgo(item.created_at),
       })),
     },
@@ -106,7 +110,7 @@ async function loadJustindematteisDashboard(accessToken) {
         id: item.id,
         title: item.company || item.name || 'Unknown',
         meta: item.requested_service || 'Service enquiry',
-        chip: item.status === 'new' ? 'New' : item.status,
+        chip: humanizeStatus(item.status),
         time: timeAgo(item.created_at),
       })),
     },
