@@ -1,5 +1,5 @@
 import { supabaseUserRest } from '../_lib/supabase.js';
-import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
+import { requireSiteAccess } from '../_lib/websiteAdmin.js';
 
 const fields = 'site_key,id,slug,title,excerpt,seo_title,seo_description,category,tags,featured_image,body,status,author_name,published_at,created_at,updated_at';
 
@@ -24,11 +24,12 @@ function cleanPost(body = {}) {
 
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const user = await requireWebsiteOwner(req, res);
-  if (!user) return;
 
   const siteKey = String(req.query?.site || req.body?.siteKey || 'justconsignin').trim().toLowerCase() || 'justconsignin';
   const siteFilter = `site_key=eq.${encodeURIComponent(siteKey)}`;
+
+  const user = await requireSiteAccess(req, res, siteKey);
+  if (!user) return;
 
   try {
     if (req.method === 'GET') {

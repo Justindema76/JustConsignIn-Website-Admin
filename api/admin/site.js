@@ -1,5 +1,10 @@
 import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
-import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
+import { requireSiteAccess, requireWebsiteOwner } from '../_lib/websiteAdmin.js';
+
+// Only these resources are open to site collaborators (not just the owner).
+// Everything else here (pages, block styles, header/footer, settings, etc.)
+// stays owner-only.
+const COLLABORATOR_RESOURCES = new Set(['social', 'media']);
 
 const MEDIA_BUCKETS = [
   { bucket: 'site-assets', mediaType: 'image', protectedAsset: true },
@@ -126,12 +131,15 @@ async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset 
 
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const user = await requireWebsiteOwner(req, res);
-  if (!user) return;
 
   const resource = String(req.query?.resource || '').trim().toLowerCase();
   const siteKey = String(req.query?.site || req.body?.siteKey || 'justconsignin').trim().toLowerCase() || 'justconsignin';
   const siteFilter = `site_key=eq.${encodeURIComponent(siteKey)}`;
+
+  const user = COLLABORATOR_RESOURCES.has(resource)
+    ? await requireSiteAccess(req, res, siteKey)
+    : await requireWebsiteOwner(req, res);
+  if (!user) return;
 
   try {
     if (req.method === 'GET' && resource === 'sites') {

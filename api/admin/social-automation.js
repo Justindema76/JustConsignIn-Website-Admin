@@ -1,5 +1,5 @@
 import { supabaseUserRest } from '../_lib/supabase.js';
-import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
+import { requireSiteAccess } from '../_lib/websiteAdmin.js';
 import {
   beginMetricoolOAuth,
   callMetricoolTool,
@@ -176,11 +176,11 @@ function callbackCookies(token, siteKey, secure) {
 
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const user = await requireWebsiteOwner(req, res);
-  if (!user) return;
   const siteKey = siteKeyFromRequest(req);
   if (!siteKey) return res.status(400).json({ error: 'Unknown website.' });
   const site = SITE_CONFIG[siteKey];
+  const user = await requireSiteAccess(req, res, siteKey);
+  if (!user) return;
 
   try {
     if (req.method === 'GET') {
