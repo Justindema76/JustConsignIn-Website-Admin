@@ -1,5 +1,5 @@
 import { supabaseUserRest } from '../../_lib/supabase.js';
-import { requireWebsiteOwner } from '../../_lib/websiteAdmin.js';
+import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
 
 const SITE_KEY = 'sunwings';
 
@@ -72,7 +72,7 @@ async function syncFacebook(token, row) {
 
 export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const owner = await requireWebsiteOwner(req, res);
+  const owner = await requireSiteAccess(req, res, SITE_KEY);
   if (!owner) return;
 
   try {
