@@ -1,5 +1,5 @@
 import { requireWebsiteOwner } from '../_lib/websiteAdmin.js';
-import { supabaseRest } from '../_lib/supabase.js';
+import { supabaseUserRest } from '../_lib/supabase.js';
 
 const ROLES = new Set(['admin', 'editor']);
 const SELECT = 'id,site_key,email,role,label,created_at';
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       const siteKey = clean(req.query?.site, 60);
       if (!siteKey) return res.status(400).json({ error: 'Missing site.' });
       const rows = await parseSupabase(
-        await supabaseRest(`site_collaborators?site_key=eq.${encodeURIComponent(siteKey)}&select=${encodeURIComponent(SELECT)}&order=created_at.asc`, { method: 'GET' }),
+        await supabaseUserRest(owner.accessToken, `site_collaborators?site_key=eq.${encodeURIComponent(siteKey)}&select=${encodeURIComponent(SELECT)}&order=created_at.asc`, { method: 'GET' }),
         'Unable to load collaborators.',
       );
       return res.status(200).json({ collaborators: rows });
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
       const id = clean(req.query?.id, 60);
       if (!validUuid(id)) return res.status(400).json({ error: 'Invalid collaborator id.' });
       await parseSupabase(
-        await supabaseRest(`site_collaborators?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }),
+        await supabaseUserRest(owner.accessToken, `site_collaborators?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }),
         'Unable to remove collaborator.',
       );
       return res.status(200).json({ ok: true });
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       if (!ROLES.has(role)) return res.status(400).json({ error: 'Invalid role.' });
 
       const rows = await parseSupabase(
-        await supabaseRest('site_collaborators?on_conflict=site_key,email', {
+        await supabaseUserRest(owner.accessToken, 'site_collaborators?on_conflict=site_key,email', {
           method: 'POST',
           headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
           body: JSON.stringify([{ site_key: siteKey, email, role, label }]),

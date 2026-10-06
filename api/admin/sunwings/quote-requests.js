@@ -1,5 +1,5 @@
 import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
-import { supabaseRest } from '../../_lib/supabase.js';
+import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const FIELDS = [
@@ -37,7 +37,8 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const requests = await parseSupabase(
-        await supabaseRest(
+        await supabaseUserRest(
+          owner.accessToken,
           `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(FIELDS)}&order=created_at.desc`,
           { method: 'GET' },
         ),
@@ -50,7 +51,8 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ error: 'Missing quote request id.' });
 
     if (req.method === 'DELETE') {
-      const response = await supabaseRest(
+      const response = await supabaseUserRest(
+        owner.accessToken,
         `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}`,
         { method: 'DELETE', headers: { Prefer: 'return=minimal' } },
       );
@@ -103,7 +105,8 @@ export default async function handler(req, res) {
     }
 
     const rows = await parseSupabase(
-      await supabaseRest(
+      await supabaseUserRest(
+        owner.accessToken,
         `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(FIELDS)}`,
         {
           method: 'PATCH',

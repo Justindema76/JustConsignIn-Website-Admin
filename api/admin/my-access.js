@@ -1,4 +1,4 @@
-import { getUserFromToken, supabaseRest } from '../_lib/supabase.js';
+import { getUserFromToken, supabaseUserRest } from '../_lib/supabase.js';
 import { isWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 export default async function handler(req, res) {
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
   try {
     const email = String(user.email || '').trim().toLowerCase();
-    const response = await supabaseRest(`site_collaborators?email=eq.${encodeURIComponent(email)}&select=site_key,role`, { method: 'GET' });
+    const response = await supabaseUserRest(token, `site_collaborators?email=eq.${encodeURIComponent(email)}&select=site_key,role`, { method: 'GET' });
     const rows = response.ok ? await response.json().catch(() => []) : [];
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     return res.status(200).json({ role: rows[0].role, sites: rows.map(row => row.site_key) });

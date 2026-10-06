@@ -1,4 +1,4 @@
-import { getUserFromToken, supabaseRest } from './supabase.js';
+import { getUserFromToken, supabaseUserRest } from './supabase.js';
 
 export const WEBSITE_OWNER_EMAIL = 'justindema76@gmail.com';
 
@@ -51,8 +51,9 @@ export async function requireWebsiteOwner(req, res) {
   return { ...user, accessToken: token };
 }
 
-async function findCollaborator(siteKey, email) {
-  const response = await supabaseRest(
+async function findCollaborator(token, siteKey, email) {
+  const response = await supabaseUserRest(
+    token,
     `site_collaborators?site_key=eq.${encodeURIComponent(siteKey)}&email=eq.${encodeURIComponent(email)}&select=role`,
     { method: 'GET' },
   );
@@ -85,7 +86,7 @@ export async function requireSiteAccess(req, res, siteKey) {
     return null;
   }
 
-  const collaborator = await findCollaborator(siteKey, normalizeEmail(user.email));
+  const collaborator = await findCollaborator(token, siteKey, normalizeEmail(user.email));
   if (!collaborator) {
     res.status(404).json({ error: 'Not found' });
     return null;
