@@ -28,7 +28,7 @@ function useSunwingsPublishedServices() {
   return services;
 }
 
-function ImageLibraryField({ field, value, onChange }) {
+function ImageLibraryField({ field, value, onChange, fallbackImage = '', fallbackLabel = '' }) {
   const { accessToken } = useAuth();
   const [media, setMedia] = useState([]);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -76,7 +76,12 @@ function ImageLibraryField({ field, value, onChange }) {
       <div className="jci-puck-image-field">
         {value
           ? <img src={value} alt="" className="jci-puck-image-thumb"/>
-          : <div className="jci-puck-image-empty"><ImageIcon size={22}/><span>No image selected</span></div>}
+          : fallbackImage
+            ? <div className="jci-puck-image-fallback">
+                <img src={fallbackImage} alt="" className="jci-puck-image-thumb"/>
+                <small>Currently showing {fallbackLabel || 'the linked item'}&rsquo;s image. Pick one above to override just this card.</small>
+              </div>
+            : <div className="jci-puck-image-empty"><ImageIcon size={22}/><span>{fallbackLabel ? `No image set on ${fallbackLabel} yet` : 'No image selected'}</span></div>}
         <input
           className="jci-puck-url-input"
           value={value || ''}
@@ -113,6 +118,18 @@ export const imageField = {
   label: 'Image',
   render: props => <ImageLibraryField {...props}/>,
 };
+
+function serviceImageOverrideField(index, label) {
+  return {
+    type: 'custom',
+    label,
+    render: props => {
+      const services = useSunwingsPublishedServices();
+      const service = services[index - 1];
+      return <ImageLibraryField {...props} fallbackImage={service?.bannerImage} fallbackLabel={service?.title}/>;
+    },
+  };
+}
 
 const backgroundOptions = [
   { label: 'White', value: 'white' },
@@ -1391,12 +1408,12 @@ export const siteBuilderConfig = {
         buttonText: { type:'text', label:'Bottom link text' },
         buttonUrl: { type:'text', label:'Bottom link URL' },
         background: { type:'select', label:'Section background', options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}] },
-        service1Image:{...imageField,label:'Card 1 override image'},service1ImageAlt:{type:'text',label:'Card 1 image alt text'},service1Title:{type:'text',label:'Card 1 title override'},service1Text:{type:'textarea',label:'Card 1 description override'},service1LinkText:{type:'text',label:'Card 1 link text override'},service1Url:{type:'text',label:'Card 1 link URL override'},
-        service2Image:{...imageField,label:'Card 2 override image'},service2ImageAlt:{type:'text',label:'Card 2 image alt text'},service2Title:{type:'text',label:'Card 2 title override'},service2Text:{type:'textarea',label:'Card 2 description override'},service2LinkText:{type:'text',label:'Card 2 link text override'},service2Url:{type:'text',label:'Card 2 link URL override'},
-        service3Image:{...imageField,label:'Card 3 override image'},service3ImageAlt:{type:'text',label:'Card 3 image alt text'},service3Title:{type:'text',label:'Card 3 title override'},service3Text:{type:'textarea',label:'Card 3 description override'},service3LinkText:{type:'text',label:'Card 3 link text override'},service3Url:{type:'text',label:'Card 3 link URL override'},
-        service4Image:{...imageField,label:'Card 4 override image'},service4ImageAlt:{type:'text',label:'Card 4 image alt text'},service4Title:{type:'text',label:'Card 4 title override'},service4Text:{type:'textarea',label:'Card 4 description override'},service4LinkText:{type:'text',label:'Card 4 link text override'},service4Url:{type:'text',label:'Card 4 link URL override'},
-        service5Image:{...imageField,label:'Card 5 override image'},service5ImageAlt:{type:'text',label:'Card 5 image alt text'},service5Title:{type:'text',label:'Card 5 title override'},service5Text:{type:'textarea',label:'Card 5 description override'},service5LinkText:{type:'text',label:'Card 5 link text override'},service5Url:{type:'text',label:'Card 5 link URL override'},
-        service6Image:{...imageField,label:'Card 6 override image'},service6ImageAlt:{type:'text',label:'Card 6 image alt text'},service6Title:{type:'text',label:'Card 6 title override'},service6Text:{type:'textarea',label:'Card 6 description override'},service6LinkText:{type:'text',label:'Card 6 link text override'},service6Url:{type:'text',label:'Card 6 link URL override'},
+        service1Image:serviceImageOverrideField(1,'Card 1 override image'),service1ImageAlt:{type:'text',label:'Card 1 image alt text'},service1Title:{type:'text',label:'Card 1 title override'},service1Text:{type:'textarea',label:'Card 1 description override'},service1LinkText:{type:'text',label:'Card 1 link text override'},service1Url:{type:'text',label:'Card 1 link URL override'},
+        service2Image:serviceImageOverrideField(2,'Card 2 override image'),service2ImageAlt:{type:'text',label:'Card 2 image alt text'},service2Title:{type:'text',label:'Card 2 title override'},service2Text:{type:'textarea',label:'Card 2 description override'},service2LinkText:{type:'text',label:'Card 2 link text override'},service2Url:{type:'text',label:'Card 2 link URL override'},
+        service3Image:serviceImageOverrideField(3,'Card 3 override image'),service3ImageAlt:{type:'text',label:'Card 3 image alt text'},service3Title:{type:'text',label:'Card 3 title override'},service3Text:{type:'textarea',label:'Card 3 description override'},service3LinkText:{type:'text',label:'Card 3 link text override'},service3Url:{type:'text',label:'Card 3 link URL override'},
+        service4Image:serviceImageOverrideField(4,'Card 4 override image'),service4ImageAlt:{type:'text',label:'Card 4 image alt text'},service4Title:{type:'text',label:'Card 4 title override'},service4Text:{type:'textarea',label:'Card 4 description override'},service4LinkText:{type:'text',label:'Card 4 link text override'},service4Url:{type:'text',label:'Card 4 link URL override'},
+        service5Image:serviceImageOverrideField(5,'Card 5 override image'),service5ImageAlt:{type:'text',label:'Card 5 image alt text'},service5Title:{type:'text',label:'Card 5 title override'},service5Text:{type:'textarea',label:'Card 5 description override'},service5LinkText:{type:'text',label:'Card 5 link text override'},service5Url:{type:'text',label:'Card 5 link URL override'},
+        service6Image:serviceImageOverrideField(6,'Card 6 override image'),service6ImageAlt:{type:'text',label:'Card 6 image alt text'},service6Title:{type:'text',label:'Card 6 title override'},service6Text:{type:'textarea',label:'Card 6 description override'},service6LinkText:{type:'text',label:'Card 6 link text override'},service6Url:{type:'text',label:'Card 6 link URL override'},
       },
       defaultProps: { eyebrow:'What we do',heading:'One call for every move.',text:'From a single couch to a full warehouse transfer, Sunwings brings the truck, the crew and the care.',align:'center',limit:'0',buttonText:'',buttonUrl:'/services',background:'white' },
       render: p => {

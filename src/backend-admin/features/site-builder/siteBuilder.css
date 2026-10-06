@@ -78,6 +78,16 @@
   border: 1px solid #e2e8f0;
 }
 
+.jci-puck-image-fallback {
+  display: grid;
+  gap: 6px;
+}
+
+.jci-puck-image-fallback small {
+  color: #64748b;
+  line-height: 1.4;
+}
+
 .jci-puck-image-empty,
 .jci-builder-placeholder {
   display: grid;
