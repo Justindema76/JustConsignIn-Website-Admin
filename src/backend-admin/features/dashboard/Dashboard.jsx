@@ -19,6 +19,13 @@ function BoardStatus({ metrics }) {
   </section>;
 }
 
+function timeOfDayGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 function LeadsPanel({ leads }) {
   if (!leads) return null;
   return <section className="site-admin-card dashboard-leads-panel">
@@ -45,7 +52,7 @@ function LeadsPanel({ leads }) {
 }
 
 export default function Dashboard() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
   const siteKey = getAdminSiteKey();
   const siteConfig = getSiteConfig(siteKey);
   const { dashboard } = siteConfig;
@@ -62,13 +69,17 @@ export default function Dashboard() {
     attention: item.label.toLowerCase().includes('request') && item.value > 0,
   }));
 
+  const firstName = (user?.name || 'there').split(' ')[0];
+  const today = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
+
   return <>
     <div className="site-admin-page-head dashboard-head">
       <div>
         <p className="site-admin-eyebrow">Overview</p>
-        <h1>Dashboard</h1>
+        <h1>{timeOfDayGreeting()}, {firstName}</h1>
         <p>{dashboard.intro}</p>
       </div>
+      <div className="dashboard-date">{today}</div>
     </div>
 
     <BoardStatus metrics={metrics}/>

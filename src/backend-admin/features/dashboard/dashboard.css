@@ -1,4 +1,5 @@
 .dashboard-head{margin-bottom:18px}
+.dashboard-date{flex:0 0 auto;color:#8c8f94;font-size:12px;white-space:nowrap;padding-top:6px}
 
 .site-admin-shell{--dashboard-accent:#1f67b2;--dashboard-accent-deep:#164f88;--dashboard-accent-wash:#eaf2fb}
 
