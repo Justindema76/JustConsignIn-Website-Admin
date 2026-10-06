@@ -1,8 +1,7 @@
 -- Lets the site owner grant other people scoped access to one site's admin,
--- without sharing the owner's own Google login. Read only by server-side
--- code using the service-role key (api/_lib/websiteAdmin.js) — never
--- exposed to anon/authenticated REST directly, so no RLS policy is needed
--- or granted here.
+-- without sharing the owner's own Google login. RLS policies (granting the
+-- owner full access, and each person read access to their own row) are
+-- added separately in 20261005_collaborator_rls.sql — run that one too.
 
 create table if not exists public.site_collaborators (
   id uuid primary key default gen_random_uuid(),
