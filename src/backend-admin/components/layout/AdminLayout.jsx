@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ChevronDown,
   ExternalLink,
@@ -74,8 +74,7 @@ export default function AdminLayout() {
     admin_label: siteConfig.adminLabel,
   };
 
-  const changeSite = event => {
-    const nextSite = event.target.value;
+  const changeSite = nextSite => {
     setAdminSiteKey(nextSite);
     setSiteKey(nextSite);
     window.location.assign('/admin');
@@ -83,6 +82,22 @@ export default function AdminLayout() {
 
   const logout = () => { signOut(); navigate('/'); };
   const toggleGroup = id => setOpenGroups(current => ({ ...current, [id]: !current[id] }));
+
+  const [openMenu, setOpenMenu] = useState('');
+  const headerActionsRef = useRef(null);
+  useEffect(() => {
+    if (!openMenu) return;
+    const onClickAway = event => {
+      if (headerActionsRef.current && !headerActionsRef.current.contains(event.target)) setOpenMenu('');
+    };
+    const onEscape = event => { if (event.key === 'Escape') setOpenMenu(''); };
+    document.addEventListener('mousedown', onClickAway);
+    document.addEventListener('keydown', onEscape);
+    return () => {
+      document.removeEventListener('mousedown', onClickAway);
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, [openMenu]);
 
   return <div className={`site-admin-shell site-${siteKey}`}>
     <aside className={`site-admin-sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
@@ -145,17 +160,56 @@ export default function AdminLayout() {
       <header className="site-admin-header">
         <button className="site-admin-mobile-menu" type="button" onClick={() => setMobileNavOpen(true)} aria-label="Open menu"><Menu size={22}/></button>
         <div className="site-admin-header-title"><strong>{activeSite.name} Website Admin</strong><small>Manage {activeSite.domain}</small></div>
-        <div className="site-admin-header-actions">
-          <label className="site-admin-site-switcher">
-            <span>Website</span>
-            <select value={siteKey} onChange={changeSite} aria-label="Select website">
-              {(sites.length ? sites : [activeSite]).map(site => <option key={site.site_key} value={site.site_key}>{site.admin_label || site.name}</option>)}
-            </select>
-          </label>
-          <a className="site-admin-btn secondary small" href={`https://${activeSite.domain}`} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
-          <span className="site-admin-header-divider" aria-hidden="true"/>
-          <span className="site-admin-user"><strong>{user?.name || 'Admin'}</strong><small>{user?.email}</small></span>
-          <button className="site-admin-btn secondary small" type="button" onClick={logout}><LogOut size={13}/> Log out</button>
+        <div className="site-admin-header-actions" ref={headerActionsRef}>
+          <div className={`site-admin-dd ${openMenu === 'site' ? 'open' : ''}`}>
+            <button
+              className="site-admin-dd-trigger"
+              type="button"
+              aria-expanded={openMenu === 'site'}
+              onClick={() => setOpenMenu(current => (current === 'site' ? '' : 'site'))}
+            >
+              <span className="site-admin-dd-dot"/>
+              <span className="site-admin-dd-name">{activeSite.admin_label || activeSite.name}</span>
+              <ChevronDown size={13} className="site-admin-dd-chevron"/>
+            </button>
+            <div className="site-admin-dd-panel">
+              <a className="site-admin-dd-item" href={`https://${activeSite.domain}`} target="_blank" rel="noreferrer">
+                <ExternalLink size={14}/> View Website
+              </a>
+              <div className="site-admin-dd-divider"/>
+              <p className="site-admin-dd-label">Switch Site</p>
+              {(sites.length ? sites : [activeSite]).map(site => (
+                <button
+                  key={site.site_key}
+                  type="button"
+                  className={`site-admin-dd-item ${site.site_key === siteKey ? 'active' : ''}`}
+                  onClick={() => { setOpenMenu(''); if (site.site_key !== siteKey) changeSite(site.site_key); }}
+                >
+                  <span className="site-admin-dd-dot"/> {site.admin_label || site.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={`site-admin-dd ${openMenu === 'user' ? 'open' : ''}`}>
+            <button
+              className="site-admin-dd-trigger site-admin-dd-trigger-avatar"
+              type="button"
+              aria-expanded={openMenu === 'user'}
+              onClick={() => setOpenMenu(current => (current === 'user' ? '' : 'user'))}
+              aria-label="Account menu"
+            >
+              <span className="site-admin-avatar">{(user?.name || 'A').slice(0, 2).toUpperCase()}</span>
+            </button>
+            <div className="site-admin-dd-panel site-admin-dd-panel-right">
+              <div className="site-admin-dd-who">
+                <span className="site-admin-avatar">{(user?.name || 'A').slice(0, 2).toUpperCase()}</span>
+                <span className="site-admin-dd-who-text"><strong>{user?.name || 'Admin'}</strong><small>{user?.email}</small></span>
+              </div>
+              <div className="site-admin-dd-divider"/>
+              <button className="site-admin-dd-item danger" type="button" onClick={logout}><LogOut size={14}/> Log out</button>
+            </div>
+          </div>
         </div>
       </header>
       <main className="site-admin-main"><Outlet /></main>

@@ -44,6 +44,15 @@
 
 .site-admin-shell.site-sunwings .dashboard-quick-card:hover{border-color:#f3c79e;box-shadow:0 9px 22px rgba(251,105,10,.12)}
 
+.site-admin-shell.site-sunwings .site-admin-dd-dot,
+.site-admin-shell.site-sunwings .site-admin-avatar{background:var(--sw-orange)}
+.site-admin-shell.site-sunwings .site-admin-dd-item:hover,
+.site-admin-shell.site-sunwings .site-admin-dd-item.active{background:#fff1e6;color:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .site-admin-dd-item:hover svg{color:var(--sw-orange-dark)}
+.site-admin-shell.site-sunwings .site-admin-dd-item.danger,
+.site-admin-shell.site-sunwings .site-admin-dd-item.danger:hover{background:#fff1f0;color:#b42318}
+.site-admin-shell.site-sunwings .site-admin-dd-item.danger svg{color:#b42318}
+
 .site-admin-shell.site-sunwings .sunwings-provider-mark{background:#fff1e6;color:var(--sw-orange-dark)}
 .site-admin-shell.site-sunwings .sunwings-social-preview-card a{color:var(--sw-orange-dark)}
 
