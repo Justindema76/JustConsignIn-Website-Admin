@@ -65,14 +65,12 @@
     overflow-wrap: normal !important;
   }
 
-  .site-admin-workspace,
-  .site-admin-main {
+  .site-admin-workspace {
     min-width: 0 !important;
-    max-width: none !important;
   }
 
   .site-admin-main {
-    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .site-admin-header {
