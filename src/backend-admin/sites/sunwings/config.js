@@ -57,6 +57,7 @@ export default {
       { to: '/admin/sunwings/services', icon: 'truck', title: 'Service Posts', copy: 'Add and edit Sunwings services' },
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
       { to: '/admin/sunwings/blog', icon: 'book', title: 'Moving Tips Posts', copy: 'Add and edit moving articles' },
+      { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming leads' },
     ],
     sections: [
       {
@@ -84,18 +85,11 @@ export default {
       },
       {
         id: 'social',
-        title: 'Social & Marketing',
-        copy: 'Manage Sunwings social profiles and create social media content.',
+        title: 'Social & Settings',
+        copy: 'Social profiles, content and website configuration.',
         items: [
           { to: '/admin/sunwings/social', icon: 'link', title: 'Social Links', copy: 'Manage Facebook, Instagram, LinkedIn, YouTube, TikTok and other social profile links.' },
           { to: '/admin/sunwings/social-posts', icon: 'sparkles', title: 'Social Posts', copy: 'Create, save, schedule and publish social content for Sunwings.' },
-        ],
-      },
-      {
-        id: 'settings',
-        title: 'Settings',
-        copy: 'Sunwings-specific business and website configuration.',
-        items: [
           { to: '/admin/sunwings/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage Sunwings website configuration, SMTP and notification routing.' },
           { to: '/admin/sunwings/integrations', icon: 'plug', title: 'Integrations', copy: 'Connect Google Reviews and the Facebook Page feed.' },
         ],

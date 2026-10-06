@@ -68,15 +68,6 @@ export default {
     ],
     sections: [
       {
-        id: 'operations',
-        title: 'Operations',
-        copy: 'Departments and recruiter contacts.',
-        items: [
-          { to: '/admin/departments', icon: 'building', title: 'Departments', copy: 'Manage departments used to route project requests.' },
-          { to: '/admin/hiring-contacts', icon: 'briefcase', title: 'Hiring Contacts', copy: 'Review employment enquiries separately from project work.' },
-        ],
-      },
-      {
         id: 'content',
         title: 'Content',
         copy: 'Manage content that belongs to JustinDeMatteis.com.',
@@ -103,9 +94,11 @@ export default {
       },
       {
         id: 'tools',
-        title: 'Social & Settings',
-        copy: 'Social links, automation and website configuration.',
+        title: 'Operations, Social & Settings',
+        copy: 'Departments, recruiting, social tools and website configuration.',
         items: [
+          { to: '/admin/departments', icon: 'building', title: 'Departments', copy: 'Manage departments used to route project requests.' },
+          { to: '/admin/hiring-contacts', icon: 'briefcase', title: 'Hiring Contacts', copy: 'Review employment enquiries separately from project work.' },
           { to: '/admin/social', icon: 'link', title: 'Social Links', copy: 'Manage the social links used by the website.' },
           { to: '/admin/social-automation', icon: 'sparkles', title: 'Social Automation', copy: 'Create, schedule and publish social content.' },
           { to: '/admin/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage email, notification routing and website services.' },

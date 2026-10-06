@@ -59,15 +59,6 @@ export default {
     ],
     sections: [
       {
-        id: 'growth',
-        title: 'Growth',
-        copy: 'Beta partners and outreach tracking.',
-        items: [
-          { to: '/admin/beta-partners', icon: 'handshake', title: 'Beta Partners', copy: 'Manage Founding Partner applications and active testing.' },
-          { to: '/admin/outreach', icon: 'map', title: 'Outreach Map', copy: 'Track consignment-shop leads and outreach activity.' },
-        ],
-      },
-      {
         id: 'content',
         title: 'Content',
         copy: 'Manage content that belongs to JustConsignIn.',
@@ -91,9 +82,11 @@ export default {
       },
       {
         id: 'tools',
-        title: 'Social & Settings',
-        copy: 'Social tools and website configuration.',
+        title: 'Growth, Social & Settings',
+        copy: 'Beta partners, outreach, social tools and website configuration.',
         items: [
+          { to: '/admin/beta-partners', icon: 'handshake', title: 'Beta Partners', copy: 'Manage Founding Partner applications and active testing.' },
+          { to: '/admin/outreach', icon: 'map', title: 'Outreach Map', copy: 'Track consignment-shop leads and outreach activity.' },
           { to: '/admin/social', icon: 'link', title: 'Social Links', copy: 'Manage website social links.' },
           { to: '/admin/social-automation', icon: 'sparkles', title: 'Social Automation', copy: 'Create and schedule social content.' },
           { to: '/admin/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage email and shared website services.' },

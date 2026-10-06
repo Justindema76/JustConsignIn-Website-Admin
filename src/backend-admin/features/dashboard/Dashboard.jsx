@@ -10,14 +10,10 @@ import './dashboard.css';
 function BoardStatus({ metrics }) {
   if (!metrics) return null;
   return <section className="dispatch-strip">
-    <div className="dispatch-strip-head">
-      <h2>Board Status</h2>
-    </div>
     <div className="dispatch-metrics">
       {metrics.map(item => <div className={`dispatch-metric ${item.attention ? 'attention' : ''}`} key={item.label}>
-        <div className="dispatch-metric-label">{item.label}</div>
-        <div className="dispatch-metric-value">{String(item.value).padStart(2, '0')}</div>
-        <div className="dispatch-metric-note">{item.note}</div>
+        <span className="dispatch-metric-label">{item.label}</span>
+        <span className="dispatch-metric-value">{String(item.value).padStart(2, '0')}</span>
       </div>)}
     </div>
   </section>;
@@ -100,31 +96,17 @@ export default function Dashboard() {
     </section>
 
     <div className="dashboard-section-grid">
-      {dashboard.sections.map((section, index) => <details className={`dashboard-section-card ${section.id}`} key={section.id} open={index === 0}>
-        <summary className="dashboard-section-heading">
-          <div>
-            <h2>{section.title}</h2>
-            <p>{section.copy}</p>
-          </div>
-          <span className="dashboard-section-toggle">›</span>
-        </summary>
-
-        <div className="dashboard-link-list">
-          {section.items.map(item => {
-            const Icon = getSiteIcon(item.icon);
-            return <Link className="dashboard-link-row" to={item.to} key={item.to}>
-              <span className="dashboard-row-icon"><Icon size={17}/></span>
-              <span className="dashboard-row-copy">
-                <strong>{item.title}</strong>
-                <small>{item.copy}</small>
-              </span>
-              <span className="dashboard-link-arrow">›</span>
-            </Link>;
-          })}
-        </div>
-      </details>)}
+      {dashboard.sections.map(section => <section className="group-card" key={section.id}>
+        <h3>{section.title}</h3>
+        {section.items.map(item => {
+          const Icon = getSiteIcon(item.icon);
+          return <Link className="group-link" to={item.to} key={item.to}>
+            <Icon size={15}/> {item.title}
+          </Link>;
+        })}
+      </section>)}
     </div>
 
-    <LeadsPanel leads={data?.leads}/>
+    {siteKey !== 'sunwings' && <LeadsPanel leads={data?.leads}/>}
   </>;
 }
