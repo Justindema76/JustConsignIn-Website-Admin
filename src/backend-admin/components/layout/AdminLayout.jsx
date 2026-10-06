@@ -19,6 +19,13 @@ function isPathInGroup(pathname, group) {
   return group.items.some(item => pathname === item.to || pathname.startsWith(`${item.to}/`));
 }
 
+// Permanent safety net: this account always gets the full admin, no matter
+// what the server-reported role says.
+const WEBSITE_OWNER_EMAIL = 'justindema76@gmail.com';
+function isOwnerUser(user) {
+  return user?.role === 'owner' || !user?.role || String(user?.email || '').trim().toLowerCase() === WEBSITE_OWNER_EMAIL;
+}
+
 export default function AdminLayout() {
   const { user, accessToken, signOut } = useAuth();
   const navigate = useNavigate();
@@ -28,11 +35,11 @@ export default function AdminLayout() {
   const [siteKey, setSiteKey] = useState(getAdminSiteKey());
   const siteConfig = useMemo(() => getSiteConfig(siteKey), [siteKey]);
   const navGroups = useMemo(() => {
-    if (user?.role === 'owner' || !user?.role) return siteConfig.navGroups;
+    if (isOwnerUser(user)) return siteConfig.navGroups;
     return siteConfig.navGroups
       .map(group => ({ ...group, items: group.items.filter(item => !item.ownerOnly) }))
       .filter(group => group.items.length > 0);
-  }, [siteConfig.navGroups, user?.role]);
+  }, [siteConfig.navGroups, user]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState(() => {
     const config = getSiteConfig(getAdminSiteKey());
@@ -73,7 +80,7 @@ export default function AdminLayout() {
   }, [location.pathname, activeGroupId]);
 
   const visibleSites = useMemo(() => {
-    if (user?.role === 'owner' || !user?.sites) return sites;
+    if (isOwnerUser(user) || !user?.sites) return sites;
     return sites.filter(site => user.sites.includes(site.site_key));
   }, [sites, user?.role, user?.sites]);
 

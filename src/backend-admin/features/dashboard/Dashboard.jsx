@@ -7,6 +7,13 @@ import { getSiteIcon } from '../../sites/icons';
 import { loadDashboardData } from './dashboardData';
 import './dashboard.css';
 
+// Permanent safety net: this account always gets the full admin, no matter
+// what the server-reported role says.
+const WEBSITE_OWNER_EMAIL = 'justindema76@gmail.com';
+function isOwnerUser(user) {
+  return user?.role === 'owner' || !user?.role || String(user?.email || '').trim().toLowerCase() === WEBSITE_OWNER_EMAIL;
+}
+
 function BoardStatus({ metrics }) {
   if (!metrics) return null;
   return <section className="dispatch-strip">
@@ -106,7 +113,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="dashboard-quick-grid">
-        {(user?.role === 'owner' || !user?.role ? dashboard.quick : dashboard.quick.filter(item => !item.ownerOnly)).map(item => {
+        {(isOwnerUser(user) ? dashboard.quick : dashboard.quick.filter(item => !item.ownerOnly)).map(item => {
           const Icon = getSiteIcon(item.icon);
           return <Link className="dashboard-quick-card" to={item.to} key={item.to}>
             <span className="dashboard-quick-icon"><Icon size={20}/></span>
@@ -122,7 +129,7 @@ export default function Dashboard() {
 
     <div className="dashboard-section-grid">
       {dashboard.sections.map(section => {
-        const items = user?.role === 'owner' || !user?.role ? section.items : section.items.filter(item => !item.ownerOnly);
+        const items = isOwnerUser(user) ? section.items : section.items.filter(item => !item.ownerOnly);
         if (!items.length) return null;
         return <section className="group-card" key={section.id}>
           <h3>{section.title}</h3>
