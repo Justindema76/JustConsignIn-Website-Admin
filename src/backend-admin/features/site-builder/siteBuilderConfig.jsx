@@ -5,6 +5,28 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import MediaPickerModal from '../social-automation/components/MediaPickerModal';
 import { loadAdminMedia, loadAdminVideos, uploadSiteImage } from '../../services/siteAdminService';
 import { FALLBACK_VIDEOS } from '../../config/siteContent';
+import { loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
+
+function useSunwingsPublishedServices() {
+  const { accessToken } = useAuth();
+  const [services, setServices] = useState([]);
+  useEffect(() => {
+    if (!accessToken) return;
+    let active = true;
+    loadServicePosts(accessToken)
+      .then(posts => {
+        if (!active) return;
+        setServices(
+          (posts || [])
+            .filter(post => post.status === 'published')
+            .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+        );
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [accessToken]);
+  return services;
+}
 
 function ImageLibraryField({ field, value, onChange }) {
   const { accessToken } = useAuth();
@@ -1378,19 +1400,21 @@ export const siteBuilderConfig = {
       },
       defaultProps: { eyebrow:'What we do',heading:'One call for every move.',text:'From a single couch to a full warehouse transfer, Sunwings brings the truck, the crew and the care.',align:'center',limit:'0',buttonText:'',buttonUrl:'/services',background:'white' },
       render: p => {
+        const services = useSunwingsPublishedServices();
         const count = Number(p.limit||0)>0?Number(p.limit):6;
         return <section style={{padding:'36px 8px',background:p.background==='soft'?'#F6F8FB':'#fff'}}>
           <div style={{textAlign:p.align==='left'?'left':'center'}}><div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase',letterSpacing:'.12em'}}>{p.eyebrow}</div><h2 style={{fontSize:34,margin:'6px 0'}}>{p.heading}</h2><p style={{color:'#5B6B82'}}>{p.text}</p></div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginTop:20}}>{Array.from({length:count},(_,i)=>i+1).map(n => {
-            const image = p[`service${n}Image`];
-            const title = p[`service${n}Title`];
-            const text = p[`service${n}Text`];
-            return <div key={n} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff',overflow:'hidden'}}>
+            const service = services[n-1];
+            const image = p[`service${n}Image`] || service?.bannerImage;
+            const title = p[`service${n}Title`] || service?.title || (service ? '' : `No published Service Post in slot ${n}`);
+            const text = p[`service${n}Text`] || service?.intro || service?.heroDescription;
+            return <div key={n} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff',overflow:'hidden',opacity:service||p[`service${n}Title`]?1:.5}}>
               {image
                 ? <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,backgroundImage:`url(${image})`,backgroundSize:'cover',backgroundPosition:'center'}}/>
-                : <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,background:'#F1F4F9',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:'#94a3b8',fontWeight:600}}>Uses Service Post image</div>}
-              <div style={{fontWeight:800}}>{title || `Service ${n}`}</div>
-              <small style={{display:'block',marginTop:6,color:'#64748b',fontWeight:500}}>{text || (title ? '' : 'Title, text & link pulled from the matching Service Post unless overridden above')}</small>
+                : <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,background:'#F1F4F9',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:'#94a3b8',fontWeight:600}}>No image set</div>}
+              <div style={{fontWeight:800}}>{title}</div>
+              <small style={{display:'block',marginTop:6,color:'#64748b',fontWeight:500}}>{text}</small>
             </div>;
           })}</div>
         </section>;
