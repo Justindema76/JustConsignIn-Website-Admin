@@ -2,22 +2,21 @@
 
 .site-admin-shell{--dashboard-accent:#1f67b2;--dashboard-accent-deep:#164f88;--dashboard-accent-wash:#eaf2fb}
 
-/* Board Status — compact single row */
+/* Board Status — compact pill sized to its content, not the full page width */
 .dispatch-strip{
   background:#14151a;
   border-radius:11px;
   padding:0 20px;
   height:54px;
   margin-bottom:18px;
-  display:flex;
+  display:inline-flex;
   align-items:center;
+  max-width:100%;
   overflow-x:auto;
 }
 .dispatch-metrics{
   display:flex;
   align-items:center;
-  flex:1;
-  min-width:0;
 }
 .dispatch-metric{
   display:flex;
@@ -204,8 +203,8 @@
     padding:12px;
     border-radius:12px;
   }
-  .dispatch-strip{height:auto;padding:4px 16px}
-  .dispatch-metrics{flex-direction:column;align-items:stretch}
+  .dispatch-strip{display:flex;width:100%;height:auto;padding:4px 16px}
+  .dispatch-metrics{flex-direction:column;align-items:stretch;width:100%}
   .dispatch-metric{
     justify-content:space-between;
     padding:11px 0;
