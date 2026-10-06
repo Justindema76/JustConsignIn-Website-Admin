@@ -106,7 +106,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="dashboard-quick-grid">
-        {dashboard.quick.map(item => {
+        {(user?.role === 'owner' || !user?.role ? dashboard.quick : dashboard.quick.filter(item => !item.ownerOnly)).map(item => {
           const Icon = getSiteIcon(item.icon);
           return <Link className="dashboard-quick-card" to={item.to} key={item.to}>
             <span className="dashboard-quick-icon"><Icon size={20}/></span>
