@@ -19,11 +19,20 @@ function BoardStatus({ metrics }) {
   </section>;
 }
 
-function timeOfDayGreeting() {
-  const hour = new Date().getHours();
+function timeOfDayGreeting(now) {
+  const hour = now.getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
+}
+
+function useLiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
 }
 
 function LeadsPanel({ leads }) {
@@ -70,16 +79,21 @@ export default function Dashboard() {
   }));
 
   const firstName = (user?.name || 'there').split(' ')[0];
-  const today = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
+  const now = useLiveClock();
+  const today = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
+  const clock = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
 
   return <>
     <div className="site-admin-page-head dashboard-head">
       <div>
         <p className="site-admin-eyebrow">Overview</p>
-        <h1>{timeOfDayGreeting()}, {firstName}</h1>
+        <h1>{timeOfDayGreeting(now)}, {firstName}</h1>
         <p>{dashboard.intro}</p>
       </div>
-      <div className="dashboard-date">{today}</div>
+      <div className="dashboard-date">
+        <span>{today}</span>
+        <span className="dashboard-clock">{clock}</span>
+      </div>
     </div>
 
     <BoardStatus metrics={metrics}/>

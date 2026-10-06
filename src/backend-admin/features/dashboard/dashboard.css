@@ -1,5 +1,6 @@
 .dashboard-head{margin-bottom:18px}
-.dashboard-date{flex:0 0 auto;color:#8c8f94;font-size:12px;white-space:nowrap;padding-top:6px}
+.dashboard-date{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;color:#8c8f94;font-size:12px;white-space:nowrap;padding-top:6px}
+.dashboard-clock{font-variant-numeric:tabular-nums;font-size:12.5px;font-weight:600;color:#6d7175}
 
 .site-admin-shell{--dashboard-accent:#1f67b2;--dashboard-accent-deep:#164f88;--dashboard-accent-wash:#eaf2fb}
 
