@@ -1,4 +1,4 @@
-import { customerAppEnabled, getProfile, getUserFromToken, supabaseAnon, supabaseRest, supabaseUrl } from '../_lib/supabase.js';
+import { customerAppEnabled, getProfile, getUserFromToken, supabaseAnon, supabaseRest, supabaseUrl, supabaseUserRest } from '../_lib/supabase.js';
 import { isWebsiteOwner } from '../_lib/websiteAdmin.js';
 import { rateLimit } from '../_lib/rateLimit.js';
 
@@ -8,12 +8,25 @@ function safeCallback(value) {
   return path;
 }
 
-async function buildSessionUser(authUser, { requireAdmin = false } = {}) {
+async function findCollaboratorAccess(token, email) {
+  const response = await supabaseUserRest(token, `site_collaborators?email=eq.${encodeURIComponent(email)}&select=site_key,role`, { method: 'GET' });
+  if (!response.ok) return null;
+  const rows = await response.json().catch(() => []);
+  if (!rows?.length) return null;
+  return { role: rows[0].role, sites: rows.map(row => row.site_key) };
+}
+
+async function buildSessionUser(authUser, { requireAdmin = false, token = '' } = {}) {
   const admin = isWebsiteOwner(authUser);
+  let collaboratorAccess = null;
+
   if (requireAdmin && !admin) {
-    const error = new Error('Not found');
-    error.statusCode = 404;
-    throw error;
+    collaboratorAccess = await findCollaboratorAccess(token, String(authUser.email || '').trim().toLowerCase());
+    if (!collaboratorAccess) {
+      const error = new Error('Not found');
+      error.statusCode = 404;
+      throw error;
+    }
   }
 
   let profile = null;
@@ -23,7 +36,7 @@ async function buildSessionUser(authUser, { requireAdmin = false } = {}) {
     profile = null;
   }
 
-  if (admin) {
+  if (admin || collaboratorAccess) {
     return {
       id: authUser.id,
       name: profile?.full_name || authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Admin',
@@ -31,6 +44,8 @@ async function buildSessionUser(authUser, { requireAdmin = false } = {}) {
       email: authUser.email,
       workspaceId: profile?.workspace_id || null,
       isAdmin: true,
+      role: admin ? 'owner' : collaboratorAccess.role,
+      sites: admin ? null : collaboratorAccess.sites,
     };
   }
 
@@ -106,7 +121,7 @@ export default async function handler(req, res) {
       if (!authUser) return res.status(401).json({ error: 'Unauthorized' });
 
       try {
-        const user = await buildSessionUser(authUser, { requireAdmin });
+        const user = await buildSessionUser(authUser, { requireAdmin, token });
         return res.status(200).json({ user });
       } catch (error) {
         return res.status(error.statusCode || 500).json({

@@ -27,7 +27,12 @@ export default function AdminLayout() {
   const [sites, setSites] = useState([]);
   const [siteKey, setSiteKey] = useState(getAdminSiteKey());
   const siteConfig = useMemo(() => getSiteConfig(siteKey), [siteKey]);
-  const navGroups = siteConfig.navGroups;
+  const navGroups = useMemo(() => {
+    if (user?.role === 'owner' || !user?.role) return siteConfig.navGroups;
+    return siteConfig.navGroups
+      .map(group => ({ ...group, items: group.items.filter(item => !item.ownerOnly) }))
+      .filter(group => group.items.length > 0);
+  }, [siteConfig.navGroups, user?.role]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState(() => {
     const config = getSiteConfig(getAdminSiteKey());
@@ -66,6 +71,11 @@ export default function AdminLayout() {
       setOpenGroups(current => ({ ...current, [activeGroupId]: true }));
     }
   }, [location.pathname, activeGroupId]);
+
+  const visibleSites = useMemo(() => {
+    if (user?.role === 'owner' || !user?.sites) return sites;
+    return sites.filter(site => user.sites.includes(site.site_key));
+  }, [sites, user?.role, user?.sites]);
 
   const activeSite = sites.find(site => site.site_key === siteKey) || {
     site_key: siteConfig.key,
@@ -177,8 +187,8 @@ export default function AdminLayout() {
                 <ExternalLink size={14}/> View Website
               </a>
               <div className="site-admin-dd-divider"/>
-              <p className="site-admin-dd-label">Switch Site</p>
-              {(sites.length ? sites : [activeSite]).map(site => (
+              {visibleSites.length > 1 && <p className="site-admin-dd-label">Switch Site</p>}
+              {(visibleSites.length ? visibleSites : [activeSite]).map(site => (
                 <button
                   key={site.site_key}
                   type="button"

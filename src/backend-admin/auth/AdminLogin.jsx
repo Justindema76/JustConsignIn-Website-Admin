@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useAuth } from './AdminAuthContext';
+import { setAdminSiteKey } from '../services/siteAdminService';
 
 const ADMIN_HOME = '/admin';
 
@@ -27,7 +28,10 @@ export default function AdminLogin(){
     setLoading(true);
     setError('');
     completeGoogleSession({accessToken:oauthAccessToken,refreshToken:oauthRefreshToken})
-      .then(()=>{
+      .then(sessionUser=>{
+        if(sessionUser?.role && sessionUser.role!=='owner' && sessionUser.sites?.[0]){
+          setAdminSiteKey(sessionUser.sites[0]);
+        }
         window.history.replaceState({},document.title,ADMIN_HOME);
         navigate(ADMIN_HOME,{replace:true});
       })
@@ -53,13 +57,13 @@ export default function AdminLogin(){
       <div className="site-admin-login-card">
         <div className="site-admin-login-heading">
           <span className="site-admin-brand-mark"><ShieldCheck size={22}/></span>
-          <div><h1>Private Website Admin</h1><p>Owner access only.</p></div>
+          <div><h1>Private Website Admin</h1><p>Authorized access only.</p></div>
         </div>
         {error&&<div className="site-admin-alert error">This Google account is not authorized.</div>}
         <button className="site-admin-btn site-admin-login-button" type="button" disabled={loading} onClick={loginWithGoogle}>
           {loading?'Opening Google…':<><span aria-hidden="true" className="site-admin-google-mark">G</span> Continue with Google</>}
         </button>
-        <p className="site-admin-login-note">Only the verified owner account can open this area.</p>
+        <p className="site-admin-login-note">Only authorized accounts can open this area.</p>
       </div>
     </div>
   </div>;

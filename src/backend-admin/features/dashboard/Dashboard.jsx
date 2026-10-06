@@ -121,15 +121,19 @@ export default function Dashboard() {
     </section>
 
     <div className="dashboard-section-grid">
-      {dashboard.sections.map(section => <section className="group-card" key={section.id}>
-        <h3>{section.title}</h3>
-        {section.items.map(item => {
-          const Icon = getSiteIcon(item.icon);
-          return <Link className="group-link" to={item.to} key={item.to}>
-            <Icon size={15}/> {item.title}
-          </Link>;
-        })}
-      </section>)}
+      {dashboard.sections.map(section => {
+        const items = user?.role === 'owner' || !user?.role ? section.items : section.items.filter(item => !item.ownerOnly);
+        if (!items.length) return null;
+        return <section className="group-card" key={section.id}>
+          <h3>{section.title}</h3>
+          {items.map(item => {
+            const Icon = getSiteIcon(item.icon);
+            return <Link className="group-link" to={item.to} key={item.to}>
+              <Icon size={15}/> {item.title}
+            </Link>;
+          })}
+        </section>;
+      })}
     </div>
 
     {siteKey !== 'sunwings' && <LeadsPanel leads={data?.leads}/>}
