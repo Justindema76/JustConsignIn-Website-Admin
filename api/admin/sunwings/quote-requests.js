@@ -1,5 +1,5 @@
-import { requireWebsiteOwner } from '../../_lib/websiteAdmin.js';
-import { supabaseUserRest } from '../../_lib/supabase.js';
+import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
+import { supabaseRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const FIELDS = [
@@ -31,14 +31,13 @@ function nullableIso(value) {
 
 export default async function handler(req, res) {
   if (!['GET','POST','DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const owner = await requireWebsiteOwner(req, res);
+  const owner = await requireSiteAccess(req, res, 'sunwings');
   if (!owner) return;
 
   try {
     if (req.method === 'GET') {
       const requests = await parseSupabase(
-        await supabaseUserRest(
-          owner.accessToken,
+        await supabaseRest(
           `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(FIELDS)}&order=created_at.desc`,
           { method: 'GET' },
         ),
@@ -51,8 +50,7 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ error: 'Missing quote request id.' });
 
     if (req.method === 'DELETE') {
-      const response = await supabaseUserRest(
-        owner.accessToken,
+      const response = await supabaseRest(
         `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}`,
         { method: 'DELETE', headers: { Prefer: 'return=minimal' } },
       );
@@ -105,8 +103,7 @@ export default async function handler(req, res) {
     }
 
     const rows = await parseSupabase(
-      await supabaseUserRest(
-        owner.accessToken,
+      await supabaseRest(
         `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(FIELDS)}`,
         {
           method: 'PATCH',

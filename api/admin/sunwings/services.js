@@ -1,11 +1,11 @@
-import { requireWebsiteOwner } from '../../_lib/websiteAdmin.js';
+import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
 import { SERVICE_FIELDS, cleanService, deletePost, listPosts, savePost } from './_lib/content.js';
 
 const TABLE = 'sunwings_services';
 
 export default async function handler(req, res) {
   if (!['GET','POST','DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
-  const owner = await requireWebsiteOwner(req, res);
+  const owner = await requireSiteAccess(req, res, 'sunwings');
   if (!owner) return;
 
   try {

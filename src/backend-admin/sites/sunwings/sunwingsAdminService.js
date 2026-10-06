@@ -84,3 +84,30 @@ export async function syncSunwingsFacebookPosts(accessToken) {
   );
   return { count: payload.count || 0, posts: Array.isArray(payload.posts) ? payload.posts : [] };
 }
+
+export async function loadCollaborators(accessToken, siteKey) {
+  const payload = await parseJsonResponse(
+    await adminFetch(`/api/admin/collaborators?site=${encodeURIComponent(siteKey)}`, {}, accessToken),
+    'Unable to load team members.',
+  );
+  return Array.isArray(payload.collaborators) ? payload.collaborators : [];
+}
+
+export async function addCollaborator(accessToken, { siteKey, email, role, label }) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/collaborators', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siteKey, email, role, label }),
+    }, accessToken),
+    'Unable to add team member.',
+  );
+  return payload.collaborator || null;
+}
+
+export async function removeCollaborator(accessToken, id) {
+  await parseJsonResponse(
+    await adminFetch(`/api/admin/collaborators?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken),
+    'Unable to remove team member.',
+  );
+}

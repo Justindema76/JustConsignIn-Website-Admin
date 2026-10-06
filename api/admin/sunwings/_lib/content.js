@@ -1,4 +1,9 @@
-import { supabaseUserRest } from '../../../_lib/supabase.js';
+import { supabaseRest } from '../../../_lib/supabase.js';
+
+// Authorization for these calls happens one layer up, in the route handler
+// (requireWebsiteOwner / requireSiteAccess) — these use the service-role key
+// so an editor/admin collaborator's request isn't also blocked by RLS
+// policies that only know about the single hardcoded owner email.
 
 export const SITE_KEY = 'sunwings';
 
@@ -115,16 +120,16 @@ export function cleanLocation(body = {}) {
   };
 }
 
-export async function listPosts(accessToken, table, fields, id = '') {
+export async function listPosts(_accessToken, table, fields, id = '') {
   const idFilter = id ? `&id=eq.${encodeURIComponent(id)}&limit=1` : '';
   const path = `${table}?site_key=eq.${SITE_KEY}${idFilter}&select=${encodeURIComponent(fields)}&order=sort_order.asc,updated_at.desc`;
   return parseSupabase(
-    await supabaseUserRest(accessToken, path, { method: 'GET' }),
+    await supabaseRest(path, { method: 'GET' }),
     `Unable to load ${table}.`,
   );
 }
 
-export async function savePost(accessToken, table, fields, body, cleaner) {
+export async function savePost(_accessToken, table, fields, body, cleaner) {
   const payload = { ...cleaner(body), site_key: SITE_KEY };
   if (!payload.title) throw new Error('Title is required.');
   if (!payload.slug) throw new Error('Slug is required.');
@@ -135,7 +140,7 @@ export async function savePost(accessToken, table, fields, body, cleaner) {
     : `${table}?select=${encodeURIComponent(fields)}`;
 
   const rows = await parseSupabase(
-    await supabaseUserRest(accessToken, path, {
+    await supabaseRest(path, {
       method: id ? 'PATCH' : 'POST',
       headers: { Prefer: 'return=representation' },
       body: JSON.stringify(payload),
@@ -146,11 +151,10 @@ export async function savePost(accessToken, table, fields, body, cleaner) {
   return Array.isArray(rows) ? rows[0] || null : rows;
 }
 
-export async function deletePost(accessToken, table, id) {
+export async function deletePost(_accessToken, table, id) {
   if (!id) throw new Error('Missing content id.');
   await parseSupabase(
-    await supabaseUserRest(
-      accessToken,
+    await supabaseRest(
       `${table}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}`,
       { method: 'DELETE', headers: { Prefer: 'return=minimal' } },
     ),

@@ -16,6 +16,7 @@ import {
   Settings,
   Sparkles,
   Truck,
+  Users,
   Video,
 } from 'lucide-react';
 
@@ -37,6 +38,7 @@ const ICONS = {
   settings: Settings,
   sparkles: Sparkles,
   truck: Truck,
+  users: Users,
   video: Video,
 };
 

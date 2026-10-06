@@ -40,6 +40,7 @@ export default {
       items: [
         { to: '/admin/sunwings/settings', label: 'Website Settings', icon: 'settings' },
         { to: '/admin/sunwings/integrations', label: 'Integrations', icon: 'plug' },
+        { to: '/admin/sunwings/team', label: 'Team', icon: 'users' },
       ],
     },
     {
@@ -92,6 +93,7 @@ export default {
           { to: '/admin/sunwings/social-posts', icon: 'sparkles', title: 'Social Posts', copy: 'Create, save, schedule and publish social content for Sunwings.' },
           { to: '/admin/sunwings/settings', icon: 'settings', title: 'Website Settings', copy: 'Manage Sunwings website configuration, SMTP and notification routing.' },
           { to: '/admin/sunwings/integrations', icon: 'plug', title: 'Integrations', copy: 'Connect Google Reviews and the Facebook Page feed.' },
+          { to: '/admin/sunwings/team', icon: 'users', title: 'Team', copy: 'Add or remove who has access to this site.' },
         ],
       },
     ],
