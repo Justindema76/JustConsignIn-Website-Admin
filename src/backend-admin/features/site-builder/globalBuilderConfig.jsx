@@ -1,6 +1,12 @@
-import { Menu } from 'lucide-react';
+import { Menu, Phone } from 'lucide-react';
 import { imageField } from './siteBuilderConfig';
 import { SOCIAL_NETWORKS } from '../../config/siteContent';
+import './sunwingsLivePreview.css';
+
+function telHref(phone = '') {
+  const digits = String(phone).replace(/\D/g, '');
+  return digits ? `tel:+${digits.startsWith('1') ? digits : `1${digits}`}` : '#';
+}
 
 export const headerDefaults = {
   logo: 'https://www.justconsignin.com/images/brand/justconsigin-logo.png',
@@ -43,7 +49,7 @@ export const justinHeaderDefaults = {
 
 
 export const sunwingsHeaderDefaults = {
-  logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
+  logo: 'https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/site-assets/sunwings/1791334339517-SUNWING-site-logo.png',
   brand: 'Sunwings Transport',
   topbarEmphasis: 'Reliable • On-Time • Professional',
   topbarText: 'Moving & delivery from Toronto to Niagara',
@@ -125,7 +131,7 @@ export const justinFooterDefaults = {
 };
 
 export const sunwingsFooterDefaults = {
-  logo: 'https://sunwingstransport.ca/wp-content/uploads/2026/01/SUNWING-site-logo.png',
+  logo: 'https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/site-assets/sunwings/1791334339517-SUNWING-site-logo.png',
   brand: 'Sunwings Transport',
   ctaTitle: 'Ready when you are.',
   ctaPrimaryText: 'Request a Quote',
@@ -340,14 +346,38 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
           render: raw => {
             const p = { ...activeHeaderDefaults, ...raw };
             const links = Array.from({ length: 7 }, (_, i) => [p[`nav${i + 1}Label`], p[`nav${i + 1}Url`]]).filter(([label]) => label);
-            return <div style={isSunwings ? {background:'#fff'} : undefined}>
-              {isSunwings && String(p.topbarEnabled) !== 'false' && <div style={{background:'#0b2b50',color:'#fff',textAlign:'center',padding:'8px 12px',fontSize:'13px'}}><strong style={{color:'#ff8a00'}}>{p.topbarEmphasis}</strong>{p.topbarText ? <> — {p.topbarText}</> : null}</div>}
-              <div className={`global-header-preview global-theme-${p.background || 'white'}`} style={isSunwings ? {minHeight:`${Number(p.headerDesktopHeight)||110}px`} : undefined}>
-              <a className="global-preview-brand" href="/" onClick={previewClick} style={isSunwings ? {transform:`translate(${Number(p.logoOffsetX)||0}px,${Number(p.logoOffsetY)||0}px)`} : undefined}>
-                {p.logo ? <img src={p.logo} alt="" style={isSunwings ? {width:`${Number(p.logoDesktopWidth)||140}px`,maxHeight:`${Number(p.logoDesktopMaxHeight)||100}px`,height:'auto',objectFit:'contain'} : undefined}/> : null}
+
+            if (isSunwings) {
+              const headerVars = {
+                '--logo-desktop-width': `${Number(p.logoDesktopWidth) || 140}px`,
+                '--logo-desktop-max-height': `${Number(p.logoDesktopMaxHeight) || 100}px`,
+                '--header-desktop-height': `${Number(p.headerDesktopHeight) || 110}px`,
+              };
+              return <div className="sunwings-live-preview">
+                {String(p.topbarEnabled) !== 'false' && <div className="topbar">
+                  <div className="container"><span><b>{p.topbarEmphasis}</b>{p.topbarText ? <> — {p.topbarText}</> : null}</span></div>
+                </div>}
+                <header className="site">
+                  <div className="container nav">
+                    <a className="logo" href="/" onClick={previewClick} style={{transform:`translate(${Number(p.logoOffsetX)||0}px,${Number(p.logoOffsetY)||0}px)`, ...headerVars}}>
+                      {p.logo ? <img src={p.logo} alt=""/> : <strong>{p.brand}</strong>}
+                    </a>
+                    <nav className="nav-links">{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}</a>)}</nav>
+                    <div className="nav-cta">
+                      {String(p.callButtonEnabled) !== 'false' && <a className="btn btn-accent header-call" href="#" onClick={previewClick}><Phone size={17}/>{p.callButtonText || 'Call Now'}</a>}
+                    </div>
+                  </div>
+                </header>
+              </div>;
+            }
+
+            return <div>
+              <div className={`global-header-preview global-theme-${p.background || 'white'}`}>
+              <a className="global-preview-brand" href="/" onClick={previewClick}>
+                {p.logo ? <img src={p.logo} alt=""/> : null}
                 {isJustin
                   ? <strong><span style={{color:p.brandFirstColor || '#0B1F33'}}>{p.brandFirst || 'Justin'}</span>{' '}<span style={{color:p.brandSecondColor || '#2F6BFF'}}>{p.brandSecond || 'DeMatteis'}</span></strong>
-                  : !isSunwings ? <strong>{p.brand}</strong> : null}
+                  : <strong>{p.brand}</strong>}
               </a>
               <nav>{links.map(([label,url],i)=><a key={i} href={url || '#'} onClick={previewClick}>{label}{['/work','/ai-development'].includes(url) ? ' ▾' : ''}</a>)}</nav>
               {isJustin && activeSocial.length > 0 && <div className="global-social-preview" style={{
@@ -357,9 +387,7 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                 '--preview-social-hover-color':p.socialIconHoverColor,
                 '--preview-social-hover-background':p.socialIconHoverBackground,
               }}>{activeSocial.map(network => <a key={network.key} href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}</div>}
-              {isSunwings
-                ? String(p.callButtonEnabled) !== 'false' && <a className="global-preview-button" href="#" onClick={previewClick}>{p.callButtonText || 'Call Now'}</a>
-                : p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
+              {p.buttonText && <a className="global-preview-button" href={p.buttonUrl || '#'} onClick={previewClick}>{p.buttonText}</a>}
               <span className="global-mobile-menu"><Menu size={24}/></span>
             </div></div>;
           },
@@ -413,6 +441,55 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
           const p = { ...activeFooterDefaults, ...raw };
           const col1 = [1,2,3,4].map(i => [p[`link${i}Label`], p[`link${i}Url`]]).filter(([label]) => label);
           const col2 = [5,6,7,8].map(i => [p[`link${i}Label`], p[`link${i}Url`]]).filter(([label]) => label);
+
+          if (isSunwings) {
+            const col1Links = col1.length ? col1 : [['Residential Moving','/services/residential-moving'],['Furniture Delivery','/services/furniture-delivery'],['Commercial Transport','/services/commercial-transport'],['All Services','/services']];
+            const col2Links = col2.length ? col2 : [['Toronto','/locations/toronto'],['Hamilton','/locations/hamilton'],['Niagara Falls','/locations/niagara-falls'],['All Areas','/locations']];
+            return <div className="sunwings-live-preview">
+              <section className="cta-band">
+                <div className="container">
+                  <h2>{p.ctaTitle}</h2>
+                  <div className="cta-actions">
+                    {p.ctaPrimaryText && <a className="btn btn-navy" href="#" onClick={previewClick}>{p.ctaPrimaryText}</a>}
+                    {p.ctaSecondaryText && <a className="btn btn-line" href="#" onClick={previewClick}>{p.ctaSecondaryText} 647-526-5132</a>}
+                  </div>
+                </div>
+              </section>
+              <footer>
+                <div className="container">
+                  <div className="foot">
+                    <div>
+                      {p.logo ? <img className="foot-logo" src={p.logo} alt={p.brand}/> : <h3>{p.brand}</h3>}
+                      <p>{p.tagline}</p>
+                    </div>
+                    <div>
+                      <h4>{p.column1Title}</h4>
+                      {col1Links.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}
+                    </div>
+                    <div>
+                      <h4>{p.column2Title}</h4>
+                      {col2Links.map(([l,u],i)=><a href={u || '#'} onClick={previewClick} key={i}>{l}</a>)}
+                    </div>
+                    <div>
+                      <h4>{p.socialTitle}</h4>
+                      {p.socialText && <p>{p.socialText}</p>}
+                      {activeSocial.length > 0 && <div className="footer-social-icons">
+                        {activeSocial.map(network => <a key={network.key} className="footer-social-icon" href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}
+                      </div>}
+                      <a href="#" onClick={previewClick}>Pricing</a>
+                      <a href="#" onClick={previewClick}>Moving Tips</a>
+                      <a href="#" onClick={previewClick}>Contact</a>
+                    </div>
+                  </div>
+                  <div className="foot-bottom">
+                    <span>© {new Date().getFullYear()} {p.copyright}</span>
+                    <span>{p.privacyLabel && <a href={p.privacyUrl || '#'} onClick={previewClick}>{p.privacyLabel}</a>}{p.termsLabel && <a href={p.termsUrl || '#'} onClick={previewClick}>{p.termsLabel}</a>}</span>
+                  </div>
+                </div>
+              </footer>
+            </div>;
+          }
+
           return <footer className={`global-footer-preview global-theme-${p.background || 'light'}`}>
             <div className="global-footer-grid">
               <div><a className="global-preview-brand" href="/" onClick={previewClick}>{p.logo ? <img src={p.logo} alt=""/> : null}<strong>{p.brand}</strong></a><p>{p.tagline}</p></div>
