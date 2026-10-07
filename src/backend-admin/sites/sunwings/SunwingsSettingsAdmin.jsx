@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Globe2, Mail, Save, Settings as SettingsIcon, Upload } from 'lucide-react';
+import { CheckCircle2, Globe2, Library, Mail, Save, Settings as SettingsIcon, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { uploadSunwingsImage } from '../../services/siteAdminService';
+import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
 import EmailSettingsForm from '../../features/settings/email/EmailSettingsForm';
+import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 import '../../features/settings/settings.css';
 import '../../features/work-posts/workPosts.css';
 
@@ -36,6 +37,22 @@ export default function SunwingsSettingsAdmin() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [faviconPickerOpen, setFaviconPickerOpen] = useState(false);
+  const [media, setMedia] = useState([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
+
+  const openFaviconPicker = async () => {
+    setFaviconPickerOpen(true);
+    if (media.length || !accessToken) return;
+    setMediaLoading(true);
+    try {
+      setMedia(await loadAdminMedia(accessToken));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setMediaLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!accessToken) return;
@@ -141,11 +158,21 @@ export default function SunwingsSettingsAdmin() {
               {settings.favicon_url
                 ? <img src={settings.favicon_url} alt="" style={{width:32,height:32,borderRadius:6,border:'1px solid #dfe3e8',objectFit:'contain',background:'#fff'}}/>
                 : <span style={{width:32,height:32,borderRadius:6,border:'1px dashed #dfe3e8',display:'grid',placeItems:'center',fontSize:10,color:'#9aa1a7'}}>None</span>}
-              <button className="site-admin-btn secondary small" type="button" onClick={() => faviconRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Favicon'}</button>
+              <button className="site-admin-btn secondary small" type="button" onClick={openFaviconPicker} disabled={mediaLoading}><Library size={13}/>{mediaLoading ? 'Loading…' : 'Choose from Media'}</button>
+              <button className="site-admin-btn secondary small" type="button" onClick={() => faviconRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload New'}</button>
             </div>
             <input ref={faviconRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadFavicon}/>
-            <small>Square image works best — 512×512 PNG is a safe size. This sets the icon shown in the browser tab.</small>
+            <small>Square image works best — 512×512 PNG is a safe size. This sets the icon shown in the browser tab. Reuse something already in Media instead of uploading a duplicate.</small>
           </label>
+          {faviconPickerOpen && <MediaPickerModal
+            items={media.filter(item => (item.mediaType || 'image') === 'image')}
+            onClose={() => setFaviconPickerOpen(false)}
+            onSelect={item => {
+              update('favicon_url', item.url);
+              setFaviconPickerOpen(false);
+              setMessage('Favicon selected from Media. Save settings to keep it.');
+            }}
+          />}
           <label>Google site verification<input value={settings.google_site_verification} onChange={event => update('google_site_verification', event.target.value)} placeholder="Paste verification token only"/></label>
           <label>GA4 Measurement ID<input value={settings.ga4_measurement_id} onChange={event => update('ga4_measurement_id', event.target.value.trim())} placeholder="G-XXXXXXXXXX"/></label>
           <label>Meta Pixel ID<input value={settings.meta_pixel_id} onChange={event => update('meta_pixel_id', event.target.value.replace(/[^0-9]/g, ''))} placeholder="Optional"/></label>
