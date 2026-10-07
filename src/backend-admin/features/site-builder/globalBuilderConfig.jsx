@@ -459,7 +459,7 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                 <div className="container">
                   <div className="foot">
                     <div>
-                      {p.logo ? <img className="foot-logo" src={p.logo} alt={p.brand}/> : <h3>{p.brand}</h3>}
+                      {p.logo ? <a href="/" onClick={previewClick} aria-label={p.brand}><img className="foot-logo" src={p.logo} alt={p.brand}/></a> : <h3>{p.brand}</h3>}
                       <p>{p.tagline}</p>
                     </div>
                     <div>
