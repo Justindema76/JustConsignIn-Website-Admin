@@ -72,15 +72,10 @@ export default function GlobalBuilder() {
   if(!data) return <div className="jci-site-builder-loading"><LoaderCircle className="jci-spin" size={26}/><strong>Loading {sectionLabel.toLowerCase()} editor…</strong></div>;
 
   return <div className="jci-site-builder-page">
-    <div className="site-admin-page-head">
-      <div>
-        <p className="site-admin-eyebrow">Website · Global</p>
-        <h1>{sectionLabel}</h1>
-        <p>Edit this once. It is reused across every public website page.</p>
-      </div>
-      <div className="site-admin-actions"><a className="site-admin-btn secondary" href={liveUrl} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a></div>
+    <div className="jci-global-builder-head">
+      <h1>{sectionLabel}<small>Reused on every page{savedAt && ` · published ${new Date(savedAt).toLocaleString()}`}</small></h1>
+      <a className="site-admin-btn secondary small" href={liveUrl} target="_blank" rel="noreferrer">View Website <ExternalLink size={13}/></a>
     </div>
-    <div className="jci-builder-notice"><strong>Global component.</strong> Puck's <strong>Publish</strong> button updates this {sectionLabel.toLowerCase()} everywhere.{savedAt && <span> Last published {new Date(savedAt).toLocaleString()}.</span>}</div>
     {message && <div className="jci-builder-message success"><CheckCircle2 size={17}/><span>{message}</span></div>}
     {error && <div className="jci-builder-message error"><span>{error}</span></div>}
     <div className={`jci-puck-editor jci-puck-editor-${type}`}>
@@ -92,7 +87,6 @@ export default function GlobalBuilder() {
         ui={{
           leftSideBarWidth: type === 'header' ? 176 : 210,
           rightSideBarWidth: type === 'header' ? 300 : 320,
-          viewports: { current: { width: '100%', height: 'auto' } },
         }}
         viewports={[
           { width: 390, height: 'auto', icon: 'Smartphone', label: 'Mobile' },
