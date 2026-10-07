@@ -83,6 +83,7 @@ export default function SunwingsPostEditor({ type }) {
   const [mediaLoading, setMediaLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [availableServices, setAvailableServices] = useState([]);
 
   const sorted = useMemo(
     () => [...posts].sort((a, b) => (a.sortOrder - b.sortOrder) || new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)),
@@ -116,7 +117,16 @@ export default function SunwingsPostEditor({ type }) {
       .finally(() => setBusy(false));
   }, [accessToken, editing, id, type]);
 
+  useEffect(() => {
+    if (!accessToken || type !== 'location') return;
+    loadServicePosts(accessToken).then(setAvailableServices).catch(() => {});
+  }, [accessToken, type]);
+
   const update = (key, value) => setDraft(current => ({ ...current, [key]: value }));
+
+  const toggleServiceSlug = slug => update('serviceSlugs', (draft.serviceSlugs || []).includes(slug)
+    ? draft.serviceSlugs.filter(value => value !== slug)
+    : [...(draft.serviceSlugs || []), slug]);
 
   const save = async event => {
     event?.preventDefault?.();
@@ -294,9 +304,15 @@ export default function SunwingsPostEditor({ type }) {
           {type === 'location' && <>
             <label>Areas / neighbourhoods served</label>
             <RepeatableText values={draft.neighbourhoods} onChange={value => update('neighbourhoods', value)} addLabel="Add area" placeholder="Stoney Creek"/>
-            <label>Service slugs <small>Comma-separated; connects this location to published Service Posts.</small>
-              <textarea rows="4" value={(draft.serviceSlugs || []).join(', ')} onChange={event => update('serviceSlugs', event.target.value.split(',').map(value => value.trim()).filter(Boolean))}/>
-            </label>
+            <label>Services offered here <small>Which Service Posts show this location under "Where we offer…". Leave all unchecked to show this location for every service.</small></label>
+            <div className="work-post-service-slugs">
+              {availableServices.length
+                ? availableServices.map(service => <label key={service.slug} className="work-post-service-slug-row">
+                    <input type="checkbox" checked={(draft.serviceSlugs || []).includes(service.slug)} onChange={() => toggleServiceSlug(service.slug)}/>
+                    <span>{service.title}</span>
+                  </label>)
+                : <small>No published Service Posts yet.</small>}
+            </div>
 
             <div className="work-post-panel-head" style={{marginTop:'18px'}}>
               <div><div><h3>Local details</h3><p>Unique facts for this city. These become the “Moving in [city]: what to know” cards.</p></div></div>
