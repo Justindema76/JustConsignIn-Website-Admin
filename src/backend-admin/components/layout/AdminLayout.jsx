@@ -229,7 +229,7 @@ export default function AdminLayout() {
           </div>
         </div>
       </header>
-      <main className="site-admin-main"><Outlet /></main>
+      <main className={`site-admin-main ${/\/pages\/[^/]+$/.test(location.pathname) ? 'site-admin-main-wide' : ''}`}><Outlet /></main>
     </div>
   </div>;
 }

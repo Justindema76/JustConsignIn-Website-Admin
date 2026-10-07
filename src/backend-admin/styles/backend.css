@@ -115,3 +115,11 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
 @media(max-width:760px){
   .site-admin-dd-name{display:none}
 }
+
+/* The page builder (3-column block editor) needs the full workspace width,
+   unlike every other admin page which is capped at 1340px for readability. */
+.site-admin-main.site-admin-main-wide{
+  max-width:none;
+  padding-left:20px;
+  padding-right:20px;
+}
