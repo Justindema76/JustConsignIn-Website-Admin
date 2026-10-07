@@ -1188,3 +1188,28 @@
     --puck-user-sidebar-right-width:280px;
   }
 }
+
+/* Puck's panel-toggle buttons only had hover-tooltip titles ("Toggle left
+   sidebar" / "Toggle right sidebar") with no visible label -- make that text
+   a permanent small pill next to the icon instead of something you have to
+   hover and wait for. */
+.jci-puck-editor button[title="Toggle left sidebar"],
+.jci-puck-editor button[title="Toggle right sidebar"]{
+  display:inline-flex !important;
+  align-items:center;
+  gap:6px;
+  width:auto !important;
+  padding:0 10px 0 8px !important;
+}
+.jci-puck-editor button[title="Toggle left sidebar"]::after,
+.jci-puck-editor button[title="Toggle right sidebar"]::after{
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.jci-puck-editor button[title="Toggle left sidebar"]::after{
+  content:"Blocks panel";
+}
+.jci-puck-editor button[title="Toggle right sidebar"]::after{
+  content:"Properties panel";
+}
