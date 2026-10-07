@@ -84,6 +84,8 @@ export default function SunwingsPostEditor({ type }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [availableServices, setAvailableServices] = useState([]);
+  const [availableLocations, setAvailableLocations] = useState([]);
+  const [locationTogglingSlug, setLocationTogglingSlug] = useState('');
 
   const sorted = useMemo(
     () => [...posts].sort((a, b) => (a.sortOrder - b.sortOrder) || new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)),
@@ -122,11 +124,32 @@ export default function SunwingsPostEditor({ type }) {
     loadServicePosts(accessToken).then(setAvailableServices).catch(() => {});
   }, [accessToken, type]);
 
+  useEffect(() => {
+    if (!accessToken || type !== 'service') return;
+    loadLocationPosts(accessToken).then(setAvailableLocations).catch(() => {});
+  }, [accessToken, type]);
+
   const update = (key, value) => setDraft(current => ({ ...current, [key]: value }));
 
   const toggleServiceSlug = slug => update('serviceSlugs', (draft.serviceSlugs || []).includes(slug)
     ? draft.serviceSlugs.filter(value => value !== slug)
     : [...(draft.serviceSlugs || []), slug]);
+
+  const toggleLocationForService = async location => {
+    if (!draft.slug) return setError('Set this service’s URL slug before picking locations.');
+    const current = location.serviceSlugs || [];
+    const nextSlugs = current.includes(draft.slug) ? current.filter(value => value !== draft.slug) : [...current, draft.slug];
+    setLocationTogglingSlug(location.slug);
+    setError('');
+    try {
+      const saved = await saveLocationPost(accessToken, { ...location, serviceSlugs: nextSlugs });
+      setAvailableLocations(current => current.map(item => (item.id === saved.id ? saved : item)));
+    } catch (err) {
+      setError(err.message || 'Unable to update that location.');
+    } finally {
+      setLocationTogglingSlug('');
+    }
+  };
 
   const save = async event => {
     event?.preventDefault?.();
@@ -370,6 +393,23 @@ export default function SunwingsPostEditor({ type }) {
           <label>CTA heading<input value={draft.ctaTitle} onChange={event => update('ctaTitle', event.target.value)}/></label>
           <label>CTA text<textarea rows="4" value={draft.ctaText} onChange={event => update('ctaText', event.target.value)}/></label>
         </div>
+
+        {type === 'service' && <div className="site-admin-card work-post-panel">
+          <div className="work-post-panel-head"><div><span>6</span><div><h2>Where we offer this</h2><p>Pick the locations that show this service. A location left unchecked everywhere still shows for every service.</p></div></div></div>
+          <div className="work-post-service-slugs">
+            {availableLocations.length
+              ? availableLocations.map(location => <label key={location.id || location.slug} className="work-post-service-slug-row">
+                  <input
+                    type="checkbox"
+                    checked={(location.serviceSlugs || []).includes(draft.slug)}
+                    disabled={locationTogglingSlug === location.slug}
+                    onChange={() => toggleLocationForService(location)}
+                  />
+                  <span>{location.title}</span>
+                </label>)
+              : <small>No published Location Posts yet.</small>}
+          </div>
+        </div>}
       </section>
 
       <aside className="work-post-editor-side">
