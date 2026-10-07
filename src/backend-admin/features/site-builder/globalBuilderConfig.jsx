@@ -461,6 +461,9 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                     <div>
                       {p.logo ? <a href="/" onClick={previewClick} aria-label={p.brand}><img className="foot-logo" src={p.logo} alt={p.brand}/></a> : <h3>{p.brand}</h3>}
                       <p>{p.tagline}</p>
+                      {activeSocial.length > 0 && <div className="footer-social-icons">
+                        {activeSocial.map(network => <a key={network.key} className="footer-social-icon" href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}
+                      </div>}
                     </div>
                     <div>
                       <h4>{p.column1Title}</h4>
@@ -473,9 +476,6 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                     <div>
                       <h4>{p.socialTitle}</h4>
                       {p.socialText && <p>{p.socialText}</p>}
-                      {activeSocial.length > 0 && <div className="footer-social-icons">
-                        {activeSocial.map(network => <a key={network.key} className="footer-social-icon" href={socialLinks[network.key].url} onClick={previewClick} aria-label={network.label}><img src={network.icon} alt=""/></a>)}
-                      </div>}
                       <a href="#" onClick={previewClick}>Pricing</a>
                       <a href="#" onClick={previewClick}>Moving Tips</a>
                       <a href="#" onClick={previewClick}>Contact</a>
