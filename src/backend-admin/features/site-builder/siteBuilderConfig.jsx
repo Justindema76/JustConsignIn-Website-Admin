@@ -119,18 +119,6 @@ export const imageField = {
   render: props => <ImageLibraryField {...props}/>,
 };
 
-function serviceImageOverrideField(index, label) {
-  return {
-    type: 'custom',
-    label,
-    render: props => {
-      const services = useSunwingsPublishedServices();
-      const service = services[index - 1];
-      return <ImageLibraryField {...props} fallbackImage={service?.bannerImage} fallbackLabel={service?.title}/>;
-    },
-  };
-}
-
 const backgroundOptions = [
   { label: 'White', value: 'white' },
   { label: 'Light', value: 'light' },
@@ -1408,32 +1396,23 @@ export const siteBuilderConfig = {
         buttonText: { type:'text', label:'Bottom link text' },
         buttonUrl: { type:'text', label:'Bottom link URL' },
         background: { type:'select', label:'Section background', options:[{label:'White',value:'white'},{label:'Soft',value:'soft'}] },
-        service1Image:serviceImageOverrideField(1,'Card 1 override image'),service1ImageAlt:{type:'text',label:'Card 1 image alt text'},service1Title:{type:'text',label:'Card 1 title override'},service1Text:{type:'textarea',label:'Card 1 description override'},service1LinkText:{type:'text',label:'Card 1 link text override'},service1Url:{type:'text',label:'Card 1 link URL override'},
-        service2Image:serviceImageOverrideField(2,'Card 2 override image'),service2ImageAlt:{type:'text',label:'Card 2 image alt text'},service2Title:{type:'text',label:'Card 2 title override'},service2Text:{type:'textarea',label:'Card 2 description override'},service2LinkText:{type:'text',label:'Card 2 link text override'},service2Url:{type:'text',label:'Card 2 link URL override'},
-        service3Image:serviceImageOverrideField(3,'Card 3 override image'),service3ImageAlt:{type:'text',label:'Card 3 image alt text'},service3Title:{type:'text',label:'Card 3 title override'},service3Text:{type:'textarea',label:'Card 3 description override'},service3LinkText:{type:'text',label:'Card 3 link text override'},service3Url:{type:'text',label:'Card 3 link URL override'},
-        service4Image:serviceImageOverrideField(4,'Card 4 override image'),service4ImageAlt:{type:'text',label:'Card 4 image alt text'},service4Title:{type:'text',label:'Card 4 title override'},service4Text:{type:'textarea',label:'Card 4 description override'},service4LinkText:{type:'text',label:'Card 4 link text override'},service4Url:{type:'text',label:'Card 4 link URL override'},
-        service5Image:serviceImageOverrideField(5,'Card 5 override image'),service5ImageAlt:{type:'text',label:'Card 5 image alt text'},service5Title:{type:'text',label:'Card 5 title override'},service5Text:{type:'textarea',label:'Card 5 description override'},service5LinkText:{type:'text',label:'Card 5 link text override'},service5Url:{type:'text',label:'Card 5 link URL override'},
-        service6Image:serviceImageOverrideField(6,'Card 6 override image'),service6ImageAlt:{type:'text',label:'Card 6 image alt text'},service6Title:{type:'text',label:'Card 6 title override'},service6Text:{type:'textarea',label:'Card 6 description override'},service6LinkText:{type:'text',label:'Card 6 link text override'},service6Url:{type:'text',label:'Card 6 link URL override'},
       },
       defaultProps: { eyebrow:'What we do',heading:'One call for every move.',text:'From a single couch to a full warehouse transfer, Sunwings brings the truck, the crew and the care.',align:'center',limit:'0',buttonText:'',buttonUrl:'/services',background:'white' },
       render: p => {
         const services = useSunwingsPublishedServices();
-        const count = Number(p.limit||0)>0?Number(p.limit):6;
+        const limit = Number(p.limit || 0);
+        const list = limit > 0 ? services.slice(0, limit) : services;
         return <section style={{padding:'36px 8px',background:p.background==='soft'?'#F6F8FB':'#fff'}}>
           <div style={{textAlign:p.align==='left'?'left':'center'}}><div style={{color:'#1F5FA8',fontSize:12,fontWeight:800,textTransform:'uppercase',letterSpacing:'.12em'}}>{p.eyebrow}</div><h2 style={{fontSize:34,margin:'6px 0'}}>{p.heading}</h2><p style={{color:'#5B6B82'}}>{p.text}</p></div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginTop:20}}>{Array.from({length:count},(_,i)=>i+1).map(n => {
-            const service = services[n-1];
-            const image = p[`service${n}Image`] || service?.bannerImage;
-            const title = p[`service${n}Title`] || service?.title || (service ? '' : `No published Service Post in slot ${n}`);
-            const text = p[`service${n}Text`] || service?.intro || service?.heroDescription;
-            return <div key={n} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff',overflow:'hidden',opacity:service||p[`service${n}Title`]?1:.5}}>
-              {image
-                ? <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,backgroundImage:`url(${image})`,backgroundSize:'cover',backgroundPosition:'center'}}/>
-                : <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,background:'#F1F4F9',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:'#94a3b8',fontWeight:600}}>No image set</div>}
-              <div style={{fontWeight:800}}>{title}</div>
-              <small style={{display:'block',marginTop:6,color:'#64748b',fontWeight:500}}>{text}</small>
-            </div>;
-          })}</div>
+          {list.length
+            ? <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginTop:20}}>{list.map(service => <div key={service.id || service.slug} style={{padding:20,border:'1px solid #E3E9F2',borderRadius:14,background:'#fff',overflow:'hidden'}}>
+                {service.bannerImage
+                  ? <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,backgroundImage:`url(${service.bannerImage})`,backgroundSize:'cover',backgroundPosition:'center'}}/>
+                  : <div style={{width:'100%',height:80,borderRadius:10,marginBottom:10,background:'#F1F4F9',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:'#94a3b8',fontWeight:600}}>No image set on this Service Post</div>}
+                <div style={{fontWeight:800}}>{service.title}</div>
+                <small style={{display:'block',marginTop:6,color:'#64748b',fontWeight:500}}>{service.intro || service.heroDescription}</small>
+              </div>)}</div>
+            : <div style={{marginTop:20,padding:20,textAlign:'center',color:'#94a3b8',fontSize:13}}>No published Service Posts yet.</div>}
         </section>;
       },
     },
