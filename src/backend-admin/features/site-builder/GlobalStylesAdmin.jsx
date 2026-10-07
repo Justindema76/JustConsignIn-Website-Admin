@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, LoaderCircle, Palette, RotateCcw, Save, Type, LayoutGrid, Square } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CheckCircle2, ChevronDown, Copy, LoaderCircle, Palette, RotateCcw, Save, Type, LayoutGrid, Square } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { getAdminSiteKey, loadAdminGlobalStyles, saveAdminGlobalStyles } from '../../services/siteAdminService';
 import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
@@ -17,6 +17,23 @@ const colorFields = [
   ['darkSurface', 'Dark surface'],
 ];
 
+const FONT_FALLBACK = `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+const FONT_OPTIONS = [
+  { name: 'Plus Jakarta Sans', category: 'Sans' },
+  { name: 'Inter', category: 'Sans' },
+  { name: 'Work Sans', category: 'Sans' },
+  { name: 'Poppins', category: 'Sans / geometric' },
+  { name: 'Montserrat', category: 'Sans / geometric' },
+  { name: 'Space Grotesk', category: 'Sans / modern' },
+  { name: 'Playfair Display', category: 'Serif / display' },
+  { name: 'Merriweather', category: 'Serif' },
+];
+
+function primaryFontName(stack = '') {
+  const match = String(stack || '').match(/^"?([^",]+)"?/);
+  return match ? match[1].trim() : stack;
+}
+
 function ColorField({ label, value, onChange }) {
   return <label className="global-style-color-field">
     <span>{label}</span>
@@ -25,6 +42,86 @@ function ColorField({ label, value, onChange }) {
       <input type="text" value={value} onChange={event => onChange(event.target.value)} />
     </div>
   </label>;
+}
+
+function FontPickerField({ label, value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const rootRef = useRef(null);
+  const selectedName = primaryFontName(value);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClickAway = event => { if (rootRef.current && !rootRef.current.contains(event.target)) setOpen(false); };
+    document.addEventListener('mousedown', onClickAway);
+    return () => document.removeEventListener('mousedown', onClickAway);
+  }, [open]);
+
+  const options = FONT_OPTIONS.filter(font => font.name.toLowerCase().includes(query.toLowerCase()));
+
+  const choose = fontName => {
+    onChange(`"${fontName}", ${FONT_FALLBACK}`);
+    setOpen(false);
+    setQuery('');
+  };
+
+  return <div className="global-font-picker" ref={rootRef}>
+    <span className="global-font-picker-label">{label}</span>
+    <button type="button" className="global-font-picker-btn" onClick={() => setOpen(current => !current)}>
+      <span style={{ fontFamily: `"${selectedName}"` }}>{selectedName}</span>
+      <ChevronDown size={15} className={open ? 'open' : ''}/>
+    </button>
+    {open && <div className="global-font-picker-panel">
+      <input
+        className="global-font-picker-search"
+        type="text"
+        placeholder="Search fonts…"
+        value={query}
+        onChange={event => setQuery(event.target.value)}
+        autoFocus
+      />
+      <div className="global-font-picker-list">
+        {options.map(font => <div
+          key={font.name}
+          className={`global-font-picker-item ${font.name === selectedName ? 'selected' : ''}`}
+          onClick={() => choose(font.name)}
+        >
+          <span style={{ fontFamily: `"${font.name}"` }}>{font.name}</span>
+          <small>{font.category}</small>
+        </div>)}
+        {!options.length && <div className="global-font-picker-empty">No fonts match &ldquo;{query}&rdquo;.</div>}
+      </div>
+    </div>}
+  </div>;
+}
+
+function BrandColorReference({ styles }) {
+  const [copiedKey, setCopiedKey] = useState('');
+
+  const copy = async (key, hex) => {
+    try { await navigator.clipboard.writeText(hex); } catch { /* clipboard unavailable */ }
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(current => (current === key ? '' : current)), 1200);
+  };
+
+  return <section className="site-admin-card global-style-section">
+    <div className="global-style-section-head"><Palette size={18}/><div><h2>Brand colour reference</h2><p>Your last saved values. If a colour gets changed by mistake below, come back here to copy it back.</p></div></div>
+    <div className="global-color-reference-grid">
+      {colorFields.map(([key, label]) => <button
+        type="button"
+        key={key}
+        className="global-color-reference-chip"
+        onClick={() => copy(key, styles[key])}
+      >
+        <span className="global-color-reference-swatch" style={{ background: styles[key] }}/>
+        <span className="global-color-reference-meta">
+          <small>{label}</small>
+          <strong>{copiedKey === key ? 'Copied ✓' : styles[key]}</strong>
+        </span>
+        <Copy size={13} className="global-color-reference-icon"/>
+      </button>)}
+    </div>
+  </section>;
 }
 
 function NumberField({ label, value, min, max, step = 1, suffix = 'px', onChange }) {
@@ -42,6 +139,7 @@ export default function GlobalStylesAdmin() {
   const siteKey = getAdminSiteKey();
   const defaults = useMemo(() => globalStylesForSite(siteKey), [siteKey]);
   const [styles, setStyles] = useState(defaults);
+  const [savedStyles, setSavedStyles] = useState(defaults);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -54,7 +152,9 @@ export default function GlobalStylesAdmin() {
     loadAdminGlobalStyles(accessToken)
       .then(result => {
         if (!active) return;
-        setStyles(normalizeGlobalStyles(result.value, siteKey));
+        const normalized = normalizeGlobalStyles(result.value, siteKey);
+        setStyles(normalized);
+        setSavedStyles(normalized);
         setUpdatedAt(result.updatedAt || '');
       })
       .catch(err => {
@@ -73,7 +173,9 @@ export default function GlobalStylesAdmin() {
     setError('');
     try {
       const result = await saveAdminGlobalStyles(accessToken, normalizeGlobalStyles(styles, siteKey));
-      setStyles(normalizeGlobalStyles(result.value || styles, siteKey));
+      const normalized = normalizeGlobalStyles(result.value || styles, siteKey);
+      setStyles(normalized);
+      setSavedStyles(normalized);
       setUpdatedAt(result.updatedAt || new Date().toISOString());
       setMessage('Global styles saved. The public website and shared block previews will use these values.');
     } catch (err) {
@@ -110,11 +212,13 @@ export default function GlobalStylesAdmin() {
           </div>
         </section>
 
+        <BrandColorReference styles={savedStyles}/>
+
         <section className="site-admin-card global-style-section">
           <div className="global-style-section-head"><Type size={18}/><div><h2>Typography</h2><p>Global heading and body font stacks.</p></div></div>
           <div className="global-style-text-grid">
-            <label><span>Heading font</span><input value={styles.headingFont} onChange={event => update('headingFont',event.target.value)}/></label>
-            <label><span>Body font</span><input value={styles.bodyFont} onChange={event => update('bodyFont',event.target.value)}/></label>
+            <FontPickerField label="Heading font" value={styles.headingFont} onChange={value => update('headingFont',value)}/>
+            <FontPickerField label="Body font" value={styles.bodyFont} onChange={value => update('bodyFont',value)}/>
           </div>
           <div className="global-style-number-grid global-heading-size-grid">
             <NumberField label="H1 size" value={styles.h1Size} min={36} max={96} onChange={value => update('h1Size',value)}/>
