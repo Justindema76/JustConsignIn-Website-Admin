@@ -23,11 +23,13 @@ const EMPTY = {
   hero_image: '',
   hero_cta_label: 'View Services',
   hero_cta_url: '/services',
+  favicon_url: '',
 };
 
 export default function SunwingsSettingsAdmin() {
   const { accessToken } = useAuth();
   const imageRef = useRef(null);
+  const faviconRef = useRef(null);
   const [tab, setTab] = useState('website');
   const [settings, setSettings] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
@@ -56,6 +58,22 @@ export default function SunwingsSettingsAdmin() {
       setError(err.message);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const uploadFavicon = async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true); setError('');
+    try {
+      const url = await uploadSunwingsImage(accessToken, file);
+      update('favicon_url', url);
+      setMessage('Favicon uploaded. Save settings to keep it.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+      event.target.value = '';
     }
   };
 
@@ -118,6 +136,16 @@ export default function SunwingsSettingsAdmin() {
           <label>SEO title<input value={settings.seo_title} onChange={event => update('seo_title', event.target.value)}/></label>
           <label>Meta description<textarea rows="5" value={settings.seo_description} onChange={event => update('seo_description', event.target.value)}/></label>
           <label>Social / OG image URL<input value={settings.seo_image} onChange={event => update('seo_image', event.target.value)}/></label>
+          <label>Favicon (browser tab icon)
+            <div style={{display:'flex',alignItems:'center',gap:12,marginTop:4}}>
+              {settings.favicon_url
+                ? <img src={settings.favicon_url} alt="" style={{width:32,height:32,borderRadius:6,border:'1px solid #dfe3e8',objectFit:'contain',background:'#fff'}}/>
+                : <span style={{width:32,height:32,borderRadius:6,border:'1px dashed #dfe3e8',display:'grid',placeItems:'center',fontSize:10,color:'#9aa1a7'}}>None</span>}
+              <button className="site-admin-btn secondary small" type="button" onClick={() => faviconRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Favicon'}</button>
+            </div>
+            <input ref={faviconRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={uploadFavicon}/>
+            <small>Square image works best — 512×512 PNG is a safe size. This sets the icon shown in the browser tab.</small>
+          </label>
           <label>Google site verification<input value={settings.google_site_verification} onChange={event => update('google_site_verification', event.target.value)} placeholder="Paste verification token only"/></label>
           <label>GA4 Measurement ID<input value={settings.ga4_measurement_id} onChange={event => update('ga4_measurement_id', event.target.value.trim())} placeholder="G-XXXXXXXXXX"/></label>
           <label>Meta Pixel ID<input value={settings.meta_pixel_id} onChange={event => update('meta_pixel_id', event.target.value.replace(/[^0-9]/g, ''))} placeholder="Optional"/></label>

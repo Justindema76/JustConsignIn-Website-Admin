@@ -18,6 +18,7 @@ const ALLOWED_KEYS = new Set([
   'hero_image',
   'hero_cta_label',
   'hero_cta_url',
+  'favicon_url',
 ]);
 
 export default async function handler(req, res) {
