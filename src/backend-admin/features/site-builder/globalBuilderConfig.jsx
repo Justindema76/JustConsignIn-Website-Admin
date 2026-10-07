@@ -475,7 +475,6 @@ export function globalConfigFor(type, siteKey = 'justconsignin', socialLinks = {
                     </div>
                     <div>
                       <h4>{p.socialTitle}</h4>
-                      {p.socialText && <p>{p.socialText}</p>}
                       <a href="#" onClick={previewClick}>Pricing</a>
                       <a href="#" onClick={previewClick}>Moving Tips</a>
                       <a href="#" onClick={previewClick}>Contact</a>
