@@ -215,6 +215,7 @@ const homeHeroDefaults = {
   text: 'JustConsignIn connects consignors, inventory, Shopify products, POS sales and payouts in one workflow — without spreadsheets or duplicate entry.',
   primaryButtonText: 'Open Shopify app demo',
   primaryButtonUrl: '/shopify-app',
+  primaryButtonNewTab: 'yes',
   watchButtonText: 'Watch videos',
   watchButtonUrl: '#home-video-heading',
   partnerButtonText: 'Founding Partner Program',
@@ -400,6 +401,7 @@ export const siteBuilderConfig = {
         primaryButtonText: { type: 'text', label: 'Primary button text' },
         primaryButtonAction: { type: 'select', label: 'Primary button action', options: [{label:'Go to URL',value:'link'},{label:'Open quote drawer',value:'quote'}] },
         primaryButtonUrl: { type: 'text', label: 'Primary button link' },
+        primaryButtonNewTab: { type: 'select', label: 'Open primary link in new tab', options: [{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }] },
         watchButtonText: { type: 'text', label: 'Watch button text' },
         watchButtonUrl: { type: 'text', label: 'Watch button link' },
         partnerButtonText: { type: 'text', label: 'Partner button text' },
@@ -440,7 +442,7 @@ export const siteBuilderConfig = {
               <h1>{props.heading}</h1>
               <p>{props.text}</p>
               <div className="hero-actions">
-                <a className="public-button large" href={props.primaryButtonUrl || '#'} onClick={previewClick}>{props.primaryButtonText} <ArrowRight size={18}/></a>
+                <a className="public-button large" href={props.primaryButtonUrl || '#'} target={props.primaryButtonNewTab === 'no' ? undefined : '_blank'} rel={props.primaryButtonNewTab === 'no' ? undefined : 'noopener noreferrer'} onClick={previewClick}>{props.primaryButtonText} <ArrowRight size={18}/></a>
                 <a className="public-button secondary large" href={props.watchButtonUrl || '#'} onClick={previewClick}>{props.watchButtonText}</a>
                 <a className="public-button secondary large" href={props.partnerButtonUrl || '#'} onClick={previewClick}>{props.partnerButtonText}</a>
               </div>
