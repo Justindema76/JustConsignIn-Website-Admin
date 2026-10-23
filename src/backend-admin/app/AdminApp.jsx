@@ -9,6 +9,7 @@ import Dashboard from '../features/dashboard/Dashboard';
 import DemoRequestsAdmin from '../features/demo-requests/DemoRequestsAdmin';
 import ServiceRequestsAdmin from '../features/service-requests/ServiceRequestsAdmin';
 import HiringContactsAdmin from '../features/hiring-contacts/HiringContactsAdmin';
+import BusinessOutreachAdmin from '../features/business-outreach/BusinessOutreachAdmin';
 import DepartmentsAdmin from '../features/departments/DepartmentsAdmin';
 import MediaAdmin from '../features/media/MediaAdmin';
 import OutreachMap from '../features/outreach/OutreachMap';
@@ -66,6 +67,7 @@ export default function AdminApp() {
 
         <Route path="/admin/service-requests" element={only(JUSTIN, <ServiceRequestsAdmin />)} />
         <Route path="/admin/hiring-contacts" element={only(JUSTIN, <HiringContactsAdmin />)} />
+        <Route path="/admin/business-outreach" element={only(JUSTIN, <BusinessOutreachAdmin />)} />
         <Route path="/admin/departments" element={only(JUSTIN, <DepartmentsAdmin />)} />
 
         <Route path="/admin/blog" element={only(STANDARD_SITES, <BlogAdmin />)} />
