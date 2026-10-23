@@ -17,6 +17,7 @@ export default {
       label: 'Recruitment',
       items: [
         { to: '/admin/hiring-contacts', label: 'Hiring Contacts', icon: 'briefcase' },
+        { to: '/admin/business-outreach', label: 'Business Outreach', icon: 'briefcase' },
       ],
     },
     {
@@ -63,6 +64,7 @@ export default {
     quick: [
       { to: '/admin/service-requests', icon: 'inbox', title: 'Service Requests', copy: 'Project and quote workflow' },
       { to: '/admin/hiring-contacts', icon: 'briefcase', title: 'Hiring Contacts', copy: 'Jobs, recruiters and interviews' },
+      { to: '/admin/business-outreach', icon: 'briefcase', title: 'Business Outreach', copy: 'Companies hiring and potential freelance clients' },
       { to: '/admin/work-posts', icon: 'panels', title: 'Work Posts', copy: 'Work experience and case studies' },
       { to: '/admin/ai-posts', icon: 'sparkles', title: 'AI Posts', copy: 'AI + development project content' },
     ],
