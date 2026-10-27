@@ -58,6 +58,15 @@ function yesNo(value) {
   return value ? 'Yes' : 'No';
 }
 
+function referralSourceFromMessage(message) {
+  const match = String(message || '').match(/(?:^|\\n)How did you hear about us\\?\\s*([^\\n]+)/i);
+  return match?.[1]?.trim() || '';
+}
+
+function messageWithoutReferral(message) {
+  return String(message || '').replace(/(?:^|\\n\\n)How did you hear about us\\?\\s*[^\\n]*/i, '').trim();
+}
+
 function routeSummary(request) {
   const pickup = [request.pickup_city, request.pickup_postal_code].filter(Boolean).join(' ');
   const dropoff = [request.dropoff_city, request.dropoff_postal_code].filter(Boolean).join(' ');
@@ -359,7 +368,8 @@ export default function QuoteRequestsAdmin() {
           </section>
 
           {selected.item_list && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Item list</p><p className="service-request-message">{selected.item_list}</p></section>}
-          {selected.message && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Additional details</p><p className="service-request-message">{selected.message}</p></section>}
+          {referralSourceFromMessage(selected.message) && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">How did you hear about us?</p><p className="service-request-message">{referralSourceFromMessage(selected.message)}</p></section>}
+          {messageWithoutReferral(selected.message) && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Additional details</p><p className="service-request-message">{messageWithoutReferral(selected.message)}</p></section>}
 
           <section className="service-request-drawer-section">
             <p className="site-admin-eyebrow">Activity</p>
