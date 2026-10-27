@@ -93,7 +93,7 @@ function externalQuoteMailto(request) {
     request.message || 'None',
   ];
   const subject = 'Moving Quote Request - ' + (request.preferred_date || 'Date TBD');
-  return 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\\n'));
+  return 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
 }
 
 export default function QuoteRequestsAdmin() {
