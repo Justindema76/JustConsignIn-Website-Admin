@@ -64,6 +64,38 @@ function routeSummary(request) {
   return [pickup || request.move_from, dropoff || request.move_to].filter(Boolean).join(' → ') || '—';
 }
 
+// Build the email from an allowlist of job fields only. Never include customer contact or private notes.
+function externalQuoteMailto(request) {
+  const pickup = [request.pickup_address, request.pickup_city, request.pickup_postal_code].filter(Boolean).join(', ') || request.move_from || 'Not specified';
+  const dropoff = [request.dropoff_address, request.dropoff_city, request.dropoff_postal_code].filter(Boolean).join(', ') || request.move_to || 'Not specified';
+  const lines = [
+    'QUOTE REQUEST',
+    '',
+    'Service: ' + (request.service || 'Not specified'),
+    'Moving Date: ' + (request.preferred_date || 'Not specified'),
+    'Preferred Time: ' + (request.preferred_time || 'Flexible'),
+    'Move / Job Size: ' + (request.move_size || 'Not specified'),
+    '',
+    'PICKUP',
+    pickup,
+    'Elevator: ' + yesNo(request.pickup_elevator),
+    'Stairs: ' + yesNo(request.pickup_stairs),
+    '',
+    'DROP-OFF',
+    dropoff,
+    'Elevator: ' + yesNo(request.dropoff_elevator),
+    'Stairs: ' + yesNo(request.dropoff_stairs),
+    '',
+    'ITEM LIST',
+    request.item_list || 'Not specified',
+    '',
+    'ADDITIONAL DETAILS',
+    request.message || 'None',
+  ];
+  const subject = 'Moving Quote Request - ' + (request.preferred_date || 'Date TBD');
+  return 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\\n'));
+}
+
 export default function QuoteRequestsAdmin() {
   const { accessToken } = useAuth();
   const [requests, setRequests] = useState([]);
@@ -284,6 +316,7 @@ export default function QuoteRequestsAdmin() {
           <div className="service-request-quick-actions">
             {selected.email && <a className="site-admin-btn" href={`mailto:${selected.email}`}><Mail size={14}/> Email Customer</a>}
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call Customer</a>}
+            {selected.request_type !== 'contact' && <a className="site-admin-btn secondary" href={externalQuoteMailto(selected)}><Mail size={14}/> Forward for Quote</a>}
           </div>
 
           <section className="service-request-drawer-section primary-section">
