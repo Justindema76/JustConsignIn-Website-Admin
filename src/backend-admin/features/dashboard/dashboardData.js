@@ -37,6 +37,7 @@ async function loadSunwingsDashboard(accessToken) {
 
   return {
     metrics: [
+      { label: 'New Requests', value: newQuotes, note: newQuotes ? 'Waiting for a reply' : 'All caught up' },
       { label: 'Service Posts', value: services.length, note: `${services.filter(item => item.status === 'published').length} published, ${services.filter(item => item.status !== 'published').length} draft` },
       { label: 'Location Posts', value: locations.length, note: 'Hamilton & Niagara coverage' },
       { label: 'Moving Tips', value: blog.length, note: blog[0]?.updatedAt ? `Last updated ${timeAgo(blog[0].updatedAt)}` : 'No posts yet' },
@@ -46,11 +47,14 @@ async function loadSunwingsDashboard(accessToken) {
       copy: 'Quote requests from the Sunwings website.',
       viewAllTo: '/admin/sunwings/quotes',
       attentionCount: newQuotes,
-      items: quotes.slice(0, 5).map(item => ({
+      // New requests first, then the most recent others.
+      items: [...quotes.filter(item => item.status === 'new'), ...quotes.filter(item => item.status !== 'new')].slice(0, 6).map(item => ({
+        isNew: item.status === 'new',
         id: item.id,
         title: item.name || 'Unknown',
         meta: item.move_from && item.move_to ? `${item.move_from} → ${item.move_to}` : (item.service || 'General enquiry'),
         chip: REQUEST_TYPE_LABEL[item.request_type] || 'Contact',
+        status: humanizeStatus(item.status),
         time: timeAgo(item.created_at),
       })),
     },

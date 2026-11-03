@@ -229,3 +229,12 @@
   }
   .dashboard-leads-row{grid-template-columns:1fr;gap:4px}
 }
+
+/* New-requests alert at the top of the dashboard */
+.dashboard-new-requests{display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:16px 20px;border-radius:16px;border:1px solid #dfe3e8;background:#fff;color:inherit;text-decoration:none}
+.dashboard-new-requests.has-new{border-color:#f59e0b;background:#fff7ed;box-shadow:0 8px 24px rgba(245,158,11,.18)}
+.dashboard-new-count{min-width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;font-weight:800;background:#eef0f3;color:#475467}
+.dashboard-new-requests.has-new .dashboard-new-count{background:#f97316;color:#fff}
+.dashboard-new-requests strong{display:block;font-size:17px}
+.dashboard-new-requests small{color:#667085}
+.dashboard-new-requests .dashboard-link-arrow{margin-left:auto}

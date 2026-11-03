@@ -42,6 +42,20 @@ function useLiveClock() {
   return now;
 }
 
+// Top-of-dashboard alert so new requests are the first thing seen when the admin opens.
+function NewRequestsAlert({ leads }) {
+  if (!leads) return null;
+  const count = leads.attentionCount || 0;
+  return <Link to={leads.viewAllTo} className={`dashboard-new-requests ${count ? 'has-new' : ''}`}>
+    <span className="dashboard-new-count">{count}</span>
+    <span>
+      <strong>{count ? `New request${count === 1 ? '' : 's'} waiting` : 'No new requests'}</strong>
+      <small>{count ? 'Tap to open Quote Requests and reply.' : 'You’re all caught up.'}</small>
+    </span>
+    <span className="dashboard-link-arrow">›</span>
+  </Link>;
+}
+
 function LeadsPanel({ leads }) {
   if (!leads) return null;
   return <section className="site-admin-card dashboard-leads-panel">
@@ -60,7 +74,7 @@ function LeadsPanel({ leads }) {
             <strong>{item.title}</strong>
             <small>{item.meta}</small>
           </div>
-          <span className="dashboard-leads-chip">{item.chip}</span>
+          <span className="dashboard-leads-chip">{item.isNew ? 'NEW · ' : ''}{item.chip}</span>
           <span className="dashboard-leads-time">{item.time}</span>
         </div>)}
       </div>}
@@ -102,6 +116,9 @@ export default function Dashboard() {
         <span className="dashboard-clock">{clock}</span>
       </div>
     </div>
+
+    <NewRequestsAlert leads={data?.leads}/>
+    {siteKey === 'sunwings' && <LeadsPanel leads={data?.leads}/>}
 
     <BoardStatus metrics={metrics}/>
 

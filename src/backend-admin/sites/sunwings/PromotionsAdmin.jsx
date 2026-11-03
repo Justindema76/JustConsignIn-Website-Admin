@@ -363,7 +363,7 @@ export default function PromotionsAdmin() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Sunwings Transport</p>
-        <h1>Promotions &amp; Banners</h1>
+        <h1>Pop-up, Slider &amp; Banners</h1>
         <p>Edit the slider, page banners, the slide-up pop-up, the price match and the snow removal plans. Changes go live about a minute after you save.</p>
       </div>
       <button className="site-admin-btn" type="button" onClick={save} disabled={busy}><Save size={15}/> {busy ? 'Saving…' : Object.keys(dirty).length ? `Save ${Object.keys(dirty).length} change${Object.keys(dirty).length > 1 ? 's' : ''}` : 'Save'}</button>
