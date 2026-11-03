@@ -29,6 +29,7 @@ import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
+import PromotionsAdmin from '../sites/sunwings/PromotionsAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
 import TeamAdmin from '../sites/sunwings/TeamAdmin';
 import { getAdminSiteKey } from '../services/siteAdminService';
@@ -109,6 +110,7 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/locations/:id" element={only(SUNWINGS, <LocationPostsAdmin />)} />
         <Route path="/admin/sunwings/quotes" element={only(SUNWINGS, <QuoteRequestsAdmin />)} />
         <Route path="/admin/sunwings/settings" element={only(SUNWINGS, <SunwingsSettingsAdmin />)} />
+        <Route path="/admin/sunwings/promotions" element={only(SUNWINGS, <PromotionsAdmin />)} />
         <Route path="/admin/sunwings/integrations" element={only(SUNWINGS, <IntegrationsAdmin />)} />
         <Route path="/admin/sunwings/team" element={only(SUNWINGS, <TeamAdmin />)} />
       </Route>

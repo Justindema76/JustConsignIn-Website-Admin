@@ -19,6 +19,15 @@ const ALLOWED_KEYS = new Set([
   'hero_cta_label',
   'hero_cta_url',
   'favicon_url',
+  // Promotions & Banners: JSON values, see src/backend-admin/sites/sunwings/PromotionsAdmin.jsx
+  'promo_popup',
+  'hero_slides',
+  'page_banners',
+  'pricing_panel',
+  'price_match',
+  'trust_links',
+  'snow_pricing',
+  'snow_page',
 ]);
 
 export default async function handler(req, res) {

@@ -20,6 +20,7 @@ export default {
       label: 'Website',
       items: [
         { to: '/admin/sunwings/pages', label: 'Pages', icon: 'panels', ownerOnly: true },
+        { to: '/admin/sunwings/promotions', label: 'Promotions & Banners', icon: 'sparkles', ownerOnly: true },
         { to: '/admin/sunwings/blocks', label: 'Block Library', icon: 'library', ownerOnly: true },
         { to: '/admin/sunwings/styles', label: 'Global Styles', icon: 'palette', ownerOnly: true },
         { to: '/admin/sunwings/global/header', label: 'Header', icon: 'panelTop', ownerOnly: true },
@@ -78,6 +79,7 @@ export default {
         copy: 'Pages, reusable blocks and global website controls.',
         items: [
           { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'Open and edit the main public pages.', ownerOnly: true },
+          { to: '/admin/sunwings/promotions', icon: 'sparkles', title: 'Promotions & Banners', copy: 'Slider, page banners, pop-up, price match and snow removal plans.', ownerOnly: true },
           { to: '/admin/sunwings/blocks', icon: 'library', title: 'Block Library', copy: 'Browse the reusable Sunwings page-builder blocks.', ownerOnly: true },
           { to: '/admin/sunwings/styles', icon: 'palette', title: 'Global Styles', copy: 'Control colours, typography, spacing, cards and buttons.', ownerOnly: true },
           { to: '/admin/sunwings/global/header', icon: 'panelTop', title: 'Header', copy: 'Edit the global Sunwings header.', ownerOnly: true },
