@@ -16,10 +16,21 @@ export default function AdminLogin(){
     const params=new URLSearchParams(window.location.hash.replace(/^#/,''));
     const oauthAccessToken=params.get('access_token');
     const oauthRefreshToken=params.get('refresh_token');
+    const query=new URLSearchParams(window.location.search);
+    // A Google sign-in that timed out can land on justconsignin.com; that site sends it back here.
+    if(query.get('signin_error')){
+      setError(query.get('signin_error')==='bad_oauth_state'
+        ? 'Google sign-in timed out. Click Continue with Google to try again.'
+        : 'Google sign-in didn’t finish. Click Continue with Google to try again.');
+      window.history.replaceState({},document.title,window.location.pathname);
+      return;
+    }
     const oauthError=params.get('error_description') || params.get('error');
 
     if(oauthError && !oauthAccessToken){
-      setError(decodeURIComponent(oauthError));
+      setError(/state/i.test(oauthError)
+        ? 'Google sign-in timed out. Click Continue with Google to try again.'
+        : 'This Google account is not authorized.');
       window.history.replaceState({},document.title,window.location.pathname);
       return;
     }
@@ -59,7 +70,7 @@ export default function AdminLogin(){
           <span className="site-admin-brand-mark"><ShieldCheck size={22}/></span>
           <div><h1>Private Website Admin</h1><p>Authorized access only.</p></div>
         </div>
-        {error&&<div className="site-admin-alert error">This Google account is not authorized.</div>}
+        {error&&<div className="site-admin-alert error">{/timed out|didn’t finish/.test(error) ? error : 'This Google account is not authorized.'}</div>}
         <button className="site-admin-btn site-admin-login-button" type="button" disabled={loading} onClick={loginWithGoogle}>
           {loading?'Opening Google…':<><span aria-hidden="true" className="site-admin-google-mark">G</span> Continue with Google</>}
         </button>
