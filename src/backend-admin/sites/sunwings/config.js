@@ -45,6 +45,11 @@ export default {
       ],
     },
     {
+      id: 'analytics',
+      label: 'Analytics',
+      items: [{ to: '/admin/sunwings/analytics', label: 'Analytics', icon: 'chart' }],
+    },
+    {
       id: 'leads',
       label: 'Leads',
       items: [
@@ -60,6 +65,7 @@ export default {
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
       { to: '/admin/sunwings/blog', icon: 'book', title: 'Moving Tips Posts', copy: 'Add and edit moving articles' },
       { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming leads' },
+      { to: '/admin/sunwings/analytics', icon: 'chart', title: 'Analytics', copy: 'Review verified website leads and phone tracking' },
       { to: '/admin/sunwings/promotions', icon: 'sparkles', title: 'Pop-up, Slider & Banners', copy: 'Edit the pop-up, homepage slider, page banners and prices', ownerOnly: true },
     ],
     sections: [
