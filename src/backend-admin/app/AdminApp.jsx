@@ -28,6 +28,7 @@ import AiPostsAdmin from '../features/ai-posts/AiPostsAdmin';
 import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
+import SunwingsAnalytics from '../features/analytics/SunwingsAnalytics';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
 import PromotionsAdmin from '../sites/sunwings/PromotionsAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
@@ -108,6 +109,7 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/services/:id" element={only(SUNWINGS, <ServicePostsAdmin />)} />
         <Route path="/admin/sunwings/locations" element={only(SUNWINGS, <LocationPostsAdmin />)} />
         <Route path="/admin/sunwings/locations/:id" element={only(SUNWINGS, <LocationPostsAdmin />)} />
+        <Route path="/admin/sunwings/analytics" element={only(SUNWINGS, <SunwingsAnalytics />)} />
         <Route path="/admin/sunwings/quotes" element={only(SUNWINGS, <QuoteRequestsAdmin />)} />
         <Route path="/admin/sunwings/settings" element={only(SUNWINGS, <SunwingsSettingsAdmin />)} />
         <Route path="/admin/sunwings/promotions" element={only(SUNWINGS, <PromotionsAdmin />)} />
