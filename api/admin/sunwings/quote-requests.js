@@ -31,6 +31,23 @@ async function withFieldFallback(token, buildPath, options) {
   return supabaseUserRest(token, buildPath(OLD_FIELDS), options);
 }
 
+// Until migration 20261103 has run, the database only accepts its original four
+// statuses. Save the closest one and remember the real step in last_activity, so the
+// admin still shows the right step. Once the migration runs, real statuses save directly.
+const LEGACY_STATUS = {
+  new: 'new', reviewing: 'contacted', forwarded: 'contacted', priced: 'contacted', needs_quote: 'contacted', contacted: 'contacted',
+  quote_sent: 'quoted', accepted: 'quoted', booked: 'quoted', quoted: 'quoted',
+  complete: 'closed', declined: 'closed', cancelled: 'closed', closed: 'closed',
+};
+const STEP_MARK = /^Status changed to ([a-z_ ]+)$/;
+
+function withRealStatus(row) {
+  if (!row || !['contacted', 'quoted', 'closed'].includes(row.status)) return row;
+  const match = STEP_MARK.exec(String(row.last_activity || ''));
+  const real = match && match[1].trim().replace(/ /g, '_');
+  return real && LEGACY_STATUS[real] === row.status ? { ...row, status: real } : row;
+}
+
 const STATUSES = new Set([
   'new','reviewing','forwarded','priced','needs_quote','contacted','quote_sent',
   'accepted','booked','complete','declined','cancelled'
@@ -76,7 +93,7 @@ export default async function handler(req, res) {
         ),
         'Unable to load Sunwings quote requests.',
       );
-      return res.status(200).json({ requests });
+      return res.status(200).json({ requests: Array.isArray(requests) ? requests.map(withRealStatus) : requests });
     }
 
     const id = clean(req.method === 'DELETE' ? req.query?.id : req.body?.id, 80);
@@ -166,19 +183,26 @@ export default async function handler(req, res) {
       payload.last_activity_at = now;
     }
 
-    const rows = await parseSupabase(
-      await withFieldFallback(
-        owner.accessToken,
-        fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(fields)}`,
-        {
-          method: 'PATCH',
-          headers: { Prefer: 'return=representation' },
-          body: JSON.stringify(payload),
-        },
-      ),
-      'Unable to update Sunwings quote request.',
-    );
-    return res.status(200).json({ request: Array.isArray(rows) ? rows[0] || null : rows });
+    const patchPath = fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(fields)}`;
+    const patch = body => withFieldFallback(owner.accessToken, patchPath, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(body),
+    });
+    let response = await patch(payload);
+    if (response.status === 400 && payload.status && LEGACY_STATUS[payload.status] !== payload.status) {
+      const text = await response.clone().text().catch(() => '');
+      if (text.includes('status_check')) {
+        response = await patch({
+          ...payload,
+          status: LEGACY_STATUS[payload.status],
+          last_activity: `Status changed to ${payload.status.replace(/_/g, ' ')}`,
+          last_activity_at: now,
+        });
+      }
+    }
+    const rows = await parseSupabase(response, 'Unable to update Sunwings quote request.');
+    return res.status(200).json({ request: withRealStatus(Array.isArray(rows) ? rows[0] || null : rows) });
   } catch (error) {
     console.error('[sunwings] quote requests failed', error);
     return res.status(500).json({ error: error.message || 'Quote request failed.' });
