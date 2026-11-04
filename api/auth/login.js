@@ -8,12 +8,15 @@ function safeCallback(value) {
   return path;
 }
 
-async function findCollaboratorAccess(token, email) {
+export async function findCollaboratorAccess(token, email) {
   const response = await supabaseUserRest(token, `site_collaborators?email=eq.${encodeURIComponent(email)}&select=site_key,role`, { method: 'GET' });
   if (!response.ok) return null;
   const rows = await response.json().catch(() => []);
-  if (!rows?.length) return null;
-  return { role: rows[0].role, sites: rows.map(row => row.site_key) };
+  if (rows?.length) return { role: rows[0].role, sites: rows.map(row => row.site_key) };
+  // Sunwings partners (e.g. Marius) only get "Jobs from Justin".
+  const partnerResponse = await supabaseUserRest(token, `sunwings_partners?email=eq.${encodeURIComponent(email)}&select=site_key`, { method: 'GET' });
+  const partnerRows = partnerResponse.ok ? await partnerResponse.json().catch(() => []) : [];
+  return partnerRows?.length ? { role: 'partner', sites: ['sunwings'] } : null;
 }
 
 async function buildSessionUser(authUser, { requireAdmin = false, token = '' } = {}) {

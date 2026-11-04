@@ -19,7 +19,13 @@ export default async function handler(req, res) {
     const email = String(user.email || '').trim().toLowerCase();
     const response = await supabaseUserRest(token, `site_collaborators?email=eq.${encodeURIComponent(email)}&select=site_key,role`, { method: 'GET' });
     const rows = response.ok ? await response.json().catch(() => []) : [];
-    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    if (!rows.length) {
+      // Partners (e.g. Marius) aren't site collaborators; they only get "Jobs from Justin".
+      const partnerResponse = await supabaseUserRest(token, `sunwings_partners?email=eq.${encodeURIComponent(email)}&select=site_key`, { method: 'GET' });
+      const partnerRows = partnerResponse.ok ? await partnerResponse.json().catch(() => []) : [];
+      if (partnerRows.length) return res.status(200).json({ role: 'partner', sites: ['sunwings'] });
+      return res.status(404).json({ error: 'Not found' });
+    }
     return res.status(200).json({ role: rows[0].role, sites: rows.map(row => row.site_key) });
   } catch (error) {
     console.error('[my-access] failed', error);

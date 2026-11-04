@@ -6,6 +6,7 @@ import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
 import { loadDashboardData } from './dashboardData';
 import './dashboard.css';
+import PartnerJobsAdmin from '../../sites/sunwings/PartnerJobsAdmin';
 
 // Permanent safety net: this account always gets the full admin, no matter
 // what the server-reported role says.
@@ -56,6 +57,19 @@ function NewRequestsAlert({ leads }) {
   </Link>;
 }
 
+function PartnerUpdatesAlert({ leads }) {
+  const count = leads?.partnerUpdates || 0;
+  if (!count) return null;
+  return <Link to={leads.viewAllTo} className="dashboard-new-requests has-new">
+    <span className="dashboard-new-count">{count}</span>
+    <span>
+      <strong>Marius updated {count} job{count === 1 ? '' : 's'}</strong>
+      <small>Open Quote Requests to see his price, status and note.</small>
+    </span>
+    <span className="dashboard-link-arrow">›</span>
+  </Link>;
+}
+
 function LeadsPanel({ leads }) {
   if (!leads) return null;
   return <section className="site-admin-card dashboard-leads-panel">
@@ -82,6 +96,13 @@ function LeadsPanel({ leads }) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  // Partners (Marius) only have "Jobs from Justin".
+  if (user?.role === 'partner') return <PartnerJobsAdmin/>;
+  return <OwnerDashboard/>;
+}
+
+function OwnerDashboard() {
   const { accessToken, user } = useAuth();
   const siteKey = getAdminSiteKey();
   const siteConfig = getSiteConfig(siteKey);
@@ -118,6 +139,7 @@ export default function Dashboard() {
     </div>
 
     <NewRequestsAlert leads={data?.leads}/>
+    <PartnerUpdatesAlert leads={data?.leads}/>
     {siteKey === 'sunwings' && <LeadsPanel leads={data?.leads}/>}
 
     <BoardStatus metrics={metrics}/>

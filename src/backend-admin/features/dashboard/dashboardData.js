@@ -34,6 +34,7 @@ async function loadSunwingsDashboard(accessToken) {
     loadSunwingsQuotes(accessToken),
   ]);
   const newQuotes = quotes.filter(item => item.status === 'new').length;
+  const mariusUpdates = quotes.filter(item => item.partner_update_unseen).length;
 
   return {
     metrics: [
@@ -47,6 +48,7 @@ async function loadSunwingsDashboard(accessToken) {
       copy: 'Quote requests from the Sunwings website.',
       viewAllTo: '/admin/sunwings/quotes',
       attentionCount: newQuotes,
+      partnerUpdates: mariusUpdates,
       // New requests first, then the most recent others.
       items: [...quotes.filter(item => item.status === 'new'), ...quotes.filter(item => item.status !== 'new')].slice(0, 6).map(item => ({
         isNew: item.status === 'new',

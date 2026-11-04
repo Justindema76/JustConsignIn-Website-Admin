@@ -111,3 +111,48 @@ export async function removeCollaborator(accessToken, id) {
     'Unable to remove team member.',
   );
 }
+
+// ---- Marius (partner) jobs, partners, investments ----
+
+export async function loadPartnerJobs(accessToken) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/partner-jobs', {}, accessToken), 'Unable to load jobs.');
+  return Array.isArray(payload.jobs) ? payload.jobs : [];
+}
+
+export async function savePartnerJob(accessToken, job) {
+  await parseJsonResponse(await adminFetch('/api/admin/sunwings/partner-jobs', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(job),
+  }, accessToken), 'Unable to save the job.');
+}
+
+export async function loadPartners(accessToken) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/partners', {}, accessToken), 'Unable to load partners.');
+  return Array.isArray(payload.partners) ? payload.partners : [];
+}
+
+export async function addPartner(accessToken, { email, label }) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/partners', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, label }),
+  }, accessToken), 'Unable to add partner.');
+  return payload.partner;
+}
+
+export async function removePartner(accessToken, id) {
+  await parseJsonResponse(await adminFetch(`/api/admin/sunwings/partners?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken), 'Unable to remove partner.');
+}
+
+export async function loadInvestments(accessToken) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/investments', {}, accessToken), 'Unable to load investments.');
+  return Array.isArray(payload.investments) ? payload.investments : [];
+}
+
+export async function addInvestment(accessToken, investment) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/investments', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(investment),
+  }, accessToken), 'Unable to save investment.');
+  return payload.investment;
+}
+
+export async function deleteInvestment(accessToken, id) {
+  await parseJsonResponse(await adminFetch(`/api/admin/sunwings/investments?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken), 'Unable to delete investment.');
+}

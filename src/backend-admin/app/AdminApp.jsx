@@ -31,6 +31,8 @@ import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
 import SunwingsAnalytics from '../features/analytics/SunwingsAnalytics';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
 import PromotionsAdmin from '../sites/sunwings/PromotionsAdmin';
+import CommissionAdmin from '../sites/sunwings/CommissionAdmin';
+import PartnerJobsAdmin from '../sites/sunwings/PartnerJobsAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
 import TeamAdmin from '../sites/sunwings/TeamAdmin';
 import { getAdminSiteKey } from '../services/siteAdminService';
@@ -113,6 +115,8 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/quotes" element={only(SUNWINGS, <QuoteRequestsAdmin />)} />
         <Route path="/admin/sunwings/settings" element={only(SUNWINGS, <SunwingsSettingsAdmin />)} />
         <Route path="/admin/sunwings/promotions" element={only(SUNWINGS, <PromotionsAdmin />)} />
+        <Route path="/admin/sunwings/commission" element={only(SUNWINGS, <CommissionAdmin />)} />
+        <Route path="/admin/sunwings/jobs" element={only(SUNWINGS, <PartnerJobsAdmin />)} />
         <Route path="/admin/sunwings/integrations" element={only(SUNWINGS, <IntegrationsAdmin />)} />
         <Route path="/admin/sunwings/team" element={only(SUNWINGS, <TeamAdmin />)} />
       </Route>

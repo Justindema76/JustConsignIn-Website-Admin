@@ -2,20 +2,52 @@ import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
 import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
-const FIELDS = [
+const BASE_FIELDS = [
   'site_key','id','request_type','name','phone','email','service','move_from','move_to',
   'preferred_date','preferred_time','move_size',
   'pickup_address','pickup_city','pickup_postal_code','pickup_elevator','pickup_stairs',
   'dropoff_address','dropoff_city','dropoff_postal_code','dropoff_elevator','dropoff_stairs',
   'item_list','message','status','priority','admin_notes','contacted_at','status_changed_at',
   'quote_number','quote_amount','next_action','next_action_due_at','last_activity','last_activity_at',
-  'email_notified_at','email_notification_error','created_at','updated_at'
-].join(',');
+  'email_notified_at','email_notification_error','created_at','updated_at',
+];
+// Added by migration 20261103 (Marius jobs & commission). Until that SQL has run,
+// requests fall back to BASE_FIELDS so Quote Requests keeps working.
+const NEW_FIELDS = [
+  'forwarded_at','partner_price','partner_status','partner_note','partner_updated_at','partner_update_unseen',
+  'contact_shared','contact_shared_at','final_price','commission_rate','commission_status',
+  'commission_paid_at','commission_paid_method'
+];
+const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
+const OLD_FIELDS = BASE_FIELDS.join(',');
+
+// Run a request with all fields; if the database doesn't have the new columns yet
+// (Postgres error 42703), run it again with only the original fields.
+async function withFieldFallback(token, buildPath, options) {
+  const response = await supabaseUserRest(token, buildPath(FIELDS), options);
+  if (response.status !== 400) return response;
+  const text = await response.clone().text().catch(() => '');
+  if (!text.includes('42703')) return response;
+  return supabaseUserRest(token, buildPath(OLD_FIELDS), options);
+}
 
 const STATUSES = new Set([
-  'new','reviewing','needs_quote','contacted','quote_sent',
+  'new','reviewing','forwarded','priced','needs_quote','contacted','quote_sent',
   'accepted','booked','complete','declined','cancelled'
 ]);
+const COMMISSION_STATUSES = new Set(['owed','paid','none']);
+
+function nullableMoney(value) {
+  const raw = clean(value, 40).replace(/[$,\s]/g, '');
+  if (!raw) return null;
+  const amount = Number(raw);
+  return Number.isFinite(amount) && amount >= 0 ? amount : undefined;
+}
+
+function nullableDate(value) {
+  const raw = clean(value, 20);
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null;
+}
 const PRIORITIES = new Set(['low','normal','high']);
 
 function clean(value, max = 5000) {
@@ -37,9 +69,9 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const requests = await parseSupabase(
-        await supabaseUserRest(
+        await withFieldFallback(
           owner.accessToken,
-          `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(FIELDS)}&order=created_at.desc`,
+          fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(fields)}&order=created_at.desc`,
           { method: 'GET' },
         ),
         'Unable to load Sunwings quote requests.',
@@ -96,6 +128,36 @@ export default async function handler(req, res) {
       if (!activity) activity = 'Quote details updated';
     }
 
+    const body = req.body || {};
+    const has = key => Object.prototype.hasOwnProperty.call(body, key);
+
+    // Send to Marius: the job appears in his "Jobs from Justin" (without contact details).
+    if (body.forward === true) {
+      payload.forwarded_at = now;
+      if (!has('status')) { payload.status = 'forwarded'; payload.status_changed_at = now; }
+      activity = 'Sent to Marius';
+    }
+    if (has('shareContact')) {
+      payload.contact_shared = body.shareContact === true;
+      payload.contact_shared_at = body.shareContact === true ? now : null;
+      activity = body.shareContact === true ? 'Customer contact shared with Marius' : 'Customer contact hidden from Marius';
+    }
+    if (body.markPartnerSeen === true) payload.partner_update_unseen = false;
+
+    for (const [key, column] of [['partnerPrice', 'partner_price'], ['finalPrice', 'final_price'], ['commissionRate', 'commission_rate']]) {
+      if (!has(key)) continue;
+      const amount = nullableMoney(body[key]);
+      if (amount === undefined) return res.status(400).json({ error: 'Enter a valid amount.' });
+      payload[column] = amount;
+    }
+    if (has('commissionStatus')) {
+      const value = clean(body.commissionStatus, 10);
+      if (!COMMISSION_STATUSES.has(value)) return res.status(400).json({ error: 'Invalid commission status.' });
+      payload.commission_status = value;
+    }
+    if (has('commissionPaidAt')) payload.commission_paid_at = nullableDate(body.commissionPaidAt);
+    if (has('commissionPaidMethod')) payload.commission_paid_method = clean(body.commissionPaidMethod, 40);
+
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextAction')) payload.next_action = clean(req.body.nextAction, 1000) || null;
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextActionDueAt')) payload.next_action_due_at = nullableIso(req.body.nextActionDueAt);
 
@@ -105,9 +167,9 @@ export default async function handler(req, res) {
     }
 
     const rows = await parseSupabase(
-      await supabaseUserRest(
+      await withFieldFallback(
         owner.accessToken,
-        `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(FIELDS)}`,
+        fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(fields)}`,
         {
           method: 'PATCH',
           headers: { Prefer: 'return=representation' },

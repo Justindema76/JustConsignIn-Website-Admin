@@ -1,5 +1,6 @@
 import { customerAppEnabled, getProfile, supabaseAnon, supabaseUrl } from '../_lib/supabase.js';
 import { isWebsiteOwner } from '../_lib/websiteAdmin.js';
+import { findCollaboratorAccess } from './login.js';
 import { rateLimit } from '../_lib/rateLimit.js';
 
 export default async function handler(req,res){
@@ -16,7 +17,12 @@ export default async function handler(req,res){
     const payload=await response.json();
     if(!response.ok) return res.status(401).json({error:'Session expired'});
     if(adminRequest){
-      if(!isWebsiteOwner(payload.user)) return res.status(404).json({error:'Not found'});
+      if(!isWebsiteOwner(payload.user)){
+        // Collaborators and partners keep their session too (same access check as login).
+        const access=await findCollaboratorAccess(payload.access_token,String(payload.user?.email||'').trim().toLowerCase());
+        if(!access) return res.status(404).json({error:'Not found'});
+        return res.status(200).json({accessToken:payload.access_token,refreshToken:payload.refresh_token,user:{id:payload.user.id,name:payload.user.user_metadata?.full_name||payload.user.user_metadata?.name||payload.user.email,email:payload.user.email,isAdmin:true,role:access.role,sites:access.sites}});
+      }
       let profile=null;
       try{profile=await getProfile(payload.user.id)}catch{}
       return res.status(200).json({accessToken:payload.access_token,refreshToken:payload.refresh_token,user:{id:payload.user.id,name:profile?.full_name||payload.user.user_metadata?.name||payload.user.user_metadata?.full_name||'Admin',businessName:profile?.business_name||payload.user.user_metadata?.businessName||'JustConsignIn',email:payload.user.email,workspaceId:profile?.workspace_id||null,isAdmin:true}});

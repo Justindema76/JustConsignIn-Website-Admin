@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronRight, Mail, Phone, RefreshCw, Search, Trash2, Workflow, X } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
+import { autoCommissionRate, commissionFor, money } from './commission';
 import '../../styles/serviceRequests.css';
+import './sunwingsJobs.css';
 
 const STATUS_OPTIONS = [
   ['new', 'New'],
   ['reviewing', 'Reviewing'],
+  ['forwarded', 'Sent to Marius'],
+  ['priced', 'Priced by Marius'],
   ['needs_quote', 'Needs Quote'],
   ['contacted', 'Contacted'],
   ['quote_sent', 'Quote Sent'],
@@ -16,6 +20,19 @@ const STATUS_OPTIONS = [
   ['declined', 'Declined'],
   ['cancelled', 'Cancelled'],
 ];
+
+// The main path a job takes. Any step can be clicked, so steps can be skipped.
+const JOB_STEPS = [
+  ['new', 'New', 'Came in'],
+  ['forwarded', 'Sent to Marius', 'Forwarded'],
+  ['priced', 'Priced', 'Marius gave a price'],
+  ['quote_sent', 'Quote sent', 'Customer has price'],
+  ['booked', 'Booked', 'Date set'],
+  ['complete', 'Complete', 'Job done'],
+  ['declined', 'Declined', 'No job'],
+];
+
+const MARIUS_STATUS_LABEL = { reviewing: 'Looking at it', priced: 'Priced', booked: 'Booked', complete: 'Complete', cant_do: 'Can’t do it' };
 
 const PRIORITY_OPTIONS = [
   ['low', 'Low'],
@@ -59,12 +76,12 @@ function yesNo(value) {
 }
 
 function referralSourceFromMessage(message) {
-  const match = String(message || '').match(/(?:^|\\n)How did you hear about us\\?\\s*([^\\n]+)/i);
+  const match = String(message || '').match(/(?:^|\n)How did you hear about us\?\s*([^\n]+)/i);
   return match?.[1]?.trim() || '';
 }
 
 function messageWithoutReferral(message) {
-  return String(message || '').replace(/(?:^|\\n\\n)How did you hear about us\\?\\s*[^\\n]*/i, '').trim();
+  return String(message || '').replace(/(?:^|\n\n)How did you hear about us\?\s*[^\n]*/i, '').trim();
 }
 
 function routeSummary(request) {
@@ -126,6 +143,13 @@ export default function QuoteRequestsAdmin() {
   const [draftQuoteAmount, setDraftQuoteAmount] = useState('');
   const [draftNextAction, setDraftNextAction] = useState('');
   const [draftNextActionDueAt, setDraftNextActionDueAt] = useState('');
+  const [draftPartnerPrice, setDraftPartnerPrice] = useState('');
+  const [draftFinalPrice, setDraftFinalPrice] = useState('');
+  const [draftRateMode, setDraftRateMode] = useState('auto');
+  const [draftCustomRate, setDraftCustomRate] = useState('');
+  const [draftCommissionStatus, setDraftCommissionStatus] = useState('owed');
+  const [draftPaidAt, setDraftPaidAt] = useState('');
+  const [draftPaidMethod, setDraftPaidMethod] = useState('');
 
   const selected = requests.find(item => item.id === selectedId) || null;
 
@@ -153,8 +177,46 @@ export default function QuoteRequestsAdmin() {
     setDraftQuoteAmount(selected.quote_amount == null ? '' : String(selected.quote_amount));
     setDraftNextAction(selected.next_action || '');
     setDraftNextActionDueAt(dateInput(selected.next_action_due_at));
+    setDraftPartnerPrice(selected.partner_price == null ? '' : String(selected.partner_price));
+    setDraftFinalPrice(selected.final_price == null ? '' : String(selected.final_price));
+    const rate = selected.commission_rate == null ? null : Number(selected.commission_rate);
+    setDraftRateMode(rate == null ? 'auto' : rate === 10 ? '10' : rate === 20 ? '20' : 'custom');
+    setDraftCustomRate(rate == null ? '' : String(rate));
+    setDraftCommissionStatus(selected.commission_status || 'owed');
+    setDraftPaidAt(selected.commission_paid_at || '');
+    setDraftPaidMethod(selected.commission_paid_method || '');
     setSuccess('');
+    // Opening a job Marius updated clears its "Marius updated" alert.
+    if (selected.partner_update_unseen) {
+      updateSunwingsQuote(accessToken, { id: selected.id, markPartnerSeen: true })
+        .then(updated => updated && setRequests(rows => rows.map(row => row.id === updated.id ? updated : row)))
+        .catch(() => {});
+    }
   }, [selected?.id]);
+
+  const draftRate = draftRateMode === 'auto' ? '' : draftRateMode === 'custom' ? draftCustomRate : draftRateMode;
+  const draftCommission = commissionFor({
+    final_price: draftFinalPrice, partner_price: draftPartnerPrice, quote_amount: draftQuoteAmount,
+    commission_rate: draftRate, commission_status: draftCommissionStatus,
+  });
+
+  // Saves one change right away (forwarding, sharing contact) without touching other unsaved edits.
+  async function quickUpdate(changes, message) {
+    if (!selected || !accessToken) return;
+    setSaving(true); setError(''); setSuccess('');
+    try {
+      const updated = await updateSunwingsQuote(accessToken, { id: selected.id, ...changes });
+      if (updated) {
+        setRequests(rows => rows.map(row => row.id === updated.id ? updated : row));
+        if (changes.forward) setDraftStatus(updated.status || draftStatus);
+      }
+      setSuccess(message);
+    } catch (err) {
+      setError(err?.message || 'Unable to update quote request.');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     if (!selectedId) return undefined;
@@ -211,6 +273,12 @@ export default function QuoteRequestsAdmin() {
         quoteAmount: draftQuoteAmount,
         nextAction: draftNextAction,
         nextActionDueAt: draftNextActionDueAt,
+        partnerPrice: draftPartnerPrice,
+        finalPrice: draftFinalPrice,
+        commissionRate: draftRate,
+        commissionStatus: draftCommissionStatus,
+        commissionPaidAt: draftPaidAt,
+        commissionPaidMethod: draftPaidMethod,
       });
       if (updated) setRequests(rows => rows.map(row => row.id === updated.id ? updated : row));
       setSuccess('Quote request updated.');
@@ -325,8 +393,80 @@ export default function QuoteRequestsAdmin() {
           <div className="service-request-quick-actions">
             {selected.email && <a className="site-admin-btn" href={`mailto:${selected.email}`}><Mail size={14}/> Email Customer</a>}
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call Customer</a>}
-            {selected.request_type !== 'contact' && <a className="site-admin-btn secondary" href={externalQuoteMailto(selected)}><Mail size={14}/> Forward for Quote</a>}
+            {selected.request_type !== 'contact' && <a className="site-admin-btn secondary" href={externalQuoteMailto(selected)}><Mail size={14}/> Email job details</a>}
           </div>
+
+          <section className="service-request-drawer-section primary-section">
+            <p className="site-admin-eyebrow">Where is this job?</p>
+            <div className="job-steps">
+              {JOB_STEPS.map(([value, label, hint]) => {
+                const currentIndex = JOB_STEPS.findIndex(([key]) => key === draftStatus);
+                const index = JOB_STEPS.findIndex(([key]) => key === value);
+                const done = draftStatus !== 'declined' && value !== 'declined' && currentIndex > index;
+                return <button type="button" key={value} className={`job-step ${draftStatus === value ? 'current' : ''} ${done ? 'done' : ''}`} onClick={() => setDraftStatus(value)}>
+                  <b>{label}</b><small>{hint}</small>
+                </button>;
+              })}
+            </div>
+            <p className="job-hint">Click a step to move the job there (skipping is fine), then Save Request.</p>
+          </section>
+
+          {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
+            <div className="job-section-head">
+              <p className="site-admin-eyebrow">Marius</p>
+              {selected.forwarded_at
+                ? <span className="job-chip">Sent {shortDate(selected.forwarded_at)}</span>
+                : <button className="site-admin-btn" type="button" disabled={saving} onClick={() => quickUpdate({ forward: true }, 'Sent to Marius. It’s now in his “Jobs from Justin”.')}><Send size={14}/> Send to Marius’s dashboard</button>}
+            </div>
+            <p className="job-hint">Marius sees the whole job in his “Jobs from Justin”, with the customer shown as first name and last initial. The customer’s phone and email stay hidden until you share them.</p>
+            {selected.partner_updated_at && <div className="job-partner-update">
+              <strong>Marius updated this job {shortDate(selected.partner_updated_at)}</strong>
+              <span>Status: {MARIUS_STATUS_LABEL[selected.partner_status] || '—'} · Price: {selected.partner_price == null ? '—' : money(selected.partner_price)}{selected.final_price != null ? ` · Final: ${money(selected.final_price)}` : ''}</span>
+              {selected.partner_note ? <p>“{selected.partner_note}”</p> : null}
+            </div>}
+            <div className="service-request-compact-details">
+              <div><dt>Marius’s price</dt><dd><input type="number" min="0" step="0.01" value={draftPartnerPrice} onChange={event => setDraftPartnerPrice(event.target.value)} placeholder="Marius enters it, or you can"/></dd></div>
+              <div><dt>Customer contact</dt><dd>
+                {selected.contact_shared
+                  ? <button className="site-admin-btn secondary small" type="button" disabled={saving} onClick={() => quickUpdate({ shareContact: false }, 'Customer contact hidden from Marius.')}><EyeOff size={13}/> Shared. Hide again</button>
+                  : <button className="site-admin-btn secondary small" type="button" disabled={saving || !selected.forwarded_at} onClick={() => { if (window.confirm('Show this customer’s phone and email to Marius?')) quickUpdate({ shareContact: true }, 'Customer contact shared with Marius.'); }}><Eye size={13}/> Share with Marius</button>}
+              </dd></div>
+            </div>
+          </section>}
+
+          {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">My commission</p>
+            <div className="service-request-compact-details">
+              <div><dt>Final job price</dt><dd><input type="number" min="0" step="0.01" value={draftFinalPrice} onChange={event => setDraftFinalPrice(event.target.value)} placeholder="What the customer paid"/></dd></div>
+              <div><dt>Rate</dt><dd>
+                <select value={draftRateMode} onChange={event => setDraftRateMode(event.target.value)}>
+                  <option value="auto">Automatic (10% up to $800, 20% over)</option>
+                  <option value="10">10%</option>
+                  <option value="20">20%</option>
+                  <option value="custom">Custom…</option>
+                </select>
+                {draftRateMode === 'custom' && <input type="number" min="0" max="100" step="0.5" value={draftCustomRate} onChange={event => setDraftCustomRate(event.target.value)} placeholder="%" style={{ marginTop: 6 }}/>}
+              </dd></div>
+              <div><dt>Status</dt><dd>
+                <select value={draftCommissionStatus} onChange={event => setDraftCommissionStatus(event.target.value)}>
+                  <option value="owed">Owed to me</option>
+                  <option value="paid">Paid</option>
+                  <option value="none">No commission on this job</option>
+                </select>
+              </dd></div>
+              <div><dt>Paid on</dt><dd><input type="date" value={draftPaidAt} onChange={event => setDraftPaidAt(event.target.value)}/></dd></div>
+              <div><dt>Paid how</dt><dd>
+                <select value={draftPaidMethod} onChange={event => setDraftPaidMethod(event.target.value)}>
+                  <option value="">—</option><option>e-Transfer</option><option>Cash</option><option>Other</option>
+                </select>
+              </dd></div>
+            </div>
+            <div className="job-commission">
+              <strong>{draftCommissionStatus === 'none' ? 'No commission' : draftCommission.price == null ? 'Enter a price' : money(draftCommission.amount)}</strong>
+              <span>{draftCommissionStatus !== 'none' && draftCommission.price != null ? `${draftCommission.rate}% of ${money(draftCommission.price)}${draftRateMode === 'auto' ? ` (automatic: ${autoCommissionRate(draftCommission.price)}%)` : ''}` : 'Uses the final price, else Marius’s price, else the quote amount.'}</span>
+            </div>
+            <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button>
+          </section>}
 
           <section className="service-request-drawer-section primary-section">
             <p className="site-admin-eyebrow">Workflow</p>

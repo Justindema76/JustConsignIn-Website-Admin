@@ -54,6 +54,9 @@ export default {
       label: 'Leads',
       items: [
         { to: '/admin/sunwings/quotes', label: 'Quote Requests', icon: 'inbox' },
+        { to: '/admin/sunwings/commission', label: 'My Commission & Investment', icon: 'briefcase', ownerOnly: true },
+        // Only partners (Marius) see this; they see nothing else.
+        { to: '/admin/sunwings/jobs', label: 'Jobs from Justin', icon: 'truck', partnerOnly: true },
       ],
     },
   ],

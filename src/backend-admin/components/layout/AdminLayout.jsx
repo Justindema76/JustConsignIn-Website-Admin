@@ -35,9 +35,11 @@ export default function AdminLayout() {
   const [siteKey, setSiteKey] = useState(getAdminSiteKey());
   const siteConfig = useMemo(() => getSiteConfig(siteKey), [siteKey]);
   const navGroups = useMemo(() => {
-    if (isOwnerUser(user)) return siteConfig.navGroups;
+    // Partners (Marius) only see partner pages; everyone else never sees them.
+    const isPartner = user?.role === 'partner';
+    const keep = item => isPartner ? item.partnerOnly : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly);
     return siteConfig.navGroups
-      .map(group => ({ ...group, items: group.items.filter(item => !item.ownerOnly) }))
+      .map(group => ({ ...group, items: group.items.filter(keep) }))
       .filter(group => group.items.length > 0);
   }, [siteConfig.navGroups, user]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
