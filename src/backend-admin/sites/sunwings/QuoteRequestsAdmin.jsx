@@ -258,6 +258,9 @@ export default function QuoteRequestsAdmin() {
     high: requests.filter(item => item.priority === 'high' && !['complete','declined','cancelled'].includes(item.status)).length,
   }), [requests]);
 
+  // The Marius/commission columns exist only after the 20261103 database setup has run.
+  const hasWorkflow = Boolean(selected && Object.prototype.hasOwnProperty.call(selected, 'commission_status'));
+
   async function save() {
     if (!selected || !accessToken) return;
     setSaving(true);
@@ -273,12 +276,14 @@ export default function QuoteRequestsAdmin() {
         quoteAmount: draftQuoteAmount,
         nextAction: draftNextAction,
         nextActionDueAt: draftNextActionDueAt,
-        partnerPrice: draftPartnerPrice,
-        finalPrice: draftFinalPrice,
-        commissionRate: draftRate,
-        commissionStatus: draftCommissionStatus,
-        commissionPaidAt: draftPaidAt,
-        commissionPaidMethod: draftPaidMethod,
+        ...(hasWorkflow ? {
+          partnerPrice: draftPartnerPrice,
+          finalPrice: draftFinalPrice,
+          commissionRate: draftRate,
+          commissionStatus: draftCommissionStatus,
+          commissionPaidAt: draftCommissionStatus === 'paid' ? draftPaidAt : '',
+          commissionPaidMethod: draftCommissionStatus === 'paid' ? draftPaidMethod : '',
+        } : {}),
       });
       if (updated) setRequests(rows => rows.map(row => row.id === updated.id ? updated : row));
       setSuccess('Quote request updated.');
@@ -408,81 +413,93 @@ export default function QuoteRequestsAdmin() {
                 </button>;
               })}
             </div>
-            <p className="job-hint">Click a step to move the job there (skipping is fine), then Save Request.</p>
+            <p className="job-hint">Click a step to move the job there (skipping is fine), then Save changes at the bottom.</p>
           </section>
 
           {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
             <div className="job-section-head">
               <p className="site-admin-eyebrow">Marius</p>
-              {selected.forwarded_at
+              {!hasWorkflow ? null : selected.forwarded_at
                 ? <span className="job-chip">Sent {shortDate(selected.forwarded_at)}</span>
-                : <button className="site-admin-btn" type="button" disabled={saving} onClick={() => quickUpdate({ forward: true }, 'Sent to Marius. It’s now in his “Jobs from Justin”.')}><Send size={14}/> Send to Marius’s dashboard</button>}
+                : <button className="site-admin-btn" type="button" disabled={saving} onClick={() => quickUpdate({ forward: true }, 'Sent to Marius. It’s now in his “Jobs from Justin”.')}><Send size={14}/> Send to Marius</button>}
             </div>
-            <p className="job-hint">Marius sees the whole job in his “Jobs from Justin”, with the customer shown as first name and last initial. The customer’s phone and email stay hidden until you share them.</p>
-            {selected.partner_updated_at && <div className="job-partner-update">
-              <strong>Marius updated this job {shortDate(selected.partner_updated_at)}</strong>
-              <span>Status: {MARIUS_STATUS_LABEL[selected.partner_status] || '—'} · Price: {selected.partner_price == null ? '—' : money(selected.partner_price)}{selected.final_price != null ? ` · Final: ${money(selected.final_price)}` : ''}</span>
-              {selected.partner_note ? <p>“{selected.partner_note}”</p> : null}
-            </div>}
-            <div className="service-request-compact-details">
-              <div><dt>Marius’s price</dt><dd><input type="number" min="0" step="0.01" value={draftPartnerPrice} onChange={event => setDraftPartnerPrice(event.target.value)} placeholder="Marius enters it, or you can"/></dd></div>
-              <div><dt>Customer contact</dt><dd>
-                {selected.contact_shared
-                  ? <button className="site-admin-btn secondary small" type="button" disabled={saving} onClick={() => quickUpdate({ shareContact: false }, 'Customer contact hidden from Marius.')}><EyeOff size={13}/> Shared. Hide again</button>
-                  : <button className="site-admin-btn secondary small" type="button" disabled={saving || !selected.forwarded_at} onClick={() => { if (window.confirm('Show this customer’s phone and email to Marius?')) quickUpdate({ shareContact: true }, 'Customer contact shared with Marius.'); }}><Eye size={13}/> Share with Marius</button>}
-              </dd></div>
-            </div>
+            {!hasWorkflow ? <p className="job-setup-note">Turns on once the database setup “Sunwings - Marius jobs &amp; commission setup (Nov 3)” has been run in Supabase.</p> : <>
+              <p className="job-hint">Marius sees the job in his “Jobs from Justin” with the customer as first name and last initial. Phone and email stay hidden until you share them.</p>
+              {selected.partner_updated_at && <div className="job-partner-update">
+                <strong>Marius updated this job {shortDate(selected.partner_updated_at)}</strong>
+                <span>Status: {MARIUS_STATUS_LABEL[selected.partner_status] || '—'} · Price: {selected.partner_price == null ? '—' : money(selected.partner_price)}{selected.final_price != null ? ` · Final: ${money(selected.final_price)}` : ''}</span>
+                {selected.partner_note ? <p>“{selected.partner_note}”</p> : null}
+              </div>}
+              <div className="job-fields">
+                <label><span>Marius’s price</span><input type="number" min="0" step="0.01" value={draftPartnerPrice} onChange={event => setDraftPartnerPrice(event.target.value)} placeholder="$ Marius adds it, or you can"/></label>
+                <div className="job-field"><span>Customer phone &amp; email</span>
+                  {selected.contact_shared
+                    ? <button className="site-admin-btn secondary" type="button" disabled={saving} onClick={() => quickUpdate({ shareContact: false }, 'Customer contact hidden from Marius.')}><EyeOff size={14}/> Shared with Marius · Hide</button>
+                    : <button className="site-admin-btn secondary" type="button" disabled={saving || !selected.forwarded_at} title={selected.forwarded_at ? '' : 'Send the job to Marius first'} onClick={() => { if (window.confirm('Show this customer’s phone and email to Marius?')) quickUpdate({ shareContact: true }, 'Customer contact shared with Marius.'); }}><Eye size={14}/> Share with Marius</button>}
+                </div>
+              </div>
+            </>}
           </section>}
 
           {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
-            <p className="site-admin-eyebrow">My commission</p>
-            <div className="service-request-compact-details">
-              <div><dt>Final job price</dt><dd><input type="number" min="0" step="0.01" value={draftFinalPrice} onChange={event => setDraftFinalPrice(event.target.value)} placeholder="What the customer paid"/></dd></div>
-              <div><dt>Rate</dt><dd>
-                <select value={draftRateMode} onChange={event => setDraftRateMode(event.target.value)}>
-                  <option value="auto">Automatic (10% up to $800, 20% over)</option>
-                  <option value="10">10%</option>
-                  <option value="20">20%</option>
-                  <option value="custom">Custom…</option>
-                </select>
-                {draftRateMode === 'custom' && <input type="number" min="0" max="100" step="0.5" value={draftCustomRate} onChange={event => setDraftCustomRate(event.target.value)} placeholder="%" style={{ marginTop: 6 }}/>}
-              </dd></div>
-              <div><dt>Status</dt><dd>
-                <select value={draftCommissionStatus} onChange={event => setDraftCommissionStatus(event.target.value)}>
-                  <option value="owed">Owed to me</option>
-                  <option value="paid">Paid</option>
-                  <option value="none">No commission on this job</option>
-                </select>
-              </dd></div>
-              <div><dt>Paid on</dt><dd><input type="date" value={draftPaidAt} onChange={event => setDraftPaidAt(event.target.value)}/></dd></div>
-              <div><dt>Paid how</dt><dd>
-                <select value={draftPaidMethod} onChange={event => setDraftPaidMethod(event.target.value)}>
-                  <option value="">—</option><option>e-Transfer</option><option>Cash</option><option>Other</option>
-                </select>
-              </dd></div>
+            <p className="site-admin-eyebrow">Price &amp; my commission</p>
+            <div className="job-fields">
+              <label><span>Quoted to customer</span><input type="number" min="0" step="0.01" value={draftQuoteAmount} onChange={event => setDraftQuoteAmount(event.target.value)} placeholder="$ 0.00"/></label>
+              {hasWorkflow && <label><span>Final job price</span><input type="number" min="0" step="0.01" value={draftFinalPrice} onChange={event => setDraftFinalPrice(event.target.value)} placeholder="$ What the customer paid"/></label>}
             </div>
-            <div className="job-commission">
-              <strong>{draftCommissionStatus === 'none' ? 'No commission' : draftCommission.price == null ? 'Enter a price' : money(draftCommission.amount)}</strong>
-              <span>{draftCommissionStatus !== 'none' && draftCommission.price != null ? `${draftCommission.rate}% of ${money(draftCommission.price)}${draftRateMode === 'auto' ? ` (automatic: ${autoCommissionRate(draftCommission.price)}%)` : ''}` : 'Uses the final price, else Marius’s price, else the quote amount.'}</span>
-            </div>
-            <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button>
+            {hasWorkflow ? <>
+              <div className="job-fields three">
+                <label><span>Rate</span>
+                  <select value={draftRateMode} onChange={event => setDraftRateMode(event.target.value)}>
+                    <option value="auto">Automatic (10% / 20%)</option>
+                    <option value="10">10%</option>
+                    <option value="20">20%</option>
+                    <option value="custom">Custom…</option>
+                  </select>
+                </label>
+                {draftRateMode === 'custom' && <label><span>Custom rate %</span><input type="number" min="0" max="100" step="0.5" value={draftCustomRate} onChange={event => setDraftCustomRate(event.target.value)} placeholder="%"/></label>}
+                <label><span>Commission</span>
+                  <select value={draftCommissionStatus} onChange={event => setDraftCommissionStatus(event.target.value)}>
+                    <option value="owed">Owed to me</option>
+                    <option value="paid">Paid to me</option>
+                    <option value="none">No commission on this job</option>
+                  </select>
+                </label>
+              </div>
+              {draftCommissionStatus === 'paid' && <div className="job-fields">
+                <label><span>Paid on</span><input type="date" value={draftPaidAt} onChange={event => setDraftPaidAt(event.target.value)}/></label>
+                <label><span>Paid how</span>
+                  <select value={draftPaidMethod} onChange={event => setDraftPaidMethod(event.target.value)}>
+                    <option value="">Choose…</option><option>e-Transfer</option><option>Cash</option><option>Other</option>
+                  </select>
+                </label>
+              </div>}
+              <div className="job-commission">
+                <strong>{draftCommissionStatus === 'none' ? 'No commission' : draftCommission.price == null ? 'Add a price' : money(draftCommission.amount)}</strong>
+                <span>{draftCommissionStatus !== 'none' && draftCommission.price != null
+                  ? `${draftCommission.rate}% of ${money(draftCommission.price)}${draftRateMode === 'auto' ? ' · 10% up to $800, 20% over $800' : ''}`
+                  : 'Uses the final price, else Marius’s price, else the quoted price.'}</span>
+              </div>
+            </> : <p className="job-setup-note">Commission tracking turns on once the database setup has been run in Supabase.</p>}
           </section>}
 
-          <section className="service-request-drawer-section primary-section">
-            <p className="site-admin-eyebrow">Workflow</p>
-            <div className="service-request-workflow-compact">
-              <div className="service-request-compact-details">
-                <div><dt>Status</dt><dd><select value={draftStatus} onChange={event => setDraftStatus(event.target.value)}>{STATUS_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></dd></div>
-                <div><dt>Priority</dt><dd><select value={draftPriority} onChange={event => setDraftPriority(event.target.value)}>{PRIORITY_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></dd></div>
-                <div><dt>Quote #</dt><dd><input value={draftQuoteNumber} onChange={event => setDraftQuoteNumber(event.target.value)} placeholder="Optional"/></dd></div>
-                <div><dt>Quote amount</dt><dd><input type="number" min="0" step="0.01" value={draftQuoteAmount} onChange={event => setDraftQuoteAmount(event.target.value)} placeholder="0.00"/></dd></div>
-                <div><dt>Next action</dt><dd><input value={draftNextAction} onChange={event => setDraftNextAction(event.target.value)} placeholder="Call customer, prepare quote…"/></dd></div>
-                <div><dt>Due</dt><dd><input type="datetime-local" value={draftNextActionDueAt} onChange={event => setDraftNextActionDueAt(event.target.value)}/></dd></div>
-              </div>
-              <label>Private notes<textarea rows="5" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Quote notes, follow-up, requirements…"/></label>
-              <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Request'}</button>
+          <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Follow-up</p>
+            <div className="job-fields three">
+              <label><span>Priority</span><select value={draftPriority} onChange={event => setDraftPriority(event.target.value)}>{PRIORITY_OPTIONS.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+              <label><span>Quote #</span><input value={draftQuoteNumber} onChange={event => setDraftQuoteNumber(event.target.value)} placeholder="Optional"/></label>
+              <label><span>Due</span><input type="datetime-local" value={draftNextActionDueAt} onChange={event => setDraftNextActionDueAt(event.target.value)}/></label>
+            </div>
+            <div className="job-fields one">
+              <label><span>Next action</span><input value={draftNextAction} onChange={event => setDraftNextAction(event.target.value)} placeholder="Call customer, send quote…"/></label>
+              <label><span>Private notes</span><textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Quote notes, follow-up, requirements…"/></label>
             </div>
           </section>
+
+          <div className="job-save-bar">
+            <span>{statusLabel(draftStatus)}{hasWorkflow && draftCommissionStatus !== 'none' && draftCommission.price != null ? ` · Commission ${money(draftCommission.amount)}` : ''}</span>
+            <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button>
+          </div>
 
           <section className="service-request-drawer-section">
             <p className="site-admin-eyebrow">Customer</p>

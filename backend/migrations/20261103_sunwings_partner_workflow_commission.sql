@@ -197,3 +197,5 @@ with check ((select auth.jwt()->>'email') = 'justindema76@gmail.com' and (select
 grant select, insert, update, delete on public.sunwings_investments to authenticated;
 
 commit;
+
+notify pgrst, 'reload schema';

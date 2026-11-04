@@ -16,6 +16,20 @@ const STATUS = [
   ['cant_do', 'Can’t do it'],
 ];
 
+// Where the job stands overall (Justin moves it along), in Marius's words.
+const JOB_STAGE = {
+  forwarded: ['Waiting for your price', 'attention'],
+  new: ['Waiting for your price', 'attention'],
+  reviewing: ['Waiting for your price', 'attention'],
+  priced: ['Your price is with Justin', ''],
+  quote_sent: ['Justin sent your price to the customer', ''],
+  accepted: ['Booked: customer said yes, go ahead', 'go'],
+  booked: ['Booked: customer said yes, go ahead', 'go'],
+  complete: ['Complete', 'done'],
+  declined: ['Customer said no', 'muted'],
+  cancelled: ['Cancelled', 'muted'],
+};
+
 function yesNo(value) {
   if (value == null) return '—';
   return value ? 'Yes' : 'No';
@@ -48,7 +62,7 @@ function JobCard({ job, onSaved }) {
     }
   }
 
-  const waiting = !job.partner_status && job.partner_price == null;
+  const [stageText, stageTone] = JOB_STAGE[job.status] || (job.partner_price == null ? JOB_STAGE.forwarded : JOB_STAGE.priced);
   return <section className="site-admin-card partner-job">
     <div className="partner-job-head">
       <div>
@@ -56,7 +70,7 @@ function JobCard({ job, onSaved }) {
         <h2>{job.customer || 'Customer'}</h2>
         <small>Sent by Justin {job.forwarded_at ? new Date(job.forwarded_at).toLocaleDateString() : ''}</small>
       </div>
-      <span className={`job-chip ${waiting ? 'attention' : ''}`}>{waiting ? 'Waiting for your price' : (STATUS.find(([v]) => v === job.partner_status)?.[1] || 'Updated')}</span>
+      <span className={`job-chip ${stageTone}`}>{stageText}</span>
     </div>
 
     <dl className="partner-job-details">
