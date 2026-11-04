@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  ChartNoAxesCombined,
   BriefcaseBusiness,
   Building2,
   Handshake,
@@ -22,6 +23,7 @@ import {
 
 const ICONS = {
   book: BookOpen,
+  chart: ChartNoAxesCombined,
   briefcase: BriefcaseBusiness,
   building: Building2,
   handshake: Handshake,
