@@ -151,7 +151,7 @@ const SECTIONS = [
   {
     key: 'snow_pricing',
     title: 'Snow removal plans',
-    intro: 'The plans, prices and service areas on the Snow Removal page and the Pricing page.',
+    intro: 'The plans, prices and service areas on the Snow Removal page and the Pricing page. Leave Service areas empty to use the locations that have Snow Removal ticked (Admin › Locations).',
     fields: [
       { name: 'eyebrow', label: 'Small tag' },
       { name: 'heading', label: 'Headline' },
@@ -185,7 +185,7 @@ const SECTIONS = [
   {
     key: 'snow_page',
     title: 'Snow removal page',
-    intro: 'Text on the Snow Removal service page. This replaces what’s in Service Posts for snow removal.',
+    intro: 'The Snow Removal service post is the page’s content. Only fill in a field here to replace that part of it; blank fields use the service post.',
     fields: [
       { name: 'hero_title', label: 'Page headline' },
       { name: 'intro', label: 'Intro', type: 'textarea' },

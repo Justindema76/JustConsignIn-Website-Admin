@@ -1,6 +1,7 @@
 import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
 import { airtableConfigured, makeConfigured, readMariusUpdates, sendJobToMake, stepFromJobStatus } from '../../_lib/sunwingsMarius.js';
 import { supabaseUserRest } from '../../_lib/supabase.js';
+import { withPhotoUrls } from '../../_lib/sunwingsPhotos.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const BASE_FIELDS = [
@@ -19,17 +20,23 @@ const NEW_FIELDS = [
   'contact_shared','contact_shared_at','final_price','commission_rate','commission_status',
   'commission_paid_at','commission_paid_method'
 ];
+// Added by migration 20261105 (quote photos).
+const PHOTO_FIELDS = ['photos'];
+const ALL_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS].join(',');
 const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
 const OLD_FIELDS = BASE_FIELDS.join(',');
 
 // Run a request with all fields; if the database doesn't have the new columns yet
 // (Postgres error 42703), run it again with only the original fields.
 async function withFieldFallback(token, buildPath, options) {
-  const response = await supabaseUserRest(token, buildPath(FIELDS), options);
-  if (response.status !== 400) return response;
-  const text = await response.clone().text().catch(() => '');
-  if (!text.includes('42703')) return response;
-  return supabaseUserRest(token, buildPath(OLD_FIELDS), options);
+  let response;
+  for (const fields of [ALL_FIELDS, FIELDS, OLD_FIELDS]) {
+    response = await supabaseUserRest(token, buildPath(fields), options);
+    if (response.status !== 400) return response;
+    const text = await response.clone().text().catch(() => '');
+    if (!text.includes('42703')) return response;
+  }
+  return response;
 }
 
 // Until migration 20261103 has run, the database only accepts its original four
@@ -143,7 +150,8 @@ export default async function handler(req, res) {
         'Unable to load Sunwings quote requests.',
       );
       const synced = isOwner && Array.isArray(requests) ? await syncFromAirtable(owner.accessToken, requests) : requests;
-      return res.status(200).json({ requests: Array.isArray(synced) ? synced.map(row => forViewer(withRealStatus(row), isOwner)) : synced });
+      const withPhotos = await withPhotoUrls(synced);
+      return res.status(200).json({ requests: Array.isArray(withPhotos) ? withPhotos.map(row => forViewer(withRealStatus(row), isOwner)) : withPhotos });
     }
 
     const id = clean(req.method === 'DELETE' ? req.query?.id : req.body?.id, 80);
@@ -273,7 +281,8 @@ export default async function handler(req, res) {
     const rows = await parseSupabase(response, 'Unable to update Sunwings quote request.');
     const row = Array.isArray(rows) ? rows[0] || null : rows;
     if (!row) return res.status(404).json({ error: 'That job is not available.' });
-    return res.status(200).json({ request: forViewer(withRealStatus(row), isOwner) });
+    const [withPhotos] = await withPhotoUrls([row]);
+    return res.status(200).json({ request: forViewer(withRealStatus(withPhotos), isOwner) });
   } catch (error) {
     console.error('[sunwings] quote requests failed', error);
     return res.status(500).json({ error: error.message || 'Quote request failed.' });

@@ -531,6 +531,7 @@ export default function QuoteRequestsAdmin() {
           </section>
 
           {selected.item_list && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Item list</p><p className="service-request-message">{selected.item_list}</p></section>}
+          {selected.photo_urls?.length > 0 && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Photos ({selected.photo_urls.length})</p><div className="sunwings-quote-photos">{selected.photo_urls.map((url, index) => <a key={url} href={url} target="_blank" rel="noopener noreferrer"><img src={url} alt={`Customer photo ${index + 1}`} loading="lazy"/></a>)}</div></section>}
           {referralSourceFromMessage(selected.message) && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">How did you hear about us?</p><p className="service-request-message">{referralSourceFromMessage(selected.message)}</p></section>}
           {messageWithoutReferral(selected.message) && <section className="service-request-drawer-section"><p className="site-admin-eyebrow">Additional details</p><p className="service-request-message">{messageWithoutReferral(selected.message)}</p></section>}
 

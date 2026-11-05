@@ -957,6 +957,25 @@ async function sendQuoteRequest(body: any) {
     .eq('id', requestId)
     .eq('site_key', 'sunwings');
 
+  // Customer photos (private bucket). Read separately so the email still works if the
+  // photos column has not been added yet.
+  const { data: photoRow } = await admin
+    .from('sunwings_quote_requests')
+    .select('photos')
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings')
+    .maybeSingle();
+  const photoPaths = (Array.isArray(photoRow?.photos) ? photoRow.photos : [])
+    .map((path: unknown) => clean(path, 80))
+    .filter((path: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-5]\.jpg$/.test(path))
+    .slice(0, 6);
+  const photoAttachments: { filename: string; content: Buffer; contentType: string }[] = [];
+  for (const [index, path] of photoPaths.entries()) {
+    const { data: file, error: photoError } = await admin.storage.from('sunwings-quote-photos').download(path);
+    if (photoError || !file) { console.error('Sunwings quote photo download failed', path, photoError?.message); continue; }
+    photoAttachments.push({ filename: `photo-${index + 1}.jpg`, content: Buffer.from(new Uint8Array(await file.arrayBuffer())), contentType: 'image/jpeg' });
+  }
+
   const display = (value: unknown) => clean(value, 6000) || 'Not provided';
   const yesNo = (value: unknown) => value == null ? 'Not provided' : value ? 'Yes' : 'No';
   const row = (label: string, value: unknown) =>
@@ -990,13 +1009,14 @@ async function sendQuoteRequest(body: any) {
       `Drop-off: ${display(dropoff)}`,
       `Drop-off elevator: ${yesNo(record.dropoff_elevator)}`,
       `Drop-off stairs: ${yesNo(record.dropoff_stairs)}`, '',
-      'Item list:', display(record.item_list), '',
     ]),
+    ...(isContact || (isQuickQuote && !record.item_list) ? [] : ['Item list:', display(record.item_list), '']),
+    ...(photoAttachments.length ? [`Photos: ${photoAttachments.length} attached`, ''] : []),
     isContact ? 'Message:' : 'Additional details:', display(record.message), '',
     'This request is saved in Website Admin → Quote Requests.',
   ].join('\n');
 
-  const html = `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div><h1 style="margin:5px 0 0;font-size:24px">New ${requestLabel}</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Phone', record.phone)}${record.email ? row('Email', record.email) : ''}${row('Service', record.service)}${isContact ? '' : row('Preferred date', record.preferred_date)}${isContact ? '' : row('Preferred time', record.preferred_time)}${isContact || isQuickQuote ? '' : row('Move size', record.move_size)}${isContact || isQuickQuote ? '' : row('Pickup', pickup)}${isContact || isQuickQuote ? '' : row('Pickup elevator', yesNo(record.pickup_elevator))}${isContact || isQuickQuote ? '' : row('Pickup stairs', yesNo(record.pickup_stairs))}${isContact || isQuickQuote ? '' : row('Drop-off', dropoff)}${isContact || isQuickQuote ? '' : row('Drop-off elevator', yesNo(record.dropoff_elevator))}${isContact || isQuickQuote ? '' : row('Drop-off stairs', yesNo(record.dropoff_stairs))}</table>${isContact || isQuickQuote ? '' : `<div style="margin:16px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Item list</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.item_list))}</div></div>`}<div style="margin:12px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">${isContact ? 'Message' : 'Additional details'}</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div>${sendToMariusUrl ? `<div style="margin:22px 12px 6px;text-align:center"><a href="${escapeHtml(sendToMariusUrl)}" style="display:inline-block;background:#F97316;color:#ffffff;text-decoration:none;font-weight:800;font-size:16px;padding:14px 28px;border-radius:10px">Send to Marius →</a><div style="margin-top:8px;color:#5B6B82;font-size:12px">Opens a confirm page. Marius gets all the customer’s details.</div></div>` : ''}<p style="margin:18px 12px 4px;color:#5B6B82;font-size:13px">This request is also saved in Website Admin → Quote Requests.</p></div></div></div>`;
+  const html = `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div><h1 style="margin:5px 0 0;font-size:24px">New ${requestLabel}</h1></div><div style="padding:20px 12px"><table role="presentation" style="width:100%;border-collapse:collapse">${row('Name', record.name)}${row('Phone', record.phone)}${record.email ? row('Email', record.email) : ''}${row('Service', record.service)}${isContact ? '' : row('Preferred date', record.preferred_date)}${isContact ? '' : row('Preferred time', record.preferred_time)}${isContact || isQuickQuote ? '' : row('Move size', record.move_size)}${isContact || isQuickQuote ? '' : row('Pickup', pickup)}${isContact || isQuickQuote ? '' : row('Pickup elevator', yesNo(record.pickup_elevator))}${isContact || isQuickQuote ? '' : row('Pickup stairs', yesNo(record.pickup_stairs))}${isContact || isQuickQuote ? '' : row('Drop-off', dropoff)}${isContact || isQuickQuote ? '' : row('Drop-off elevator', yesNo(record.dropoff_elevator))}${isContact || isQuickQuote ? '' : row('Drop-off stairs', yesNo(record.dropoff_stairs))}</table>${isContact || (isQuickQuote && !record.item_list) ? '' : `<div style="margin:16px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">Item list</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.item_list))}</div></div>`}<div style="margin:12px 12px 4px;padding:16px;background:#F6F8FB;border-radius:10px"><strong style="display:block;margin-bottom:8px">${isContact ? 'Message' : 'Additional details'}</strong><div style="white-space:pre-wrap;line-height:1.55">${escapeHtml(display(record.message))}</div></div>${sendToMariusUrl ? `<div style="margin:22px 12px 6px;text-align:center"><a href="${escapeHtml(sendToMariusUrl)}" style="display:inline-block;background:#F97316;color:#ffffff;text-decoration:none;font-weight:800;font-size:16px;padding:14px 28px;border-radius:10px">Send to Marius →</a><div style="margin-top:8px;color:#5B6B82;font-size:12px">Opens a confirm page. Marius gets all the customer’s details.</div></div>` : ''}${photoAttachments.length ? `<p style="margin:16px 12px 4px;color:#14213D;font-weight:700">📷 ${photoAttachments.length} photo${photoAttachments.length === 1 ? '' : 's'} attached</p>` : ''}<p style="margin:18px 12px 4px;color:#5B6B82;font-size:13px">This request is also saved in Website Admin → Quote Requests.</p></div></div></div>`;
 
   try {
     const settings = await loadSettings('sunwings');
@@ -1008,6 +1028,7 @@ async function sendQuoteRequest(body: any) {
       subject: `New Sunwings ${requestLabel} — ${display(record.name)}`,
       text,
       html,
+      attachments: photoAttachments.length ? photoAttachments : undefined,
     });
 
     await admin

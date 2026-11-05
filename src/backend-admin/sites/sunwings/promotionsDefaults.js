@@ -32,13 +32,13 @@ export const PROMOTIONS_DEFAULTS = {
       "enabled": true,
       "slug": "residential-moving",
       "image": "",
-      "eyebrow": "Upfront quotes · Price-match guarantee",
+      "eyebrow": "Upfront quotes · Careful crews",
       "heading": "Moving day,",
       "accent": "without the stress.",
-      "text": "Careful crews, a clean truck, blankets and wrapping. Get an upfront quote, and show us a lower written quote for the same job and we’ll match it.",
-      "badgeTop": "We match",
-      "badgeMain": "Any",
-      "badgeBottom": "lower written quote",
+      "text": "Careful crews, a clean truck, blankets and wrapping. Clear, upfront quotes tailored to your job.",
+      "badgeTop": "",
+      "badgeMain": "",
+      "badgeBottom": "",
       "badgeFromPrice": false,
       "primary": "Get my moving quote",
       "plan": "",
@@ -115,7 +115,7 @@ export const PROMOTIONS_DEFAULTS = {
       "showServiceSlides": true
     },
     "pricing": {
-      "eyebrow": "Upfront pricing · Price-match guarantee",
+      "eyebrow": "Upfront pricing",
       "heading": "Straight answers",
       "accent": "on price.",
       "text": "",
@@ -159,13 +159,13 @@ export const PROMOTIONS_DEFAULTS = {
       "note": "Based on crew, truck time and distance"
     },
     {
-      "label": "Price-match guarantee",
-      "value": "We match any lower written quote",
-      "note": "Show us a lower written quote for the same job and we’ll match it."
+      "label": "Upfront quotes",
+      "value": "Tailored to your job",
+      "note": "Clear, upfront quotes tailored to your job."
     }
   ],
   "price_match": {
-    "enabled": true,
+    "enabled": false,
     "eyebrow": "Price-match guarantee",
     "heading": "We match any lower written quote.",
     "text": "Found a lower price somewhere else? Don’t book with them yet. Show us their written quote for the same job and we’ll match it.",
@@ -199,9 +199,9 @@ export const PROMOTIONS_DEFAULTS = {
       "href": "https://search.google.com/local/reviews?placeid=ChIJXTBVHE3zTkcRiUEmU5P3CsI"
     },
     {
-      "title": "Price-match guarantee",
-      "text": "We match any lower written quote",
-      "href": "/pricing#price-match"
+      "title": "Upfront quotes",
+      "text": "Clear, upfront quotes tailored to your job.",
+      "href": "/pricing"
     },
     {
       "title": "Flexible scheduling",
@@ -280,78 +280,16 @@ export const PROMOTIONS_DEFAULTS = {
         "note": "most areas"
       }
     ],
-    "regions": [
-      {
-        "label": "Markham & Stouffville",
-        "places": [
-          {
-            "label": "Markham",
-            "href": "/locations/markham"
-          },
-          {
-            "label": "Stouffville"
-          },
-          {
-            "label": "Richmond Hill",
-            "href": "/locations/richmond-hill"
-          }
-        ]
-      },
-      {
-        "label": "Toronto",
-        "places": [
-          {
-            "label": "Scarborough",
-            "href": "/locations/scarborough"
-          },
-          {
-            "label": "North York",
-            "href": "/locations/north-york"
-          },
-          {
-            "label": "Toronto",
-            "href": "/locations/toronto"
-          }
-        ]
-      }
-    ],
+    "regions": [],
     "footnote": "Prices in CAD. Final price is confirmed once we see the property. Cleaning times are a service target and can be affected by severe weather, road access and municipal plowing."
   },
   "snow_page": {
-    "seo_title": "Snow Removal Markham, Stouffville & Toronto | From $175/Month | Sunwings Transport",
-    "seo_description": "Residential snow removal in Markham, Stouffville, Richmond Hill, Scarborough and North York from $175/month. Driveway, walkways and front steps cleared after every 5 cm snowfall. Limited spots.",
-    "hero_title": "Residential Snow Removal in Markham, Stouffville & Toronto",
-    "intro": "Keep your driveway and walkways clear this winter. Sunwings Transport clears your driveway, walkways and front steps after every 5 cm snowfall, with target clearing within 6–8 hours after the snow stops. Now booking in Markham, Stouffville, Richmond Hill, Scarborough and North York.",
-    "bullets": [
-      "Driveway snow removal",
-      "Walkways and front steps",
-      "Snowblower + hand shovelling",
-      "5 cm snowfall trigger",
-      "Target clearing within 6–8 hours after snowfall ends",
-      "Reliable, professional service"
-    ],
-    "body_html": "<h2>How the seasonal plan works</h2><p>Sign up once for the season (October 15 to March 15 in most areas). When 5 cm or more of snow falls, your property is added to the route automatically, so there is no need to call after every storm. We clear your driveway, walkways and front steps using a snowblower and hand shovelling, with a target of 6–8 hours after the snowfall ends.</p><p>Spots are limited each season, so book early to secure your place on the route.</p>",
-    "faq": [
-      {
-        "question": "How much does snow removal cost?",
-        "answer": "The seasonal plan starts at $175/month for a residential driveway, walkways and front steps. Larger driveways and corner lots are quoted based on the property."
-      },
-      {
-        "question": "Do you offer snow removal in Stouffville?",
-        "answer": "Yes. We clear residential driveways, walkways and front steps across Stouffville, including Ballantrae, as part of our Markham and Stouffville route."
-      },
-      {
-        "question": "When does the season run?",
-        "answer": "October 15 to March 15 in most areas."
-      },
-      {
-        "question": "When do you come out?",
-        "answer": "Service starts automatically when 5 cm or more of snow falls. We aim to clear your property within 6–8 hours after the snowfall ends."
-      },
-      {
-        "question": "Which areas do you cover?",
-        "answer": "Markham, Stouffville and Richmond Hill in York Region, and Scarborough, North York and Toronto."
-      }
-    ]
+    "hero_title": "",
+    "intro": "",
+    "seo_title": "",
+    "seo_description": "",
+    "bullets": [],
+    "body_html": "",
+    "faq": []
   }
 };

@@ -5,6 +5,8 @@
 //   SUNWINGS_AIRTABLE_BASE     – optional, defaults below
 //   SUNWINGS_AIRTABLE_TABLE    – optional, defaults below
 
+import { photoPaths, signPhotoPaths } from './sunwingsPhotos.js';
+
 const AIRTABLE_BASE = () => process.env.SUNWINGS_AIRTABLE_BASE || 'apphgwJeoFeNAiW8a';
 const AIRTABLE_TABLE = () => process.env.SUNWINGS_AIRTABLE_TABLE || 'tblfL8OcXrBvUSCiF';
 
@@ -28,8 +30,9 @@ function isoDate(value) {
   return parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : '';
 }
 
-// Exactly the fields Marius asked for.
-export function makePayload(row) {
+// The fields Marius asked for, plus `photos` (customer photo links, valid 7 days —
+// Airtable copies an attachment when the record is created).
+export function makePayload(row, photoUrls = []) {
   return {
     customerName: text(row.name),
     phone: text(row.phone),
@@ -44,6 +47,7 @@ export function makePayload(row) {
     items: [text(row.move_size) && `Size: ${text(row.move_size)}`, text(row.item_list)].filter(Boolean).join('\n'),
     additionalInformation: text(row.message),
     submissionId: text(row.id),
+    photos: photoUrls,
   };
 }
 
@@ -54,10 +58,13 @@ export function makeConfigured() {
 export async function sendJobToMake(row) {
   const url = process.env.SUNWINGS_MAKE_WEBHOOK_URL;
   if (!url) throw new Error('Marius’s Make webhook is not set up yet (SUNWINGS_MAKE_WEBHOOK_URL).');
+  const paths = photoPaths(row);
+  const signed = await signPhotoPaths(paths, 7 * 24 * 3600);
+  const photoUrls = paths.map(path => signed[path]).filter(Boolean);
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(makePayload(row)),
+    body: JSON.stringify(makePayload(row, photoUrls)),
   });
   if (!response.ok) {
     const body = await response.text().catch(() => '');
