@@ -1,4 +1,5 @@
 import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
+import { airtableConfigured, makeConfigured, readMariusUpdates, sendJobToMake, stepFromJobStatus } from '../../_lib/sunwingsMarius.js';
 import { supabaseUserRest } from '../../_lib/supabase.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
@@ -90,6 +91,40 @@ function forViewer(row, isOwner) {
   return copy;
 }
 
+// Pull Marius's Job Status / Job Date / Final Price from his Airtable into forwarded jobs.
+// Only writes when something changed, and flags it as "Marius updated". Never blocks the page.
+async function syncFromAirtable(token, rows) {
+  if (!airtableConfigured()) return rows;
+  const sent = rows.filter(row => row.forwarded_at);
+  if (!sent.length) return rows;
+  let updates = {};
+  try { updates = await readMariusUpdates(sent.map(row => row.id)); }
+  catch (error) { console.error('[sunwings] airtable read failed', error.message); return rows; }
+
+  const changed = new Map();
+  for (const row of sent) {
+    const update = updates[row.id];
+    if (!update || (!update.jobStatus && !update.jobDate && update.finalPrice == null)) continue;
+    const step = stepFromJobStatus(update.jobStatus);
+    const note = ['From Marius’s Airtable', update.jobStatus && `Job status: ${update.jobStatus}`, update.jobDate && `Job date: ${update.jobDate}`].filter(Boolean).join(' · ');
+    const patch = {};
+    if (note !== (row.partner_note || '')) patch.partner_note = note;
+    if (step && step !== row.partner_status) patch.partner_status = step;
+    if (update.finalPrice != null && Number(update.finalPrice) !== Number(row.final_price)) patch.final_price = update.finalPrice;
+    if (step && step !== 'priced' && step !== row.status) { patch.status = step; patch.status_changed_at = new Date().toISOString(); }
+    if (!Object.keys(patch).length) continue;
+    const now = new Date().toISOString();
+    Object.assign(patch, { partner_updated_at: now, partner_update_unseen: true, last_activity: 'Marius updated the job (Airtable)', last_activity_at: now, updated_at: now });
+    try {
+      const response = await supabaseUserRest(token, `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(row.id)}`, {
+        method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(patch),
+      });
+      if (response.ok) changed.set(row.id, patch);
+    } catch (error) { console.error('[sunwings] airtable write failed', error.message); }
+  }
+  return changed.size ? rows.map(row => changed.has(row.id) ? { ...row, ...changed.get(row.id) } : row) : rows;
+}
+
 export default async function handler(req, res) {
   if (!['GET','POST','DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireSiteAccess(req, res, 'sunwings');
@@ -107,7 +142,8 @@ export default async function handler(req, res) {
         ),
         'Unable to load Sunwings quote requests.',
       );
-      return res.status(200).json({ requests: Array.isArray(requests) ? requests.map(row => forViewer(withRealStatus(row), isOwner)) : requests });
+      const synced = isOwner && Array.isArray(requests) ? await syncFromAirtable(owner.accessToken, requests) : requests;
+      return res.status(200).json({ requests: Array.isArray(synced) ? synced.map(row => forViewer(withRealStatus(row), isOwner)) : synced });
     }
 
     const id = clean(req.method === 'DELETE' ? req.query?.id : req.body?.id, 80);
@@ -166,6 +202,16 @@ export default async function handler(req, res) {
 
     // Send to Marius: the job appears in his "Jobs from Justin" (without contact details).
     if (body.forward === true) {
+      // Send the job into Marius's Make → Airtable first; only record it as sent if that worked.
+      if (makeConfigured()) {
+        const rows = await parseSupabase(
+          await supabaseUserRest(owner.accessToken, `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=*`, { method: 'GET' }),
+          'Unable to load the job.',
+        );
+        const job = Array.isArray(rows) ? rows[0] : rows;
+        if (!job) return res.status(404).json({ error: 'Quote request not found.' });
+        await sendJobToMake(job);
+      }
       payload.forwarded_at = now;
       if (!has('status')) { payload.status = 'forwarded'; payload.status_changed_at = now; }
       activity = 'Sent to Marius';
