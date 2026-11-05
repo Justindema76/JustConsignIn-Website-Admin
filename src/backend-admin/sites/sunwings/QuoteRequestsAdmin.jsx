@@ -411,8 +411,10 @@ export default function QuoteRequestsAdmin() {
                 const currentIndex = JOB_STEPS.findIndex(([key]) => key === draftStatus);
                 const index = JOB_STEPS.findIndex(([key]) => key === value);
                 const done = draftStatus !== 'declined' && value !== 'declined' && currentIndex > index;
-                return <button type="button" key={value} className={`job-step ${draftStatus === value ? 'current' : ''} ${done ? 'done' : ''}`} onClick={() => setDraftStatus(value)}>
-                  <b>{label}</b><small>{hint}</small>
+                // Once the job has really gone to Marius, his step stays green with the date.
+                const sent = value === 'forwarded' && Boolean(selected.forwarded_at);
+                return <button type="button" key={value} className={`job-step ${draftStatus === value ? 'current' : ''} ${done || sent ? 'done' : ''} ${sent ? 'sent' : ''}`} onClick={() => setDraftStatus(value)}>
+                  <b>{label}</b><small>{sent ? `Sent ${new Date(selected.forwarded_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}` : hint}</small>
                 </button>;
               })}
             </div>
@@ -431,7 +433,7 @@ export default function QuoteRequestsAdmin() {
             <div className="job-section-head">
               <p className="site-admin-eyebrow">Marius</p>
               {!hasWorkflow ? null : selected.forwarded_at
-                ? <span className="job-chip">Sent {shortDate(selected.forwarded_at)}</span>
+                ? <span className="job-chip sent">✓ Sent {shortDate(selected.forwarded_at)}</span>
                 : <button className="site-admin-btn" type="button" disabled={saving} onClick={() => quickUpdate({ forward: true }, 'Sent to Marius. It’s now in his “Jobs from Justin”.')}><Send size={14}/> Send to Marius</button>}
             </div>
             {!hasWorkflow ? <p className="job-setup-note">Turns on once the database setup “Sunwings - Marius jobs &amp; commission setup (Nov 3)” has been run in Supabase.</p> : <>
