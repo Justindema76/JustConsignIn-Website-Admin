@@ -123,7 +123,9 @@ function externalQuoteMailto(request) {
 }
 
 export default function QuoteRequestsAdmin() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  // Editors (Marius) only get jobs Justin sent them; the server enforces this too.
+  const isOwner = !user?.role || user.role === 'owner';
   const [requests, setRequests] = useState([]);
   const [selectedId, setSelectedId] = useState('');
   const [query, setQuery] = useState('');
@@ -259,7 +261,7 @@ export default function QuoteRequestsAdmin() {
   }), [requests]);
 
   // The Marius/commission columns exist only after the 20261103 database setup has run.
-  const hasWorkflow = Boolean(selected && Object.prototype.hasOwnProperty.call(selected, 'commission_status'));
+  const hasWorkflow = Boolean(selected && Object.prototype.hasOwnProperty.call(selected, 'forwarded_at'));
 
   async function save() {
     if (!selected || !accessToken) return;
@@ -271,12 +273,13 @@ export default function QuoteRequestsAdmin() {
         id: selected.id,
         status: draftStatus,
         priority: draftPriority,
-        adminNotes: draftNotes,
+        ...(isOwner ? { adminNotes: draftNotes } : {}),
         quoteNumber: draftQuoteNumber,
         quoteAmount: draftQuoteAmount,
         nextAction: draftNextAction,
         nextActionDueAt: draftNextActionDueAt,
-        ...(hasWorkflow ? {
+        ...(hasWorkflow && !isOwner ? { partnerPrice: draftPartnerPrice, finalPrice: draftFinalPrice } : {}),
+        ...(hasWorkflow && isOwner ? {
           partnerPrice: draftPartnerPrice,
           finalPrice: draftFinalPrice,
           commissionRate: draftRate,
@@ -316,7 +319,7 @@ export default function QuoteRequestsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Leads & Quotes</p>
         <h1>Quote Requests</h1>
-        <p>Track Sunwings enquiries from the website through review, quote, acceptance and booking.</p>
+        <p>{isOwner ? 'Track Sunwings enquiries from the website through review, quote, acceptance and booking.' : 'Jobs Justin sent you, with the customer’s full details. Update the step and your price as the job goes.'}</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
@@ -351,7 +354,7 @@ export default function QuoteRequestsAdmin() {
     </div>
 
     {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading quote requests…</p></div> :
-      requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>No requests yet</h2><p>Full Quote, Quick Quote and Contact submissions will all appear here.</p></div> :
+      requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>{isOwner ? 'No requests yet' : 'No jobs yet'}</h2><p>{isOwner ? 'Full Quote, Quick Quote and Contact submissions will all appear here.' : 'Jobs Justin sends you will show up here.'}</p></div> :
       <section className="site-admin-card service-request-queue" aria-label="Quote request queue">
         <div className="service-request-queue-head">
           <span>Customer</span><span>Form / Service</span><span>Route</span><span>Status</span><span>Priority</span><span>Received</span><span aria-hidden="true"></span>
@@ -416,7 +419,15 @@ export default function QuoteRequestsAdmin() {
             <p className="job-hint">Click a step to move the job there (skipping is fine), then Save changes at the bottom.</p>
           </section>
 
-          {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
+          {!isOwner && hasWorkflow && selected.request_type !== 'contact' && <section className="service-request-drawer-section">
+            <p className="site-admin-eyebrow">Your price</p>
+            <div className="job-fields">
+              <label><span>Your price</span><input type="number" min="0" step="0.01" value={draftPartnerPrice} onChange={event => setDraftPartnerPrice(event.target.value)} placeholder="$ Your price for this job"/></label>
+              <label><span>Final price (after the job)</span><input type="number" min="0" step="0.01" value={draftFinalPrice} onChange={event => setDraftFinalPrice(event.target.value)} placeholder="$ What the customer paid"/></label>
+            </div>
+          </section>}
+
+          {isOwner && selected.request_type !== 'contact' && <section className="service-request-drawer-section">
             <div className="job-section-head">
               <p className="site-admin-eyebrow">Marius</p>
               {!hasWorkflow ? null : selected.forwarded_at
@@ -424,7 +435,7 @@ export default function QuoteRequestsAdmin() {
                 : <button className="site-admin-btn" type="button" disabled={saving} onClick={() => quickUpdate({ forward: true }, 'Sent to Marius. It’s now in his “Jobs from Justin”.')}><Send size={14}/> Send to Marius</button>}
             </div>
             {!hasWorkflow ? <p className="job-setup-note">Turns on once the database setup “Sunwings - Marius jobs &amp; commission setup (Nov 3)” has been run in Supabase.</p> : <>
-              <p className="job-hint">Marius sees the job in his “Jobs from Justin” with the customer as first name and last initial. Phone and email stay hidden until you share them.</p>
+              <p className="job-hint">Once sent, Marius sees this job in his Quote Requests with the customer’s full name, phone, email and all details, so he can work with them directly. Jobs you haven’t sent stay hidden from him.</p>
               {selected.partner_updated_at && <div className="job-partner-update">
                 <strong>Marius updated this job {shortDate(selected.partner_updated_at)}</strong>
                 <span>Status: {MARIUS_STATUS_LABEL[selected.partner_status] || '—'} · Price: {selected.partner_price == null ? '—' : money(selected.partner_price)}{selected.final_price != null ? ` · Final: ${money(selected.final_price)}` : ''}</span>
@@ -432,16 +443,11 @@ export default function QuoteRequestsAdmin() {
               </div>}
               <div className="job-fields">
                 <label><span>Marius’s price</span><input type="number" min="0" step="0.01" value={draftPartnerPrice} onChange={event => setDraftPartnerPrice(event.target.value)} placeholder="$ Marius adds it, or you can"/></label>
-                <div className="job-field"><span>Customer phone &amp; email</span>
-                  {selected.contact_shared
-                    ? <button className="site-admin-btn secondary" type="button" disabled={saving} onClick={() => quickUpdate({ shareContact: false }, 'Customer contact hidden from Marius.')}><EyeOff size={14}/> Shared with Marius · Hide</button>
-                    : <button className="site-admin-btn secondary" type="button" disabled={saving || !selected.forwarded_at} title={selected.forwarded_at ? '' : 'Send the job to Marius first'} onClick={() => { if (window.confirm('Show this customer’s phone and email to Marius?')) quickUpdate({ shareContact: true }, 'Customer contact shared with Marius.'); }}><Eye size={14}/> Share with Marius</button>}
-                </div>
               </div>
             </>}
           </section>}
 
-          {selected.request_type !== 'contact' && <section className="service-request-drawer-section">
+          {isOwner && selected.request_type !== 'contact' && <section className="service-request-drawer-section">
             <p className="site-admin-eyebrow">Price &amp; my commission</p>
             <div className="job-fields">
               <label><span>Quoted to customer</span><input type="number" min="0" step="0.01" value={draftQuoteAmount} onChange={event => setDraftQuoteAmount(event.target.value)} placeholder="$ 0.00"/></label>
@@ -492,12 +498,12 @@ export default function QuoteRequestsAdmin() {
             </div>
             <div className="job-fields one">
               <label><span>Next action</span><input value={draftNextAction} onChange={event => setDraftNextAction(event.target.value)} placeholder="Call customer, send quote…"/></label>
-              <label><span>Private notes</span><textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Quote notes, follow-up, requirements…"/></label>
+              {isOwner && <label><span>Private notes</span><textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Quote notes, follow-up, requirements…"/></label>}
             </div>
           </section>
 
           <div className="job-save-bar">
-            <span>{statusLabel(draftStatus)}{hasWorkflow && draftCommissionStatus !== 'none' && draftCommission.price != null ? ` · Commission ${money(draftCommission.amount)}` : ''}</span>
+            <span>{statusLabel(draftStatus)}{isOwner && hasWorkflow && draftCommissionStatus !== 'none' && draftCommission.price != null ? ` · Commission ${money(draftCommission.amount)}` : ''}</span>
             <button className="site-admin-btn" type="button" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button>
           </div>
 
@@ -538,9 +544,9 @@ export default function QuoteRequestsAdmin() {
             </dl>
           </section>
 
-          <div className="service-request-danger-zone">
+          {isOwner && <div className="service-request-danger-zone">
             <button className="site-admin-btn danger" type="button" onClick={remove} disabled={deleting}><Trash2 size={14}/> {deleting ? 'Deleting…' : 'Delete Request'}</button>
-          </div>
+          </div>}
         </div>
       </aside>
     </>}

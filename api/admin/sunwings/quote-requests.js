@@ -78,28 +78,43 @@ function nullableIso(value) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+// Editors (e.g. Marius) only see jobs Justin has sent them, never Justin's private notes or
+// commission. Only the owner sees every request and can forward, delete or set commission.
+const OWNER_ONLY_FIELDS = ['admin_notes', 'commission_rate', 'commission_status', 'commission_paid_at', 'commission_paid_method', 'partner_update_unseen'];
+const OWNER_ONLY_INPUTS = ['forward', 'shareContact', 'markPartnerSeen', 'commissionRate', 'commissionStatus', 'commissionPaidAt', 'commissionPaidMethod', 'adminNotes'];
+
+function forViewer(row, isOwner) {
+  if (!row || isOwner) return row;
+  const copy = { ...row };
+  OWNER_ONLY_FIELDS.forEach(key => { delete copy[key]; });
+  return copy;
+}
+
 export default async function handler(req, res) {
   if (!['GET','POST','DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireSiteAccess(req, res, 'sunwings');
   if (!owner) return;
+  const isOwner = owner.role === 'owner';
+  const sentOnly = isOwner ? '' : '&forwarded_at=not.is.null';
 
   try {
     if (req.method === 'GET') {
       const requests = await parseSupabase(
         await withFieldFallback(
           owner.accessToken,
-          fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(fields)}&order=created_at.desc`,
+          fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&select=${encodeURIComponent(fields)}${sentOnly}&order=created_at.desc`,
           { method: 'GET' },
         ),
         'Unable to load Sunwings quote requests.',
       );
-      return res.status(200).json({ requests: Array.isArray(requests) ? requests.map(withRealStatus) : requests });
+      return res.status(200).json({ requests: Array.isArray(requests) ? requests.map(row => forViewer(withRealStatus(row), isOwner)) : requests });
     }
 
     const id = clean(req.method === 'DELETE' ? req.query?.id : req.body?.id, 80);
     if (!id) return res.status(400).json({ error: 'Missing quote request id.' });
 
     if (req.method === 'DELETE') {
+      if (!isOwner) return res.status(403).json({ error: 'Only Justin can delete requests.' });
       const response = await supabaseUserRest(
         owner.accessToken,
         `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}`,
@@ -131,7 +146,7 @@ export default async function handler(req, res) {
       payload.priority = priority;
     }
 
-    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'adminNotes')) payload.admin_notes = clean(req.body.adminNotes, 12000);
+    if (isOwner && Object.prototype.hasOwnProperty.call(req.body || {}, 'adminNotes')) payload.admin_notes = clean(req.body.adminNotes, 12000);
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'quoteNumber')) payload.quote_number = clean(req.body.quoteNumber, 80) || null;
 
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'quoteAmount')) {
@@ -145,7 +160,8 @@ export default async function handler(req, res) {
       if (!activity) activity = 'Quote details updated';
     }
 
-    const body = req.body || {};
+    const body = { ...(req.body || {}) };
+    if (!isOwner) OWNER_ONLY_INPUTS.forEach(key => { delete body[key]; });
     const has = key => Object.prototype.hasOwnProperty.call(body, key);
 
     // Send to Marius: the job appears in his "Jobs from Justin" (without contact details).
@@ -178,12 +194,19 @@ export default async function handler(req, res) {
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextAction')) payload.next_action = clean(req.body.nextAction, 1000) || null;
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextActionDueAt')) payload.next_action_due_at = nullableIso(req.body.nextActionDueAt);
 
+    // An editor's save shows up for Justin as "Marius updated this job".
+    if (!isOwner) {
+      payload.partner_updated_at = now;
+      payload.partner_update_unseen = true;
+      if (!activity) activity = 'Marius updated the job';
+    }
+
     if (activity) {
       payload.last_activity = activity;
       payload.last_activity_at = now;
     }
 
-    const patchPath = fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}&select=${encodeURIComponent(fields)}`;
+    const patchPath = fields => `sunwings_quote_requests?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}${sentOnly}&select=${encodeURIComponent(fields)}`;
     const patch = body => withFieldFallback(owner.accessToken, patchPath, {
       method: 'PATCH',
       headers: { Prefer: 'return=representation' },
@@ -202,7 +225,9 @@ export default async function handler(req, res) {
       }
     }
     const rows = await parseSupabase(response, 'Unable to update Sunwings quote request.');
-    return res.status(200).json({ request: withRealStatus(Array.isArray(rows) ? rows[0] || null : rows) });
+    const row = Array.isArray(rows) ? rows[0] || null : rows;
+    if (!row) return res.status(404).json({ error: 'That job is not available.' });
+    return res.status(200).json({ request: forViewer(withRealStatus(row), isOwner) });
   } catch (error) {
     console.error('[sunwings] quote requests failed', error);
     return res.status(500).json({ error: error.message || 'Quote request failed.' });
