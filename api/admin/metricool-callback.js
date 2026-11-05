@@ -1,5 +1,5 @@
 import { getUserFromToken, supabaseUserRest } from '../_lib/supabase.js';
-import { isWebsiteOwner } from '../_lib/websiteAdmin.js';
+import { hasSiteAccess } from '../_lib/websiteAdmin.js';
 import { finishMetricoolOAuth, getMetricoolTools } from '../_lib/metricoolMcp.js';
 
 const CALLBACK_COOKIE = 'jci_metricool_callback_session';
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     const userToken = cookieValue(req, CALLBACK_COOKIE);
     if (!userToken) return redirect(res, siteKey, false, 'Your admin session was not available during the Metricool callback. Try connecting again.');
     const user = await getUserFromToken(userToken);
-    if (!user || !isWebsiteOwner(user)) return redirect(res, siteKey, false, 'Your Website Admin session expired. Sign in and connect Metricool again.');
+    if (!(await hasSiteAccess(user, userToken, siteKey))) return redirect(res, siteKey, false, 'Your Website Admin session expired. Sign in and connect Metricool again.');
 
     const row = await readRow(userToken, siteKey);
     if (!row) return redirect(res, siteKey, false, 'Metricool connection record is missing');

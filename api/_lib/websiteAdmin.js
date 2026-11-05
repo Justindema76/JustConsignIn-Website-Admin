@@ -62,6 +62,15 @@ async function findCollaborator(token, siteKey, email) {
   return rows?.[0] || null;
 }
 
+// True when this signed-in user is the owner, or a Google-signed-in collaborator on siteKey.
+// Used where there is no Authorization header (e.g. the Metricool OAuth callback).
+export async function hasSiteAccess(user, token, siteKey) {
+  if (!user) return false;
+  if (isWebsiteOwner(user)) return true;
+  if (!identityProviders(user).has('google')) return false;
+  return Boolean(await findCollaborator(token, siteKey, normalizeEmail(user.email)));
+}
+
 // Like requireWebsiteOwner, but also accepts a site_collaborators row for
 // the given site. Returns { ...user, accessToken, role: 'owner' | 'admin' | 'editor' }.
 // 'owner' is always the hardcoded WEBSITE_OWNER_EMAIL (unrestricted, every site) so
