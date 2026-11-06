@@ -40,6 +40,42 @@ const PRIORITY_OPTIONS = [
   ['high', 'High'],
 ];
 
+// Intercity = pickup and drop-off are in different areas. Priority = an intercity job worth
+// $800 or more (final price, else Marius's price, else the quoted price). Small jobs still show.
+const AREAS = [
+  ['Toronto & GTA', /\b(toronto|north york|scarborough|etobicoke|east york|york|mississauga|brampton|vaughan|woodbridge|concord|maple|markham|richmond hill|thornhill|stouffville|pickering|ajax|whitby|oshawa|newmarket|aurora|king city)\b/i, /^M/i],
+  ['Hamilton & Halton', /\b(hamilton|stoney creek|ancaster|dundas|waterdown|binbrook|flamborough|burlington|oakville|milton|georgetown)\b/i, /^L8/i],
+  ['Niagara', /\b(st\.? catharines|niagara|welland|grimsby|thorold|fort erie|lincoln|beamsville|pelham|port colborne|smithville)\b/i, /^L2/i],
+  ['Waterloo & Guelph', /\b(waterloo|kitchener|cambridge|guelph)\b/i, null],
+  ['London', /\blondon\b/i, null],
+];
+const PRIORITY_VALUE = 800;
+
+function areaOf(...parts) {
+  const text = parts.filter(Boolean).join(' ');
+  const postal = parts.map(part => String(part || '').trim()).find(part => /^[A-Z]\d[A-Z]/i.test(part)) || '';
+  const match = AREAS.find(([, words]) => words.test(text)) || AREAS.find(([, , codes]) => codes && postal && codes.test(postal));
+  return match ? match[0] : '';
+}
+
+function jobFlags(row) {
+  if (!row || row.request_type === 'contact') return { intercity: false, priority: false };
+  const from = areaOf(row.pickup_city, row.move_from, row.pickup_postal_code);
+  const to = areaOf(row.dropoff_city, row.move_to, row.dropoff_postal_code);
+  const intercity = Boolean(from && to && from !== to);
+  const value = Math.max(...[row.final_price, row.partner_price, row.quote_amount].map(Number).filter(Number.isFinite), 0);
+  return { intercity, priority: intercity && value >= PRIORITY_VALUE, from, to };
+}
+
+function JobFlags({ row }) {
+  const flags = jobFlags(row);
+  if (!flags.intercity) return null;
+  return <>
+    <span className="job-chip intercity" title={`${flags.from} → ${flags.to}`}>Intercity</span>
+    {flags.priority ? <span className="job-chip priority-lead">Priority</span> : null}
+  </>;
+}
+
 function statusLabel(value) {
   return STATUS_OPTIONS.find(([key]) => key === value)?.[1] || value || 'New';
 }
@@ -369,7 +405,7 @@ export default function QuoteRequestsAdmin() {
               <strong>{requestTypeLabel(request.request_type)}</strong>
               <small>{request.request_type === 'contact' ? 'General Contact' : (request.service || 'Not specified')}</small>
             </span>
-            <span className="service-request-department unassigned">{routeSummary(request)}</span>
+            <span className="service-request-department unassigned">{routeSummary(request)}<span className="job-flags"><JobFlags row={request}/></span></span>
             <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
             <span><span className={`service-request-priority ${request.priority || 'normal'}`}>{request.priority || 'normal'}</span></span>
             <span className="service-request-date">{shortDate(request.created_at)}</span>
@@ -388,8 +424,10 @@ export default function QuoteRequestsAdmin() {
             <div className="service-request-drawer-title">
               <h2>{selected.name}</h2>
               <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
+              <JobFlags row={selected}/>
             </div>
             <p>{formatDate(selected.created_at)} · {routeSummary(selected)}</p>
+            {selected.lead_source ? <p className="job-lead-source">Came from: {selected.lead_source}</p> : null}
           </div>
           <button className="service-request-drawer-close" type="button" onClick={() => setSelectedId('')} aria-label="Close quote request"><X size={20}/></button>
         </header>

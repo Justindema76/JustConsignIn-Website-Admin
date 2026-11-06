@@ -20,8 +20,8 @@ const NEW_FIELDS = [
   'contact_shared','contact_shared_at','final_price','commission_rate','commission_status',
   'commission_paid_at','commission_paid_method'
 ];
-// Added by migration 20261105 (quote photos).
-const PHOTO_FIELDS = ['photos'];
+// Added by migrations 20261105 (quote photos) and 20261106 (where the quote came from).
+const PHOTO_FIELDS = ['photos', 'lead_source'];
 const ALL_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS].join(',');
 const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
 const OLD_FIELDS = BASE_FIELDS.join(',');
