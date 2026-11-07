@@ -805,7 +805,7 @@ export const STARTER_PRODUCTS = [
     "slug": "inflsalesman",
     "category_slug": "inflatables",
     "sku": "9115-9120",
-    "name": "Inflatable Manager Salesman & Banner",
+    "name": "Inflatable Manager Salesman",
     "images": [
       "https://rent-and-rally.vercel.app/img/inflsalesman-1.jpg",
       "https://rent-and-rally.vercel.app/img/inflsalesman-2.jpg",
@@ -816,47 +816,138 @@ export const STARTER_PRODUCTS = [
     ],
     "day_rate": 175,
     "buy_price": 795,
-    "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/9115-101-9115-106-12-inflatable-manager-salesman-banner.html",
+    "buy_note": "banner not included",
+    "buy_url": "https://wheelsauto.com/ca-en/9115-9120-inflatable-manager-salesman.html",
     "badge": "",
     "description": [
-      "A giant inflatable salesman holding your banner message. Choose 12 ft or 18 ft tall, plus the banner that suits your event."
+      "Replace your manager or salesman in a hurry with this guy. He approves every deal and never complains. A giant heavyweight vinyl salesman, 12 ft or 18 ft tall, giving two thumbs up.",
+      "The banner he holds is not part of the rental. Pick no banner, buy one of the 6 stock banners, or order a custom one with your own message. Banners are yours to keep."
     ],
     "features": [
       "12' or 18' tall",
-      "Holds a swappable banner",
-      "Stakes and tethers included",
-      "Blower included with rental"
+      "Heavyweight vinyl",
+      "Ropes and stakes included",
+      "Blower included with rental",
+      "Banner optional: stock or custom, yours to keep"
     ],
     "specs": [
       {
         "label": "Height",
-        "value": "12' or 18'"
+        "value": "12' (9115) or 18' (9120)"
+      },
+      {
+        "label": "Material",
+        "value": "Heavyweight vinyl"
       },
       {
         "label": "Banner",
-        "value": "Interchangeable message banner"
+        "value": "Not included. Stock $35, custom $99 (12') / $129 (18') + set-up"
       },
       {
         "label": "Power",
-        "value": "Blower included, standard outlet"
+        "value": "Blower included (BR15 for 12', BR35 for 18')"
       },
       {
         "label": "Use",
-        "value": "Outdoor"
+        "value": "Outdoor. Check local bylaws"
       }
     ],
     "options": [
       {
         "label": "Size",
+        "style": "cards",
         "values": [
           {
-            "v": "12'",
+            "v": "12' tall",
             "img": 2
           },
           {
-            "v": "18' (+$50/day)",
+            "v": "18' tall (+$50/day)",
             "img": 5
+          }
+        ]
+      },
+      {
+        "label": "Banner",
+        "style": "cards",
+        "when": {
+          "option": "Size",
+          "has": "12'"
+        },
+        "values": [
+          {
+            "v": "No banner",
+            "note": "The salesman on his own, thumbs up."
+          },
+          {
+            "v": "Sale banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Used Car Blowout banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Managers Sale Event banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "I'll Sign Any Deal banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Biggest Deals In Town banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Managers Away Sale banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Custom banner (+$149 one-time)",
+            "note": "$99 banner at the Wheels price + $50 artwork set-up. Your message, yours to keep."
+          }
+        ]
+      },
+      {
+        "label": "Banner",
+        "style": "cards",
+        "when": {
+          "option": "Size",
+          "has": "18'"
+        },
+        "values": [
+          {
+            "v": "No banner",
+            "note": "The salesman on his own, thumbs up."
+          },
+          {
+            "v": "Sale banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Used Car Blowout banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Managers Sale Event banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "I'll Sign Any Deal banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Biggest Deals In Town banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Managers Away Sale banner (+$35 one-time)",
+            "note": "Stock red-and-white banner. Yours to keep."
+          },
+          {
+            "v": "Custom banner (+$179 one-time)",
+            "note": "$129 banner at the Wheels price + $50 artwork set-up. Your message, yours to keep."
           }
         ]
       }
