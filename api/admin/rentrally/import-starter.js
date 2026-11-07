@@ -62,9 +62,11 @@ function keepAdminPhotos(row, existing) {
   const options = (row.options || []).map(o => ({
     ...o,
     values: (o.values || []).map(v => {
-      const { img, ...rest } = v;
+      const { img, find, ...rest } = v;
       const byUrl = img ? mine.indexOf(row.images[img - 1]) + 1 : 0;
-      const kept = byUrl || setBefore.get(`${o.label}|${v.v}`);
+      // Last resort: a photo whose file name contains one of the choice's keywords (e.g. "auto-sale").
+      const byName = (v.find || []).map(k => mine.findIndex(src => String(src).toLowerCase().includes(k)) + 1).find(Boolean);
+      const kept = byUrl || setBefore.get(`${o.label}|${v.v}`) || byName;
       return kept && kept <= mine.length ? { ...rest, img: kept } : rest;
     }),
   }));
@@ -76,10 +78,15 @@ async function refreshContent(token) {
   for (const slug of REFRESH_FROM_STARTER) {
     const row = STARTER_PRODUCTS.find(p => p.slug === slug);
     if (!row) continue;
-    const where = `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}`;
-    const found = await parseSupabase(await supabaseUserRest(token, `${where}&select=images,options`), `Unable to read ${slug}.`);
-    const existing = Array.isArray(found) ? found[0] : null;
+    // Find the rental by its web address, or by SKU if the address was changed in the admin.
+    const base = `${TABLES.products}?site_key=eq.${SITE_KEY}`;
+    const lookup = async filter => {
+      const rows = await parseSupabase(await supabaseUserRest(token, `${base}&${filter}&select=slug,images,options`), `Unable to read ${slug}.`);
+      return Array.isArray(rows) ? rows[0] : null;
+    };
+    const existing = (await lookup(`slug=eq.${encodeURIComponent(slug)}`)) || (row.sku ? await lookup(`sku=eq.${encodeURIComponent(row.sku)}`) : null);
     if (!existing) continue;
+    const where = `${base}&slug=eq.${encodeURIComponent(existing.slug)}`;
     const patch = { ...Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]])), ...keepAdminPhotos(row, existing) };
     const updated = await parseSupabase(
       await supabaseUserRest(token, `${where}&select=slug`, {

@@ -374,36 +374,44 @@ export const STARTER_PRODUCTS = [
     ],
     "day_rate": 50,
     "buy_price": 199,
-    "buy_note": "",
+    "buy_note": "blower not included",
     "buy_url": "https://wheelsauto.com/ca-en/9101l-9105r-crazy-car-salesman-air-dancers.html",
     "badge": "",
     "description": [
-      "They dance, they swing, they never get tired. Over 16 feet tall, this waving salesman with a face, arms and a big SALE arrow grabs attention for sales events, lot specials and grand openings.",
-      "A powerful fan blows the dancer up while special vents let air escape to make it dance. Pick the print and which way the arrow points. Needs one power blower (rent it below)."
+      "They dance, they swing, they never get tired. The Crazy Car Salesman stands over 16 feet tall, waving his arms with a big yellow SALE arrow across his body.",
+      "A powerful fan blows him up while special vents let the air escape, which makes him dance. Pick one of the 5 dancers and which way the SALE arrow points. Printed on one side. Needs one power blower (9199), rented separately."
     ],
     "features": [
-      "Over 16 ft tall",
-      "Yellow SALE arrow, left or right facing",
-      "5 prints: Used Cars, Auto Sale, Trucks, New Cars or plain",
+      "Over 16' tall",
+      "5 dancers: Used Cars, Auto Sale, Trucks, New Cars or No Print",
+      "SALE arrow points left or right",
       "Printed on one side",
-      "Needs one power blower"
+      "Needs one power blower (9199), rented separately"
     ],
     "specs": [
       {
         "label": "Height",
-        "value": "Over 16'"
+        "value": "Over 16' tall"
       },
       {
-        "label": "Colour",
-        "value": "Red with yellow SALE arrow"
+        "label": "Models",
+        "value": "9101 Used Cars · 9102 Auto Sale · 9103 Trucks · 9104 New Cars · 9105 No Print"
+      },
+      {
+        "label": "Arrow",
+        "value": "Left (L) or right (R) facing"
       },
       {
         "label": "Print",
         "value": "One side"
       },
       {
+        "label": "Colour",
+        "value": "Red with yellow SALE arrow"
+      },
+      {
         "label": "Power",
-        "value": "Power blower (9199), standard outlet"
+        "value": "Power blower 9199 (rented separately), standard outlet"
       },
       {
         "label": "Use",
@@ -416,24 +424,41 @@ export const STARTER_PRODUCTS = [
         "style": "tiles",
         "values": [
           {
-            "v": "Used Cars",
-            "img": 2
+            "v": "Used Cars (9101)",
+            "img": 2,
+            "find": [
+              "used-cars-sale-inflatable",
+              "used-cars"
+            ]
           },
           {
-            "v": "Auto Sale",
-            "img": 3
+            "v": "Auto Sale (9102)",
+            "img": 3,
+            "find": [
+              "auto-sale"
+            ]
           },
           {
-            "v": "Trucks",
-            "img": 4
+            "v": "Trucks (9103)",
+            "img": 4,
+            "find": [
+              "trucks"
+            ]
           },
           {
-            "v": "New Cars",
-            "img": 5
+            "v": "New Cars (9104)",
+            "img": 5,
+            "find": [
+              "new-cars"
+            ]
           },
           {
-            "v": "No Print (SALE arrow only)",
-            "img": 6
+            "v": "No Print (9105)",
+            "img": 6,
+            "find": [
+              "red-inflatable-sale-tube-man",
+              "no-print"
+            ]
           }
         ]
       },
@@ -442,10 +467,12 @@ export const STARTER_PRODUCTS = [
         "style": "cards",
         "values": [
           {
-            "v": "Left"
+            "v": "Left (L)",
+            "note": "SALE arrow points to the left, as shown."
           },
           {
-            "v": "Right"
+            "v": "Right (R)",
+            "note": "SALE arrow points to the right."
           }
         ]
       }
