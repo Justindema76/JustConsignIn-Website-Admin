@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle2, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
 import { PhotoList, SeoFields } from './fields';
-import { RENTRALLY_SITE_URL, money, packagesApi, productsApi, slugify } from './rentrallyAdminService';
+import { RENTRALLY_SITE_URL, money, packagesApi, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
 
 const BASE = '/admin/rentrally/packages';
@@ -99,7 +99,7 @@ function PackageEditor({ id }) {
     setBusy(true); setError(''); setMessage('');
     try {
       const { goodForText, ...rest } = draft;
-      const saved = await packagesApi.save({ ...rest, good_for: goodForText.split(',').map(s => s.trim()).filter(Boolean) });
+      const saved = await packagesApi.save({ ...rest, slug: slugify(rest.slug), good_for: goodForText.split(',').map(s => s.trim()).filter(Boolean) });
       setDraft({ ...EMPTY, ...saved, goodForText: (saved.good_for || []).join(', ') });
       setMessage(saved.status === 'published' ? 'Saved. It’s live on the website.' : 'Saved as a draft.');
       if (isNew) navigate(`${BASE}/${saved.id}`, { replace: true });
@@ -174,7 +174,7 @@ function PackageEditor({ id }) {
         <div className="site-admin-card site-admin-side-card"><PhotoList single label="Main photo" value={draft.hero_image} onChange={v => set('hero_image', v)}/></div>
         <div className="site-admin-card site-admin-side-card">
           <h2>Web address</h2>
-          <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugify(e.target.value)); }}/></label>
+          <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugTyping(e.target.value)); }} onBlur={e => set('slug', slugify(e.target.value))}/></label>
           <p className="site-admin-url">{RENTRALLY_SITE_URL}/packages/{draft.slug || 'slug'}</p>
         </div>
         <SeoFields

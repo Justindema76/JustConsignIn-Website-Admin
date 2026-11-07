@@ -49,3 +49,5 @@ export const money = n => (n === null || n === undefined || n === '')
   : `$${Number(n).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export const slugify = value => String(value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+// While typing in a web-address box: same rules, but a dash at the end is kept so you can type the next word.
+export const slugTyping = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '');

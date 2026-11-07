@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle2, Copy, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
 import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToList } from './fields';
-import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify } from './rentrallyAdminService';
+import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
 
 // When photos are reordered or removed, keep each option choice pointing at the same picture.
@@ -35,7 +35,7 @@ const toDraft = row => ({
 });
 const fromDraft = d => {
   const { descriptionText, featuresText, ...rest } = d;
-  return { ...rest, description: paragraphsToList(descriptionText), features: linesToList(featuresText) };
+  return { ...rest, slug: slugify(rest.slug), description: paragraphsToList(descriptionText), features: linesToList(featuresText) };
 };
 
 export default function RentalsAdmin() {
@@ -264,7 +264,7 @@ function RentalEditor({ id }) {
         </div>
         <div className="site-admin-card site-admin-side-card">
           <h2>Web address</h2>
-          <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugify(e.target.value)); }}/></label>
+          <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugTyping(e.target.value)); }} onBlur={e => set('slug', slugify(e.target.value))}/></label>
           <p className="site-admin-url">{RENTRALLY_SITE_URL}/rental/{draft.slug || 'slug'}</p>
           {!isNew && draft.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/rental/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View live</a>}
         </div>

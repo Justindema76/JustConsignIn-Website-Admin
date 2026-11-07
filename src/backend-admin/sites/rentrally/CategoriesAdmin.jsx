@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Plus, Save, Trash2 } from 'lucide-react';
 import { PhotoList } from './fields';
-import { categoriesApi, productsApi, slugify } from './rentrallyAdminService';
+import { categoriesApi, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
 
 const blank = () => ({ id: '', slug: '', name: '', blurb: '', image: '', seo_title: '', seo_description: '', status: 'published', sort_order: 0, _new: true });
@@ -60,7 +60,7 @@ export default function CategoriesAdmin() {
         <PhotoList single label="Tile photo" value={r.image} onChange={v => set(i, { image: v })}/>
         <div className="site-admin-form rr-cat-form">
           <label>Name<input value={r.name} onChange={e => set(i, { name: e.target.value, ...(r._new ? { slug: slugify(e.target.value) } : {}) })}/></label>
-          <label>Slug <small>used in the web address</small><input value={r.slug} onChange={e => set(i, { slug: slugify(e.target.value) })}/></label>
+          <label>Slug <small>used in the web address</small><input value={r.slug} onChange={e => set(i, { slug: slugTyping(e.target.value) })} onBlur={e => set(i, { slug: slugify(e.target.value) })}/></label>
           <label className="wide">Blurb<input value={r.blurb} onChange={e => set(i, { blurb: e.target.value })}/></label>
           <label className="wide">SEO title <small>blank = “{r.name || 'Category'} Rentals | Rent &amp; Rally”</small><input value={r.seo_title || ''} maxLength={120} onChange={e => set(i, { seo_title: e.target.value })}/></label>
           <label className="wide">SEO description <small>blank = written from the blurb</small><textarea rows={2} value={r.seo_description || ''} maxLength={320} onChange={e => set(i, { seo_description: e.target.value })}/></label>
