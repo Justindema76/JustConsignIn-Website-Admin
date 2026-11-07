@@ -378,29 +378,73 @@ export const STARTER_PRODUCTS = [
     "buy_url": "https://wheelsauto.com/ca-en/9101l-9105r-crazy-car-salesman-air-dancers.html",
     "badge": "",
     "description": [
-      "A waving salesman character with a face and arms that grab attention for sales events, lot specials and grand openings."
+      "They dance, they swing, they never get tired. Over 16 feet tall, this waving salesman with a face, arms and a big SALE arrow grabs attention for sales events, lot specials and grand openings.",
+      "A powerful fan blows the dancer up while special vents let air escape to make it dance. Pick the print and which way the arrow points. Needs one power blower (rent it below)."
     ],
     "features": [
-      "Character-style air dancer",
-      "Several colour styles",
-      "Constant waving motion",
+      "Over 16 ft tall",
+      "Yellow SALE arrow, left or right facing",
+      "5 prints: Used Cars, Auto Sale, Trucks, New Cars or plain",
+      "Printed on one side",
       "Needs one power blower"
     ],
     "specs": [
       {
-        "label": "Style",
-        "value": "Salesman character"
+        "label": "Height",
+        "value": "Over 16'"
+      },
+      {
+        "label": "Colour",
+        "value": "Red with yellow SALE arrow"
+      },
+      {
+        "label": "Print",
+        "value": "One side"
       },
       {
         "label": "Power",
-        "value": "Air dancer blower, standard outlet"
+        "value": "Power blower (9199), standard outlet"
       },
       {
         "label": "Use",
-        "value": "Outdoor"
+        "value": "Outdoor. Check local bylaws"
       }
     ],
-    "options": [],
+    "options": [
+      {
+        "label": "Print",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Used Cars"
+          },
+          {
+            "v": "Auto Sale"
+          },
+          {
+            "v": "Trucks"
+          },
+          {
+            "v": "New Cars"
+          },
+          {
+            "v": "No print (SALE arrow only)"
+          }
+        ]
+      },
+      {
+        "label": "Arrow points",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Left"
+          },
+          {
+            "v": "Right"
+          }
+        ]
+      }
+    ],
     "related": [
       "powerblower",
       "tubeman",
