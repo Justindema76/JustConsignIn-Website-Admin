@@ -30,6 +30,28 @@ async function insertMissing(token, table, rows) {
 const REFRESH_FROM_STARTER = ['swooper', 'blade', 'sidewalk', 'xbanner', 'simplebanner', 'retractable', 'outdoorbanner'];
 const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
 
+// Packages rebuilt around the full catalogue: refreshed from the starter list (status, sort order and SEO kept).
+const REFRESH_PACKAGES = ['grand-opening', 'dealership-weekend', 'tire-promo', 'attention-grabber', 'vendor-market', 'backyard-party'];
+const PACKAGE_FIELDS = ['tag', 'name', 'hero_image', 'day_rate', 'items', 'description', 'good_for'];
+
+async function patchRows(token, table, slugs, starter, fields) {
+  let refreshed = 0;
+  for (const slug of slugs) {
+    const row = starter.find(p => p.slug === slug);
+    if (!row) continue;
+    const updated = await parseSupabase(
+      await supabaseUserRest(token, `${table}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=slug`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(Object.fromEntries(fields.map(key => [key, row[key]]))),
+      }),
+      `Unable to refresh ${slug}.`,
+    );
+    refreshed += Array.isArray(updated) ? updated.length : 0;
+  }
+  return refreshed;
+}
+
 async function refreshContent(token) {
   let refreshed = 0;
   for (const slug of REFRESH_FROM_STARTER) {
@@ -59,10 +81,11 @@ export default async function handler(req, res) {
     const products = await insertMissing(owner.accessToken, TABLES.products, STARTER_PRODUCTS);
     const packages = await insertMissing(owner.accessToken, TABLES.packages, STARTER_PACKAGES);
     const refreshed = await refreshContent(owner.accessToken);
+    const refreshedPackages = await patchRows(owner.accessToken, TABLES.packages, REFRESH_PACKAGES, STARTER_PACKAGES, PACKAGE_FIELDS);
     return res.status(200).json({
       ok: true,
       added: { categories, products, packages },
-      refreshed: { products: refreshed },
+      refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },
     });
   } catch (error) {

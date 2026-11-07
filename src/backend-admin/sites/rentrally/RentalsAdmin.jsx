@@ -61,7 +61,7 @@ function RentalList() {
     setBusy(true); setError(''); setMessage('');
     try {
       const result = await importStarterCatalogue();
-      const refreshed = result.refreshed?.products ? ` Updated ${result.refreshed.products} rebuilt rentals (flags, signs and banner stands); their prices and status were kept.` : '';
+      const refreshed = result.refreshed?.products || result.refreshed?.packages ? ` Updated ${result.refreshed.products || 0} rebuilt rentals and ${result.refreshed.packages || 0} packages.` : '';
       setMessage(`Imported ${result.added.products} rentals, ${result.added.packages} packages and ${result.added.categories} categories.${refreshed} Everything else already here was left as it was.`);
       await refresh();
     } catch (err) {
