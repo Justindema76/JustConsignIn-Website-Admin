@@ -34,11 +34,12 @@ async function insertMissing(token, table, rows) {
 // Rentals whose catalogue content was rebuilt in the starter list (stock-only flag slogans,
 // banner/sign choices with one-time custom charges). Importing refreshes their content from the
 // starter list; day rate, status, featured, sort order and SEO set in the admin are kept.
-const REFRESH_FROM_STARTER = ['swooper', 'blade', 'bowflag', 'salesman', 'inflsalesman', 'sidewalk', 'xbanner', 'simplebanner', 'retractable', 'outdoorbanner'];
+// Empty on purpose: the button only ADDS missing rentals now. It never overwrites anything edited in the admin.
+const REFRESH_FROM_STARTER = [];
 const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
 
 // Packages rebuilt around the full catalogue: refreshed from the starter list (status, sort order and SEO kept).
-const REFRESH_PACKAGES = ['grand-opening', 'dealership-weekend', 'tire-promo', 'attention-grabber', 'vendor-market', 'backyard-party'];
+const REFRESH_PACKAGES = [];
 const PACKAGE_FIELDS = ['tag', 'name', 'hero_image', 'day_rate', 'items', 'description', 'good_for'];
 
 async function patchRows(token, table, slugs, starter, fields) {
