@@ -24,6 +24,31 @@ async function insertMissing(token, table, rows) {
   return Array.isArray(inserted) ? inserted.length : 0;
 }
 
+// Rentals whose catalogue content was rebuilt in the starter list (stock-only flag slogans,
+// banner/sign choices with one-time custom charges). Importing refreshes their content from the
+// starter list; day rate, status, featured, sort order and SEO set in the admin are kept.
+const REFRESH_FROM_STARTER = ['swooper', 'blade', 'sidewalk', 'xbanner', 'simplebanner', 'retractable', 'outdoorbanner'];
+const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
+
+async function refreshContent(token) {
+  let refreshed = 0;
+  for (const slug of REFRESH_FROM_STARTER) {
+    const row = STARTER_PRODUCTS.find(p => p.slug === slug);
+    if (!row) continue;
+    const patch = Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]]));
+    const updated = await parseSupabase(
+      await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=slug`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(patch),
+      }),
+      `Unable to refresh ${slug}.`,
+    );
+    refreshed += Array.isArray(updated) ? updated.length : 0;
+  }
+  return refreshed;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -33,9 +58,11 @@ export default async function handler(req, res) {
     const categories = await insertMissing(owner.accessToken, TABLES.categories, STARTER_CATEGORIES);
     const products = await insertMissing(owner.accessToken, TABLES.products, STARTER_PRODUCTS);
     const packages = await insertMissing(owner.accessToken, TABLES.packages, STARTER_PACKAGES);
+    const refreshed = await refreshContent(owner.accessToken);
     return res.status(200).json({
       ok: true,
       added: { categories, products, packages },
+      refreshed: { products: refreshed },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },
     });
   } catch (error) {

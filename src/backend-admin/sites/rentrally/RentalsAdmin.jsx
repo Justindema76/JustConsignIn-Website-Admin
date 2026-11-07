@@ -61,7 +61,8 @@ function RentalList() {
     setBusy(true); setError(''); setMessage('');
     try {
       const result = await importStarterCatalogue();
-      setMessage(`Imported ${result.added.products} rentals, ${result.added.packages} packages and ${result.added.categories} categories. Anything already here was left as it was.`);
+      const refreshed = result.refreshed?.products ? ` Updated ${result.refreshed.products} rebuilt rentals (flags, signs and banner stands); their prices and status were kept.` : '';
+      setMessage(`Imported ${result.added.products} rentals, ${result.added.packages} packages and ${result.added.categories} categories.${refreshed} Everything else already here was left as it was.`);
       await refresh();
     } catch (err) {
       setError(err.message);

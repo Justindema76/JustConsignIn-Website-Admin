@@ -28,7 +28,7 @@ export const STARTER_CATEGORIES = [
   {
     "slug": "flags-signs",
     "name": "Flags & Signs",
-    "blurb": "Swooper flags, blade flags and sidewalk signs.",
+    "blurb": "Swooper, blade and bow flags, lot signs and boulevard banners.",
     "image": "https://rent-and-rally.vercel.app/img/swooper-1.jpg",
     "status": "published",
     "sort_order": 40
@@ -40,6 +40,30 @@ export const STARTER_CATEGORIES = [
     "image": "https://rent-and-rally.vercel.app/img/retractable-3.jpg",
     "status": "published",
     "sort_order": 50
+  },
+  {
+    "slug": "vehicle-display",
+    "name": "Vehicle Display Ramps",
+    "blurb": "Lift your feature vehicle up where everyone can see it.",
+    "image": "https://rent-and-rally.vercel.app/img/ramp20-1.jpg",
+    "status": "published",
+    "sort_order": 60
+  },
+  {
+    "slug": "balloons",
+    "name": "Balloon Displays",
+    "blurb": "Reusable, weatherproof balloon poles, clusters and light pole kits.",
+    "image": "https://rent-and-rally.vercel.app/img/balloon5-1.jpg",
+    "status": "published",
+    "sort_order": 70
+  },
+  {
+    "slug": "lot-event",
+    "name": "Lot & Event Gear",
+    "blurb": "Cones, delineators, bollards, belt barriers and raffle drums.",
+    "image": "https://rent-and-rally.vercel.app/img/beltbarrier-1.jpg",
+    "status": "published",
+    "sort_order": 80
   }
 ];
 
@@ -899,29 +923,27 @@ export const STARTER_PRODUCTS = [
   {
     "slug": "swooper",
     "category_slug": "flags-signs",
-    "sku": "SF200",
+    "sku": "SF201-NSF1027KT",
     "name": "Swooper Flag",
     "images": [
       "https://rent-and-rally.vercel.app/img/swooper-1.jpg",
       "https://rent-and-rally.vercel.app/img/swooper-2.jpg",
-      "https://rent-and-rally.vercel.app/img/swooper-3.jpg",
-      "https://rent-and-rally.vercel.app/img/swooper-4.jpg",
-      "https://rent-and-rally.vercel.app/img/swooper-5.jpg",
-      "https://rent-and-rally.vercel.app/img/swooper-6.jpg"
+      "https://rent-and-rally.vercel.app/img/swooper-3.jpg"
     ],
     "day_rate": 30,
-    "buy_price": 89.95,
+    "buy_price": 49.95,
     "buy_note": "flag only",
-    "buy_url": "https://wheelsauto.com/ca-en/sf200-custom-swooper-flags.html",
+    "buy_url": "https://wheelsauto.com/ca-en/swooper-flag.html",
     "badge": "",
     "description": [
-      "A high-visibility swooper flag that moves in the breeze and lines your lot or storefront with colour. Rentals include the pole and base.",
-      "Want your own logo? Custom full-colour swooper flags can be printed and purchased."
+      "A tall swooper flag that moves in the breeze and lines your lot or storefront with colour. Pick a stock slogan and the base that suits your ground.",
+      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
     ],
     "features": [
-      "High-visibility swooper shape",
-      "Pole and base included with rental",
-      "Durable outdoor construction",
+      "31 stock slogans and colours",
+      "100% poly knit polyester",
+      "Pole and hardware included",
+      "Ground spike for grass, under-tire base for pavement",
       "Priced per flag"
     ],
     "specs": [
@@ -930,34 +952,132 @@ export const STARTER_PRODUCTS = [
         "value": "Swooper / feather"
       },
       {
+        "label": "Material",
+        "value": "Poly knit polyester"
+      },
+      {
         "label": "Includes",
-        "value": "Flag, pole & base"
+        "value": "Flag, pole & hardware"
       },
       {
         "label": "Use",
         "value": "Outdoor"
-      },
-      {
-        "label": "Custom print",
-        "value": "Available to buy"
       }
     ],
     "options": [
       {
-        "label": "Base",
+        "label": "Slogan",
         "values": [
           {
-            "v": "Ground spike"
+            "v": "Sale (Red)"
           },
           {
-            "v": "Weighted base (hard surfaces)"
+            "v": "Sale (Blue)"
+          },
+          {
+            "v": "Big Sale"
+          },
+          {
+            "v": "Used Cars (Red)"
+          },
+          {
+            "v": "Used Cars (Blue)"
+          },
+          {
+            "v": "Used Cars"
+          },
+          {
+            "v": "Used Trucks (Red)"
+          },
+          {
+            "v": "Used Trucks (Blue)"
+          },
+          {
+            "v": "Trucks (Red)"
+          },
+          {
+            "v": "Trucks (Blue)"
+          },
+          {
+            "v": "Pre-Owned Cars"
+          },
+          {
+            "v": "Certified Pre-Owned"
+          },
+          {
+            "v": "Clearance Sale"
+          },
+          {
+            "v": "Red Tag"
+          },
+          {
+            "v": "Hot Prices"
+          },
+          {
+            "v": "Save $$$"
+          },
+          {
+            "v": "Stop Save Now"
+          },
+          {
+            "v": "Look Special"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "Easy Finance"
+          },
+          {
+            "v": "Buy Here Pay Here"
+          },
+          {
+            "v": "No Credit? Bad Credit? OK!"
+          },
+          {
+            "v": "We Buy Cars"
+          },
+          {
+            "v": "Walk In Drive Out"
+          },
+          {
+            "v": "Welcome"
+          },
+          {
+            "v": "Welcome, Drive In"
+          },
+          {
+            "v": "Open"
+          },
+          {
+            "v": "Open Saturday"
+          },
+          {
+            "v": "Open Sunday"
+          },
+          {
+            "v": "Checkered Black & White"
+          },
+          {
+            "v": "Checkered Black & Yellow"
+          }
+        ]
+      },
+      {
+        "label": "Hardware",
+        "values": [
+          {
+            "v": "Ground spike kit (grass)"
+          },
+          {
+            "v": "Under-tire base (pavement)"
           }
         ]
       }
     ],
     "related": [
       "blade",
-      "sidewalk",
+      "bowflag",
       "tubeman"
     ],
     "featured": true,
@@ -967,36 +1087,34 @@ export const STARTER_PRODUCTS = [
   {
     "slug": "blade",
     "category_slug": "flags-signs",
-    "sku": "104133-104140",
+    "sku": "104101-104128SB",
     "name": "Blade Flag",
     "images": [
       "https://rent-and-rally.vercel.app/img/blade-1.jpg",
       "https://rent-and-rally.vercel.app/img/blade-2.jpg",
       "https://rent-and-rally.vercel.app/img/blade-3.jpg",
-      "https://rent-and-rally.vercel.app/img/blade-4.jpg",
-      "https://rent-and-rally.vercel.app/img/blade-5.jpg",
-      "https://rent-and-rally.vercel.app/img/blade-6.jpg"
+      "https://rent-and-rally.vercel.app/img/blade-4.jpg"
     ],
     "day_rate": 30,
     "buy_price": 74.95,
     "buy_note": "flag only",
-    "buy_url": "https://wheelsauto.com/ca-en/blade-flags-custom-dealership-banners.html",
+    "buy_url": "https://wheelsauto.com/ca-en/104101-104128sb-blade-flags.html",
     "badge": "",
     "description": [
       "Blade flags stay open to show your message with or without wind. Heavyweight polyester for showrooms or outdoor lots.",
-      "Rentals include the pole and your choice of ground spike or weighted base."
+      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
     ],
     "features": [
-      "Heavyweight polyester",
+      "28 stock slogans and colours",
       "Stays open with or without wind",
-      "Over 11 ft tall assembled",
+      "Heavyweight polyester",
       "Indoor & outdoor use",
       "Priced per flag"
     ],
     "specs": [
       {
-        "label": "Height",
-        "value": "Over 11' assembled"
+        "label": "Flag size",
+        "value": "2½' x 9'"
       },
       {
         "label": "Material",
@@ -1008,48 +1126,282 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Includes",
-        "value": "Flag, pole & base"
+        "value": "Flag, pole & hardware"
       }
     ],
     "options": [
       {
-        "label": "Message",
+        "label": "Slogan",
         "values": [
           {
-            "v": "Sale"
+            "v": "Sale (Red)"
+          },
+          {
+            "v": "Sale (Blue)"
+          },
+          {
+            "v": "Sale On Now"
           },
           {
             "v": "Auto Sale"
           },
           {
-            "v": "Event"
-          },
-          {
-            "v": "Certified Pre-Owned"
-          },
-          {
             "v": "Used Cars"
+          },
+          {
+            "v": "Used Cars (Red)"
+          },
+          {
+            "v": "Used Cars (Blue)"
           },
           {
             "v": "Used Trucks"
           },
           {
-            "v": "Low Finance %"
+            "v": "Used Trucks (Red)"
           },
           {
-            "v": "We Sell Tires"
+            "v": "Used Trucks (Blue)"
+          },
+          {
+            "v": "Certified Pre-Owned"
+          },
+          {
+            "v": "Certified Pre-Owned (Red)"
+          },
+          {
+            "v": "Certified Pre-Owned (Blue)"
+          },
+          {
+            "v": "Clearance Sale (Red)"
+          },
+          {
+            "v": "Clearance Sale (Blue)"
+          },
+          {
+            "v": "Tire Sale (Red)"
+          },
+          {
+            "v": "Tire Sale (Blue)"
+          },
+          {
+            "v": "0% Financing"
+          },
+          {
+            "v": "0% Financing (Red)"
+          },
+          {
+            "v": "0% Financing (Blue)"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "We Finance (Red)"
+          },
+          {
+            "v": "We Finance (Blue)"
+          },
+          {
+            "v": "Free Warranty"
+          },
+          {
+            "v": "Welcome"
+          },
+          {
+            "v": "Now Open"
+          },
+          {
+            "v": "Now Open (Red)"
+          },
+          {
+            "v": "Now Open (Blue)"
+          }
+        ]
+      },
+      {
+        "label": "Hardware",
+        "values": [
+          {
+            "v": "Ground spike kit (grass)"
+          },
+          {
+            "v": "Under-tire kit (pavement)"
+          },
+          {
+            "v": "Showroom kit (indoor)"
           }
         ]
       }
     ],
     "related": [
+      "bowflag",
       "swooper",
-      "sidewalk",
-      "retractable"
+      "sidewalk"
     ],
     "featured": false,
     "status": "published",
     "sort_order": 160
+  },
+  {
+    "slug": "bowflag",
+    "category_slug": "flags-signs",
+    "sku": "103101-103127SB",
+    "name": "Bow Flag",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/bowflag-1.jpg",
+      "https://rent-and-rally.vercel.app/img/bowflag-2.jpg",
+      "https://rent-and-rally.vercel.app/img/bowflag-3.jpg",
+      "https://rent-and-rally.vercel.app/img/bowflag-4.jpg"
+    ],
+    "day_rate": 30,
+    "buy_price": 74.95,
+    "buy_note": "flag only",
+    "buy_url": "https://wheelsauto.com/ca-en/bow-flags-103101-103127.html",
+    "badge": "",
+    "description": [
+      "A teardrop-shaped bow flag that stays open and readable even when there is no wind. Bright, bold and easy to read from the road.",
+      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
+    ],
+    "features": [
+      "27 stock slogans and colours",
+      "Stays open with or without wind",
+      "Heavyweight polyester",
+      "Indoor & outdoor use",
+      "Priced per flag"
+    ],
+    "specs": [
+      {
+        "label": "Flag size",
+        "value": "3' x 9½'"
+      },
+      {
+        "label": "Material",
+        "value": "Heavyweight polyester"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
+      },
+      {
+        "label": "Includes",
+        "value": "Flag, pole & hardware"
+      }
+    ],
+    "options": [
+      {
+        "label": "Slogan",
+        "values": [
+          {
+            "v": "Sale (Red)"
+          },
+          {
+            "v": "Sale (Blue)"
+          },
+          {
+            "v": "Sale (Yellow)"
+          },
+          {
+            "v": "Save (Red)"
+          },
+          {
+            "v": "Save (Blue)"
+          },
+          {
+            "v": "Save (Yellow)"
+          },
+          {
+            "v": "Used Cars (Red)"
+          },
+          {
+            "v": "Used Cars (Blue)"
+          },
+          {
+            "v": "Used Trucks (Red)"
+          },
+          {
+            "v": "Used Trucks (Blue)"
+          },
+          {
+            "v": "Trucks (Red)"
+          },
+          {
+            "v": "Trucks (Blue)"
+          },
+          {
+            "v": "Pre-Owned (Red)"
+          },
+          {
+            "v": "Pre-Owned (Blue)"
+          },
+          {
+            "v": "Certified Used Vehicles (Red)"
+          },
+          {
+            "v": "Certified Used Vehicles (Blue)"
+          },
+          {
+            "v": "Certified Used Vehicles (Yellow)"
+          },
+          {
+            "v": "Tire Sale (Red)"
+          },
+          {
+            "v": "Tire Sale (Blue)"
+          },
+          {
+            "v": "0% Financing (Red)"
+          },
+          {
+            "v": "0% Financing (Blue)"
+          },
+          {
+            "v": "We Finance (Red)"
+          },
+          {
+            "v": "We Finance (Blue)"
+          },
+          {
+            "v": "Now Open (Red)"
+          },
+          {
+            "v": "Now Open (Blue)"
+          },
+          {
+            "v": "Open Sundays (Red)"
+          },
+          {
+            "v": "Open Sundays (Blue)"
+          }
+        ]
+      },
+      {
+        "label": "Hardware",
+        "values": [
+          {
+            "v": "Ground spike kit (grass)"
+          },
+          {
+            "v": "Under-tire kit (pavement)",
+            "img": 4
+          },
+          {
+            "v": "Showroom kit (indoor)"
+          },
+          {
+            "v": "Outdoor base kit (hard surfaces)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "blade",
+      "swooper",
+      "balloon5"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 170
   },
   {
     "slug": "sidewalk",
@@ -1068,7 +1420,7 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A double-sided sidewalk sign with a spring-mounted frame that flexes in the wind instead of blowing over.",
-      "The snap-open frame makes changing posters quick, and the base fills with water or sand for stability."
+      "The snap-open frame takes 24\" x 36\" posters. Bring your own, or order a custom printed sign that is yours to keep."
     ],
     "features": [
       "Double-sided display",
@@ -1095,19 +1447,727 @@ export const STARTER_PRODUCTS = [
         "value": "Fillable with water or sand"
       },
       {
-        "label": "Use",
-        "value": "Indoor & outdoor"
+        "label": "Custom sign",
+        "value": "$39.95 + $50 one-time artwork set-up"
       }
     ],
-    "options": [],
+    "options": [
+      {
+        "label": "Sign",
+        "values": [
+          {
+            "v": "I have my own 24\" x 36\" posters"
+          },
+          {
+            "v": "Custom printed sign, 1 side (+$89.95 one-time)"
+          }
+        ]
+      }
+    ],
     "related": [
-      "swooper",
-      "blade",
-      "tent10"
+      "aframe",
+      "quickie",
+      "blade"
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 170
+    "sort_order": 180
+  },
+  {
+    "slug": "aframe",
+    "category_slug": "flags-signs",
+    "sku": "1082436-1083248",
+    "name": "A-Frame Sign (32\" x 48\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/aframe-1.jpg",
+      "https://rent-and-rally.vercel.app/img/aframe-2.jpg",
+      "https://rent-and-rally.vercel.app/img/aframe-3.jpg"
+    ],
+    "day_rate": 25,
+    "buy_price": 109.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/1082436-1083248-a-frame-style-steel-sign-holder.html",
+    "badge": "",
+    "description": [
+      "A steel sandwich-board sign that holds two 32\" x 48\" coroplast signs, one on each side. Folds flat with a top handle for easy moving.",
+      "Choose a stock sign for each side, or order custom signs that are yours to keep."
+    ],
+    "features": [
+      "Sturdy black steel frame",
+      "Holds two 32\" x 48\" signs",
+      "Stock signs included with the rental",
+      "Folds flat, top handle",
+      "Indoor & outdoor use"
+    ],
+    "specs": [
+      {
+        "label": "Sign size",
+        "value": "32\" x 48\""
+      },
+      {
+        "label": "Frame",
+        "value": "Black painted steel"
+      },
+      {
+        "label": "Signs",
+        "value": "4mm coroplast, one per side"
+      },
+      {
+        "label": "Custom sign",
+        "value": "$69.95 each + $50 one-time artwork set-up"
+      }
+    ],
+    "options": [
+      {
+        "label": "Side 1 sign",
+        "values": [
+          {
+            "v": "$0 Down"
+          },
+          {
+            "v": "Auto Clearance Event"
+          },
+          {
+            "v": "Big Storewide Sale"
+          },
+          {
+            "v": "Black Friday"
+          },
+          {
+            "v": "Buy Here Pay Here"
+          },
+          {
+            "v": "Canada Day Savings Event"
+          },
+          {
+            "v": "Cash For Your Car"
+          },
+          {
+            "v": "Certified Pre-Owned Center"
+          },
+          {
+            "v": "Extended Warranty"
+          },
+          {
+            "v": "Finance Options"
+          },
+          {
+            "v": "Many Finance Options"
+          },
+          {
+            "v": "Free Warranty"
+          },
+          {
+            "v": "Nobody Sells for Less"
+          },
+          {
+            "v": "Now Open"
+          },
+          {
+            "v": "Open During Construction"
+          },
+          {
+            "v": "Pre-Owned Centre"
+          },
+          {
+            "v": "Pre-Owned Truck Sale"
+          },
+          {
+            "v": "Pre-Owned Vehicle Sale"
+          },
+          {
+            "v": "Red Hot Clear the Lot"
+          },
+          {
+            "v": "Sale On Now"
+          },
+          {
+            "v": "Save a Bundle"
+          },
+          {
+            "v": "Save Big"
+          },
+          {
+            "v": "Sharp Pencils"
+          },
+          {
+            "v": "Stop And Save"
+          },
+          {
+            "v": "Storewide Sale"
+          },
+          {
+            "v": "Storewide Vehicle Sale"
+          },
+          {
+            "v": "Supersale Event"
+          },
+          {
+            "v": "Tight On Cash"
+          },
+          {
+            "v": "Tire Sale"
+          },
+          {
+            "v": "Tires"
+          },
+          {
+            "v": "Top Dollar Paid"
+          },
+          {
+            "v": "Truck Center"
+          },
+          {
+            "v": "Truck Event"
+          },
+          {
+            "v": "Truck Sale Extravaganza"
+          },
+          {
+            "v": "Used Car Sale"
+          },
+          {
+            "v": "Used Car Sale on Now"
+          },
+          {
+            "v": "Vehicles For Every Budget"
+          },
+          {
+            "v": "We Buy & Sell"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "Custom 32\" x 48\" sign (+$119.95 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Side 2 sign",
+        "values": [
+          {
+            "v": "Same as side 1"
+          },
+          {
+            "v": "$0 Down"
+          },
+          {
+            "v": "Auto Clearance Event"
+          },
+          {
+            "v": "Big Storewide Sale"
+          },
+          {
+            "v": "Black Friday"
+          },
+          {
+            "v": "Buy Here Pay Here"
+          },
+          {
+            "v": "Canada Day Savings Event"
+          },
+          {
+            "v": "Cash For Your Car"
+          },
+          {
+            "v": "Certified Pre-Owned Center"
+          },
+          {
+            "v": "Extended Warranty"
+          },
+          {
+            "v": "Finance Options"
+          },
+          {
+            "v": "Many Finance Options"
+          },
+          {
+            "v": "Free Warranty"
+          },
+          {
+            "v": "Nobody Sells for Less"
+          },
+          {
+            "v": "Now Open"
+          },
+          {
+            "v": "Open During Construction"
+          },
+          {
+            "v": "Pre-Owned Centre"
+          },
+          {
+            "v": "Pre-Owned Truck Sale"
+          },
+          {
+            "v": "Pre-Owned Vehicle Sale"
+          },
+          {
+            "v": "Red Hot Clear the Lot"
+          },
+          {
+            "v": "Sale On Now"
+          },
+          {
+            "v": "Save a Bundle"
+          },
+          {
+            "v": "Save Big"
+          },
+          {
+            "v": "Sharp Pencils"
+          },
+          {
+            "v": "Stop And Save"
+          },
+          {
+            "v": "Storewide Sale"
+          },
+          {
+            "v": "Storewide Vehicle Sale"
+          },
+          {
+            "v": "Supersale Event"
+          },
+          {
+            "v": "Tight On Cash"
+          },
+          {
+            "v": "Tire Sale"
+          },
+          {
+            "v": "Tires"
+          },
+          {
+            "v": "Top Dollar Paid"
+          },
+          {
+            "v": "Truck Center"
+          },
+          {
+            "v": "Truck Event"
+          },
+          {
+            "v": "Truck Sale Extravaganza"
+          },
+          {
+            "v": "Used Car Sale"
+          },
+          {
+            "v": "Used Car Sale on Now"
+          },
+          {
+            "v": "Vehicles For Every Budget"
+          },
+          {
+            "v": "We Buy & Sell"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "Custom 32\" x 48\" sign (+$119.95 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "quickie",
+      "sidewalk",
+      "dbs"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 190
+  },
+  {
+    "slug": "quickie",
+    "category_slug": "flags-signs",
+    "sku": "1083224",
+    "name": "Quickie Lot Sign A-Frame (24\" x 32\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/quickie-1.jpg",
+      "https://rent-and-rally.vercel.app/img/quickie-2.jpg"
+    ],
+    "day_rate": 15,
+    "buy_price": 79.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/quickie-auto-sign-a-frame-holder-1083224.html",
+    "badge": "",
+    "description": [
+      "A compact A-frame that holds two 24\" x 32\" Quickie lot signs. Set them in front of feature vehicles or along the curb.",
+      "Choose a stock black Quickie sign for each side, or order custom signs that are yours to keep."
+    ],
+    "features": [
+      "Holds two 24\" x 32\" signs",
+      "18 stock black Quickie slogans",
+      "Stock signs included with the rental",
+      "Great on pavement",
+      "Carry handle"
+    ],
+    "specs": [
+      {
+        "label": "Sign size",
+        "value": "24\" x 32\""
+      },
+      {
+        "label": "Signs",
+        "value": "4mm coroplast, one per side"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      },
+      {
+        "label": "Custom sign",
+        "value": "$36.95 each + $50 one-time artwork set-up"
+      }
+    ],
+    "options": [
+      {
+        "label": "Side 1 sign",
+        "values": [
+          {
+            "v": "$0 Down"
+          },
+          {
+            "v": "0% Financing"
+          },
+          {
+            "v": "Auto Clearance On Now"
+          },
+          {
+            "v": "Certified Pre-Owned"
+          },
+          {
+            "v": "Clear Out All Prices"
+          },
+          {
+            "v": "Demo Sale"
+          },
+          {
+            "v": "Extended Warranty"
+          },
+          {
+            "v": "Many Finance Options"
+          },
+          {
+            "v": "No Credit No Problem"
+          },
+          {
+            "v": "Pre-Owned Center"
+          },
+          {
+            "v": "Sale"
+          },
+          {
+            "v": "Sale On Now"
+          },
+          {
+            "v": "Stop And Save"
+          },
+          {
+            "v": "Tight On Cash"
+          },
+          {
+            "v": "Truck Sale On Now"
+          },
+          {
+            "v": "Used Car Blow Out"
+          },
+          {
+            "v": "Used Car Sale"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "Custom 24\" x 32\" sign (+$86.95 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Side 2 sign",
+        "values": [
+          {
+            "v": "Same as side 1"
+          },
+          {
+            "v": "$0 Down"
+          },
+          {
+            "v": "0% Financing"
+          },
+          {
+            "v": "Auto Clearance On Now"
+          },
+          {
+            "v": "Certified Pre-Owned"
+          },
+          {
+            "v": "Clear Out All Prices"
+          },
+          {
+            "v": "Demo Sale"
+          },
+          {
+            "v": "Extended Warranty"
+          },
+          {
+            "v": "Many Finance Options"
+          },
+          {
+            "v": "No Credit No Problem"
+          },
+          {
+            "v": "Pre-Owned Center"
+          },
+          {
+            "v": "Sale"
+          },
+          {
+            "v": "Sale On Now"
+          },
+          {
+            "v": "Stop And Save"
+          },
+          {
+            "v": "Tight On Cash"
+          },
+          {
+            "v": "Truck Sale On Now"
+          },
+          {
+            "v": "Used Car Blow Out"
+          },
+          {
+            "v": "Used Car Sale"
+          },
+          {
+            "v": "We Finance"
+          },
+          {
+            "v": "Custom 24\" x 32\" sign (+$86.95 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "aframe",
+      "sidewalk",
+      "ramps"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 200
+  },
+  {
+    "slug": "boulevard",
+    "category_slug": "flags-signs",
+    "sku": "BB2601-BB2608",
+    "name": "Boulevard Light Pole Banner",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/boulevard-1.jpg"
+    ],
+    "day_rate": 25,
+    "buy_price": 169,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/used-cars-boulevard-banners-1.html",
+    "badge": "",
+    "description": [
+      "Double-sided vertical banners that hang from your light poles, so your message is seen from both directions along the road.",
+      "We install them on your light poles and take them down at the end of the rental. Priced per banner."
+    ],
+    "features": [
+      "Printed on both sides",
+      "Heavy-duty 16 oz vinyl",
+      "8 stock slogans, or custom",
+      "Installed and removed by us",
+      "Priced per banner"
+    ],
+    "specs": [
+      {
+        "label": "Stock banner size",
+        "value": "24\" x 72\""
+      },
+      {
+        "label": "Material",
+        "value": "16 oz vinyl, double-sided"
+      },
+      {
+        "label": "Mounting",
+        "value": "Your light poles"
+      },
+      {
+        "label": "Install & removal",
+        "value": "Confirmed with your quote"
+      },
+      {
+        "label": "Custom banner",
+        "value": "$179 to $199 + $50 one-time artwork set-up"
+      }
+    ],
+    "options": [
+      {
+        "label": "Banner",
+        "values": [
+          {
+            "v": "Pre-Owned (24\" x 72\")"
+          },
+          {
+            "v": "New Cars (24\" x 72\")"
+          },
+          {
+            "v": "New Trucks (24\" x 72\")"
+          },
+          {
+            "v": "Used Cars (24\" x 72\")"
+          },
+          {
+            "v": "Used Trucks (24\" x 72\")"
+          },
+          {
+            "v": "Mini Vans (24\" x 72\")"
+          },
+          {
+            "v": "Leasing (24\" x 72\")"
+          },
+          {
+            "v": "Welcome (24\" x 72\")"
+          },
+          {
+            "v": "Custom 24\" x 72\" (+$229 one-time)"
+          },
+          {
+            "v": "Custom 24\" x 96\" (+$239 one-time)"
+          },
+          {
+            "v": "Custom 30\" x 72\" (+$239 one-time)"
+          },
+          {
+            "v": "Custom 30\" x 96\" (+$249 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Brackets",
+        "values": [
+          {
+            "v": "Standard bracket kit"
+          },
+          {
+            "v": "BannerSaver wind-tensioned brackets (+$5/day)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "dbs",
+      "swooper",
+      "lightpole4"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 210
+  },
+  {
+    "slug": "dbs",
+    "category_slug": "displays",
+    "sku": "DBS",
+    "name": "Lot Banner Display Stand",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/dbs-1.jpg",
+      "https://rent-and-rally.vercel.app/img/dbs-2.jpg"
+    ],
+    "day_rate": 35,
+    "buy_price": 499,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/banner-display-stand-dbs.html",
+    "badge": "",
+    "description": [
+      "A galvanized steel banner frame that anchors under a vehicle tire, so your banner stands tall right beside the car you are featuring.",
+      "Comes with a stock 30\" x 82\" banner of your choice, or order a custom banner that is yours to keep."
+    ],
+    "features": [
+      "Galvanized steel, rust resistant",
+      "Counterweighted, stays put while cars move",
+      "Under-tire brackets",
+      "Stock banner included",
+      "8' W x 10' H overall"
+    ],
+    "specs": [
+      {
+        "label": "Overall size",
+        "value": "8' W x 10' H"
+      },
+      {
+        "label": "Banner size",
+        "value": "30\" x 82\""
+      },
+      {
+        "label": "Frame",
+        "value": "1½\" galvanized steel"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      },
+      {
+        "label": "Custom banner",
+        "value": "$159 + $50 one-time artwork set-up"
+      }
+    ],
+    "options": [
+      {
+        "label": "Banner",
+        "values": [
+          {
+            "v": "Managers Special",
+            "img": 2
+          },
+          {
+            "v": "Sale Event On Now",
+            "img": 2
+          },
+          {
+            "v": "Sale On Now",
+            "img": 2
+          },
+          {
+            "v": "Special Of The Week",
+            "img": 2
+          },
+          {
+            "v": "Special Of The Week (Centered)",
+            "img": 2
+          },
+          {
+            "v": "Used Car Blow Out",
+            "img": 2
+          },
+          {
+            "v": "We Finance",
+            "img": 2
+          },
+          {
+            "v": "Used Car/Truck Sale",
+            "img": 2
+          },
+          {
+            "v": "Custom 30\" x 82\" banner (+$209 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "outdoorbanner",
+      "ramp20",
+      "boulevard"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 220
   },
   {
     "slug": "xbanner",
@@ -1125,7 +2185,8 @@ export const STARTER_PRODUCTS = [
     "buy_url": "https://wheelsauto.com/ca-en/nt101-nt101-b-x-banner-stand.html",
     "badge": "",
     "description": [
-      "A lightweight X-frame banner stand with carbon fibre rods. It sets up in seconds and adjusts to fit a range of banner sizes."
+      "A lightweight X-frame banner stand with carbon fibre rods. It sets up in seconds and adjusts to fit a range of banner sizes.",
+      "Bring your own banner, or order a custom printed banner that is yours to keep."
     ],
     "features": [
       "Carbon fibre rods",
@@ -1149,6 +2210,10 @@ export const STARTER_PRODUCTS = [
       {
         "label": "Use",
         "value": "Indoor"
+      },
+      {
+        "label": "Custom banner",
+        "value": "$79.95 + $50 one-time artwork set-up"
       }
     ],
     "options": [
@@ -1156,10 +2221,10 @@ export const STARTER_PRODUCTS = [
         "label": "Banner",
         "values": [
           {
-            "v": "Stand only (bring your banner)"
+            "v": "I have my own banner"
           },
           {
-            "v": "Add a custom printed banner (quote)"
+            "v": "Custom printed banner (+$129.95 one-time)"
           }
         ]
       }
@@ -1167,11 +2232,11 @@ export const STARTER_PRODUCTS = [
     "related": [
       "simplebanner",
       "retractable",
-      "outdoorbanner"
+      "beltbarrier"
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 180
+    "sort_order": 230
   },
   {
     "slug": "simplebanner",
@@ -1189,7 +2254,8 @@ export const STARTER_PRODUCTS = [
     "buy_url": "https://wheelsauto.com/ca-en/nt104-nt104-b-simple-banner-stand.html",
     "badge": "",
     "description": [
-      "A sleek aluminum banner stand that assembles in seconds. A clean, professional look for showrooms, receptions and trade shows."
+      "A sleek aluminum banner stand that assembles in seconds. A clean, professional look for showrooms, receptions and trade shows.",
+      "Bring your own 77\" x 30\" banner, or order a custom printed banner that is yours to keep."
     ],
     "features": [
       "Lightweight aluminum",
@@ -1213,6 +2279,10 @@ export const STARTER_PRODUCTS = [
       {
         "label": "Use",
         "value": "Indoor"
+      },
+      {
+        "label": "Custom banner",
+        "value": "$79.95 + $50 one-time artwork set-up"
       }
     ],
     "options": [
@@ -1220,10 +2290,10 @@ export const STARTER_PRODUCTS = [
         "label": "Banner",
         "values": [
           {
-            "v": "Stand only (bring your banner)"
+            "v": "I have my own banner"
           },
           {
-            "v": "Add a custom printed banner (quote)"
+            "v": "Custom printed banner (+$129.95 one-time)"
           }
         ]
       }
@@ -1231,11 +2301,11 @@ export const STARTER_PRODUCTS = [
     "related": [
       "retractable",
       "xbanner",
-      "outdoorbanner"
+      "beltbarrier"
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 190
+    "sort_order": 240
   },
   {
     "slug": "retractable",
@@ -1253,7 +2323,8 @@ export const STARTER_PRODUCTS = [
     "buy_url": "https://wheelsauto.com/ca-en/nt105-nt105-b-retractable-banner-stand.html",
     "badge": "",
     "description": [
-      "A roll-up banner display with an adjustable pole and travel case. It pulls up in seconds and adjusts from 40\" to 90\" tall."
+      "A roll-up banner display with an adjustable pole and travel case. It pulls up in seconds and adjusts from 40\" to 90\" tall.",
+      "Bring your own banner, or order a custom printed banner that is yours to keep."
     ],
     "features": [
       "Roll-up design",
@@ -1279,8 +2350,8 @@ export const STARTER_PRODUCTS = [
         "value": "Travel case"
       },
       {
-        "label": "Use",
-        "value": "Indoor"
+        "label": "Custom banner",
+        "value": "$79.95 + $50 one-time artwork set-up"
       }
     ],
     "options": [
@@ -1288,10 +2359,10 @@ export const STARTER_PRODUCTS = [
         "label": "Banner",
         "values": [
           {
-            "v": "Stand only (bring your banner)"
+            "v": "I have my own banner"
           },
           {
-            "v": "Add a custom printed banner (quote)"
+            "v": "Custom printed banner (+$129.95 one-time)"
           }
         ]
       }
@@ -1299,11 +2370,11 @@ export const STARTER_PRODUCTS = [
     "related": [
       "simplebanner",
       "xbanner",
-      "outdoorbanner"
+      "beltbarrier"
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 200
+    "sort_order": 250
   },
   {
     "slug": "outdoorbanner",
@@ -1323,13 +2394,14 @@ export const STARTER_PRODUCTS = [
     "buy_url": "https://wheelsauto.com/ca-en/hp2401-hp2402-outdoor-durable-banner-stand.html",
     "badge": "",
     "description": [
-      "A heavy-duty banner stand built for outdoor use. Keeps your message upright on lots, sidewalks and event grounds."
+      "A heavy-duty banner stand built for outdoor use. Keeps your message upright on lots, sidewalks and event grounds.",
+      "This stand takes a custom printed banner made to fit, which is yours to keep. The banner price is confirmed with your quote."
     ],
     "features": [
       "Built for outdoor use",
-      "Heavy, stable base",
-      "Single- and double-banner models",
-      "Swappable banners"
+      "Holds a 2' x 8' or 3' x 12' banner",
+      "Foot bases for pavement, ground spikes for grass",
+      "Custom banner made to fit"
     ],
     "specs": [
       {
@@ -1337,35 +2409,1204 @@ export const STARTER_PRODUCTS = [
         "value": "Outdoor"
       },
       {
-        "label": "Models",
-        "value": "Single / double banner"
+        "label": "Banner size",
+        "value": "2' x 8' or 3' x 12'"
       },
       {
-        "label": "Base",
-        "value": "Heavy-duty"
+        "label": "Banner",
+        "value": "Custom, confirmed with your quote"
+      },
+      {
+        "label": "Set-up fee",
+        "value": "$50 one-time artwork set-up"
       }
     ],
     "options": [
       {
-        "label": "Model",
+        "label": "Size",
         "values": [
           {
-            "v": "Single banner"
+            "v": "Holds a 2' x 8' banner"
           },
           {
-            "v": "Double banner (+$15/day)"
+            "v": "Holds a 3' x 12' banner (+$15/day)"
+          }
+        ]
+      },
+      {
+        "label": "Base",
+        "values": [
+          {
+            "v": "Foot bases (pavement)"
+          },
+          {
+            "v": "Ground spikes (grass)"
+          }
+        ]
+      },
+      {
+        "label": "Banner",
+        "values": [
+          {
+            "v": "Custom banner, price confirmed with your quote (+$50 one-time set-up)"
           }
         ]
       }
     ],
     "related": [
+      "dbs",
       "retractable",
-      "sidewalk",
-      "blade"
+      "sidewalk"
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 210
+    "sort_order": 260
+  },
+  {
+    "slug": "ramp20",
+    "category_slug": "vehicle-display",
+    "sku": "RMP20",
+    "name": "Aluminum Vehicle Display Podium",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/ramp20-1.jpg",
+      "https://rent-and-rally.vercel.app/img/ramp20-2.jpg"
+    ],
+    "day_rate": 250,
+    "buy_price": 4995,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/aluminum-display-ramp-rmp20.html",
+    "badge": "",
+    "description": [
+      "Put a car or truck up on a stage. This all-aluminum podium lifts a vehicle 22\" to 27\" off the ground, so your feature vehicle is seen from the road.",
+      "Modular, lightweight and strong. Perfect for off-site sales, tent events and front-line displays. Delivery and setup confirmed with your quote."
+    ],
+    "features": [
+      "All-aluminum, modular",
+      "Rated 4,000 lbs per axle",
+      "Adjustable height 22\" to 27\"",
+      "Fits 48\" to 80\" wheelbase widths",
+      "Two people can set it up"
+    ],
+    "specs": [
+      {
+        "label": "Podium length",
+        "value": "20'"
+      },
+      {
+        "label": "Access ramps",
+        "value": "8' long"
+      },
+      {
+        "label": "Track width",
+        "value": "18\""
+      },
+      {
+        "label": "Overall width",
+        "value": "84\""
+      },
+      {
+        "label": "Load rating",
+        "value": "4,000 lbs per axle"
+      }
+    ],
+    "options": [],
+    "related": [
+      "ramps",
+      "dbs",
+      "tent20"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 270
+  },
+  {
+    "slug": "ramps",
+    "category_slug": "vehicle-display",
+    "sku": "RMP976B-RMP976Y",
+    "name": "Portable Display Ramps (Set)",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/ramps-1.jpg"
+    ],
+    "day_rate": 60,
+    "buy_price": 795,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/rmp976-portable-display-ramps.html",
+    "badge": "",
+    "description": [
+      "A set of steel display ramps that tilts a vehicle up 1 foot at the front, giving your front line or showroom feature car instant presence.",
+      "Each ramp weighs only 48 lbs, so one person can move and set them up."
+    ],
+    "features": [
+      "1\" tube steel construction",
+      "Holds up to 3,000 lbs per set",
+      "Lifts vehicle 1 ft",
+      "1.5\" safety stop",
+      "Powder-coated in 4 colours"
+    ],
+    "specs": [
+      {
+        "label": "Ramp size",
+        "value": "64\" L x 12\" W"
+      },
+      {
+        "label": "Weight",
+        "value": "48 lbs per ramp"
+      },
+      {
+        "label": "Lift",
+        "value": "1 ft"
+      },
+      {
+        "label": "Capacity",
+        "value": "3,000 lbs per set"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Black"
+          },
+          {
+            "v": "Blue"
+          },
+          {
+            "v": "Red"
+          },
+          {
+            "v": "Yellow"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "ramp20",
+      "quickie",
+      "balloon5"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 280
+  },
+  {
+    "slug": "balloonpole",
+    "category_slug": "balloons",
+    "sku": "111401",
+    "name": "18\" Balloon Pole",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/balloonpole-1.jpg",
+      "https://rent-and-rally.vercel.app/img/balloonpole-2.jpg"
+    ],
+    "day_rate": 10,
+    "buy_price": 44.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/long-pole-kit-for-18-balloons-111401.html",
+    "badge": "",
+    "description": [
+      "A single 18\" balloon on a 7 ft pole. Line the front of your lot or mark the entrance.",
+      "The kit is rented. The reusable 18\" Dura balloon is bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds one 18\" balloon",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Ground spike or under-tire mount",
+      "Balloon yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "48\" pole + 41\" fibreglass stem"
+      },
+      {
+        "label": "Balloons",
+        "value": "1 × 18\" Dura balloon"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$14.95 each, printed $19.95"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "Red 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Dark Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Light Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Yellow 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Orange 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Green 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Lime Green 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "White 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Silver 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Gold 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Bronze 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Burgundy 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Pink 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Purple 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Printed SALE balloon, red/white/blue/yellow (+$19.95 one-time)"
+          },
+          {
+            "v": "Smiley face balloon (+$19.95 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Mount",
+        "values": [
+          {
+            "v": "Ground spike (grass)"
+          },
+          {
+            "v": "Under-tire base (pavement)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon5",
+      "balloon3",
+      "bowflag"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 290
+  },
+  {
+    "slug": "balloon3",
+    "category_slug": "balloons",
+    "sku": "111435",
+    "name": "3-Balloon Cluster",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/balloon3-1.jpg",
+      "https://rent-and-rally.vercel.app/img/balloon3-2.jpg"
+    ],
+    "day_rate": 18,
+    "buy_price": 109.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/three-balloon-cluster-kit-for-18-balloons-111435.html",
+    "badge": "",
+    "description": [
+      "Three 18\" balloons on one pole. A clean, eye-catching cluster for vehicles and entrances.",
+      "The kit is rented. The 3 reusable 18\" Dura balloons are bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds 3 18\" balloons",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Ground spike or under-tire mount",
+      "Balloons yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "48\" cluster pole + three 41\" stems"
+      },
+      {
+        "label": "Balloons",
+        "value": "3 × 18\" Dura balloons"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$14.95 each, printed $19.95"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "3 × Red 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Blue 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Dark Blue 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Light Blue 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Yellow 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Orange 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Green 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Lime Green 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × White 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Silver 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Gold 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Bronze 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Burgundy 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Pink 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Purple 18\" balloons (+$44.85 one-time)"
+          },
+          {
+            "v": "3 × Printed SALE balloons, red/white/blue/yellow (+$59.85 one-time)"
+          },
+          {
+            "v": "3 × Smiley face balloons (+$59.85 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Mount",
+        "values": [
+          {
+            "v": "Ground spike (grass)"
+          },
+          {
+            "v": "Under-tire base (pavement)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon5",
+      "balloonpole",
+      "bowflag"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 300
+  },
+  {
+    "slug": "balloon5",
+    "category_slug": "balloons",
+    "sku": "111430",
+    "name": "5-Balloon Cluster",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/balloon5-1.jpg"
+    ],
+    "day_rate": 25,
+    "buy_price": 134.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/five-balloon-cluster-kit-for-18-balloons-111430.html",
+    "badge": "",
+    "description": [
+      "Five 18\" balloons on one pole for maximum colour. The classic car-lot balloon display.",
+      "The kit is rented. The 5 reusable 18\" Dura balloons are bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds 5 18\" balloons",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Ground spike or under-tire mount",
+      "Balloons yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "48\" cluster pole + five 41\" stems"
+      },
+      {
+        "label": "Balloons",
+        "value": "5 × 18\" Dura balloons"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$14.95 each, printed $19.95"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "5 × Red 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Blue 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Dark Blue 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Light Blue 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Yellow 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Orange 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Green 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Lime Green 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × White 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Silver 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Gold 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Bronze 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Burgundy 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Pink 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Purple 18\" balloons (+$74.75 one-time)"
+          },
+          {
+            "v": "5 × Printed SALE balloons, red/white/blue/yellow (+$99.75 one-time)"
+          },
+          {
+            "v": "5 × Smiley face balloons (+$99.75 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Mount",
+        "values": [
+          {
+            "v": "Ground spike (grass)"
+          },
+          {
+            "v": "Under-tire base (pavement)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon3",
+      "balloonpole",
+      "bowflag"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 310
+  },
+  {
+    "slug": "balloon30",
+    "category_slug": "balloons",
+    "sku": "111402",
+    "name": "30\" Mega Balloon Pole",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/balloon30-1.jpg"
+    ],
+    "day_rate": 15,
+    "buy_price": 64.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/mega-pole-kit-for-30-balloons-111402.html",
+    "badge": "",
+    "description": [
+      "One giant 30\" balloon on a tall pole. Big enough to spot from across the road.",
+      "The kit is rented. The reusable 30\" Dura balloon is bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds one 30\" balloon",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Ground spike or under-tire mount",
+      "Balloon yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "48\" mega pole + 48\" fibreglass stem"
+      },
+      {
+        "label": "Balloons",
+        "value": "1 × 30\" Dura balloon"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$24.95 each"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "Red 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Blue 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Dark Blue 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Light Blue 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Yellow 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Orange 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Green 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Lime Green 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "White 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Silver 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Gold 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Bronze 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Burgundy 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Pink 30\" balloon (+$24.95 one-time)"
+          },
+          {
+            "v": "Purple 30\" balloon (+$24.95 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Mount",
+        "values": [
+          {
+            "v": "Ground spike (grass)"
+          },
+          {
+            "v": "Under-tire base (pavement)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon5",
+      "balloon3",
+      "balloonpole"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 320
+  },
+  {
+    "slug": "lightpole1",
+    "category_slug": "balloons",
+    "sku": "11138",
+    "name": "Light Pole Balloon (Single)",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/lightpole1-1.jpg",
+      "https://rent-and-rally.vercel.app/img/lightpole1-2.jpg"
+    ],
+    "day_rate": 10,
+    "buy_price": 39.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/duraballoonr-single-balloon-light-pole-kit.html",
+    "badge": "",
+    "description": [
+      "One balloon mounted high on your light pole. We install it with band clamps, no drilling.",
+      "The kit is rented. The reusable 18\" Dura balloon is bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds one 18\" balloon",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Installed on your light pole by us",
+      "Balloon yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "1 bracket, 1 pole, 2 band clamps"
+      },
+      {
+        "label": "Balloons",
+        "value": "1 × 18\" Dura balloon"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$14.95 each, printed $19.95"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "Red 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Dark Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Light Blue 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Yellow 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Orange 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Green 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Lime Green 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "White 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Silver 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Gold 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Bronze 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Burgundy 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Pink 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Purple 18\" balloon (+$14.95 one-time)"
+          },
+          {
+            "v": "Printed SALE balloon, red/white/blue/yellow (+$19.95 one-time)"
+          },
+          {
+            "v": "Smiley face balloon (+$19.95 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon5",
+      "balloon3",
+      "balloonpole"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 330
+  },
+  {
+    "slug": "lightpole4",
+    "category_slug": "balloons",
+    "sku": "11136",
+    "name": "Light Pole Balloon Kit (4 Balloons)",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/lightpole4-1.jpg"
+    ],
+    "day_rate": 25,
+    "buy_price": 129.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/duraballoonr-4-balloon-light-pole-kit.html",
+    "badge": "",
+    "description": [
+      "Four balloons around the top of your light pole, seen from every direction. We install it with band clamps, no drilling.",
+      "The kit is rented. The 4 reusable 18\" Dura balloons are bought with your rental and yours to keep."
+    ],
+    "features": [
+      "Holds 4 18\" balloons",
+      "Reusable, weather-resistant Dura balloons",
+      "UV-enhanced to resist fading",
+      "Installed on your light pole by us",
+      "Balloons yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Kit",
+        "value": "4 brackets, 4 poles, 2 band clamps"
+      },
+      {
+        "label": "Balloons",
+        "value": "4 × 18\" Dura balloons"
+      },
+      {
+        "label": "Balloon price",
+        "value": "$14.95 each, printed $19.95"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Balloons",
+        "values": [
+          {
+            "v": "4 × Red 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Blue 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Dark Blue 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Light Blue 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Yellow 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Orange 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Green 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Lime Green 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × White 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Silver 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Gold 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Bronze 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Burgundy 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Pink 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Purple 18\" balloons (+$59.80 one-time)"
+          },
+          {
+            "v": "4 × Printed SALE balloons, red/white/blue/yellow (+$79.80 one-time)"
+          },
+          {
+            "v": "4 × Smiley face balloons (+$79.80 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "balloon5",
+      "balloon3",
+      "balloonpole"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 340
+  },
+  {
+    "slug": "cones",
+    "category_slug": "lot-event",
+    "sku": "287531",
+    "name": "28\" Traffic Safety Cones",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/cones-1.jpg"
+    ],
+    "day_rate": 3,
+    "buy_price": 29.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/28-traffic-safety-cone.html",
+    "badge": "",
+    "description": [
+      "Bright orange 28\" traffic cones for parking, test-drive lanes, event entrances and closing off areas of your lot."
+    ],
+    "features": [
+      "28\" tall",
+      "High-visibility orange",
+      "Stackable for delivery",
+      "Priced per cone"
+    ],
+    "specs": [
+      {
+        "label": "Height",
+        "value": "28\""
+      },
+      {
+        "label": "Colour",
+        "value": "Orange"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      }
+    ],
+    "options": [],
+    "related": [
+      "delineator",
+      "bollard",
+      "beltbarrier"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 350
+  },
+  {
+    "slug": "delineator",
+    "category_slug": "lot-event",
+    "sku": "287533-287538",
+    "name": "45\" Traffic Delineator Posts",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/delineator-1.jpg",
+      "https://rent-and-rally.vercel.app/img/delineator-2.jpg",
+      "https://rent-and-rally.vercel.app/img/delineator-3.jpg"
+    ],
+    "day_rate": 8,
+    "buy_price": 149.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/45-black-yellow-traffic-delineator-posts.html",
+    "badge": "",
+    "description": [
+      "Tall 45\" delineator posts. Mark out lanes, parking rows and event routes so they are easy to see."
+    ],
+    "features": [
+      "45\" tall",
+      "High-visibility colours",
+      "Priced per post"
+    ],
+    "specs": [
+      {
+        "label": "Height",
+        "value": "45\""
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
+      },
+      {
+        "label": "Colours",
+        "value": "Black & yellow, orange, green, white"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Black & yellow",
+            "img": 1
+          },
+          {
+            "v": "Orange",
+            "img": 2
+          },
+          {
+            "v": "Green",
+            "img": 2
+          },
+          {
+            "v": "White",
+            "img": 3
+          }
+        ]
+      }
+    ],
+    "related": [
+      "cones",
+      "bollard",
+      "beltbarrier"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 360
+  },
+  {
+    "slug": "bollard",
+    "category_slug": "lot-event",
+    "sku": "287855-287857",
+    "name": "BollardGard Anywhere Portable Bollard",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/bollard-1.jpg",
+      "https://rent-and-rally.vercel.app/img/bollard-2.jpg"
+    ],
+    "day_rate": 15,
+    "buy_price": 239.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/287855-287857-bollardgard-anywhere.html",
+    "badge": "",
+    "description": [
+      "A free-standing bollard on a heavy 25 lb rubber base. Set it down anywhere to block a lane, protect a display or mark a valet or work zone. No bolting needed."
+    ],
+    "features": [
+      "25 lb molded rubber base",
+      "Stands on its own",
+      "Quick to place and move",
+      "Priced per bollard"
+    ],
+    "specs": [
+      {
+        "label": "Base",
+        "value": "25 lb molded rubber"
+      },
+      {
+        "label": "Sizes",
+        "value": "4\" or 7\" cover"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Size",
+        "values": [
+          {
+            "v": "4\" bollard"
+          },
+          {
+            "v": "7\" bollard (+$3/day)"
+          }
+        ]
+      },
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Federal yellow"
+          },
+          {
+            "v": "Orange"
+          },
+          {
+            "v": "Black"
+          },
+          {
+            "v": "Red"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "cones",
+      "delineator",
+      "beltbarrier"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 370
+  },
+  {
+    "slug": "beltbarrier",
+    "category_slug": "lot-event",
+    "sku": "107811-107813",
+    "name": "Belt Barrier Stanchions",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/beltbarrier-1.jpg",
+      "https://rent-and-rally.vercel.app/img/beltbarrier-2.jpg",
+      "https://rent-and-rally.vercel.app/img/beltbarrier-3.jpg"
+    ],
+    "day_rate": 12,
+    "buy_price": 84.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/indoor-showroom-displays/showroom-equipment-accessories/belt-barriers.html",
+    "badge": "",
+    "description": [
+      "Retractable belt stanchions for lines, VIP areas, showroom displays and crowd control. Each stand has a 78\" belt that hooks onto the next one."
+    ],
+    "features": [
+      "35.5\" tall",
+      "78\" retractable belt",
+      "Weighted round base",
+      "Rent 2 or more to make a line",
+      "Priced per stand"
+    ],
+    "specs": [
+      {
+        "label": "Height",
+        "value": "35.5\""
+      },
+      {
+        "label": "Belt length",
+        "value": "78\""
+      },
+      {
+        "label": "Base",
+        "value": "14\" to 15.5\" diameter"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Finish",
+        "values": [
+          {
+            "v": "Stainless steel",
+            "img": 1
+          },
+          {
+            "v": "Black satin",
+            "img": 2
+          },
+          {
+            "v": "Shiny black",
+            "img": 3
+          }
+        ]
+      }
+    ],
+    "related": [
+      "raffle",
+      "retractable",
+      "cones"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 380
+  },
+  {
+    "slug": "raffle",
+    "category_slug": "lot-event",
+    "sku": "114010-114011",
+    "name": "Brass Raffle Drum",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/raffle-1.jpg"
+    ],
+    "day_rate": 20,
+    "buy_price": 179.95,
+    "buy_note": "",
+    "buy_url": "https://wheelsauto.com/ca-en/114010-114011-brass-plated-raffle-drums.html",
+    "badge": "",
+    "description": [
+      "A classic brass-plated raffle drum with a turning handle. Perfect for draws at grand openings, sales events, fundraisers and parties."
+    ],
+    "features": [
+      "Brass-plated finish",
+      "Turning handle",
+      "Two sizes",
+      "Tickets not included"
+    ],
+    "specs": [
+      {
+        "label": "Small",
+        "value": "8\" x 11.5\" x 11\" deep"
+      },
+      {
+        "label": "Large",
+        "value": "18\" x 21\" x 15\" deep"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Size",
+        "values": [
+          {
+            "v": "Small (8\" x 11.5\")"
+          },
+          {
+            "v": "Large (18\" x 21\", +$10/day)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "beltbarrier",
+      "balloon5",
+      "tent10"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 390
   }
 ];
 
