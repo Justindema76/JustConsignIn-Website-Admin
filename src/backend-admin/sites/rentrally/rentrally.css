@@ -1,0 +1,90 @@
+/* Rent & Rally admin screens. Builds on backend.css (site-admin-*). */
+.rr-section{padding:18px;margin-top:14px}
+.site-admin-editor-grid>div>.site-admin-card+.site-admin-card{margin-top:14px}
+.rr-photos-head{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+.rr-photos-head strong{font-size:14px}
+.rr-photos-head small,.rr-hint{color:#7b8085;font-size:12px;font-weight:500;line-height:1.45}
+.rr-hint{display:block;margin-top:8px}
+.rr-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.rr-photo{position:relative;aspect-ratio:1/1;border:1px solid #dfe3e8;border-radius:10px;overflow:hidden;background:#fff}
+.rr-photo img{width:100%;height:100%;object-fit:contain;padding:6px}
+.rr-photo-n{position:absolute;top:6px;left:6px;background:#202223;color:#fff;font-size:10px;font-weight:900;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;padding:0 5px}
+.rr-photo-tools{position:absolute;right:4px;bottom:4px;display:flex;gap:3px}
+.rr-photo-tools button{width:26px;height:26px;border:1px solid #dfe3e8;border-radius:7px;background:#fff;display:grid;place-items:center;cursor:pointer;color:#50565c}
+.rr-photo-tools button:hover:not(:disabled){border-color:#1f67b2;color:#1f67b2}
+.rr-photo-tools button:disabled{opacity:.35;cursor:default}
+.rr-photo-add{border:2px dashed #ccd6e0;background:#fafcfe;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#164f88;font-size:12px;font-weight:800;cursor:pointer}
+.rr-inline{display:flex;gap:8px;margin-top:10px}
+.rr-inline input,.rr-row input,.rr-row select,.rr-side-input{flex:1;min-width:0;border:1px solid #d7dce1;border-radius:8px;background:#fff;padding:9px 11px;font:inherit;font-size:13px}
+.rr-side-input{width:100%}
+.rr-rows,.rr-options{display:grid;gap:8px;justify-items:start}
+.rr-row{display:flex;gap:8px;width:100%;align-items:center}
+.rr-option{width:100%;display:grid;gap:8px;justify-items:start;padding:12px;border:1px solid #edf0f2;border-radius:10px;background:#fafbfc}
+.rr-choice{padding-left:18px}
+.rr-choice select{flex:0 0 170px}
+.rr-icon-btn{flex:0 0 34px;height:34px;border:1px solid #efc6c2;border-radius:8px;background:#fff;color:#b42318;display:grid;place-items:center;cursor:pointer}
+.rr-thumb img{object-fit:contain!important;background:#fff}
+.rr-switch{margin:12px 0}
+.rr-checklist{display:grid;gap:7px;max-height:260px;overflow:auto;padding-right:4px}
+.rr-checklist label{font-weight:600!important;color:#202223!important}
+.rr-item-row .rr-item-thumb{flex:0 0 40px;height:40px;border:1px solid #edf0f2;border-radius:8px;overflow:hidden;background:#fff}
+.rr-item-row .rr-item-thumb img{width:100%;height:100%;object-fit:contain}
+.rr-qty{flex:0 0 70px!important;text-align:center}
+.rr-line{flex:0 0 90px;text-align:right;font-weight:800;font-size:13px}
+.rr-savings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.rr-savings div{border:1px solid #edf0f2;border-radius:10px;padding:10px 12px;background:#fafbfc}
+.rr-savings span{display:block;color:#7b8085;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.rr-savings b{font-size:17px}
+.rr-savings .good{background:#edf8f1;border-color:#b9dfc8}.rr-savings .good b{color:#17643a}
+.rr-savings .bad{background:#fff2f1;border-color:#efc6c2}.rr-savings .bad b{color:#9f2119}
+.rr-cat-list{display:grid;gap:12px}
+.rr-cat{display:grid;grid-template-columns:200px minmax(0,1fr);gap:4px;padding:16px;align-items:start}
+.rr-cat .rr-photo-grid{grid-template-columns:1fr 1fr}
+.rr-cat-form{padding:0 0 0 12px}
+.rr-cat-form .site-admin-actions small{color:#7b8085}
+.rr-settings-group{padding:18px 0 0}
+.rr-settings-group h2{font-size:16px;margin:0 18px}
+
+/* quotes */
+.rr-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rr-chips button{border:1px solid #dfe3e8;background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;font-weight:800;color:#50565c;cursor:pointer}
+.rr-chips button span{display:inline-block;min-width:18px;margin-left:4px;padding:1px 6px;border-radius:999px;background:#eef1f4;font-size:11px}
+.rr-chips button.on{background:#1f67b2;border-color:#1f67b2;color:#fff}
+.rr-chips button.on span{background:rgba(255,255,255,.25)}
+.rr-quotes{display:grid;gap:10px}
+.rr-quote{overflow:hidden}
+.rr-quote.open{border-color:#1f67b2}
+.rr-quote-head{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 110px;gap:14px;align-items:center;padding:14px 16px;border:0;background:transparent;text-align:left;font:inherit;cursor:pointer}
+.rr-quote-head strong{display:block;font-size:14px}
+.rr-quote-head strong span{font-weight:600;color:#50565c}
+.rr-quote-head small{display:block;color:#6d7175;font-size:12px;margin-top:3px}
+.rr-quote-right{text-align:right}
+.rr-quote-right b{display:block;font-size:15px}
+.rr-status{justify-self:end;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;background:#eef1f4;color:#50565c;white-space:nowrap}
+.rr-status.s-new{background:#fde8e8;color:#b42318}
+.rr-status.s-contacted{background:#fff4d6;color:#8b6500}
+.rr-status.s-quoted{background:#eaf2fb;color:#164f88}
+.rr-status.s-booked,.rr-status.s-completed{background:#eaf7ef;color:#177245}
+.rr-quote-body{border-top:1px solid #edf0f2;padding:14px 16px 4px;display:grid;gap:12px}
+.rr-contact{display:flex;gap:8px;flex-wrap:wrap}
+.rr-lines{border:1px solid #edf0f2;border-radius:10px;overflow:hidden}
+.rr-line-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid #edf0f2}
+.rr-line-row img,.rr-noimg{width:48px;height:48px;border-radius:8px;border:1px solid #edf0f2;object-fit:contain;background:#fff;display:block}
+.rr-line-row strong{display:block;font-size:13px}
+.rr-line-row small{display:block;color:#6d7175;font-size:12px;margin-top:2px}
+.rr-line-row .rr-note{font-style:italic}
+.rr-line-row>span{text-align:right;font-weight:800;font-size:13px}
+.rr-line-total{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;background:#fafbfc;font-size:13px}
+.rr-quote-form{padding:0 0 12px}
+
+@media(max-width:760px){
+  .rr-cat{grid-template-columns:1fr}
+  .rr-cat-form{padding:0}
+  .rr-savings{grid-template-columns:1fr}
+  .rr-choice{padding-left:0;flex-wrap:wrap}
+  .rr-choice select{flex:1 1 100%}
+  .rr-item-row{flex-wrap:wrap}
+  .rr-quote-head{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}
+  .rr-status{grid-column:1/-1;justify-self:start}
+  .rr-inline input,.rr-row input,.rr-row select,.rr-side-input{font-size:16px;min-height:42px}
+}

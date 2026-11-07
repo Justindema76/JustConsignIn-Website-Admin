@@ -140,7 +140,7 @@ function OwnerDashboard() {
 
     <NewRequestsAlert leads={data?.leads}/>
     <PartnerUpdatesAlert leads={data?.leads}/>
-    {siteKey === 'sunwings' && <LeadsPanel leads={data?.leads}/>}
+    {['sunwings', 'rentrally'].includes(siteKey) && <LeadsPanel leads={data?.leads}/>}
 
     <BoardStatus metrics={metrics}/>
 
@@ -182,6 +182,6 @@ function OwnerDashboard() {
       })}
     </div>
 
-    {siteKey !== 'sunwings' && <LeadsPanel leads={data?.leads}/>}
+    {!['sunwings', 'rentrally'].includes(siteKey) && <LeadsPanel leads={data?.leads}/>}
   </>;
 }

@@ -5,6 +5,7 @@ import { loadServiceRequests } from '../service-requests/serviceRequests.service
 import { loadAdminWorkPosts } from '../work-posts/workPostStore';
 import { loadSunwingsQuotes } from '../../sites/sunwings/sunwingsAdminService';
 import { loadLocationPosts, loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
+import { money as rrMoney, packagesApi as rrPackages, productsApi as rrProducts, quotesApi as rrQuotes } from '../../sites/rentrally/rentrallyAdminService';
 
 const REQUEST_TYPE_LABEL = { quote: 'Full Quote', quick_quote: 'Quick Quote', contact: 'Contact' };
 
@@ -123,8 +124,40 @@ async function loadJustindematteisDashboard(accessToken) {
   };
 }
 
+async function loadRentrallyDashboard() {
+  const [quotes, products, packages] = await Promise.all([rrQuotes.list(), rrProducts.list(), rrPackages.list()]);
+  const fresh = quotes.filter(item => item.status === 'new');
+  const open = quotes.filter(item => ['new', 'contacted', 'quoted', 'booked'].includes(item.status));
+  const booked = quotes.filter(item => ['booked', 'completed'].includes(item.status));
+  const LABELS = { new: 'New', contacted: 'Contacted', quoted: 'Quote sent', booked: 'Booked', completed: 'Completed', declined: 'Declined', cancelled: 'Cancelled' };
+  return {
+    metrics: [
+      { label: 'New Quotes', value: fresh.length, note: fresh.length ? 'Waiting for a reply' : 'All caught up' },
+      { label: 'Open Quotes', value: open.length, note: `${rrMoney(open.reduce((s, q) => s + Number(q.quote_amount ?? q.estimated_total ?? 0), 0))} in play` },
+      { label: 'Booked', value: booked.length, note: `${rrMoney(booked.reduce((s, q) => s + Number(q.quote_amount ?? q.estimated_total ?? 0), 0))} total` },
+      { label: 'Rentals', value: products.length, note: `${products.filter(p => p.status === 'published').length} live · ${packages.length} packages` },
+    ],
+    leads: {
+      title: 'Leads',
+      copy: 'Quote requests from the Rent & Rally website.',
+      viewAllTo: '/admin/rentrally/quotes',
+      attentionCount: fresh.length,
+      items: [...fresh, ...quotes.filter(item => item.status !== 'new')].slice(0, 6).map(item => ({
+        isNew: item.status === 'new',
+        id: item.id,
+        title: item.name || 'Unknown',
+        meta: `${(item.lines || []).length} item${(item.lines || []).length === 1 ? '' : 's'} · ${rrMoney(item.quote_amount ?? item.estimated_total)}${item.area ? ' · ' + item.area : ''}`,
+        chip: 'Quote',
+        status: LABELS[item.status] || item.status,
+        time: timeAgo(item.created_at),
+      })),
+    },
+  };
+}
+
 export async function loadDashboardData(siteKey, accessToken) {
   if (siteKey === 'sunwings') return loadSunwingsDashboard(accessToken);
+  if (siteKey === 'rentrally') return loadRentrallyDashboard(accessToken);
   if (siteKey === 'justconsignin') return loadJustconsigninDashboard(accessToken);
   if (siteKey === 'justindematteis') return loadJustindematteisDashboard(accessToken);
   return { metrics: [], leads: null };

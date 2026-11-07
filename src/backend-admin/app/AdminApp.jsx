@@ -35,12 +35,18 @@ import CommissionAdmin from '../sites/sunwings/CommissionAdmin';
 import PartnerJobsAdmin from '../sites/sunwings/PartnerJobsAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
 import TeamAdmin from '../sites/sunwings/TeamAdmin';
+import RentalsAdmin from '../sites/rentrally/RentalsAdmin';
+import RentrallyPackagesAdmin from '../sites/rentrally/PackagesAdmin';
+import RentrallyCategoriesAdmin from '../sites/rentrally/CategoriesAdmin';
+import RentrallyQuotesAdmin from '../sites/rentrally/QuoteRequestsAdmin';
+import RentrallySettingsAdmin from '../sites/rentrally/SettingsAdmin';
 import { getAdminSiteKey } from '../services/siteAdminService';
 
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
 const SUNWINGS = ['sunwings'];
+const RENTRALLY = ['rentrally'];
 const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings'];
 
 const only = (sites, element) => <SiteOnly sites={sites}>{element}</SiteOnly>;
@@ -119,6 +125,14 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/jobs" element={only(SUNWINGS, <PartnerJobsAdmin />)} />
         <Route path="/admin/sunwings/integrations" element={only(SUNWINGS, <IntegrationsAdmin />)} />
         <Route path="/admin/sunwings/team" element={only(SUNWINGS, <TeamAdmin />)} />
+
+        <Route path="/admin/rentrally/rentals" element={only(RENTRALLY, <RentalsAdmin />)} />
+        <Route path="/admin/rentrally/rentals/:id" element={only(RENTRALLY, <RentalsAdmin />)} />
+        <Route path="/admin/rentrally/packages" element={only(RENTRALLY, <RentrallyPackagesAdmin />)} />
+        <Route path="/admin/rentrally/packages/:id" element={only(RENTRALLY, <RentrallyPackagesAdmin />)} />
+        <Route path="/admin/rentrally/categories" element={only(RENTRALLY, <RentrallyCategoriesAdmin />)} />
+        <Route path="/admin/rentrally/quotes" element={only(RENTRALLY, <RentrallyQuotesAdmin />)} />
+        <Route path="/admin/rentrally/settings" element={only(RENTRALLY, <RentrallySettingsAdmin />)} />
       </Route>
     </Route>
     <Route path="*" element={<Navigate to="/admin" replace />} />
