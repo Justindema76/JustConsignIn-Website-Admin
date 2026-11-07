@@ -412,23 +412,28 @@ export const STARTER_PRODUCTS = [
     ],
     "options": [
       {
-        "label": "Print",
-        "style": "cards",
+        "label": "Choose your dancer",
+        "style": "tiles",
         "values": [
           {
-            "v": "Used Cars"
+            "v": "Used Cars",
+            "img": 2
           },
           {
-            "v": "Auto Sale"
+            "v": "Auto Sale",
+            "img": 3
           },
           {
-            "v": "Trucks"
+            "v": "Trucks",
+            "img": 4
           },
           {
-            "v": "New Cars"
+            "v": "New Cars",
+            "img": 5
           },
           {
-            "v": "No print (SALE arrow only)"
+            "v": "No Print (SALE arrow only)",
+            "img": 6
           }
         ]
       },
