@@ -8,6 +8,13 @@ import { STARTER_CATEGORIES, STARTER_PACKAGES, STARTER_PRODUCTS } from './_lib/s
 // editing in the admin, never overwrites your changes.
 async function insertMissing(token, table, rows) {
   const now = new Date().toISOString();
+  // A rental whose web address was renamed in the admin is still the same rental: match it by SKU.
+  if (table === TABLES.products) {
+    const have = await parseSupabase(await supabaseUserRest(token, `${table}?site_key=eq.${SITE_KEY}&select=slug,sku`), `Unable to read ${table}.`);
+    const slugs = new Set((have || []).map(r => r.slug));
+    const skus = new Set((have || []).map(r => r.sku).filter(Boolean));
+    rows = rows.filter(row => slugs.has(row.slug) || !row.sku || !skus.has(row.sku));
+  }
   const payload = rows.map(row => ({
     ...row,
     site_key: SITE_KEY,
@@ -78,24 +85,23 @@ async function refreshContent(token) {
   for (const slug of REFRESH_FROM_STARTER) {
     const row = STARTER_PRODUCTS.find(p => p.slug === slug);
     if (!row) continue;
-    // Find the rental by its web address, or by SKU if the address was changed in the admin.
+    // Update the rental found by its web address or by SKU (the address may have been changed in the admin).
     const base = `${TABLES.products}?site_key=eq.${SITE_KEY}`;
-    const lookup = async filter => {
-      const rows = await parseSupabase(await supabaseUserRest(token, `${base}&${filter}&select=slug,images,options`), `Unable to read ${slug}.`);
-      return Array.isArray(rows) ? rows[0] : null;
-    };
-    const existing = (await lookup(`slug=eq.${encodeURIComponent(slug)}`)) || (row.sku ? await lookup(`sku=eq.${encodeURIComponent(row.sku)}`) : null);
-    if (!existing) continue;
-    const where = `${base}&slug=eq.${encodeURIComponent(existing.slug)}`;
-    const patch = { ...Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]])), ...keepAdminPhotos(row, existing) };
-    const updated = await parseSupabase(
-      await supabaseUserRest(token, `${where}&select=slug`, {
-        method: 'PATCH',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(patch),
-      }),
-      `Unable to refresh ${slug}.`,
-    );
+    const filter = row.sku ? `or=(slug.eq.${encodeURIComponent(slug)},sku.eq.${encodeURIComponent(row.sku)})` : `slug=eq.${encodeURIComponent(slug)}`;
+    const found = await parseSupabase(await supabaseUserRest(token, `${base}&${filter}&select=slug,images,options`), `Unable to read ${slug}.`);
+    let updated = [];
+    for (const existing of Array.isArray(found) ? found : []) {
+      const patch = { ...Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]])), ...keepAdminPhotos(row, existing) };
+      const done = await parseSupabase(
+        await supabaseUserRest(token, `${base}&slug=eq.${encodeURIComponent(existing.slug)}&select=slug`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(patch),
+        }),
+        `Unable to refresh ${existing.slug}.`,
+      );
+      if (Array.isArray(done)) updated = updated.concat(done);
+    }
     refreshed += Array.isArray(updated) ? updated.length : 0;
   }
   return refreshed;
