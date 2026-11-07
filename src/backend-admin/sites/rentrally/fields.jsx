@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, GripVertical, ImagePlus, Plus, Star, Trash2, X } from 'lucide-react';
 import { uploadSiteImage } from '../../services/siteAdminService';
 
 // Ordered list of photo URLs. First photo = main photo on the site.
@@ -26,13 +26,29 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
     }
   };
 
-  const move = (i, d) => {
+  // Drag a photo onto another spot to reorder. Click a photo to see it big.
+  const [drag, setDrag] = useState(null);
+  const [over, setOver] = useState(null);
+  const [view, setView] = useState(null);
+  const moveTo = (from, to) => {
+    if (from === to || from == null || to == null) return;
     const next = [...list];
-    const j = i + d;
-    if (j < 0 || j >= next.length) return;
-    [next[i], next[j]] = [next[j], next[i]];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
     commit(next);
   };
+  const remove = i => commit(list.filter((_, j) => j !== i));
+
+  useEffect(() => {
+    if (view == null) return undefined;
+    const key = e => {
+      if (e.key === 'Escape') setView(null);
+      if (e.key === 'ArrowRight') setView(v => Math.min(list.length - 1, v + 1));
+      if (e.key === 'ArrowLeft') setView(v => Math.max(0, v - 1));
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [view, list.length]);
 
   const addUrl = () => {
     const clean = url.trim();
@@ -48,13 +64,21 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     <div className="rr-photo-grid">
-      {list.map((src, i) => <div className="rr-photo" key={`${src}-${i}`}>
-        <img src={src} alt="" loading="lazy"/>
-        <span className="rr-photo-n">{i + 1}</span>
+      {list.map((src, i) => <div
+        className={`rr-photo${drag === i ? ' is-dragging' : ''}${over === i && drag !== i ? ' is-over' : ''}`}
+        key={`${src}-${i}`}
+        draggable={!single}
+        onDragStart={e => { setDrag(i); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); }}
+        onDragOver={e => { if (drag == null) return; e.preventDefault(); if (over !== i) setOver(i); }}
+        onDragLeave={() => setOver(o => (o === i ? null : o))}
+        onDrop={e => { e.preventDefault(); moveTo(drag, i); setDrag(null); setOver(null); }}
+        onDragEnd={() => { setDrag(null); setOver(null); }}
+      >
+        <button type="button" className="rr-photo-open" onClick={() => setView(i)} aria-label={`View photo ${i + 1}`}><img src={src} alt="" loading="lazy" draggable={false}/></button>
+        <span className="rr-photo-n">{i + 1}{i === 0 && !single ? ' · Main' : ''}</span>
+        {!single && <span className="rr-photo-grip" aria-hidden="true"><GripVertical size={14}/></span>}
         <div className="rr-photo-tools">
-          {!single && <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move earlier"><ArrowUp size={13}/></button>}
-          {!single && <button type="button" onClick={() => move(i, 1)} disabled={i === list.length - 1} aria-label="Move later"><ArrowDown size={13}/></button>}
-          <button type="button" onClick={() => commit(list.filter((_, j) => j !== i))} aria-label="Remove photo"><Trash2 size={13}/></button>
+          <button type="button" onClick={() => remove(i)} aria-label="Remove photo"><Trash2 size={13}/></button>
         </div>
       </div>)}
       <label className="rr-photo rr-photo-add upload-button">
@@ -63,6 +87,24 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
         <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple={!single} onChange={upload} disabled={busy}/>
       </label>
     </div>
+    {!single && list.length > 1 && <small className="rr-hint">Drag photos to reorder. Click one to see it full size.</small>}
+    {view != null && list[view] && <div className="rr-lightbox" role="dialog" aria-modal="true" aria-label={`Photo ${view + 1} of ${list.length}`} onClick={() => setView(null)}>
+      <div className="rr-lightbox-box" onClick={e => e.stopPropagation()}>
+        <div className="rr-lightbox-head">
+          <strong>Photo {view + 1} of {list.length}{view === 0 && !single ? ' (main photo)' : ''}</strong>
+          <button type="button" className="rr-icon-btn" onClick={() => setView(null)} aria-label="Close"><X size={16}/></button>
+        </div>
+        <div className="rr-lightbox-img">
+          <img src={list[view]} alt=""/>
+          {view > 0 && <button type="button" className="rr-lb-nav prev" onClick={() => setView(view - 1)} aria-label="Previous photo"><ChevronLeft size={22}/></button>}
+          {view < list.length - 1 && <button type="button" className="rr-lb-nav next" onClick={() => setView(view + 1)} aria-label="Next photo"><ChevronRight size={22}/></button>}
+        </div>
+        <div className="rr-lightbox-foot">
+          {!single && view > 0 && <button type="button" className="site-admin-btn secondary small" onClick={() => { moveTo(view, 0); setView(0); }}><Star size={13}/> Make main photo</button>}
+          <button type="button" className="site-admin-btn secondary small" onClick={() => { remove(view); setView(null); }}><Trash2 size={13}/> Remove</button>
+        </div>
+      </div>
+    </div>}
     <div className="rr-inline">
       <input value={url} onChange={e => setUrl(e.target.value)} placeholder="…or paste a photo URL" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addUrl(); } }}/>
       <button className="site-admin-btn secondary small" type="button" onClick={addUrl}>Add URL</button>
@@ -85,7 +127,7 @@ export function PairRows({ value = [], onChange, labels = ['Label', 'Value'], ad
 
 // Options like Colour / Size. Each choice can switch the gallery to a photo number,
 // and "(+$50/day)" in a choice adds that amount to the day rate on the site.
-export function OptionRows({ value = [], onChange, photoCount = 0 }) {
+export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }) {
   const setOption = (i, patch) => onChange(value.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   const setChoice = (i, k, patch) => setOption(i, { values: value[i].values.map((v, j) => (j === k ? { ...v, ...patch } : v)) });
   return <div className="rr-options">
@@ -100,6 +142,7 @@ export function OptionRows({ value = [], onChange, photoCount = 0 }) {
           <option value="">No photo change</option>
           {Array.from({ length: photoCount }, (_, n) => <option key={n} value={n + 1}>Show photo {n + 1}</option>)}
         </select>
+        {choice.img && photos[choice.img - 1] ? <img className="rr-choice-thumb" src={photos[choice.img - 1]} alt={`Photo ${choice.img}`}/> : <span className="rr-choice-thumb"/>}
         <button type="button" className="rr-icon-btn" onClick={() => setOption(i, { values: option.values.filter((_, j) => j !== k) })} aria-label="Remove choice"><Trash2 size={14}/></button>
       </div>)}
       <button type="button" className="site-admin-btn secondary small" onClick={() => setOption(i, { values: [...option.values, { v: '' }] })}><Plus size={13}/> Add choice</button>

@@ -52,14 +52,37 @@ async function patchRows(token, table, slugs, starter, fields) {
   return refreshed;
 }
 
+// Photos edited in the admin are kept. Option choices then point at the same picture by URL,
+// or keep the photo number the admin already set for a choice with the same name.
+function keepAdminPhotos(row, existing) {
+  const mine = Array.isArray(existing?.images) ? existing.images : [];
+  if (!mine.length) return { images: row.images, options: row.options };
+  const setBefore = new Map();
+  (existing.options || []).forEach(o => (o.values || []).forEach(v => { if (v?.img) setBefore.set(`${o.label}|${v.v}`, v.img); }));
+  const options = (row.options || []).map(o => ({
+    ...o,
+    values: (o.values || []).map(v => {
+      const { img, ...rest } = v;
+      const byUrl = img ? mine.indexOf(row.images[img - 1]) + 1 : 0;
+      const kept = byUrl || setBefore.get(`${o.label}|${v.v}`);
+      return kept && kept <= mine.length ? { ...rest, img: kept } : rest;
+    }),
+  }));
+  return { images: mine, options };
+}
+
 async function refreshContent(token) {
   let refreshed = 0;
   for (const slug of REFRESH_FROM_STARTER) {
     const row = STARTER_PRODUCTS.find(p => p.slug === slug);
     if (!row) continue;
-    const patch = Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]]));
+    const where = `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}`;
+    const found = await parseSupabase(await supabaseUserRest(token, `${where}&select=images,options`), `Unable to read ${slug}.`);
+    const existing = Array.isArray(found) ? found[0] : null;
+    if (!existing) continue;
+    const patch = { ...Object.fromEntries(REFRESH_FIELDS.map(key => [key, row[key]])), ...keepAdminPhotos(row, existing) };
     const updated = await parseSupabase(
-      await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=slug`, {
+      await supabaseUserRest(token, `${where}&select=slug`, {
         method: 'PATCH',
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify(patch),

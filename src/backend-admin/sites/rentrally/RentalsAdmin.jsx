@@ -5,6 +5,17 @@ import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToLi
 import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify } from './rentrallyAdminService';
 import './rentrally.css';
 
+// When photos are reordered or removed, keep each option choice pointing at the same picture.
+const remapOptionPhotos = (options = [], before = [], after = []) => options.map(o => ({
+  ...o,
+  values: (o.values || []).map(v => {
+    if (!v.img) return v;
+    const n = after.indexOf(before[v.img - 1]) + 1;
+    return { ...v, img: n || undefined };
+  }),
+}));
+
+
 const BASE = '/admin/rentrally/rentals';
 
 const EMPTY = {
@@ -217,7 +228,7 @@ function RentalEditor({ id }) {
           <label>Badge <small>(optional, e.g. New)</small><input value={draft.badge} onChange={e => set('badge', e.target.value)}/></label>
         </div>
 
-        <div className="site-admin-card rr-section"><PhotoList value={draft.images} onChange={v => set('images', v)}/></div>
+        <div className="site-admin-card rr-section"><PhotoList value={draft.images} onChange={v => setDraft(d => ({ ...d, images: v, options: remapOptionPhotos(d.options, d.images, v) }))}/></div>
 
         <div className="site-admin-card site-admin-form">
           <label className="wide">Description <small>Leave a blank line between paragraphs.</small>
@@ -233,7 +244,7 @@ function RentalEditor({ id }) {
 
         <div className="site-admin-card rr-section">
           <div className="rr-photos-head"><strong>Options</strong><small>Choices the customer picks before adding to their quote.</small></div>
-          <OptionRows value={draft.options} onChange={v => set('options', v)} photoCount={draft.images.length}/>
+          <OptionRows value={draft.options} onChange={v => set('options', v)} photoCount={draft.images.length} photos={draft.images}/>
         </div>
 
         <div className="site-admin-card site-admin-form">
