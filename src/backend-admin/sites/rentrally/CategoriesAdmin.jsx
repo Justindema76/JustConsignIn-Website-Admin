@@ -4,7 +4,7 @@ import { PhotoList } from './fields';
 import { categoriesApi, productsApi, slugify } from './rentrallyAdminService';
 import './rentrally.css';
 
-const blank = () => ({ id: '', slug: '', name: '', blurb: '', image: '', status: 'published', sort_order: 0, _new: true });
+const blank = () => ({ id: '', slug: '', name: '', blurb: '', image: '', seo_title: '', seo_description: '', status: 'published', sort_order: 0, _new: true });
 
 export default function CategoriesAdmin() {
   const [rows, setRows] = useState([]);
@@ -62,6 +62,8 @@ export default function CategoriesAdmin() {
           <label>Name<input value={r.name} onChange={e => set(i, { name: e.target.value, ...(r._new ? { slug: slugify(e.target.value) } : {}) })}/></label>
           <label>Slug <small>used in the web address</small><input value={r.slug} onChange={e => set(i, { slug: slugify(e.target.value) })}/></label>
           <label className="wide">Blurb<input value={r.blurb} onChange={e => set(i, { blurb: e.target.value })}/></label>
+          <label className="wide">SEO title <small>blank = “{r.name || 'Category'} Rentals | Rent &amp; Rally”</small><input value={r.seo_title || ''} maxLength={120} onChange={e => set(i, { seo_title: e.target.value })}/></label>
+          <label className="wide">SEO description <small>blank = written from the blurb</small><textarea rows={2} value={r.seo_description || ''} maxLength={320} onChange={e => set(i, { seo_description: e.target.value })}/></label>
           <label>Sort order<input type="number" value={r.sort_order} onChange={e => set(i, { sort_order: e.target.value })}/></label>
           <label>Status<select value={r.status} onChange={e => set(i, { status: e.target.value })}><option value="published">Published</option><option value="draft">Hidden</option></select></label>
           <div className="wide site-admin-actions">

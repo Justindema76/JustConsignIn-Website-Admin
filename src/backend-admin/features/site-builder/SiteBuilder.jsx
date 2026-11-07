@@ -12,6 +12,7 @@ import {
   saveAdminSitePageDraft,
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
+import { RENTRALLY_BLOCK_NAMES, rentrallyBuilderCategories, rentrallyBuilderComponents } from '../../sites/rentrally/builderBlocks';
 import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePagesData';
 import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
@@ -39,6 +40,14 @@ function writeLocalDraft(siteKey, pageId, data) {
 
 function validatePublishData(page, data, siteKey) {
   const blocks = Array.isArray(data?.content) ? data.content : [];
+
+  if (siteKey === 'rentrally') {
+    const allowed = new Set(RENTRALLY_BLOCK_NAMES);
+    const unsupported = blocks.map(block => block?.type).filter(type => type && !allowed.has(type));
+    if (!blocks.length) throw new Error('This page needs at least one block before publishing.');
+    if (unsupported.length) throw new Error(`Rent & Rally publish blocked: remove unsupported blocks (${[...new Set(unsupported)].join(', ')}).`);
+    return;
+  }
 
   if (siteKey === 'sunwings') {
     const allowed = new Set([
@@ -116,6 +125,10 @@ export default function SiteBuilder() {
 
   const fallbackData = useMemo(() => getInitialPageBuilderData(page.id, siteKey), [page.id, siteKey]);
   const builderConfig = useMemo(() => {
+    // Rent & Rally only uses its own blocks: they render the real website markup and CSS.
+    if (siteKey === 'rentrally') {
+      return { ...siteBuilderConfig, categories: rentrallyBuilderCategories, components: rentrallyBuilderComponents };
+    }
     const standardBlocks = ['HeadingBlock', 'TextBlock', 'ImageBlock', 'ImageTextBlock', 'HeroBlock', 'CtaBlock', 'ProjectCardBlock', 'HiringContactBlock'];
     const justConsignInBlocks = [
       'HomeHeroBlock', 'HomeIntegrationBlock', 'HomeVideosBlock', 'HomeLinksBlock',

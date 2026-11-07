@@ -113,3 +113,22 @@ export function OptionRows({ value = [], onChange, photoCount = 0 }) {
 export const linesToList = text => String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
 // Paragraphs separated by a blank line (description).
 export const paragraphsToList = text => String(text || '').split(/\n\s*\n/).map(s => s.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
+
+const clip = (value, max) => (value.length > max ? `${value.slice(0, max - 2).trim()}…` : value);
+
+// Google search title and description. Blank = the website writes one from the item's details.
+export function SeoFields({ title = '', description = '', onChange, autoTitle = '', autoDescription = '', url = '' }) {
+  const shownTitle = title || autoTitle;
+  const shownDescription = description || autoDescription;
+  return <div className="site-admin-card site-admin-side-card rr-seo">
+    <h2>Google search</h2>
+    <p>Leave blank and the website writes these for you.</p>
+    <label>SEO title <small>{title.length}/60</small><input className="rr-side-input" value={title} maxLength={120} placeholder={autoTitle} onChange={e => onChange({ seo_title: e.target.value })}/></label>
+    <label>SEO description <small>{description.length}/155</small><textarea className="rr-side-input" rows={4} value={description} maxLength={320} placeholder={autoDescription} onChange={e => onChange({ seo_description: e.target.value })}/></label>
+    <div className="rr-serp" aria-label="Search result preview">
+      <small>{url}</small>
+      <b>{clip(shownTitle, 62)}</b>
+      <span>{clip(shownDescription, 158)}</span>
+    </div>
+  </div>;
+}

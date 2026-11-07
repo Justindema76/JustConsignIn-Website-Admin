@@ -21,6 +21,11 @@ export default {
       items: [{ to: '/admin/rentrally/quotes', label: 'Quote Requests', icon: 'inbox' }],
     },
     {
+      id: 'website',
+      label: 'Website',
+      items: [{ to: '/admin/website/pages', label: 'Pages', icon: 'panels', ownerOnly: true }],
+    },
+    {
       id: 'settings',
       label: 'Settings',
       items: [{ to: '/admin/rentrally/settings', label: 'Website Settings', icon: 'settings', ownerOnly: true }],
@@ -50,7 +55,8 @@ export default {
         copy: 'Quotes from the website and site-wide details.',
         items: [
           { to: '/admin/rentrally/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Every quote request, with status, quoted price and notes.' },
-          { to: '/admin/rentrally/settings', icon: 'settings', title: 'Website Settings', copy: 'Top bar message, homepage hero, phone, hours and service areas.', ownerOnly: true },
+          { to: '/admin/website/pages', icon: 'panels', title: 'Website Pages', copy: 'Drag-and-drop editor for the homepage and How It Works.', ownerOnly: true },
+          { to: '/admin/rentrally/settings', icon: 'settings', title: 'Website Settings', copy: 'Top bar message, phone, hours, service areas, Google search and social links.', ownerOnly: true },
         ],
       },
     ],

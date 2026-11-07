@@ -14,17 +14,17 @@ export const TABLES = Object.freeze({
   quotes: 'rentrally_quote_requests',
 });
 
-export const CATEGORY_FIELDS = 'site_key,id,slug,name,blurb,image,status,sort_order,created_at,updated_at';
+export const CATEGORY_FIELDS = 'site_key,id,slug,name,blurb,image,seo_title,seo_description,status,sort_order,created_at,updated_at';
 
 export const PRODUCT_FIELDS = [
   'site_key','id','slug','category_slug','sku','name','images','day_rate','buy_price','buy_note','buy_url',
-  'badge','description','features','specs','options','related','featured','status','sort_order',
+  'badge','description','features','specs','options','related','featured','seo_title','seo_description','status','sort_order',
   'published_at','created_at','updated_at',
 ].join(',');
 
 export const PACKAGE_FIELDS = [
   'site_key','id','slug','tag','name','hero_image','day_rate','items','description','good_for',
-  'status','sort_order','published_at','created_at','updated_at',
+  'seo_title','seo_description','status','sort_order','published_at','created_at','updated_at',
 ].join(',');
 
 export const QUOTE_FIELDS = [
@@ -80,6 +80,8 @@ export function cleanCategory(body = {}) {
     name: text(body.name, 200),
     blurb: text(body.blurb, 600),
     image: text(body.image, 2000),
+    seo_title: text(body.seoTitle ?? body.seo_title, 120),
+    seo_description: text(body.seoDescription ?? body.seo_description, 320),
     status: body.status === 'draft' ? 'draft' : 'published',
     sort_order: int(body.sortOrder ?? body.sort_order),
     updated_at: new Date().toISOString(),
@@ -128,6 +130,8 @@ export function cleanProduct(body = {}) {
     options: cleanOptions(body.options),
     related: textArray(body.related, 180).map(slugify),
     featured: Boolean(body.featured),
+    seo_title: text(body.seoTitle ?? body.seo_title, 120),
+    seo_description: text(body.seoDescription ?? body.seo_description, 320),
     sort_order: int(body.sortOrder ?? body.sort_order),
     published_at,
     ...rest,
@@ -148,6 +152,8 @@ export function cleanPackage(body = {}) {
     items,
     description: text(body.description, 4000),
     good_for: textArray(body.goodFor ?? body.good_for, 120),
+    seo_title: text(body.seoTitle ?? body.seo_title, 120),
+    seo_description: text(body.seoDescription ?? body.seo_description, 320),
     sort_order: int(body.sortOrder ?? body.sort_order),
     published_at,
     ...rest,

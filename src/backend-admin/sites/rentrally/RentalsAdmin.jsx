@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle2, Copy, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
-import { OptionRows, PairRows, PhotoList, linesToList, paragraphsToList } from './fields';
+import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToList } from './fields';
 import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify } from './rentrallyAdminService';
 import './rentrally.css';
 
@@ -10,6 +10,7 @@ const BASE = '/admin/rentrally/rentals';
 const EMPTY = {
   id: '', slug: '', name: '', sku: '', category_slug: '', images: [], day_rate: '', buy_price: '', buy_note: '', buy_url: '',
   badge: '', description: [], features: [], specs: [], options: [], related: [], featured: false, status: 'draft', sort_order: 0,
+  seo_title: '', seo_description: '',
 };
 
 // Editor keeps description/features as plain text; convert on load/save.
@@ -81,7 +82,7 @@ function RentalList() {
         <p>Everything customers can rent. Published items show on the website straight away.</p>
       </div>
       <div className="site-admin-actions">
-        <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/#/rentals/all`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
+        <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/rentals`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
         <Link className="site-admin-btn" to={`${BASE}/new`}><Plus size={15}/> New Rental</Link>
       </div>
     </div>
@@ -115,7 +116,7 @@ function RentalList() {
           <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
-            {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/#/item/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
+            {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/rental/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
             <button className="site-admin-btn danger small" type="button" onClick={() => remove(r)} aria-label={`Delete ${r.name}`}><Trash2 size={13}/></button>
           </div>
         </div>)}
@@ -251,9 +252,17 @@ function RentalEditor({ id }) {
         <div className="site-admin-card site-admin-side-card">
           <h2>Web address</h2>
           <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugify(e.target.value)); }}/></label>
-          <p className="site-admin-url">{RENTRALLY_SITE_URL}/#/item/{draft.slug || 'slug'}</p>
-          {!isNew && draft.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/#/item/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View live</a>}
+          <p className="site-admin-url">{RENTRALLY_SITE_URL}/rental/{draft.slug || 'slug'}</p>
+          {!isNew && draft.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/rental/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View live</a>}
         </div>
+        <SeoFields
+          title={draft.seo_title || ''}
+          description={draft.seo_description || ''}
+          onChange={patch => setDraft(d => ({ ...d, ...patch }))}
+          autoTitle={`${draft.name || 'Rental name'} Rental | Rent & Rally`}
+          autoDescription={`Rent the ${draft.name || 'item'} from ${money(draft.day_rate || 0)}/day in Hamilton, Niagara and the GTA. ${(draft.descriptionText || '').split('\n')[0].slice(0, 110)}`}
+          url={`rent-and-rally.vercel.app › rental › ${draft.slug || 'slug'}`}
+        />
         <div className="site-admin-card site-admin-side-card">
           <h2>Related rentals</h2>
           <p>Shown under “Related Rentals” on this item.</p>

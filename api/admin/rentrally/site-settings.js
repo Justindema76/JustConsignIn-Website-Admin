@@ -19,6 +19,14 @@ export const ALLOWED_KEYS = new Set([
   'service_areas',
   'footer_note',
   'supplier_url',
+  // SEO and social (Next.js website)
+  'seo_title',
+  'seo_description',
+  'seo_image',
+  'google_site_verification',
+  'facebook_url',
+  'instagram_url',
+  'tiktok_url',
 ]);
 
 export default async function handler(req, res) {

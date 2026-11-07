@@ -47,7 +47,7 @@ const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
 const SUNWINGS = ['sunwings'];
 const RENTRALLY = ['rentrally'];
-const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings'];
+const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings', 'rentrally'];
 
 const only = (sites, element) => <SiteOnly sites={sites}>{element}</SiteOnly>;
 

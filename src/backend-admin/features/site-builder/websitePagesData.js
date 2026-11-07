@@ -1,3 +1,5 @@
+import { DEFAULT_PAGES as RENTRALLY_DEFAULT_PAGES } from '../../sites/rentrally/rrBlocks';
+
 export const JUSTCONSIGNIN_PAGES = [
   {
     id: 'home',
@@ -281,11 +283,55 @@ export const SUNWINGS_PAGES = [
   },
 ];
 
+// Rent & Rally (Next.js site in the rent-and-rally repo). Rentals, packages and categories
+// have their own editors; these are the free-form pages built from Rent & Rally blocks.
+export const RENTRALLY_PAGES = [
+  {
+    id: 'home',
+    title: 'Home',
+    path: '/',
+    source: 'shared page builder + Rent & Rally catalogue',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'Homepage: hero, selling points, category tiles, packages, popular rentals, steps and rent-or-buy.',
+  },
+  {
+    id: 'how-it-works',
+    title: 'How It Works',
+    path: '/how-it-works',
+    source: 'shared page builder',
+    kind: 'marketing',
+    editor: 'visual',
+    description: 'How renting works, plus the FAQ (also shown to Google as FAQ results).',
+  },
+  {
+    id: 'rentals',
+    title: 'Rentals, Packages & Categories',
+    path: '/rentals',
+    source: 'Rent & Rally catalogue',
+    kind: 'structured',
+    editor: 'custom',
+    editorTarget: '/admin/rentrally/rentals',
+    description: 'Every rental, package and category page is built from the catalogue. Edit them under Catalogue.',
+  },
+  {
+    id: 'quote',
+    title: 'Quote',
+    path: '/quote',
+    source: 'quote form',
+    kind: 'form',
+    editor: 'custom',
+    editorTarget: '/admin/rentrally/quotes',
+    description: 'The quote cart and request form. Requests arrive in Leads › Quote Requests.',
+  },
+];
+
 export const WEBSITE_PAGES = JUSTCONSIGNIN_PAGES;
 
 export function getWebsitePages(siteKey = 'justconsignin') {
   if (siteKey === 'justindematteis') return JUSTINDEMATTEIS_PAGES;
   if (siteKey === 'sunwings') return SUNWINGS_PAGES;
+  if (siteKey === 'rentrally') return RENTRALLY_PAGES;
   return JUSTCONSIGNIN_PAGES;
 }
 
@@ -294,6 +340,7 @@ export function getWebsitePage(id, siteKey = 'justconsignin') {
 }
 
 export function livePageUrl(path, siteKey = 'justconsignin') {
+  if (siteKey === 'rentrally') return `https://rent-and-rally.vercel.app${path === '/' ? '' : path}`;
   const domain = siteKey === 'justindematteis'
     ? 'justindematteis.com'
     : siteKey === 'sunwings'
@@ -1103,6 +1150,8 @@ const SUNWINGS_PAGE_EDITOR_DATA = {
 };
 
 export function getInitialPageBuilderData(id, siteKey = 'justconsignin') {
+  // Rent & Rally's starting content is the website's own built-in layout.
+  if (siteKey === 'rentrally') return structuredClone(RENTRALLY_DEFAULT_PAGES[id] || { content: [], root: { props: {} } });
   const source = siteKey === 'justindematteis'
     ? JUSTIN_PAGE_EDITOR_DATA
     : siteKey === 'sunwings'

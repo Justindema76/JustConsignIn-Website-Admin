@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { CheckCircle2, Save } from 'lucide-react';
 import { PhotoList } from './fields';
 import { settingsApi } from './rentrallyAdminService';
@@ -15,23 +16,31 @@ const GROUPS = [
     ],
   },
   {
-    title: 'Homepage hero',
-    fields: [
-      ['hero_title', 'Headline (first line)', 'Rent the gear that'],
-      ['hero_highlight', 'Headline (red second line)', 'stops traffic.'],
-      ['hero_text', 'Intro paragraph', 'Giant inflatables, air dancers, tents, flags and banner stands, delivered and set up…', 'wide', 'textarea'],
-      ['hero_badge_title', 'Photo badge title', "22' Gorilla"],
-      ['hero_badge_text', 'Photo badge text', 'Rent from $350/day'],
-    ],
-  },
-  {
     title: 'Contact & service area',
     fields: [
       ['phone', 'Phone', '905-555-0123'],
       ['email', 'Email', 'hello@example.com'],
       ['hours', 'Hours', '9 AM – 5 PM Monday to Friday'],
-      ['service_areas', 'Service areas', 'Hamilton, Stoney Creek, Burlington, Niagara, GTA'],
+      ['service_areas', 'Service areas', 'Hamilton, Stoney Creek, Burlington, Niagara & the GTA'],
       ['footer_note', 'Footer line under the hours', 'Weekend delivery available', 'wide'],
+    ],
+  },
+  {
+    title: 'Google search (whole site)',
+    note: 'Used for the homepage and anywhere a page has no SEO text of its own.',
+    fields: [
+      ['seo_title', 'Homepage SEO title', 'Rent & Rally | Event & Promotional Rentals in Hamilton, Niagara & the GTA', 'wide'],
+      ['seo_description', 'Homepage SEO description', 'Rent tents, air dancers, giant inflatables, flags, signs and banner stands. Delivered and set up across…', 'wide', 'textarea'],
+      ['google_site_verification', 'Google Search Console code', 'The content="…" value from the HTML-tag method', 'wide'],
+    ],
+  },
+  {
+    title: 'Social links (footer)',
+    note: 'Only the ones you fill in are shown.',
+    fields: [
+      ['facebook_url', 'Facebook', 'https://facebook.com/…'],
+      ['instagram_url', 'Instagram', 'https://instagram.com/…'],
+      ['tiktok_url', 'TikTok', 'https://tiktok.com/@…'],
     ],
   },
 ];
@@ -52,7 +61,7 @@ export default function SettingsAdmin() {
     event.preventDefault();
     setBusy(true); setError(''); setMessage('');
     try {
-      const keys = [...GROUPS.flatMap(g => g.fields.map(f => f[0])), 'hero_image'];
+      const keys = [...GROUPS.flatMap(g => g.fields.map(f => f[0])), 'seo_image'];
       await settingsApi.save(Object.fromEntries(keys.map(k => [k, values[k] ?? ''])));
       setMessage('Saved. The website picks these up on the next page load.');
     } catch (err) {
@@ -67,7 +76,7 @@ export default function SettingsAdmin() {
       <div>
         <p className="site-admin-eyebrow">Settings</p>
         <h1>Website Settings</h1>
-        <p>Text and contact details used across the Rent &amp; Rally website. Leave a field blank to keep the website’s default.</p>
+        <p>Text and contact details used across the Rent &amp; Rally website. Leave a field blank to keep the website’s default. Homepage and How It Works content is edited in <Link to="/admin/website/pages">Website › Pages</Link>.</p>
       </div>
       <button className="site-admin-btn" type="submit" disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save settings'}</button>
     </div>
@@ -78,6 +87,7 @@ export default function SettingsAdmin() {
       <div>
         {GROUPS.map(group => <div className="site-admin-card rr-settings-group" key={group.title}>
           <h2>{group.title}</h2>
+          {group.note && <p className="rr-hint" style={{ margin: '4px 18px 0' }}>{group.note}</p>}
           <div className="site-admin-form">
             {group.fields.map(([key, label, placeholder, wide, kind]) => <label key={key} className={wide || ''}>
               {label}
@@ -90,8 +100,8 @@ export default function SettingsAdmin() {
       </div>
       <aside>
         <div className="site-admin-card site-admin-side-card">
-          <PhotoList single label="Homepage hero photo" value={values.hero_image || ''} onChange={v => set('hero_image', v)}/>
-          <small className="rr-hint">Leave empty to use the gorilla photo.</small>
+          <PhotoList single label="Social share image" value={values.seo_image || ''} onChange={v => set('seo_image', v)}/>
+          <small className="rr-hint">Shown when the site is shared on Facebook, texts, etc. Leave empty to use the gorilla photo. Best size 1200 × 630.</small>
         </div>
       </aside>
     </div>

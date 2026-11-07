@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle2, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
-import { PhotoList } from './fields';
+import { PhotoList, SeoFields } from './fields';
 import { RENTRALLY_SITE_URL, money, packagesApi, productsApi, slugify } from './rentrallyAdminService';
 import './rentrally.css';
 
 const BASE = '/admin/rentrally/packages';
-const EMPTY = { id: '', slug: '', tag: '', name: '', hero_image: '', day_rate: '', items: [], description: '', good_for: [], status: 'draft', sort_order: 0 };
+const EMPTY = { id: '', slug: '', tag: '', name: '', hero_image: '', day_rate: '', items: [], description: '', good_for: [], status: 'draft', sort_order: 0, seo_title: '', seo_description: '' };
 
 const separately = (items, products) => items.reduce((sum, item) => {
   const p = products.find(x => x.slug === item.product);
@@ -58,7 +58,7 @@ function PackageList() {
           <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
-            {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/#/package/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
+            {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/packages/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
             <button className="site-admin-btn danger small" type="button" onClick={() => remove(r)} aria-label={`Delete ${r.name}`}><Trash2 size={13}/></button>
           </div>
         </div>;
@@ -175,8 +175,16 @@ function PackageEditor({ id }) {
         <div className="site-admin-card site-admin-side-card">
           <h2>Web address</h2>
           <label>Slug<input className="rr-side-input" value={draft.slug} onChange={e => { setSlugTouched(true); set('slug', slugify(e.target.value)); }}/></label>
-          <p className="site-admin-url">{RENTRALLY_SITE_URL}/#/package/{draft.slug || 'slug'}</p>
+          <p className="site-admin-url">{RENTRALLY_SITE_URL}/packages/{draft.slug || 'slug'}</p>
         </div>
+        <SeoFields
+          title={draft.seo_title || ''}
+          description={draft.seo_description || ''}
+          onChange={patch => setDraft(d => ({ ...d, ...patch }))}
+          autoTitle={`${draft.name || 'Package name'} Rental Package | Rent & Rally`}
+          autoDescription={`${draft.name || 'This package'}: ${draft.items.reduce((s, i) => s + i.qty, 0)} pieces from ${money(rate)}/day. Delivered and set up in Hamilton, Niagara and the GTA.`}
+          url={`rent-and-rally.vercel.app › packages › ${draft.slug || 'slug'}`}
+        />
         {!isNew && <div className="site-admin-card site-admin-side-card danger-zone"><h2>Delete</h2><button className="site-admin-btn danger small" type="button" onClick={remove}><Trash2 size={13}/> Delete package</button></div>}
       </aside>
     </form>
