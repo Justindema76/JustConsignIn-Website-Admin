@@ -1,6 +1,58 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, GripVertical, ImagePlus, Plus, Star, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, GripVertical, ImagePlus, Images, Plus, Star, Trash2, X } from 'lucide-react';
 import { uploadSiteImage } from '../../services/siteAdminService';
+import { categoriesApi, packagesApi, productsApi } from './rentrallyAdminService';
+
+// Every photo already used on the site (rentals, packages, categories), so you can reuse one instead of uploading again.
+function PhotoLibrary({ chosen = [], single, onPick, onClose }) {
+  const [photos, setPhotos] = useState(null);
+  const [error, setError] = useState('');
+  const [q, setQ] = useState('');
+  useEffect(() => {
+    let live = true;
+    Promise.all([productsApi.list(), packagesApi.list(), categoriesApi.list()])
+      .then(([products, packages, categories]) => {
+        const seen = new Map();
+        const add = (src, from) => { if (src && !seen.has(src)) seen.set(src, from); };
+        (products || []).forEach(p => (p.images || []).forEach(src => add(src, p.name)));
+        (packages || []).forEach(p => add(p.hero_image, p.name));
+        (categories || []).forEach(c => add(c.image, c.name));
+        if (live) setPhotos([...seen].map(([src, from]) => ({ src, from })));
+      })
+      .catch(err => live && setError(err.message));
+    return () => { live = false; };
+  }, []);
+  useEffect(() => {
+    const key = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [onClose]);
+  const term = q.trim().toLowerCase();
+  const shown = (photos || []).filter(p => !term || p.from.toLowerCase().includes(term) || p.src.toLowerCase().includes(term));
+  return <div className="rr-lightbox" role="dialog" aria-modal="true" aria-label="Choose an existing photo" onClick={onClose}>
+    <div className="rr-lightbox-box rr-library" onClick={e => e.stopPropagation()}>
+      <div className="rr-lightbox-head">
+        <strong>Choose an existing photo</strong>
+        <button type="button" className="rr-icon-btn" onClick={onClose} aria-label="Close"><X size={16}/></button>
+      </div>
+      <div className="rr-library-search"><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search by rental name, e.g. tube man" autoFocus/></div>
+      <div className="rr-library-grid">
+        {error && <div className="site-admin-alert error">{error}</div>}
+        {!photos && !error && <small className="rr-hint">Loading photos…</small>}
+        {photos && !shown.length && <small className="rr-hint">No photos match.</small>}
+        {shown.map(p => {
+          const on = chosen.includes(p.src);
+          return <button type="button" key={p.src} className={`rr-library-item${on ? ' on' : ''}`} onClick={() => { onPick(p.src); if (single) onClose(); }} title={p.from}>
+            <img src={p.src} alt="" loading="lazy"/>
+            <span>{p.from}</span>
+            {on && <i aria-label="Already added"><Check size={13}/></i>}
+          </button>;
+        })}
+      </div>
+      <div className="rr-lightbox-foot"><small className="rr-hint" style={{ marginRight: 'auto' }}>{single ? 'Click a photo to use it.' : 'Click photos to add them. Click again to take one out.'}</small><button type="button" className="site-admin-btn small" onClick={onClose}>Done</button></div>
+    </div>
+  </div>;
+}
 
 // Ordered list of photo URLs. First photo = main photo on the site.
 export function PhotoList({ value = [], onChange, single = false, label = 'Photos' }) {
@@ -30,6 +82,8 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
   const [drag, setDrag] = useState(null);
   const [over, setOver] = useState(null);
   const [view, setView] = useState(null);
+  const [library, setLibrary] = useState(false);
+  const pickExisting = src => commit(single ? [src] : (list.includes(src) ? list.filter(x => x !== src) : [...list, src]));
   const moveTo = (from, to) => {
     if (from === to || from == null || to == null) return;
     const next = [...list];
@@ -87,6 +141,8 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
         <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple={!single} onChange={upload} disabled={busy}/>
       </label>
     </div>
+    <button type="button" className="site-admin-btn secondary small rr-library-btn" onClick={() => setLibrary(true)}><Images size={13}/> Choose existing photo</button>
+    {library && <PhotoLibrary chosen={list} single={single} onPick={pickExisting} onClose={() => setLibrary(false)}/>}
     {!single && list.length > 1 && <small className="rr-hint">Drag photos to reorder. Click one to see it full size.</small>}
     {view != null && list[view] && <div className="rr-lightbox" role="dialog" aria-modal="true" aria-label={`Photo ${view + 1} of ${list.length}`} onClick={() => setView(null)}>
       <div className="rr-lightbox-box" onClick={e => e.stopPropagation()}>
