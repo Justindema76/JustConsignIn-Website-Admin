@@ -84,6 +84,7 @@ function RentalList() {
       </div>
       <div className="site-admin-actions">
         <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/rentals`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
+        <button className="site-admin-btn secondary" type="button" onClick={runImport} disabled={busy}>Load new rentals</button>
         <Link className="site-admin-btn" to={`${BASE}/new`}><Plus size={15}/> New Rental</Link>
       </div>
     </div>
@@ -93,7 +94,7 @@ function RentalList() {
 
     {!busy && !rows.length && <div className="site-admin-card site-admin-empty large">
       <h2>No rentals yet</h2>
-      <p>Load the 21 rentals, 6 packages and 5 categories from the prototype website to start with. You can edit or delete any of them after.</p>
+      <p>Load the starter rentals, packages and categories to start with. You can edit or delete any of them after.</p>
       <button className="site-admin-btn" type="button" onClick={runImport}>Import starter catalogue</button>
     </div>}
 
