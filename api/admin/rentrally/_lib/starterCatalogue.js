@@ -931,33 +931,33 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/swooper-3.jpg"
     ],
     "day_rate": 30,
-    "buy_price": 49.95,
-    "buy_note": "flag only",
+    "buy_price": 139.95,
+    "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/swooper-flag.html",
     "badge": "",
     "description": [
-      "A tall swooper flag that moves in the breeze and lines your lot or storefront with colour. Pick a stock slogan and the base that suits your ground.",
-      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
+      "A tall swooper flag that moves in the breeze and lines your lot or storefront with colour.",
+      "You rent the hardware: a 15' pole and the mount that suits your spot. Put a stock flag on it, bring your own, or order a custom one. The day rate is per flag set (pole, mount and flag)."
     ],
     "features": [
+      "Rent the pole and mount, pick the flag",
       "31 stock slogans and colours",
-      "100% poly knit polyester",
-      "Pole and hardware included",
-      "Ground spike for grass, under-tire base for pavement",
-      "Priced per flag"
+      "Mounts for grass, pavement, trailer hitches and posts",
+      "Bring your own flag at no extra charge",
+      "Day rate per flag set"
     ],
     "specs": [
       {
-        "label": "Style",
-        "value": "Swooper / feather"
+        "label": "Pole",
+        "value": "15' aluminum (heavy-duty available)"
       },
       {
-        "label": "Material",
+        "label": "Flag",
         "value": "Poly knit polyester"
       },
       {
-        "label": "Includes",
-        "value": "Flag, pole & hardware"
+        "label": "Mounts",
+        "value": "Ground spike, under-tire, trailer hitch, post bracket"
       },
       {
         "label": "Use",
@@ -966,7 +966,64 @@ export const STARTER_PRODUCTS = [
     ],
     "options": [
       {
+        "label": "Hardware",
+        "style": "cards",
+        "hint": "This is what you rent. Pick the mount that suits where it goes.",
+        "values": [
+          {
+            "v": "Ground spike kit",
+            "note": "15' pole + ground spike. For grass and soil."
+          },
+          {
+            "v": "Under-tire kit",
+            "note": "15' pole + a bracket that sits under a parked car's tire. For pavement."
+          },
+          {
+            "v": "Trailer hitch kit (+$3/day)",
+            "note": "15' pole + a mount that pins into a truck or trailer hitch."
+          },
+          {
+            "v": "Post bracket kit (+$2/day)",
+            "note": "15' pole + a bracket clamped to a sign post or light pole."
+          }
+        ]
+      },
+      {
+        "label": "Hardware extras",
+        "style": "checks",
+        "values": [
+          {
+            "v": "Heavy-duty pole (+$2/day)",
+            "note": "Stiffer pole for windy, open lots."
+          }
+        ]
+      },
+      {
+        "label": "Flag",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Stock flag",
+            "note": "Pick a slogan below. It comes back with the hardware."
+          },
+          {
+            "v": "My own flag",
+            "note": "Use a swooper flag you already have. We supply the pole and mount.",
+            "tag": "No charge"
+          },
+          {
+            "v": "Custom flag (we quote it)",
+            "note": "Wheels doesn't list custom swooper flags, so we'll get you a price before you book.",
+            "tag": "Quote"
+          }
+        ]
+      },
+      {
         "label": "Slogan",
+        "when": {
+          "option": "Flag",
+          "has": "Stock"
+        },
         "values": [
           {
             "v": "Sale (Red)"
@@ -1062,17 +1119,6 @@ export const STARTER_PRODUCTS = [
             "v": "Checkered Black & Yellow"
           }
         ]
-      },
-      {
-        "label": "Hardware",
-        "values": [
-          {
-            "v": "Ground spike kit (grass)"
-          },
-          {
-            "v": "Under-tire base (pavement)"
-          }
-        ]
       }
     ],
     "related": [
@@ -1096,20 +1142,20 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/blade-4.jpg"
     ],
     "day_rate": 30,
-    "buy_price": 74.95,
-    "buy_note": "flag only",
+    "buy_price": 169.95,
+    "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/104101-104128sb-blade-flags.html",
     "badge": "",
     "description": [
       "Blade flags stay open to show your message with or without wind. Heavyweight polyester for showrooms or outdoor lots.",
-      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
+      "You rent the hardware: a 12' pole and the base that suits your spot. Put a stock flag on it, bring your own, or order a custom one. The day rate is per flag set (pole, base and flag)."
     ],
     "features": [
+      "Rent the pole and base, pick the flag",
       "28 stock slogans and colours",
       "Stays open with or without wind",
-      "Heavyweight polyester",
-      "Indoor & outdoor use",
-      "Priced per flag"
+      "Bases for grass, pavement, showrooms and walls",
+      "Day rate per flag set"
     ],
     "specs": [
       {
@@ -1117,21 +1163,78 @@ export const STARTER_PRODUCTS = [
         "value": "2½' x 9'"
       },
       {
-        "label": "Material",
-        "value": "Heavyweight polyester"
+        "label": "Pole",
+        "value": "12' aluminum / fiberglass"
+      },
+      {
+        "label": "Bases",
+        "value": "Ground spike, under-tire, showroom, wall"
       },
       {
         "label": "Use",
         "value": "Indoor & outdoor"
-      },
-      {
-        "label": "Includes",
-        "value": "Flag, pole & hardware"
       }
     ],
     "options": [
       {
+        "label": "Hardware",
+        "style": "cards",
+        "hint": "This is what you rent. Pick the base that suits where it goes.",
+        "values": [
+          {
+            "v": "Ground spike kit",
+            "note": "12' pole + into-ground bracket. For grass and soil."
+          },
+          {
+            "v": "Under-tire kit (+$2/day)",
+            "note": "12' pole + a bracket that sits under a parked car's tire. For pavement."
+          },
+          {
+            "v": "Showroom kit (+$2/day)",
+            "note": "12' pole + a weighted floor base. For showrooms and indoor events."
+          },
+          {
+            "v": "Wall mount kit (+$2/day)",
+            "note": "12' pole + a bracket that screws to a wall or fence."
+          }
+        ]
+      },
+      {
+        "label": "Hardware extras",
+        "style": "checks",
+        "values": [
+          {
+            "v": "Ballast bags (+$2/day)",
+            "note": "Extra weight over the base for windy days."
+          }
+        ]
+      },
+      {
+        "label": "Flag",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Stock flag",
+            "note": "Pick a slogan below. It comes back with the hardware."
+          },
+          {
+            "v": "My own flag",
+            "note": "Use a blade flag you already have. We supply the pole and base.",
+            "tag": "No charge"
+          },
+          {
+            "v": "Custom flag (we quote it)",
+            "note": "Wheels doesn't list custom blade flags, so we'll get you a price before you book.",
+            "tag": "Quote"
+          }
+        ]
+      },
+      {
         "label": "Slogan",
+        "when": {
+          "option": "Flag",
+          "has": "Stock"
+        },
         "values": [
           {
             "v": "Sale (Red)"
@@ -1218,20 +1321,6 @@ export const STARTER_PRODUCTS = [
             "v": "Now Open (Blue)"
           }
         ]
-      },
-      {
-        "label": "Hardware",
-        "values": [
-          {
-            "v": "Ground spike kit (grass)"
-          },
-          {
-            "v": "Under-tire kit (pavement)"
-          },
-          {
-            "v": "Showroom kit (indoor)"
-          }
-        ]
       }
     ],
     "related": [
@@ -1255,20 +1344,20 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/bowflag-4.jpg"
     ],
     "day_rate": 30,
-    "buy_price": 74.95,
-    "buy_note": "flag only",
+    "buy_price": 159.95,
+    "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/bow-flags-103101-103127.html",
     "badge": "",
     "description": [
       "A teardrop-shaped bow flag that stays open and readable even when there is no wind. Bright, bold and easy to read from the road.",
-      "Rentals include the flag, pole and your choice of hardware. Priced per flag."
+      "You rent the hardware: a 14' pole and the base that suits your spot. Put a stock flag on it, bring your own, or buy a custom printed one to keep. The day rate is per flag set (pole, base and flag)."
     ],
     "features": [
+      "Rent the pole and base, pick the flag",
       "27 stock slogans and colours",
-      "Stays open with or without wind",
-      "Heavyweight polyester",
-      "Indoor & outdoor use",
-      "Priced per flag"
+      "Custom full-colour flags available to buy",
+      "Bases for grass, pavement, showrooms and walls",
+      "Day rate per flag set"
     ],
     "specs": [
       {
@@ -1276,21 +1365,82 @@ export const STARTER_PRODUCTS = [
         "value": "3' x 9½'"
       },
       {
-        "label": "Material",
-        "value": "Heavyweight polyester"
+        "label": "Pole",
+        "value": "14' bow flag pole"
+      },
+      {
+        "label": "Bases",
+        "value": "Ground spike, under-tire, showroom, outdoor steel, wall"
       },
       {
         "label": "Use",
         "value": "Indoor & outdoor"
-      },
-      {
-        "label": "Includes",
-        "value": "Flag, pole & hardware"
       }
     ],
     "options": [
       {
+        "label": "Hardware",
+        "style": "cards",
+        "hint": "This is what you rent. Pick the base that suits where it goes.",
+        "values": [
+          {
+            "v": "Ground spike kit",
+            "note": "14' pole + rotating ground spike. For grass and soil."
+          },
+          {
+            "v": "Under-tire kit (+$3/day)",
+            "note": "14' pole + a bracket that sits under a parked car's tire. For pavement.",
+            "img": 4
+          },
+          {
+            "v": "Outdoor base kit (+$3/day)",
+            "note": "14' pole + rotating steel post on a steel base. For hard surfaces."
+          },
+          {
+            "v": "Showroom kit (+$3/day)",
+            "note": "14' pole + a floor stand. For showrooms and indoor events."
+          },
+          {
+            "v": "Wall mount kit (+$2/day)",
+            "note": "14' pole + a bracket that screws to a wall or fence."
+          }
+        ]
+      },
+      {
+        "label": "Hardware extras",
+        "style": "checks",
+        "values": [
+          {
+            "v": "Ballast bags (+$2/day)",
+            "note": "Extra weight over the base for windy days."
+          }
+        ]
+      },
+      {
+        "label": "Flag",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Stock flag",
+            "note": "Pick a slogan below. It comes back with the hardware."
+          },
+          {
+            "v": "My own flag",
+            "note": "Use a bow flag you already have. We supply the pole and base.",
+            "tag": "No charge"
+          },
+          {
+            "v": "Custom full-colour flag, yours to keep (+$144.95 one-time)",
+            "note": "$94.95 flag at the Wheels price + $50 artwork set-up. Printed with your logo and message."
+          }
+        ]
+      },
+      {
         "label": "Slogan",
+        "when": {
+          "option": "Flag",
+          "has": "Stock"
+        },
         "values": [
           {
             "v": "Sale (Red)"
@@ -1372,24 +1522,6 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Open Sundays (Blue)"
-          }
-        ]
-      },
-      {
-        "label": "Hardware",
-        "values": [
-          {
-            "v": "Ground spike kit (grass)"
-          },
-          {
-            "v": "Under-tire kit (pavement)",
-            "img": 4
-          },
-          {
-            "v": "Showroom kit (indoor)"
-          },
-          {
-            "v": "Outdoor base kit (hard surfaces)"
           }
         ]
       }

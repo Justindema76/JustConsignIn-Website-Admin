@@ -27,7 +27,7 @@ async function insertMissing(token, table, rows) {
 // Rentals whose catalogue content was rebuilt in the starter list (stock-only flag slogans,
 // banner/sign choices with one-time custom charges). Importing refreshes their content from the
 // starter list; day rate, status, featured, sort order and SEO set in the admin are kept.
-const REFRESH_FROM_STARTER = ['swooper', 'blade', 'sidewalk', 'xbanner', 'simplebanner', 'retractable', 'outdoorbanner'];
+const REFRESH_FROM_STARTER = ['swooper', 'blade', 'bowflag', 'sidewalk', 'xbanner', 'simplebanner', 'retractable', 'outdoorbanner'];
 const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
 
 // Packages rebuilt around the full catalogue: refreshed from the starter list (status, sort order and SEO kept).
