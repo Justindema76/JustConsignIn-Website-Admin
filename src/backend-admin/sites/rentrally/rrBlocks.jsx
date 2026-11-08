@@ -16,6 +16,15 @@ export const categoryHref = slug => (slug && slug !== 'all' ? `/rentals/${slug}`
 
 const lines = value => String(value || '').split('\n').map(s => s.trim()).filter(Boolean);
 const paragraphs = value => String(value || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+// An old launch photo like /img/gorilla-1.jpg shows that rental's current first photo instead,
+// once a new photo has been set on the rental in the admin.
+const isLaunchPhoto = url => /(^|vercel\.app)\/img\//.test(url || '');
+export const livePhoto = (url, ctx) => {
+  const m = /\/img\/([a-z0-9-]+?)-\d+\.(jpg|png|webp)$/i.exec(url || '');
+  const now = m && ctx?.products?.[m[1]]?.images?.[0];
+  return now && !isLaunchPhoto(now) ? now : url;
+};
+
 const A = ({ ctx, href, children, ...rest }) => {
   const L = ctx?.Link || 'a';
   if (!href) return null;
@@ -90,6 +99,52 @@ const sectionClass = (p, extra = '') => `section ${p.background === 'soft' ? 're
 
 // ---------- blocks ----------
 
+// Live price for a rental or package web address, e.g. "gorilla" -> "$425/day".
+// Used by banner badges so they never show an old price.
+export function livePrice(slug, ctx) {
+  const key = String(slug || '').trim().replace(/^\/?(rental|packages)\//, '');
+  if (!key) return null;
+  const p = ctx?.products?.[key];
+  if (p) return { text: `${money0(p.price)}/day`, href: rentalHref(p.slug), image: p.images?.[0] || '', name: p.name };
+  const pk = (ctx?.packages || []).find(x => x.slug === key);
+  if (pk) return { text: `${money0(pk.price)}/day package`, href: packageHref(pk.slug), image: pk.image || '', name: pk.name };
+  return null;
+}
+
+// One banner slide: text on the left, photo with a red price badge on the right.
+function Slide({ s, ctx, level = 'h2' }) {
+  const price = livePrice(s.rental, ctx);
+  const image = livePhoto(s.image || price?.image || '', ctx);
+  return (
+    <div className="wrap">
+      <div>
+        {s.eyebrow ? <div className="hero-eyebrow">{s.eyebrow}</div> : null}
+        <Heading level={level}>{s.title}{s.highlight ? <><br/><em>{s.highlight}</em></> : null}</Heading>
+        {s.text ? <p>{s.text}</p> : null}
+        <div className="ctas">
+          {s.button1Text ? <A ctx={ctx} className="btn btn-red" href={s.button1Url || price?.href || '/packages'}>{s.button1Text}</A> : null}
+          {s.button2Text ? <A ctx={ctx} className="btn btn-line" href={s.button2Url || '/rentals'}>{s.button2Text}</A> : null}
+        </div>
+      </div>
+      <div className="hero-img">
+        {image ? <img src={image} alt={s.imageAlt || s.badgeTitle || price?.name || ''} {...(level === 'h1' ? { fetchPriority: 'high' } : { loading: 'lazy' })}/> : null}
+        {s.badgeTitle || price ? <A ctx={ctx} className="hero-tag" href={price?.href || s.button1Url || '/rentals'}><b>{s.badgeTitle || price?.name}</b>{price ? price.text : ''}</A> : null}
+      </div>
+    </div>
+  );
+}
+
+// Banner slider. On the website ctx.Slider (components/HeroSlider.js) rotates the slides;
+// anywhere without it (the admin preview) the first slide shows on its own.
+function HeroSliderBlock({ p, ctx }) {
+  const list = (Array.isArray(p.slides) ? p.slides : []).filter(s => s && (s.title || s.highlight));
+  if (!list.length) return null;
+  const slides = list.map((s, i) => ({ key: `${i}-${s.rental || s.title}`, content: <Slide s={s} ctx={ctx} level={i === 0 ? (p.headingLevel || 'h1') : 'h2'}/> }));
+  const S = ctx?.Slider;
+  if (S) return <S slides={slides}/>;
+  return <section className="hero rr-slider"><div className="rr-slides"><div className="rr-slide is-active">{slides[0].content}</div></div></section>;
+}
+
 function Hero({ p, ctx }) {
   return (
     <section className="hero"><div className="wrap">
@@ -102,8 +157,8 @@ function Hero({ p, ctx }) {
         </div>
       </div>
       <div className="hero-img">
-        {p.image ? <img src={p.image} alt={p.imageAlt || p.badgeTitle || ''} fetchPriority="high"/> : null}
-        {p.badgeTitle ? <A ctx={ctx} className="hero-tag" href={p.badgeUrl || '/rentals'}><b>{p.badgeTitle}</b>{p.badgeText}</A> : null}
+        {p.image ? <img src={livePhoto(p.image, ctx)} alt={p.imageAlt || p.badgeTitle || ''} fetchPriority="high"/> : null}
+        {p.badgeTitle ? <A ctx={ctx} className="hero-tag" href={p.badgeUrl || '/rentals'}><b>{p.badgeTitle}</b>{livePrice(p.badgeUrl, ctx)?.text || p.badgeText}</A> : null}
       </div>
     </div></section>
   );
@@ -221,7 +276,7 @@ function TextBlock({ p, ctx }) {
 function ImageText({ p, ctx }) {
   return (
     <section className={sectionClass(p)}><div className={`wrap imgtext ${p.imagePosition === 'right' ? 'flip' : ''}`}>
-      <div className="imgtext-im">{p.image ? <img src={p.image} alt={p.imageAlt || p.heading || ''} loading="lazy"/> : null}</div>
+      <div className="imgtext-im">{p.image ? <img src={livePhoto(p.image, ctx)} alt={p.imageAlt || p.heading || ''} loading="lazy"/> : null}</div>
       <div className="prose">
         {p.heading ? <h2 className="sec-title">{p.heading}</h2> : null}
         {paragraphs(p.text).map((para, i) => <p key={i}>{para}</p>)}
@@ -251,6 +306,7 @@ function Cta({ p, ctx }) {
 
 export const RR_BLOCKS = {
   RRHeroBlock: Hero,
+  RRHeroSliderBlock: HeroSliderBlock,
   RRPageHeaderBlock: PageHeader,
   RRUspBlock: Usp,
   RRCategoriesBlock: Categories,
@@ -282,12 +338,26 @@ export const DEFAULT_PAGES = {
   home: {
     root: { props: { seoTitle: '', seoDescription: '', ogImage: '' } },
     content: [
-      block('RRHeroBlock', 'rr-home-hero', {
-        title: 'Rent the gear that', highlight: 'stops traffic.', headingLevel: 'h1',
-        text: 'Giant inflatables, air dancers, tents, flags and banner stands, delivered and set up for your grand opening, sales event, market or party.',
-        button1Text: 'Shop Rental Packages', button1Url: '/packages', button2Text: 'Browse All Rentals', button2Url: '/rentals',
-        image: '/img/gorilla-1.jpg', imageAlt: '22 foot inflatable gorilla rental',
-        badgeTitle: "22' Gorilla", badgeText: 'Rent from $350/day', badgeUrl: '/rental/gorilla',
+      block('RRHeroSliderBlock', 'rr-home-slider', {
+        headingLevel: 'h1',
+        slides: [
+          { eyebrow: 'Giant inflatables', title: 'Rent the gear that', highlight: 'stops traffic.',
+            text: 'A 22 ft gorilla seen from blocks away. Giant inflatables, air dancers and tents, delivered and set up for your sale, opening or event.',
+            button1Text: 'See the Gorilla', button1Url: '', button2Text: 'Browse All Rentals', button2Url: '/rentals',
+            rental: 'gorilla', badgeTitle: "22' Gorilla", image: '', imageAlt: '22 foot inflatable gorilla rental at a car dealership' },
+          { eyebrow: 'Air dancers', title: 'Wave them', highlight: 'onto your lot.',
+            text: 'Crazy Car Salesman air dancers, over 16 ft tall with the blower included. Pick Used Cars, Auto Sale, Trucks, New Cars or plain.',
+            button1Text: 'Pick Your Dancers', button1Url: '', button2Text: 'All Air Dancers', button2Url: '/rentals/air-dancers',
+            rental: 'crazy-salesman-air-dancers', badgeTitle: 'Crazy Car Salesman', image: '', imageAlt: 'Crazy Car Salesman air dancer in front of a used car lot' },
+          { eyebrow: 'Packages', title: 'Open with', highlight: 'a bang.',
+            text: 'The gorilla, two tube men and four swooper flags in one package, for less than renting each piece.',
+            button1Text: 'See the Package', button1Url: '', button2Text: 'All Packages', button2Url: '/packages',
+            rental: 'grand-opening', badgeTitle: 'Grand Opening Blowout', image: '', imageAlt: 'Grand opening rental package with air dancers' },
+          { eyebrow: 'Tents & canopies', title: 'Cover the event,', highlight: 'rain or shine.',
+            text: "10' x 10' and 10' x 20' pop-up tents, delivered, set up and anchored with base weights.",
+            button1Text: 'See Tents', button1Url: '/rentals/tents', button2Text: 'Party Package', button2Url: '/packages/backyard-party',
+            rental: 'tent20', badgeTitle: "10' x 20' Tent", image: '', imageAlt: '10 by 20 foot pop-up tent rental' },
+        ],
       }),
       block('RRUspBlock', 'rr-home-usp', {
         item1Icon: 'truck', item1Title: 'Delivery & setup', item1Text: 'Hamilton, Niagara & GTA',

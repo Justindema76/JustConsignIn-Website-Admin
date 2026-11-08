@@ -39,7 +39,7 @@ const siteAsset = value => (typeof value === 'string' && value.startsWith('/img/
 function Preview({ type, props }) {
   const [catalogue, setCatalogue] = useState({ categories: [], products: {}, packages: [] });
   useEffect(() => { let on = true; loadCatalogue().then(c => on && setCatalogue(c)); return () => { on = false; }; }, []);
-  const shown = Object.fromEntries(Object.entries(props).map(([key, value]) => [key, siteAsset(value)]));
+  const shown = Object.fromEntries(Object.entries(props).map(([key, value]) => [key, Array.isArray(value) ? value.map(v => (v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, siteAsset(x)])) : v)) : siteAsset(value)]));
   return <div className="rr-live" data-block-type={type}><RRBlock type={type} props={shown} ctx={{ ...catalogue, Link: PreviewLink }}/></div>;
 }
 
@@ -73,6 +73,29 @@ const defs = {
       badgeTitle: t('Red badge title'), badgeText: t('Red badge text'), badgeUrl: t('Red badge link'),
     },
     defaultProps: defaultsFrom('home', 'rr-home-hero'),
+  },
+  RRHeroSliderBlock: {
+    label: 'Hero slider (rotating banners)',
+    fields: {
+      headingLevel: { type: 'select', label: 'First slide heading level', options: [{ label: 'H1 (main page heading)', value: 'h1' }, { label: 'H2', value: 'h2' }] },
+      slides: {
+        type: 'array',
+        label: 'Slides (they rotate every 7 seconds)',
+        getItemSummary: (item, i) => `${(i ?? 0) + 1}. ${[item?.title, item?.highlight].filter(Boolean).join(' ') || 'New slide'}`,
+        defaultItemProps: { eyebrow: '', title: 'New slide', highlight: '', text: '', button1Text: 'See it', button1Url: '', button2Text: 'Browse All Rentals', button2Url: '/rentals', rental: '', badgeTitle: '', image: '', imageAlt: '' },
+        arrayFields: {
+          rental: t('Rental or package web address (e.g. gorilla or grand-opening). The red badge shows its current price.'),
+          eyebrow: t('Small red label (e.g. Giant inflatables)'),
+          title: t('Headline (white)'), highlight: t('Headline (red second line)'),
+          text: ta('Text'),
+          button1Text: t('Red button text'), button1Url: t('Red button link (blank = the rental or package)'),
+          button2Text: t('Outline button text'), button2Url: t('Outline button link'),
+          badgeTitle: t('Red badge title (blank = the rental name)'),
+          image: img('Photo (blank = the rental or package photo)'), imageAlt: t('Photo description (for Google & screen readers)'),
+        },
+      },
+    },
+    defaultProps: defaultsFrom('home', 'rr-home-slider'),
   },
   RRPageHeaderBlock: {
     label: 'Page title + intro',
@@ -167,7 +190,7 @@ export const rentrallyBuilderComponents = Object.fromEntries(Object.entries(defs
 }]));
 
 export const rentrallyBuilderCategories = {
-  rentrallyPage: { title: 'RENT & RALLY — Page sections', components: ['RRHeroBlock', 'RRPageHeaderBlock', 'RRUspBlock', 'RRStepsBlock', 'RRRentBuyBlock', 'RRFaqBlock', 'RRCtaBlock'] },
+  rentrallyPage: { title: 'RENT & RALLY — Page sections', components: ['RRHeroSliderBlock', 'RRHeroBlock', 'RRPageHeaderBlock', 'RRUspBlock', 'RRStepsBlock', 'RRRentBuyBlock', 'RRFaqBlock', 'RRCtaBlock'] },
   rentrallyCatalogue: { title: 'RENT & RALLY — Automatic catalogue', components: ['RRCategoriesBlock', 'RRPackagesBlock', 'RRPopularBlock'] },
   rentrallyContent: { title: 'RENT & RALLY — Text & photos', components: ['RRTextBlock', 'RRImageTextBlock'] },
 };
