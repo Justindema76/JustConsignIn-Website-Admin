@@ -144,3 +144,8 @@
 .rr-switch:focus-visible{outline:2px solid #1f67b2;outline-offset:2px;border-radius:6px}
 @media(max-width:1080px){.site-admin-table-head.rr-rentals,.site-admin-table-row.rr-rentals{grid-template-columns:28px 78px minmax(180px,1fr) 100px 170px}.site-admin-table-head.rr-rentals>*:nth-child(5),.site-admin-table-row.rr-rentals>*:nth-child(5){display:none}}
 .site-admin-table-row>div>small.rr-warn{color:#8b6500;font-weight:700}
+
+.rr-choice-wrap{display:flex;flex-direction:column;gap:4px;padding-bottom:6px;border-bottom:1px dashed #eef0f2}
+.rr-choice-extra input{font-size:12.5px;color:#50565c}
+.rr-choice-extra .rr-choice-tag{flex:0 0 170px}
+.rr-choice-extra{padding-right:76px}

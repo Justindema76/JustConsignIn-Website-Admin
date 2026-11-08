@@ -200,7 +200,7 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
         </select>
         <button type="button" className="rr-icon-btn" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label="Remove option"><Trash2 size={14}/></button>
       </div>
-      {option.values.map((choice, k) => <div className="rr-row rr-choice" key={k}>
+      {option.values.map((choice, k) => <div className="rr-choice-wrap" key={k}><div className="rr-row rr-choice">
         <input value={choice.v} onChange={e => setChoice(i, k, { v: e.target.value })} placeholder={option.style === 'checks' || option.style === 'count' ? 'Add-on, e.g. Base weights, set of 4 (+$25/day)' : 'Choice, e.g. Red   or   18 ft (+$50/day)'} aria-label="Choice"/>
         <select value={choice.img || ''} onChange={e => setChoice(i, k, { img: e.target.value ? Number(e.target.value) : undefined })} aria-label="Photo for this choice">
           <option value="">No photo change</option>
@@ -208,6 +208,11 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
         </select>
         {choice.img && photos[choice.img - 1] ? <img className="rr-choice-thumb" src={photos[choice.img - 1]} alt={`Photo ${choice.img}`}/> : <span className="rr-choice-thumb"/>}
         <button type="button" className="rr-icon-btn" onClick={() => setOption(i, { values: option.values.filter((_, j) => j !== k) })} aria-label="Remove choice"><Trash2 size={14}/></button>
+      </div>
+      {['cards', 'checks', 'count', 'tiles'].includes(option.style) && <div className="rr-row rr-choice rr-choice-extra">
+        <input value={choice.note || ''} onChange={e => setChoice(i, k, { note: e.target.value || undefined })} placeholder="Description under this choice (optional), e.g. 15' pole + ground spike. For grass." aria-label="Choice description"/>
+        <input className="rr-choice-tag" value={choice.tag || ''} onChange={e => setChoice(i, k, { tag: e.target.value || undefined })} placeholder="Label, e.g. No charge" aria-label="Label shown instead of a price" title="Shown on the right when this choice has no price, e.g. No charge or Quote"/>
+      </div>}
       </div>)}
       <button type="button" className="site-admin-btn secondary small" onClick={() => setOption(i, { values: [...option.values, { v: '' }] })}><Plus size={13}/> Add choice</button>
     </div>)}
@@ -215,6 +220,7 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
     <small className="rr-hint">
       <b>Prices:</b> put the extra in brackets at the end of a choice. <code>(+$25/day)</code> adds $25 to the day rate.
       <code>(+$99 one-time)</code> charges $99 once (things they buy and keep). No brackets means no extra charge.<br/>
+      <b>Descriptions:</b> cards, tick boxes, how many and photo tiles show a description line under each choice (it shows on the picked card). Dropdowns don't show descriptions.<br/>
       <b>Show as:</b> dropdown, cards or photo tiles make the customer pick one choice. Tick boxes are optional
       add-ons: nothing is added unless they tick it. <i>How many</i> gives each choice a − / + counter, and the
       price is multiplied by the number picked. Example: option <i>Extra base weights</i>, show as how many,
