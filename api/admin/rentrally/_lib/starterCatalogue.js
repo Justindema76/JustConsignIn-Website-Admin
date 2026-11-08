@@ -4065,6 +4065,36 @@ export const STARTER_PACKAGES = [
     "sort_order": 50
   },
   {
+    "slug": "tent-salesmen",
+    "tag": "Dealerships",
+    "name": "Tent Sale + 2 Crazy Car Salesmen",
+    "hero_image": "https://rent-and-rally.vercel.app/img/salesman-1.jpg",
+    "day_rate": 274,
+    "items": [
+      {
+        "product": "tent10",
+        "qty": 1
+      },
+      {
+        "product": "weights",
+        "qty": 1
+      },
+      {
+        "product": "crazy-salesman-air-dancers",
+        "qty": 2
+      }
+    ],
+    "description": "A sales tent your customers can't miss. A 10' x 10' tent anchored with base weights, plus two Crazy Car Salesman air dancers, blowers included. Pick which two dancers you want (Used Cars, Auto Sale, Trucks, New Cars or No Print) and which way each SALE arrow points.",
+    "good_for": [
+      "Lot sales",
+      "Tent events",
+      "Weekend specials",
+      "Off-site sales"
+    ],
+    "status": "published",
+    "sort_order": 60
+  },
+  {
     "slug": "offsite-tent-sale",
     "tag": "Off-site sales",
     "name": "Off-Site Tent Sale",
@@ -4096,7 +4126,7 @@ export const STARTER_PACKAGES = [
       "Trade days"
     ],
     "status": "published",
-    "sort_order": 60
+    "sort_order": 70
   },
   {
     "slug": "vendor-market",
@@ -4126,7 +4156,7 @@ export const STARTER_PACKAGES = [
       "Trade shows"
     ],
     "status": "published",
-    "sort_order": 70
+    "sort_order": 80
   },
   {
     "slug": "backyard-party",
@@ -4156,7 +4186,7 @@ export const STARTER_PACKAGES = [
       "Backyard weddings"
     ],
     "status": "published",
-    "sort_order": 80
+    "sort_order": 90
   },
   {
     "slug": "event-entry",
@@ -4190,6 +4220,6 @@ export const STARTER_PACKAGES = [
       "Parking control"
     ],
     "status": "published",
-    "sort_order": 90
+    "sort_order": 100
   }
 ];

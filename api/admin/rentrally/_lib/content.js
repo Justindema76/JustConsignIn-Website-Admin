@@ -95,19 +95,31 @@ function cleanSpecs(value) {
     .filter(row => row.label && row.value);
 }
 
+// Keeps how each option shows on the site: style (tiles / cards / checks), "only show when"
+// rules, the hint line, and each choice's photo number, note and price tag.
+const OPTION_STYLES = ['tiles', 'cards', 'checks'];
 function cleanOptions(value) {
   if (!Array.isArray(value)) return [];
   return value
-    .map(option => ({
-      label: text(option?.label, 80),
-      values: (Array.isArray(option?.values) ? option.values : [])
+    .map(option => {
+      const out = { label: text(option?.label, 80) };
+      if (OPTION_STYLES.includes(option?.style)) out.style = option.style;
+      if (option?.when?.option && option?.when?.has) out.when = { option: text(option.when.option, 80), has: text(option.when.has, 80) };
+      if (option?.hint) out.hint = text(option.hint, 200);
+      out.values = (Array.isArray(option?.values) ? option.values : [])
         .map(v => {
           const label = text(typeof v === 'string' ? v : v?.v, 120);
+          if (!label) return null;
+          const choice = { v: label };
           const img = typeof v === 'object' && v ? int(v.img) : 0;
-          return label ? (img > 0 ? { v: label, img } : { v: label }) : null;
+          if (img > 0) choice.img = img;
+          if (v?.note) choice.note = text(v.note, 240);
+          if (v?.tag) choice.tag = text(v.tag, 40);
+          return choice;
         })
-        .filter(Boolean),
-    }))
+        .filter(Boolean);
+      return out;
+    })
     .filter(option => option.label && option.values.length);
 }
 

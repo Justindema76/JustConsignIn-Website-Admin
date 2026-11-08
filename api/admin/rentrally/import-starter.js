@@ -119,6 +119,60 @@ async function refreshContent(token) {
   return refreshed;
 }
 
+// Puts back how options SHOW (tiles / cards / tick boxes, "only show when" rules, hints, choice notes
+// and price tags) where an older admin save dropped them. Matches by option name and choice text.
+// Never changes names, choices, prices, photos or anything else edited in the admin.
+async function repairOptionLooks(token) {
+  const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&select=id,slug,sku,options`), 'Unable to read rentals.');
+  let repaired = 0;
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const starter = STARTER_PRODUCTS.find(p => p.slug === row.slug) || STARTER_PRODUCTS.find(p => p.sku && p.sku === row.sku);
+    if (!starter?.options?.length || !Array.isArray(row.options)) continue;
+    const seen = {};
+    let changed = false;
+    const options = row.options.map(o => {
+      const n = seen[o.label] = (seen[o.label] || 0) + 1;
+      const src = starter.options.filter(x => x.label === o.label)[n - 1];
+      if (!src) return o;
+      const out = { ...o };
+      for (const key of ['style', 'when', 'hint']) if (src[key] && !out[key]) { out[key] = src[key]; changed = true; }
+      out.values = (o.values || []).map(v => {
+        const sv = (src.values || []).find(x => x.v === v.v);
+        if (!sv) return v;
+        const nv = { ...v };
+        for (const key of ['note', 'tag']) if (sv[key] && !nv[key]) { nv[key] = sv[key]; changed = true; }
+        return nv;
+      });
+      return out;
+    });
+    if (!changed) continue;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(row.id)}&select=id`, {
+      method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ options }),
+    }), `Unable to repair ${row.slug}.`);
+    repaired += 1;
+  }
+  return repaired;
+}
+
+// New packages to add once (only if that web address isn't already used). Emptied after it has run.
+const ADD_PACKAGES = ['tent-salesmen'];
+async function addPackages(token) {
+  let added = 0;
+  for (const slug of ADD_PACKAGES) {
+    const row = STARTER_PACKAGES.find(p => p.slug === slug);
+    if (!row) continue;
+    const have = await parseSupabase(await supabaseUserRest(token, `${TABLES.packages}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=id`), `Unable to read ${slug}.`);
+    if (Array.isArray(have) && have.length) continue;
+    const { hero_image, ...rest } = row;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.packages}?select=id`, {
+      method: 'POST', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ ...rest, hero_image: '', site_key: SITE_KEY, published_at: new Date().toISOString() }),
+    }), `Unable to add ${slug}.`);
+    added += 1;
+  }
+  return added;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -130,9 +184,12 @@ export default async function handler(req, res) {
     const packages = await insertMissing(owner.accessToken, TABLES.packages, STARTER_PACKAGES);
     const refreshed = await refreshContent(owner.accessToken);
     const refreshedPackages = await patchRows(owner.accessToken, TABLES.packages, REFRESH_PACKAGES, STARTER_PACKAGES, PACKAGE_FIELDS);
+    const repaired = await repairOptionLooks(owner.accessToken);
+    const newPackages = await addPackages(owner.accessToken);
     return res.status(200).json({
       ok: true,
-      added: { categories, products, packages },
+      repaired,
+      added: { categories, products, packages: packages + newPackages },
       refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },
     });
