@@ -12,6 +12,7 @@ export default {
       items: [
         { to: '/admin/rentrally/rentals', label: 'Rentals', icon: 'package' },
         { to: '/admin/rentrally/packages', label: 'Packages', icon: 'boxes' },
+        { to: '/admin/rentrally/shop', label: 'Shop (buy & keep)', icon: 'tags' },
         { to: '/admin/rentrally/categories', label: 'Categories', icon: 'tags' },
       ],
     },

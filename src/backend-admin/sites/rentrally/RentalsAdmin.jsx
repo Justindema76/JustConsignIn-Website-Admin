@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CheckCircle2, Copy, ExternalLink, Eye, EyeOff, Plus, Save, Star, Trash2 } from 'lucide-react';
 import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToList } from './fields';
 import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify, slugTyping } from './rentrallyAdminService';
@@ -17,6 +17,11 @@ const remapOptionPhotos = (options = [], before = [], after = []) => options.map
 
 
 const BASE = '/admin/rentrally/rentals';
+const SHOP_BASE = '/admin/rentrally/shop';
+const SHOP_CATEGORY = 'decorations';
+// Shop items are sold, not rented: no day rate, a buy price.
+const isSaleItem = r => !(Number(r.day_rate) > 0) && Number(r.buy_price) > 0;
+const useBase = () => { const shop = useLocation().pathname.startsWith(SHOP_BASE); return { shop, base: shop ? SHOP_BASE : BASE }; };
 
 const EMPTY = {
   id: '', slug: '', name: '', sku: '', category_slug: '', images: [], day_rate: '', buy_price: '', buy_note: '', buy_url: '',
@@ -44,6 +49,7 @@ export default function RentalsAdmin() {
 }
 
 function RentalList() {
+  const { shop, base } = useBase();
   const [rows, setRows] = useState([]);
   const [cats, setCats] = useState([]);
   const [busy, setBusy] = useState(true);
@@ -66,9 +72,10 @@ function RentalList() {
 
   const catName = slug => cats.find(c => c.slug === slug)?.name || slug || 'No category';
   const filtered = useMemo(() => rows.filter(r =>
-    (cat === 'all' || r.category_slug === cat)
+    isSaleItem(r) === shop
+    && (cat === 'all' || r.category_slug === cat)
     && (status === 'all' || (status === 'popular' ? r.featured : r.status === status))
-    && (!q || `${r.name} ${r.sku} ${r.slug}`.toLowerCase().includes(q.toLowerCase()))), [rows, q, cat, status]);
+    && (!q || `${r.name} ${r.sku} ${r.slug}`.toLowerCase().includes(q.toLowerCase()))), [rows, q, cat, status, shop]);
 
   const runImport = async () => {
     setBusy(true); setError(''); setMessage('');
@@ -139,13 +146,13 @@ function RentalList() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Catalogue</p>
-        <h1>Rentals</h1>
-        <p>Everything customers can rent. Rentals switched On show on the website. ★ marks Popular rentals (shown on the homepage). Tick several to change them together.</p>
+        <h1>{shop ? 'Shop' : 'Rentals'}</h1>
+        {shop ? <p>Things customers buy and keep (no rental). Price = the buy price. Switched On items show in the Shop on the website. Tick several to change them together.</p> : <p>Everything customers can rent. Rentals switched On show on the website. ★ marks Popular rentals (shown on the homepage). Tick several to change them together.</p>}
       </div>
       <div className="site-admin-actions">
-        <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/rentals`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
+        <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}${shop ? `/rentals/${SHOP_CATEGORY}` : '/rentals'}`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View {shop ? 'shop' : 'site'}</a>
         <button className="site-admin-btn secondary" type="button" onClick={runImport} disabled={busy}>Load new rentals</button>
-        <Link className="site-admin-btn" to={`${BASE}/new`}><Plus size={15}/> New Rental</Link>
+        <Link className="site-admin-btn" to={`${base}/new`}><Plus size={15}/> {shop ? 'New Shop Item' : 'New Rental'}</Link>
       </div>
     </div>
 
@@ -179,7 +186,7 @@ function RentalList() {
         {saving && <small>Saving…</small>}
       </div>}
       <div className="site-admin-card site-admin-table">
-        <div className="site-admin-table-head rr-rentals"><span><input type="checkbox" className="rr-check" checked={allShown} onChange={toggleAll} aria-label="Select all rentals shown"/></span><span>Photo</span><span>Rental</span><span>On website</span><span>Day rate</span><span>Actions</span></div>
+        <div className="site-admin-table-head rr-rentals"><span><input type="checkbox" className="rr-check" checked={allShown} onChange={toggleAll} aria-label="Select all rentals shown"/></span><span>Photo</span><span>Rental</span><span>On website</span><span>{shop ? 'Price' : 'Day rate'}</span><span>Actions</span></div>
         {filtered.map(r => <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
           <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
           <div className="site-admin-blog-thumb rr-thumb">
@@ -187,14 +194,14 @@ function RentalList() {
             {r.images?.[0] ? <img src={r.images[0]} alt=""/> : '—'}</div>
           <div><strong>{r.name}</strong><small>{catName(r.category_slug)} · SKU {r.sku || '—'}</small></div>
           <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
-          <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
+          {shop ? <div><strong>{money(r.buy_price)}</strong><small>to buy</small></div> : <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>}
           <div className="site-admin-actions right">
-            <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
+            <Link className="site-admin-btn secondary small" to={`${base}/${r.id}`}>Edit</Link>
             {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/rental/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
             <button className="site-admin-btn danger small" type="button" onClick={() => remove(r)} aria-label={`Delete ${r.name}`}><Trash2 size={13}/></button>
           </div>
         </div>)}
-        {!filtered.length && <div className="site-admin-empty">No rentals match.</div>}
+        {!filtered.length && <div className="site-admin-empty">{shop ? 'No shop items match.' : 'No rentals match.'}</div>}
       </div>
     </>}
     {busy && !rows.length && <div className="site-admin-card site-admin-empty">Loading rentals…</div>}
@@ -203,8 +210,9 @@ function RentalList() {
 
 function RentalEditor({ id }) {
   const navigate = useNavigate();
+  const { shop, base } = useBase();
   const isNew = id === 'new';
-  const [draft, setDraft] = useState(toDraft(EMPTY));
+  const [draft, setDraft] = useState(toDraft(shop ? { ...EMPTY, category_slug: SHOP_CATEGORY, day_rate: 0 } : EMPTY));
   const [cats, setCats] = useState([]);
   const [all, setAll] = useState([]);
   const [busy, setBusy] = useState(true);
@@ -234,7 +242,7 @@ function RentalEditor({ id }) {
       const saved = await productsApi.save(fromDraft(draft));
       setDraft(toDraft(saved));
       setMessage(saved.status === 'published' ? 'Saved. It’s live on the website.' : 'Saved as a draft. It won’t show on the website until you publish it.');
-      if (isNew) navigate(`${BASE}/${saved.id}`, { replace: true });
+      if (isNew) navigate(`${base}/${saved.id}`, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -246,13 +254,13 @@ function RentalEditor({ id }) {
     const copy = fromDraft({ ...draft, id: '', name: `${draft.name} (copy)`, slug: `${draft.slug}-copy`, status: 'draft' });
     try {
       const saved = await productsApi.save(copy);
-      navigate(`${BASE}/${saved.id}`);
+      navigate(`${base}/${saved.id}`);
     } catch (err) { setError(err.message); }
   };
 
   const remove = async () => {
     if (!confirm(`Delete "${draft.name}"? This can’t be undone.`)) return;
-    try { await productsApi.remove(draft.id); navigate(BASE); } catch (err) { setError(err.message); }
+    try { await productsApi.remove(draft.id); navigate(base); } catch (err) { setError(err.message); }
   };
 
   const others = all.filter(p => p.id !== draft.id);
@@ -260,12 +268,12 @@ function RentalEditor({ id }) {
   return <>
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Rentals</p>
-        <h1>{isNew ? 'New Rental' : draft.name || 'Edit Rental'}</h1>
+        <p className="site-admin-eyebrow">{shop ? 'Shop' : 'Rentals'}</p>
+        <h1>{isNew ? (shop ? 'New Shop Item' : 'New Rental') : draft.name || (shop ? 'Edit Shop Item' : 'Edit Rental')}</h1>
         <p>{draft.status === 'published' ? 'Published: changes go live when you save.' : 'Draft: only you can see this.'}</p>
       </div>
       <div className="site-admin-actions">
-        <Link className="site-admin-btn secondary" to={BASE}>← Rentals</Link>
+        <Link className="site-admin-btn secondary" to={base}>← {shop ? 'Shop' : 'Rentals'}</Link>
         <button className="site-admin-btn" type="submit" form="rr-rental-form" disabled={busy}><Save size={15}/> {busy ? 'Saving…' : 'Save'}</button>
       </div>
     </div>
@@ -284,8 +292,10 @@ function RentalEditor({ id }) {
             </select>
           </label>
           <label>SKU<input value={draft.sku} onChange={e => set('sku', e.target.value)}/></label>
-          <label>Day rate (CAD)<input inputMode="decimal" required value={draft.day_rate} onChange={e => set('day_rate', e.target.value)} placeholder="45"/>
-            <small>Weekend = 2 days, 1 week = 4 days, 2 weeks = 8 days.</small></label>
+          {shop ? <label>Price to buy (CAD)<input inputMode="decimal" required value={draft.buy_price} onChange={e => setDraft(d => ({ ...d, buy_price: e.target.value, day_rate: 0 }))} placeholder="35"/>
+            <small>Sold, not rented. The customer keeps it.</small></label>
+          : <label>Day rate (CAD)<input inputMode="decimal" required value={draft.day_rate} onChange={e => set('day_rate', e.target.value)} placeholder="45"/>
+            <small>2 days = 1.75 days, weekend = 2 days, 1 week = 4 days, 2 weeks = 7 days.</small></label>}
           <label>Badge <small>(optional, e.g. New)</small><input value={draft.badge} onChange={e => set('badge', e.target.value)}/></label>
         </div>
 

@@ -128,6 +128,8 @@ export default function AdminApp() {
 
         <Route path="/admin/rentrally/rentals" element={only(RENTRALLY, <RentalsAdmin />)} />
         <Route path="/admin/rentrally/rentals/:id" element={only(RENTRALLY, <RentalsAdmin />)} />
+        <Route path="/admin/rentrally/shop" element={only(RENTRALLY, <RentalsAdmin />)} />
+        <Route path="/admin/rentrally/shop/:id" element={only(RENTRALLY, <RentalsAdmin />)} />
         <Route path="/admin/rentrally/packages" element={only(RENTRALLY, <RentrallyPackagesAdmin />)} />
         <Route path="/admin/rentrally/packages/:id" element={only(RENTRALLY, <RentrallyPackagesAdmin />)} />
         <Route path="/admin/rentrally/categories" element={only(RENTRALLY, <RentrallyCategoriesAdmin />)} />
