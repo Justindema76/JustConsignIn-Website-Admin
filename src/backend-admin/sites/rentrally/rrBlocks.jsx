@@ -186,17 +186,39 @@ function Usp({ p }) {
   );
 }
 
+// Category icons (line drawings, red), picked from the category's web address or name.
+const CAT_ICONS = [
+  [/tent|canop/, 'M2 10 12 4l10 6zM2 10c1.7 1.3 3.3 1.3 5 0 1.7 1.3 3.3 1.3 5 0 1.7 1.3 3.3 1.3 5 0 1.7 1.3 3.3 1.3 5 0M4 11v10M20 11v10'],
+  [/dancer|blower/, 'M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2'],
+  [/balloon/, 'M12 15c-3.3 0-6-2.9-6-6.3S8.7 3 12 3s6 2.4 6 5.7S15.3 15 12 15Zm-1.2 0 1.2 2 1.2-2M12 17c0 2-2 2.2-2 4'],
+  [/inflat/, 'M8 21h8M12 17v4M7 10a5 5 0 0 1 10 0v2a5 5 0 0 1-10 0Zm2-1h.01M15 9h.01M10 13c1.2.8 2.8.8 4 0'],
+  [/flag/, 'M4 22V4M4 4h13l-2.5 4L17 12H4'],
+  [/display|banner|stand|sign/, 'M4 3h16v11H4zM8 21l2-7M16 21l-2-7M8 7h8M8 10h5'],
+  [/vehicle|ramp|car/, 'M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm18 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM3 13l2-5h11l4 5M3 13h18v4'],
+  [/lot|event|cone|barrier/, 'M12 3l6 18H6zM5 21h14M8.3 15h7.4M9.7 10h4.6'],
+  [/decor|shop|buy|pennant|bow/, 'M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4ZM7.5 7.5h.01'],
+];
+const catIcon = c => (CAT_ICONS.find(([re]) => re.test(`${c.slug} ${c.name}`.toLowerCase())) || [null, 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z'])[1];
+const Icon = ({ d }) => <svg className="cat-ic" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d}/></svg>;
+
+// Category tiles: grey tiles with a red icon and the name, then a black "browse everything" tile.
 function Categories({ p, ctx }) {
   const cats = ctx.categories || [];
   return (
     <section className={sectionClass(p)}><div className="wrap">
       <SecHead p={p} ctx={ctx}/>
-      <div className="cats">{cats.map(c => (
-        <A ctx={ctx} key={c.slug} className="cat" href={categoryHref(c.slug)}>
-          <div className="im"><img src={c.image} alt={c.name} loading="lazy"/></div>
-          <div className="nm">{c.name}<span>→</span></div>
-        </A>
-      ))}</div>
+      <div className="cat-tiles">
+        {cats.map(c => (
+          <A ctx={ctx} key={c.slug} className="cat-tile" href={categoryHref(c.slug)}>
+            <Icon d={catIcon(c)}/>
+            <span>{c.name}</span>
+          </A>
+        ))}
+        {cats.length ? <A ctx={ctx} className="cat-tile all" href={p.linkUrl || '/rentals'}>
+          <Icon d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2zM22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/>
+          <span>Browse all rentals</span>
+        </A> : null}
+      </div>
       {!cats.length ? <p className="count-note">Categories appear here once they are published in Admin › Categories.</p> : null}
     </div></section>
   );
@@ -222,7 +244,7 @@ function Popular({ p, ctx }) {
   return (
     <section className={sectionClass(p)} style={p.tight ? { paddingTop: 0 } : undefined}><div className="wrap">
       <SecHead p={p} ctx={ctx}/>
-      <div className="cards">{list.slice(0, limit).map(x => <ProductCard key={x.slug} p={x} ctx={ctx}/>)}</div>
+      <div className="carousel">{list.slice(0, limit).map(x => <ProductCard key={x.slug} p={x} ctx={ctx}/>)}</div>
     </div></section>
   );
 }
