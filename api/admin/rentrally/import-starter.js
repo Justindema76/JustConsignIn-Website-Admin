@@ -8,6 +8,10 @@ import { STARTER_CATEGORIES, STARTER_PACKAGES, STARTER_PRODUCTS } from './_lib/s
 // editing in the admin, never overwrites your changes.
 async function insertMissing(token, table, rows) {
   const now = new Date().toISOString();
+  // Only fills an EMPTY table (first-time setup). Once anything exists, nothing is ever added back,
+  // so rentals, packages or categories you deleted stay deleted.
+  const any = await parseSupabase(await supabaseUserRest(token, `${table}?site_key=eq.${SITE_KEY}&select=id&limit=1`), `Unable to read ${table}.`);
+  if (Array.isArray(any) && any.length) return 0;
   // A rental whose web address was renamed in the admin is still the same rental: match it by SKU.
   if (table === TABLES.products) {
     const have = await parseSupabase(await supabaseUserRest(token, `${table}?site_key=eq.${SITE_KEY}&select=slug,sku`), `Unable to read ${table}.`);
@@ -39,7 +43,7 @@ const REFRESH_FROM_STARTER = [];
 const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
 
 // Packages rebuilt around the full catalogue: refreshed from the starter list (status, sort order and SEO kept).
-const REFRESH_PACKAGES = ['grand-opening', 'dealership-weekend', 'lot-dress-up', 'tire-promo', 'attention-grabber', 'offsite-tent-sale', 'vendor-market', 'backyard-party', 'event-entry'];
+const REFRESH_PACKAGES = [];
 const PACKAGE_FIELDS = ['tag', 'name', 'hero_image', 'day_rate', 'items', 'description', 'good_for'];
 
 async function patchRows(token, table, slugs, starter, fields) {

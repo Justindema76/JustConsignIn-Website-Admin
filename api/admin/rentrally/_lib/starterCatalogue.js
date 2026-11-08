@@ -1044,7 +1044,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/tire-1.jpg",
       "https://rent-and-rally.vercel.app/img/tire-2.jpg"
     ],
-    "day_rate": 200,
+    "day_rate": 375,
     "buy_price": 1595,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/giant-inflatable-tire-9165.html",
@@ -4009,7 +4009,7 @@ export const STARTER_PACKAGES = [
     "tag": "Tire season",
     "name": "Tire & Service Promo",
     "hero_image": "https://rent-and-rally.vercel.app/img/tire-1.jpg",
-    "day_rate": 539,
+    "day_rate": 689,
     "items": [
       {
         "product": "tire",
