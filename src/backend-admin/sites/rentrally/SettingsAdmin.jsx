@@ -16,6 +16,13 @@ const GROUPS = [
     ],
   },
   {
+    title: 'Buying (Shop)',
+    note: 'What rental pages show under "Prefer to own it?". Shop items only appear on the website when this is set to Our Shop.',
+    fields: [
+      ['buy_mode', '"Prefer to own it?" on rental pages', '', 'wide', 'select'],
+    ],
+  },
+  {
     title: 'Contact & service area',
     fields: [
       ['phone', 'Phone', '905-555-0123'],
@@ -44,6 +51,14 @@ const GROUPS = [
     ],
   },
 ];
+
+const SELECTS = {
+  buy_mode: [
+    ['supplier', 'Link to the supplier (Shop now → opens their page)'],
+    ['shop', 'Our Shop (Buy it → our own buy pages; Shop items shown)'],
+    ['off', 'Off (no buying on the website)'],
+  ],
+};
 
 export default function SettingsAdmin() {
   const [values, setValues] = useState({});
@@ -91,7 +106,9 @@ export default function SettingsAdmin() {
           <div className="site-admin-form">
             {group.fields.map(([key, label, placeholder, wide, kind]) => <label key={key} className={wide || ''}>
               {label}
-              {kind === 'textarea'
+              {kind === 'select'
+                ? <select value={values[key] || 'supplier'} onChange={e => set(key, e.target.value)}>{SELECTS[key].map(([v, text]) => <option key={v} value={v}>{text}</option>)}</select>
+                : kind === 'textarea'
                 ? <textarea rows={3} value={values[key] || ''} placeholder={placeholder} onChange={e => set(key, e.target.value)}/>
                 : <input value={values[key] || ''} placeholder={placeholder} onChange={e => set(key, e.target.value)}/>}
             </label>)}
