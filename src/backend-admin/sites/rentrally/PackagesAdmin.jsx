@@ -8,10 +8,15 @@ import './rentrally.css';
 const BASE = '/admin/rentrally/packages';
 const EMPTY = { id: '', slug: '', tag: '', name: '', hero_image: '', day_rate: '', items: [], description: '', good_for: [], status: 'draft', sort_order: 0, seo_title: '', seo_description: '' };
 
+// Only rentals switched on count, same as the website.
 const separately = (items, products) => items.reduce((sum, item) => {
-  const p = products.find(x => x.slug === item.product);
+  const p = products.find(x => x.slug === item.product && x.status === 'published');
   return sum + (p ? Number(p.day_rate) * item.qty : 0);
 }, 0);
+// Package prices are automatic: 10% under renting the pieces separately, rounded to end in 9.
+// The website works it out the same way, so packages follow every rental price change.
+export const PACKAGE_DISCOUNT = 0.10;
+export const autoPrice = list => (list > 0 ? Math.max(1, Math.round((list * (1 - PACKAGE_DISCOUNT)) / 5) * 5 - 1) : 0);
 
 export default function PackagesAdmin() {
   const { id } = useParams();
@@ -96,9 +101,9 @@ function PackageList() {
         return <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
           <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
           <div className="site-admin-blog-thumb">{r.hero_image ? <img src={r.hero_image} alt=""/> : '—'}</div>
-          <div><strong>{r.name}</strong><small>{(r.items || []).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > r.day_rate ? ` · saves ${money(list - r.day_rate)}/day` : ''}</small>{off > 0 && <small className="rr-warn">{off} rental{off === 1 ? ' is' : 's are'} switched off, so {off === 1 ? 'it is' : 'they are'} left out of this package on the site</small>}</div>
+          <div><strong>{r.name}</strong><small>{(r.items || []).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > autoPrice(list) ? ` · saves ${money(list - autoPrice(list))}/day` : ''}</small>{off > 0 && <small className="rr-warn">{off} rental{off === 1 ? ' is' : 's are'} switched off, so {off === 1 ? 'it is' : 'they are'} left out of this package on the site</small>}</div>
           <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
-          <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
+          <div><strong>{money(autoPrice(list))}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
             {r.status === 'published' && <a className="site-admin-btn secondary small" href={`${RENTRALLY_SITE_URL}/packages/${r.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/></a>}
@@ -135,14 +140,14 @@ function PackageEditor({ id }) {
   const set = (key, value) => setDraft(d => ({ ...d, [key]: value }));
   const setItem = (i, patch) => set('items', draft.items.map((it, j) => (j === i ? { ...it, ...patch } : it)));
   const list = useMemo(() => separately(draft.items, products), [draft.items, products]);
-  const rate = Number(draft.day_rate) || 0;
+  const rate = autoPrice(list);
 
   const save = async event => {
     event?.preventDefault();
     setBusy(true); setError(''); setMessage('');
     try {
       const { goodForText, ...rest } = draft;
-      const saved = await packagesApi.save({ ...rest, slug: slugify(rest.slug), good_for: goodForText.split(',').map(s => s.trim()).filter(Boolean) });
+      const saved = await packagesApi.save({ ...rest, day_rate: rate, slug: slugify(rest.slug), good_for: goodForText.split(',').map(s => s.trim()).filter(Boolean) });
       setDraft({ ...EMPTY, ...saved, goodForText: (saved.good_for || []).join(', ') });
       setMessage(saved.status === 'published' ? 'Saved. It’s live on the website.' : 'Saved as a draft.');
       if (isNew) navigate(`${BASE}/${saved.id}`, { replace: true });
@@ -177,7 +182,7 @@ function PackageEditor({ id }) {
         <div className="site-admin-card site-admin-form">
           <label className="wide">Package name<input required value={draft.name} onChange={e => setDraft(d => ({ ...d, name: e.target.value, slug: slugTouched ? d.slug : slugify(e.target.value) }))}/></label>
           <label>Tag <small>(e.g. Most popular)</small><input value={draft.tag} onChange={e => set('tag', e.target.value)}/></label>
-          <label>Package day rate (CAD)<input inputMode="decimal" required value={draft.day_rate} onChange={e => set('day_rate', e.target.value)}/></label>
+          <label>Package day rate (CAD) <small>automatic</small><input value={rate ? `${money(rate)} / day` : 'Add rentals below'} readOnly aria-readonly="true" title="10% under renting the pieces separately. Updates when you change a rental's price."/></label>
           <label className="wide">Description<textarea rows={4} value={draft.description} onChange={e => set('description', e.target.value)}/></label>
           <label className="wide">Great for <small>Comma separated, e.g. Grand openings, Car lots</small><input value={draft.goodForText} onChange={e => set('goodForText', e.target.value)}/></label>
         </div>
@@ -202,7 +207,7 @@ function PackageEditor({ id }) {
           </div>
           <div className="rr-savings">
             <div><span>Rented separately</span><b>{money(list)}/day</b></div>
-            <div><span>Package price</span><b>{money(rate)}/day</b></div>
+            <div><span>Package price (10% off, automatic)</span><b>{money(rate)}/day</b></div>
             <div className={list - rate > 0 ? 'good' : 'bad'}><span>Customer saves</span><b>{money(Math.max(0, list - rate))}/day</b></div>
           </div>
         </div>
