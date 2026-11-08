@@ -65,6 +65,13 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
   const upload = async event => {
     const files = [...(event.target.files || [])];
     event.target.value = '';
+    return uploadFiles(files);
+  };
+  // Photos dragged in from the computer upload straight away.
+  const [fileOver, setFileOver] = useState(false);
+  const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+  const dropFiles = e => { if (!hasFiles(e)) return; e.preventDefault(); setFileOver(false); uploadFiles([...e.dataTransfer.files].filter(f => /^image\//.test(f.type))); };
+  const uploadFiles = async files => {
     if (!files.length) return;
     setBusy(true); setError('');
     try {
@@ -117,7 +124,7 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
       <small>{single ? 'One photo.' : 'The first photo is the main one. Options can point at a photo number.'}</small>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
-    <div className="rr-photo-grid">
+    <div className={`rr-photo-grid${fileOver ? ' is-file-over' : ''}`} onDragOver={e => { if (hasFiles(e)) { e.preventDefault(); setFileOver(true); } }} onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setFileOver(false); }} onDrop={dropFiles}>
       {list.map((src, i) => <div
         className={`rr-photo${drag === i ? ' is-dragging' : ''}${over === i && drag !== i ? ' is-over' : ''}`}
         key={`${src}-${i}`}
@@ -137,7 +144,7 @@ export function PhotoList({ value = [], onChange, single = false, label = 'Photo
       </div>)}
       <label className="rr-photo rr-photo-add upload-button">
         <ImagePlus size={20}/>
-        <span>{busy ? 'Uploading…' : single && list.length ? 'Replace' : 'Upload'}</span>
+        <span>{busy ? 'Uploading…' : single && list.length ? 'Replace' : <>Upload photo<small>or drag photos here</small></>}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple={!single} onChange={upload} disabled={busy}/>
       </label>
     </div>

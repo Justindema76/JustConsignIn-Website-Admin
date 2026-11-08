@@ -161,3 +161,7 @@
 .rr-star:hover{color:#e0a100;border-color:#e0a100}
 .rr-star.on{color:#fff;background:#e0a100;border-color:#e0a100}
 .rr-star.on svg{fill:#fff}
+
+.rr-photo-add span{display:flex;flex-direction:column;align-items:center;text-align:center;line-height:1.2}
+.rr-photo-add small{font-weight:600;color:#5b6b7b;font-size:11px;margin-top:2px}
+.rr-photo-grid.is-file-over{outline:3px dashed #164f88;outline-offset:4px;border-radius:10px;background:#eef5fc}
