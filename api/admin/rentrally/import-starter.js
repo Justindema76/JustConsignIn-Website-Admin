@@ -256,7 +256,7 @@ async function repriceOnce(token) {
 
 // New rentals to add once (skipped if that SKU is already there). Category follows a
 // sibling rental's category in the admin. Emptied after it has run.
-const ADD_PRODUCTS_ONCE = [];
+const ADD_PRODUCTS_ONCE = ['pennants', 'metalpennant', 'fluorpennant', 'gatorpennant', 'pullbow', 'giantbow', 'holidaybow'].map(slug => ({ slug }));
 async function addProductsOnce(token) {
   let added = 0;
   for (const { slug, categoryLike } of ADD_PRODUCTS_ONCE) {
@@ -290,6 +290,21 @@ async function fixDoubleDollars(token) {
   return fixed;
 }
 
+// New categories to add once (skipped if already there). Emptied after it has run.
+const ADD_CATEGORIES_ONCE = ['decorations'];
+async function addCategoriesOnce(token) {
+  let added = 0;
+  for (const slug of ADD_CATEGORIES_ONCE) {
+    const row = STARTER_CATEGORIES.find(c => c.slug === slug);
+    if (!row) continue;
+    const have = await parseSupabase(await supabaseUserRest(token, `${TABLES.categories}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=slug`), `Unable to read ${slug}.`);
+    if (Array.isArray(have) && have.length) continue;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.categories}?select=slug`, { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ ...row, site_key: SITE_KEY }) }), `Unable to add ${slug}.`);
+    added += 1;
+  }
+  return added;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -306,6 +321,7 @@ export default async function handler(req, res) {
     const relinked = await repairRenamedLinks(owner.accessToken);
     const updated = await updateOnce(owner.accessToken);
     const repriced = await repriceOnce(owner.accessToken);
+    const newCategories = await addCategoriesOnce(owner.accessToken);
     const newProducts = await addProductsOnce(owner.accessToken);
     const dollars = await fixDoubleDollars(owner.accessToken);
     return res.status(200).json({
@@ -315,7 +331,7 @@ export default async function handler(req, res) {
       dollars,
       updated,
       repriced,
-      added: { categories, products: products + newProducts, packages: packages + newPackages },
+      added: { categories: categories + newCategories, products: products + newProducts, packages: packages + newPackages },
       refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },
     });

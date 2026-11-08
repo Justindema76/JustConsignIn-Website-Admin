@@ -60,8 +60,8 @@ export function ProductCard({ p, ctx }) {
       <div className="bd">
         <div className="sku">SKU {p.sku}</div>
         <div className="nm">{p.name}</div>
-        <div className="from">Rent from</div>
-        <div className="pr"><b>{money(p.price)} <small>/day</small></b><span className="arrow">→</span></div>
+        <div className="from">{p.price > 0 || !(p.buy > 0) ? 'Rent from' : 'Buy & keep'}</div>
+        <div className="pr"><b>{p.price > 0 || !(p.buy > 0) ? <>{money(p.price)} <small>/day</small></> : <>{money(p.buy)} <small>each</small></>}</b><span className="arrow">→</span></div>
       </div>
     </A>
   );

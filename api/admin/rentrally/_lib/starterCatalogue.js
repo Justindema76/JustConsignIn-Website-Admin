@@ -64,6 +64,14 @@ export const STARTER_CATEGORIES = [
     "image": "https://rent-and-rally.vercel.app/img/beltbarrier-1.jpg",
     "status": "published",
     "sort_order": 80
+  },
+  {
+    "slug": "decorations",
+    "name": "Lot Decorations (Buy)",
+    "blurb": "Pennants and bows to buy and keep. Add them to any rental order.",
+    "image": "https://rent-and-rally.vercel.app/img/pennants-1.jpg",
+    "status": "published",
+    "sort_order": 90
   }
 ];
 
@@ -4190,6 +4198,501 @@ export const STARTER_PRODUCTS = [
     "featured": false,
     "status": "published",
     "sort_order": 400
+  },
+  {
+    "slug": "pennants",
+    "category_slug": "decorations",
+    "sku": "P12305-P12309",
+    "name": "Pennant Streamer String (60 ft)",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/pennants-1.jpg",
+      "https://rent-and-rally.vercel.app/img/pennants-2.jpg",
+      "https://rent-and-rally.vercel.app/img/pennants-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 24.95,
+    "buy_note": "per 60 ft string, yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "The classic car-lot pennant string. 50 bright 9\" x 12\" poly pennants sewn on a 60 ft nylon string. Run them between light poles, along fences or over the lot to make it look like something is happening.",
+      "These are bought, not rented: they are yours to keep. Add as many strings as you need to your order and we bring them with your rentals."
+    ],
+    "features": [
+      "60 ft string",
+      "50 pennants, 9\" x 12\"",
+      "4 mil poly plastic",
+      "6 colour mixes",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Length",
+        "value": "60 ft per string"
+      },
+      {
+        "label": "Pennants",
+        "value": "50 per string, 9\" x 12\""
+      },
+      {
+        "label": "Material",
+        "value": "4 mil poly plastic on nylon string"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor, short-term sales events"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colours",
+        "values": [
+          {
+            "v": "Red & White"
+          },
+          {
+            "v": "Blue & White"
+          },
+          {
+            "v": "Red, Blue & White"
+          },
+          {
+            "v": "Blue & Yellow"
+          },
+          {
+            "v": "Yellow & Red"
+          },
+          {
+            "v": "Multi-Coloured"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "metalpennant",
+      "giantbow",
+      "swooper"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 410
+  },
+  {
+    "slug": "metalpennant",
+    "category_slug": "decorations",
+    "sku": "TM5D-TM5G",
+    "name": "Metallic Antenna Pennants",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/metalpennant-1.jpg",
+      "https://rent-and-rally.vercel.app/img/metalpennant-2.jpg",
+      "https://rent-and-rally.vercel.app/img/metalpennant-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 47.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "Five shiny 4\" x 12\" pennants sewn on a 32\" metallic mylar sleeve that slides over a car antenna. Catches the light and moves in the wind on every car on the lot."
+    ],
+    "features": [
+      "Slides over a car antenna",
+      "Five 4\" x 12\" pennants",
+      "Metallic mylar",
+      "3 colour mixes",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Pennants",
+        "value": "Five 4\" x 12\""
+      },
+      {
+        "label": "Sleeve",
+        "value": "32\" metallic mylar"
+      },
+      {
+        "label": "Fits",
+        "value": "Car antennas"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colours",
+        "values": [
+          {
+            "v": "Red & Silver"
+          },
+          {
+            "v": "Blue & Silver"
+          },
+          {
+            "v": "Red, Blue & Silver"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "fluorpennant",
+      "pennants",
+      "pullbow"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 420
+  },
+  {
+    "slug": "fluorpennant",
+    "category_slug": "decorations",
+    "sku": "TT2A-TT2D",
+    "name": "Fluorescent Antenna Pennants",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/fluorpennant-1.jpg",
+      "https://rent-and-rally.vercel.app/img/fluorpennant-2.jpg",
+      "https://rent-and-rally.vercel.app/img/fluorpennant-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 47.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "Five bright fluorescent 4\" x 12\" pennants sewn on a 32\" vinyl sleeve that slides over a car antenna. Easy to see from the road, day or night under lot lights."
+    ],
+    "features": [
+      "Slides over a car antenna",
+      "Five 4\" x 12\" pennants",
+      "Fluorescent colours",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Pennants",
+        "value": "Five 4\" x 12\""
+      },
+      {
+        "label": "Sleeve",
+        "value": "32\" vinyl"
+      },
+      {
+        "label": "Fits",
+        "value": "Car antennas"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colours",
+        "values": [
+          {
+            "v": "Multi-Coloured"
+          },
+          {
+            "v": "Red & White"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "metalpennant",
+      "gatorpennant",
+      "pennants"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 430
+  },
+  {
+    "slug": "gatorpennant",
+    "category_slug": "decorations",
+    "sku": "PC50",
+    "name": "Antenna Flag (12\" x 18\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/gatorpennant-1.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 38.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "A large 12\" x 18\" fluorescent polyester flag sewn on a 32\" sleeve that slides easily over a car antenna. Bigger than a pennant, so feature vehicles stand out."
+    ],
+    "features": [
+      "Slides over a car antenna",
+      "12\" x 18\" flag",
+      "Fluorescent polyester",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Flag",
+        "value": "12\" x 18\" polyester"
+      },
+      {
+        "label": "Sleeve",
+        "value": "32\""
+      },
+      {
+        "label": "Fits",
+        "value": "Car antennas"
+      }
+    ],
+    "options": [],
+    "related": [
+      "metalpennant",
+      "fluorpennant",
+      "giantbow"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 440
+  },
+  {
+    "slug": "pullbow",
+    "category_slug": "decorations",
+    "sku": "53601-53607",
+    "name": "Pull-String Windshield Bow (12\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/pullbow-1.jpg",
+      "https://rent-and-rally.vercel.app/img/pullbow-2.jpg",
+      "https://rent-and-rally.vercel.app/img/pullbow-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 16.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "A 12\" shiny bow with 8\" tails. It ships flat: pull the string and it pops into a bow. Ties to a suction cup for the windshield, perfect for highlighting a price, year or feature."
+    ],
+    "features": [
+      "12\" bow, 8\" tails",
+      "Pull the string to make the bow",
+      "Suction cup for windshields",
+      "7 colours",
+      "Indoor & outdoor",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Size",
+        "value": "12\" diameter, 8\" tails"
+      },
+      {
+        "label": "Material",
+        "value": "4\" wide weather-resistant ribbon"
+      },
+      {
+        "label": "Mount",
+        "value": "Suction cup"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Red"
+          },
+          {
+            "v": "Blue"
+          },
+          {
+            "v": "Gold"
+          },
+          {
+            "v": "Green"
+          },
+          {
+            "v": "Pink"
+          },
+          {
+            "v": "Silver"
+          },
+          {
+            "v": "White"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "giantbow",
+      "holidaybow",
+      "metalpennant"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 450
+  },
+  {
+    "slug": "giantbow",
+    "category_slug": "decorations",
+    "sku": "53501-53507",
+    "name": "Giant Vehicle Bow (30\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/giantbow-1.jpg",
+      "https://rent-and-rally.vercel.app/img/giantbow-2.jpg",
+      "https://rent-and-rally.vercel.app/img/giantbow-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 84.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "The big bow for a vehicle delivery, showroom feature or sales event. 30\" wide, waterproof vinyl, fully assembled and ready to put on a hood, roof or windshield."
+    ],
+    "features": [
+      "30\" wide",
+      "Waterproof vinyl",
+      "Fully assembled",
+      "Magnetic or suction cup base",
+      "7 colours",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Size",
+        "value": "30\" wide"
+      },
+      {
+        "label": "Material",
+        "value": "Weather-resistant waterproof vinyl"
+      },
+      {
+        "label": "Mount",
+        "value": "Magnetic or suction cup base"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Red"
+          },
+          {
+            "v": "Blue"
+          },
+          {
+            "v": "Gold"
+          },
+          {
+            "v": "Green"
+          },
+          {
+            "v": "Pink"
+          },
+          {
+            "v": "Silver"
+          },
+          {
+            "v": "White"
+          }
+        ]
+      },
+      {
+        "label": "Base",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Magnetic base",
+            "note": "For steel hoods and roofs."
+          },
+          {
+            "v": "Suction cup base",
+            "note": "For glass and non-magnetic surfaces."
+          }
+        ]
+      }
+    ],
+    "related": [
+      "holidaybow",
+      "pullbow",
+      "pennants"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 460
+  },
+  {
+    "slug": "holidaybow",
+    "category_slug": "decorations",
+    "sku": "53508-53509",
+    "name": "Giant \"Happy Holidays\" Bow (30\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/holidaybow-1.jpg",
+      "https://rent-and-rally.vercel.app/img/holidaybow-2.jpg",
+      "https://rent-and-rally.vercel.app/img/holidaybow-3.jpg"
+    ],
+    "day_rate": 0,
+    "buy_price": 84.95,
+    "buy_note": "yours to keep",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "A 30\" waterproof vinyl bow with two 30\" tails printed \"Happy Holidays\". Arrives full and ready to display on a hood, roof or windshield. Great for December sales and gift deliveries."
+    ],
+    "features": [
+      "30\" wide, 30\" tails",
+      "\"Happy Holidays\" print",
+      "Waterproof vinyl",
+      "Magnetic or suction cup base",
+      "Yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "Size",
+        "value": "30\" wide, two 30\" x 4½\" tails"
+      },
+      {
+        "label": "Material",
+        "value": "Waterproof vinyl"
+      },
+      {
+        "label": "Mount",
+        "value": "Magnetic or suction cup base"
+      }
+    ],
+    "options": [
+      {
+        "label": "Colour",
+        "values": [
+          {
+            "v": "Red"
+          },
+          {
+            "v": "White"
+          }
+        ]
+      },
+      {
+        "label": "Base",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Magnetic base",
+            "note": "For steel hoods and roofs."
+          },
+          {
+            "v": "Suction cup base",
+            "note": "For glass and non-magnetic surfaces."
+          }
+        ]
+      }
+    ],
+    "related": [
+      "giantbow",
+      "pullbow",
+      "pennants"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 470
   }
 ];
 
