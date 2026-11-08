@@ -155,7 +155,7 @@ async function repairOptionLooks(token) {
 }
 
 // New packages to add once (only if that web address isn't already used). Emptied after it has run.
-const ADD_PACKAGES = ['tent-salesmen'];
+const ADD_PACKAGES = [];
 async function addPackages(token) {
   let added = 0;
   for (const slug of ADD_PACKAGES) {
