@@ -717,7 +717,23 @@ export const STARTER_PRODUCTS = [
         "value": "Delivered & set up by our crew"
       }
     ],
-    "options": [],
+    "options": [
+      {
+        "label": "Blower",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "tag": "Included",
+            "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
+          },
+          {
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
+          }
+        ]
+      }
+    ],
     "related": [
       "shirt",
       "arrow",
@@ -843,7 +859,23 @@ export const STARTER_PRODUCTS = [
         "value": "Blower included, standard outlet"
       }
     ],
-    "options": [],
+    "options": [
+      {
+        "label": "Blower",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "tag": "Included",
+            "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
+          },
+          {
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
+          }
+        ]
+      }
+    ],
     "related": [
       "gorilla",
       "tire",
@@ -906,6 +938,21 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "18' tall (+$50/day)"
+          }
+        ]
+      },
+      {
+        "label": "Blower",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "tag": "Included",
+            "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
+          },
+          {
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
           }
         ]
       }
@@ -1170,7 +1217,23 @@ export const STARTER_PRODUCTS = [
         "value": "Outdoor"
       }
     ],
-    "options": [],
+    "options": [
+      {
+        "label": "Blower",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "tag": "Included",
+            "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
+          },
+          {
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
+          }
+        ]
+      }
+    ],
     "related": [
       "gorilla",
       "arrow",

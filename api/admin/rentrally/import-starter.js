@@ -362,6 +362,39 @@ async function patchOnce(token) {
   return done;
 }
 
+// One time: add a choice to rentals (found by web address) if they don't already have one with that name.
+// Their other choices are kept. Emptied after it has run.
+const ADD_OPTION_ONCE = { slugs: ["gorilla", "tire", "arrow", "balloon-inflatable"], option: {
+  "label": "Blower",
+  "style": "cards",
+  "values": [
+    {
+      "v": "BR15 blower",
+      "tag": "Included",
+      "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
+    },
+    {
+      "v": "BR35 blower (+$20/day)",
+      "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
+    }
+  ]
+} };
+async function addOptionOnce(token) {
+  const { slugs = [], option } = ADD_OPTION_ONCE;
+  if (!option) return 0;
+  let done = 0;
+  for (const slug of slugs) {
+    const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=id,options`), `Unable to read ${slug}.`);
+    for (const live of Array.isArray(rows) ? rows : []) {
+      const options = Array.isArray(live.options) ? live.options : [];
+      if (options.some(o => o.label === option.label)) continue;
+      await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(live.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ options: [...options, option] }) }), `Unable to update ${slug}.`);
+      done += 1;
+    }
+  }
+  return done;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -382,6 +415,7 @@ export default async function handler(req, res) {
     const newProducts = await addProductsOnce(owner.accessToken);
     const dollars = await fixDoubleDollars(owner.accessToken);
     const patched = await patchOnce(owner.accessToken);
+    const optionsAdded = await addOptionOnce(owner.accessToken);
     const saleCopies = await addSaleCopies(owner.accessToken);
     return res.status(200).json({
       ok: true,
