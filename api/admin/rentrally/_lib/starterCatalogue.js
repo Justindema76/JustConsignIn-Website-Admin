@@ -84,7 +84,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 75,
     "buy_price": 289,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/12011-12015-10-x-10-pop-up-tent.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A commercial-grade 10' x 10' pop-up canopy that sets up in minutes. The go-to tent for vendor markets, lot sales, sidewalk events and backyard gatherings.",
@@ -164,7 +164,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 120,
     "buy_price": 399,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/12021-12025-10-x-20-pop-up-tent.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Double the space of our 10' x 10'. Covers food service, seating or a full sales display, and it still pops up in minutes.",
@@ -239,7 +239,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 50,
     "buy_price": 49.95,
     "buy_note": "each",
-    "buy_url": "https://wheelsauto.com/ca-en/10-kg-tent-leg-weight-12099.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Cast metal 10 kg weights that hold your tent down in breezy conditions. Four are needed per 10' x 10' tent."
@@ -293,7 +293,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 95,
     "buy_price": 199,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/9201-9205-gigantic-tube-man-air-dancer.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "The classic waving tube man, built to be seen from the road. Pick your colour, plug in the blower and watch the traffic slow down.",
@@ -375,7 +375,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 90,
     "buy_price": 199,
     "buy_note": "blower not included",
-    "buy_url": "https://wheelsauto.com/ca-en/9101l-9105r-crazy-car-salesman-air-dancers.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "They dance, they swing, they never get tired. The Crazy Car Salesman stands over 16 feet tall, waving his arms with a big yellow SALE arrow across his body.",
@@ -498,7 +498,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 175,
     "buy_price": 289,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/sale-clown-air-dancer-9105.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A colourful clown air dancer that waves and dances to draw attention to your sale event in a big way."
@@ -548,7 +548,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 70,
     "buy_price": 479.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/power-blower-for-air-dancers-9199.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A powerful 3/4 HP fan that keeps air dancers standing tall and moving. Two speeds, with wheels for easy moving."
@@ -600,7 +600,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 65,
     "buy_price": 199,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/br15-br35-blower-for-inflatables.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A constant-air blower for giant inflatables. Included free with every giant inflatable rental, and available on its own for your own inflatables."
@@ -658,7 +658,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 375,
     "buy_price": 1595,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/gigantic-22-inflatable-gorilla-9160.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Nothing draws as much attention as this gigantic inflatable gorilla. At 22 feet tall it can be seen from blocks away.",
@@ -719,7 +719,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 25,
     "buy_price": 99.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/91601-91606-gorilla-sign-shirt.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Put your message on the gorilla. The sign shirt slips over the 22' gorilla and turns it into a giant billboard."
@@ -788,7 +788,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 150,
     "buy_price": 1295,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/dual-sided-12-inflatable-sale-arrow-9140.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Point customers right to your door. This dual-sided inflatable arrow gets noticed from miles away.",
@@ -844,7 +844,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 375,
     "buy_price": 795,
     "buy_note": "banner not included",
-    "buy_url": "https://wheelsauto.com/ca-en/9115-9120-inflatable-manager-salesman.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Replace your manager or salesman in a hurry with this guy. He approves every deal and never complains. A giant heavyweight vinyl salesman, 12 ft or 18 ft tall, giving two thumbs up.",
@@ -932,7 +932,7 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Custom banner (+$149 one-time)",
-            "note": "$99 banner at the Wheels price + $50 artwork set-up. Your message, yours to keep."
+            "note": "$99 banner + $50 artwork set-up. Your message, yours to keep."
           }
         ]
       },
@@ -974,7 +974,7 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Custom banner (+$179 one-time)",
-            "note": "$129 banner at the Wheels price + $50 artwork set-up. Your message, yours to keep."
+            "note": "$129 banner + $50 artwork set-up. Your message, yours to keep."
           }
         ]
       }
@@ -1001,7 +1001,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 175,
     "buy_price": 799,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/9130-9135-inflatable-sale-clown.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A cheerful giant clown that gets noticed from the road. Perfect for retail sales and family-friendly events."
@@ -1047,7 +1047,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 375,
     "buy_price": 1595,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/giant-inflatable-tire-9165.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Get noticed by everyone driving past. This gigantic inflatable tire is printed on both sides with \"Tire Sale on Now\".",
@@ -1100,7 +1100,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 150,
     "buy_price": 139.95,
     "buy_note": "flag + kit",
-    "buy_url": "https://wheelsauto.com/ca-en/swooper-flag.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A tall swooper flag that moves in the breeze and lines your lot or storefront with colour.",
@@ -1180,7 +1180,7 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Custom flag (we quote it)",
-            "note": "Wheels doesn't list custom swooper flags, so we'll get you a price before you book.",
+            "note": "We'll get you a price for your custom swooper flag before you book.",
             "tag": "Quote"
           }
         ]
@@ -1311,7 +1311,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 150,
     "buy_price": 169.95,
     "buy_note": "flag + kit",
-    "buy_url": "https://wheelsauto.com/ca-en/104101-104128sb-blade-flags.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Blade flags stay open to show your message with or without wind. Heavyweight polyester for showrooms or outdoor lots.",
@@ -1391,7 +1391,7 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Custom flag (we quote it)",
-            "note": "Wheels doesn't list custom blade flags, so we'll get you a price before you book.",
+            "note": "We'll get you a price for your custom blade flag before you book.",
             "tag": "Quote"
           }
         ]
@@ -1513,7 +1513,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 150,
     "buy_price": 159.95,
     "buy_note": "flag + kit",
-    "buy_url": "https://wheelsauto.com/ca-en/bow-flags-103101-103127.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A teardrop-shaped bow flag that stays open and readable even when there is no wind. Bright, bold and easy to read from the road.",
@@ -1598,7 +1598,7 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Custom full-colour flag, yours to keep (+$144.95 one-time)",
-            "note": "$94.95 flag at the Wheels price + $50 artwork set-up. Printed with your logo and message."
+            "note": "$94.95 flag + $50 artwork set-up. Printed with your logo and message."
           }
         ]
       },
@@ -1715,7 +1715,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 35,
     "buy_price": 229,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/107302-107302-ss-windmaster-sign-frame.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A double-sided sidewalk sign with a spring-mounted frame that flexes in the wind instead of blowing over.",
@@ -1785,7 +1785,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 25,
     "buy_price": 109.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/1082436-1083248-a-frame-style-steel-sign-holder.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A steel sandwich-board sign that holds two 32\" x 48\" coroplast signs, one on each side. Folds flat with a top handle for easy moving.",
@@ -2092,7 +2092,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 15,
     "buy_price": 79.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/quickie-auto-sign-a-frame-holder-1083224.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A compact A-frame that holds two 24\" x 32\" Quickie lot signs. Set them in front of feature vehicles or along the curb.",
@@ -2272,7 +2272,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 25,
     "buy_price": 169,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/used-cars-boulevard-banners-1.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Double-sided vertical banners that hang from your light poles, so your message is seen from both directions along the road.",
@@ -2382,7 +2382,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 35,
     "buy_price": 499,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/banner-display-stand-dbs.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A galvanized steel banner frame that anchors under a vehicle tire, so your banner stands tall right beside the car you are featuring.",
@@ -2481,7 +2481,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 20,
     "buy_price": 149,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/nt101-nt101-b-x-banner-stand.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A lightweight X-frame banner stand with carbon fibre rods. It sets up in seconds and adjusts to fit a range of banner sizes.",
@@ -2550,7 +2550,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 20,
     "buy_price": 109.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/nt104-nt104-b-simple-banner-stand.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A sleek aluminum banner stand that assembles in seconds. A clean, professional look for showrooms, receptions and trade shows.",
@@ -2619,7 +2619,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 25,
     "buy_price": 239,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/nt105-nt105-b-retractable-banner-stand.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A roll-up banner display with an adjustable pole and travel case. It pulls up in seconds and adjusts from 40\" to 90\" tall.",
@@ -2690,7 +2690,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 45,
     "buy_price": 995,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/hp2401-hp2402-outdoor-durable-banner-stand.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A heavy-duty banner stand built for outdoor use. Keeps your message upright on lots, sidewalks and event grounds.",
@@ -2773,7 +2773,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 250,
     "buy_price": 4995,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/aluminum-display-ramp-rmp20.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Put a car or truck up on a stage. This all-aluminum podium lifts a vehicle 22\" to 27\" off the ground, so your feature vehicle is seen from the road.",
@@ -2829,7 +2829,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 60,
     "buy_price": 795,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/rmp976-portable-display-ramps.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A set of steel display ramps that tilts a vehicle up 1 foot at the front, giving your front line or showroom feature car instant presence.",
@@ -2901,10 +2901,10 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/balloonpole-1.jpg",
       "https://rent-and-rally.vercel.app/img/balloonpole-2.jpg"
     ],
-    "day_rate": 10,
+    "day_rate": 30,
     "buy_price": 44.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/long-pole-kit-for-18-balloons-111401.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A single 18\" balloon on a 7 ft pole. Line the front of your lot or mark the entrance.",
@@ -3022,10 +3022,10 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/balloon3-1.jpg",
       "https://rent-and-rally.vercel.app/img/balloon3-2.jpg"
     ],
-    "day_rate": 18,
+    "day_rate": 55,
     "buy_price": 109.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/three-balloon-cluster-kit-for-18-balloons-111435.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Three 18\" balloons on one pole. A clean, eye-catching cluster for vehicles and entrances.",
@@ -3142,10 +3142,10 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/balloon5-1.jpg"
     ],
-    "day_rate": 25,
+    "day_rate": 75,
     "buy_price": 134.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/five-balloon-cluster-kit-for-18-balloons-111430.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Five 18\" balloons on one pole for maximum colour. The classic car-lot balloon display.",
@@ -3265,7 +3265,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 15,
     "buy_price": 64.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/mega-pole-kit-for-30-balloons-111402.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "One giant 30\" balloon on a tall pole. Big enough to spot from across the road.",
@@ -3377,10 +3377,10 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/lightpole1-1.jpg",
       "https://rent-and-rally.vercel.app/img/lightpole1-2.jpg"
     ],
-    "day_rate": 10,
+    "day_rate": 40,
     "buy_price": 39.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/duraballoonr-single-balloon-light-pole-kit.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "One balloon mounted high on your light pole. We install it with band clamps, no drilling.",
@@ -3486,10 +3486,10 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/lightpole4-1.jpg"
     ],
-    "day_rate": 25,
+    "day_rate": 95,
     "buy_price": 129.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/duraballoonr-4-balloon-light-pole-kit.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Four balloons around the top of your light pole, seen from every direction. We install it with band clamps, no drilling.",
@@ -3598,7 +3598,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 3,
     "buy_price": 29.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/28-traffic-safety-cone.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Bright orange 28\" traffic cones for parking, test-drive lanes, event entrances and closing off areas of your lot."
@@ -3646,7 +3646,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 8,
     "buy_price": 149.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/45-black-yellow-traffic-delineator-posts.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Tall 45\" delineator posts. Mark out lanes, parking rows and event routes so they are easy to see."
@@ -3714,7 +3714,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 15,
     "buy_price": 239.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/287855-287857-bollardgard-anywhere.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A free-standing bollard on a heavy 25 lb rubber base. Set it down anywhere to block a lane, protect a display or mark a valet or work zone. No bolting needed."
@@ -3791,7 +3791,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 12,
     "buy_price": 84.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/indoor-showroom-displays/showroom-equipment-accessories/belt-barriers.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "Retractable belt stanchions for lines, VIP areas, showroom displays and crowd control. Each stand has a 78\" belt that hooks onto the next one."
@@ -3860,7 +3860,7 @@ export const STARTER_PRODUCTS = [
     "day_rate": 20,
     "buy_price": 179.95,
     "buy_note": "",
-    "buy_url": "https://wheelsauto.com/ca-en/114010-114011-brass-plated-raffle-drums.html",
+    "buy_url": "",
     "badge": "",
     "description": [
       "A classic brass-plated raffle drum with a turning handle. Perfect for draws at grand openings, sales events, fundraisers and parties."
