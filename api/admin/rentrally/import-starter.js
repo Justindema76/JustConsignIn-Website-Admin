@@ -202,7 +202,7 @@ async function repairRenamedLinks(token) {
 
 // One-time content update for specific rentals, found by SKU (so a renamed web address still matches).
 // Keeps the name, category, photos, related rentals, status and SEO set in the admin. Emptied after it has run.
-const UPDATE_ONCE = ['aframe', 'quickie'];
+const UPDATE_ONCE = [];
 const UPDATE_ONCE_FIELDS = ['buy_price', 'buy_note', 'description', 'features', 'specs', 'options'];
 async function updateOnce(token) {
   let done = 0;
@@ -256,7 +256,7 @@ async function repriceOnce(token) {
 
 // New rentals to add once (skipped if that SKU is already there). Category follows a
 // sibling rental's category in the admin. Emptied after it has run.
-const ADD_PRODUCTS_ONCE = [{ slug: 'quickiestake', categoryLike: '1083224' }];
+const ADD_PRODUCTS_ONCE = [];
 async function addProductsOnce(token) {
   let added = 0;
   for (const { slug, categoryLike } of ADD_PRODUCTS_ONCE) {
