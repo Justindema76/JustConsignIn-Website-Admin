@@ -275,6 +275,21 @@ async function addProductsOnce(token) {
   return added;
 }
 
+// Fixes "$$34.95" typos in choice names and notes (a "$" right before another "$" and a number).
+// Safe to run any time: it only removes the extra "$".
+async function fixDoubleDollars(token) {
+  const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&select=id,options`), 'Unable to read rentals.');
+  let fixed = 0;
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const before = JSON.stringify(row.options || []);
+    const after = before.replace(/\$\$(\d)/g, '$$$1');
+    if (after === before) continue;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(row.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ options: JSON.parse(after) }) }), 'Unable to fix prices.');
+    fixed += 1;
+  }
+  return fixed;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -292,10 +307,12 @@ export default async function handler(req, res) {
     const updated = await updateOnce(owner.accessToken);
     const repriced = await repriceOnce(owner.accessToken);
     const newProducts = await addProductsOnce(owner.accessToken);
+    const dollars = await fixDoubleDollars(owner.accessToken);
     return res.status(200).json({
       ok: true,
       repaired,
       relinked,
+      dollars,
       updated,
       repriced,
       added: { categories, products: products + newProducts, packages: packages + newPackages },

@@ -1864,11 +1864,11 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $$64.95 per sign, yours to keep."
+            "note": "Pick a design for each side below. $64.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$$189.90 one-time)",
-            "note": "2 signs at $$69.95 + $50 artwork set-up. Yours to keep."
+            "v": "Buy custom signs, both sides (+$189.90 one-time)",
+            "note": "2 signs at $69.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
@@ -2159,11 +2159,11 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $$34.95 per sign, yours to keep."
+            "note": "Pick a design for each side below. $34.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$$123.90 one-time)",
-            "note": "2 signs at $$36.95 + $50 artwork set-up. Yours to keep."
+            "v": "Buy custom signs, both sides (+$123.90 one-time)",
+            "note": "2 signs at $36.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
@@ -2404,11 +2404,11 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $$34.95 per sign, yours to keep."
+            "note": "Pick a design for each side below. $34.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$$123.90 one-time)",
-            "note": "2 signs at $$36.95 + $50 artwork set-up. Yours to keep."
+            "v": "Buy custom signs, both sides (+$123.90 one-time)",
+            "note": "2 signs at $36.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
