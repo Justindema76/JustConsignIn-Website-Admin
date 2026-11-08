@@ -353,10 +353,10 @@ export const DEFAULT_PAGES = {
             text: 'The gorilla, two tube men and four swooper flags in one package, for less than renting each piece.',
             button1Text: 'See the Package', button1Url: '', button2Text: 'All Packages', button2Url: '/packages',
             rental: 'grand-opening', badgeTitle: 'Grand Opening Blowout', image: '', imageAlt: 'Grand opening rental package with air dancers' },
-          { eyebrow: 'Tents & canopies', title: 'Cover the event,', highlight: 'rain or shine.',
-            text: "10' x 10' and 10' x 20' pop-up tents, delivered, set up and anchored with base weights.",
-            button1Text: 'See Tents', button1Url: '/rentals/tents', button2Text: 'Party Package', button2Url: '/packages/backyard-party',
-            rental: 'tent20', badgeTitle: "10' x 20' Tent", image: '', imageAlt: '10 by 20 foot pop-up tent rental' },
+          { eyebrow: 'Retail & storefronts', title: 'Turn heads at', highlight: 'any storefront.',
+            text: 'The Sale Clown air dancer, two tube men and two blade flags in one package, for less than renting each piece.',
+            button1Text: 'See the Package', button1Url: '', button2Text: 'All Packages', button2Url: '/packages',
+            rental: 'attention-grabber', badgeTitle: 'Retail Attention Grabber', image: '', imageAlt: 'Sale clown air dancer in front of a furniture store sale' },
         ],
       }),
       block('RRUspBlock', 'rr-home-usp', {
@@ -366,7 +366,7 @@ export const DEFAULT_PAGES = {
         item4Icon: 'tag', item4Title: 'Rent or buy', item4Text: 'Own the same equipment',
       }),
       block('RRCategoriesBlock', 'rr-home-cats', { heading: 'Shop by Category', linkText: 'View all rentals →', linkUrl: '/rentals', background: 'white' }),
-      block('RRPackagesBlock', 'rr-home-pkgs', { heading: 'Rental Packages', linkText: 'All packages →', linkUrl: '/packages', limit: '6', tight: true, background: 'white' }),
+      block('RRPackagesBlock', 'rr-home-pkgs', { heading: 'Rental Packages', linkText: 'All packages →', linkUrl: '/packages', limit: '8', tight: true, background: 'white' }),
       block('RRPopularBlock', 'rr-home-popular', { heading: 'Popular Rentals', linkText: 'Shop all →', linkUrl: '/rentals', limit: '10', source: 'featured', tight: true, background: 'white' }),
       block('RRStepsBlock', 'rr-home-steps', {
         heading: 'How Renting Works', background: 'white',
