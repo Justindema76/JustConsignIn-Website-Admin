@@ -226,6 +226,34 @@ async function updateOnce(token) {
   return done;
 }
 
+// One-time price change for add-on choices, matched by rental SKU and choice name. Only the
+// "(+$N/day)" price in that choice changes. Emptied after it has run.
+const REPRICE_ONCE = {'swooper': {'Under-tire kit': 30, 'Trailer hitch kit': 35, 'Post bracket kit': 20, 'Heavy-duty pole': 35}, 'blade': {'Under-tire kit': 35, 'Showroom kit': 30, 'Wall mount kit': 25, 'Ballast bags': 15}, 'bowflag': {'Under-tire kit': 35, 'Outdoor base kit': 30, 'Showroom kit': 30, 'Wall mount kit': 25, 'Ballast bags': 15}, 'inflsalesman': {"18' tall": 265}};
+async function repriceOnce(token) {
+  let changed = 0;
+  for (const [slug, prices] of Object.entries(REPRICE_ONCE)) {
+    const sku = STARTER_PRODUCTS.find(p => p.slug === slug)?.sku;
+    if (!sku) continue;
+    const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&sku=eq.${encodeURIComponent(sku)}&select=id,options`), `Unable to read ${slug}.`);
+    for (const row of Array.isArray(rows) ? rows : []) {
+      let touched = false;
+      const options = (row.options || []).map(o => ({ ...o, values: (o.values || []).map(v => {
+        const name = Object.keys(prices).find(n => String(v.v).startsWith(n));
+        if (!name) return v;
+        const base = String(v.v).replace(/\s*\(\+\$\d+(?:\.\d+)?\/day\)/, '');
+        const next = `${base} (+$${prices[name]}/day)`;
+        if (next === v.v) return v;
+        touched = true;
+        return { ...v, v: next };
+      }) }));
+      if (!touched) continue;
+      await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(row.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ options }) }), `Unable to reprice ${slug}.`);
+      changed += 1;
+    }
+  }
+  return changed;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -241,11 +269,13 @@ export default async function handler(req, res) {
     const newPackages = await addPackages(owner.accessToken);
     const relinked = await repairRenamedLinks(owner.accessToken);
     const updated = await updateOnce(owner.accessToken);
+    const repriced = await repriceOnce(owner.accessToken);
     return res.status(200).json({
       ok: true,
       repaired,
       relinked,
       updated,
+      repriced,
       added: { categories, products, packages: packages + newPackages },
       refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },

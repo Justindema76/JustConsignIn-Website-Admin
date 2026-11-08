@@ -899,7 +899,7 @@ export const STARTER_PRODUCTS = [
             "img": 2
           },
           {
-            "v": "18' tall (+$50/day)",
+            "v": "18' tall (+$265/day)",
             "img": 5
           }
         ]
@@ -1152,15 +1152,15 @@ export const STARTER_PRODUCTS = [
             "note": "15' pole + ground spike. For grass and soil."
           },
           {
-            "v": "Under-tire kit",
+            "v": "Under-tire kit (+$30/day)",
             "note": "15' pole + a bracket that sits under a parked car's tire. For pavement."
           },
           {
-            "v": "Trailer hitch kit (+$3/day)",
+            "v": "Trailer hitch kit (+$35/day)",
             "note": "15' pole + a mount that pins into a truck or trailer hitch."
           },
           {
-            "v": "Post bracket kit (+$2/day)",
+            "v": "Post bracket kit (+$20/day)",
             "note": "15' pole + a bracket clamped to a sign post or light pole."
           }
         ]
@@ -1170,7 +1170,7 @@ export const STARTER_PRODUCTS = [
         "style": "checks",
         "values": [
           {
-            "v": "Heavy-duty pole (+$2/day)",
+            "v": "Heavy-duty pole (+$35/day)",
             "note": "Stiffer pole for windy, open lots."
           }
         ]
@@ -1363,15 +1363,15 @@ export const STARTER_PRODUCTS = [
             "note": "12' pole + into-ground bracket. For grass and soil."
           },
           {
-            "v": "Under-tire kit (+$2/day)",
+            "v": "Under-tire kit (+$35/day)",
             "note": "12' pole + a bracket that sits under a parked car's tire. For pavement."
           },
           {
-            "v": "Showroom kit (+$2/day)",
+            "v": "Showroom kit (+$30/day)",
             "note": "12' pole + a weighted floor base. For showrooms and indoor events."
           },
           {
-            "v": "Wall mount kit (+$2/day)",
+            "v": "Wall mount kit (+$25/day)",
             "note": "12' pole + a bracket that screws to a wall or fence."
           }
         ]
@@ -1381,7 +1381,7 @@ export const STARTER_PRODUCTS = [
         "style": "checks",
         "values": [
           {
-            "v": "Ballast bags (+$2/day)",
+            "v": "Ballast bags (+$15/day)",
             "note": "Extra weight over the base for windy days."
           }
         ]
@@ -1565,20 +1565,20 @@ export const STARTER_PRODUCTS = [
             "note": "14' pole + rotating ground spike. For grass and soil."
           },
           {
-            "v": "Under-tire kit (+$3/day)",
+            "v": "Under-tire kit (+$35/day)",
             "note": "14' pole + a bracket that sits under a parked car's tire. For pavement.",
             "img": 4
           },
           {
-            "v": "Outdoor base kit (+$3/day)",
+            "v": "Outdoor base kit (+$30/day)",
             "note": "14' pole + rotating steel post on a steel base. For hard surfaces."
           },
           {
-            "v": "Showroom kit (+$3/day)",
+            "v": "Showroom kit (+$30/day)",
             "note": "14' pole + a floor stand. For showrooms and indoor events."
           },
           {
-            "v": "Wall mount kit (+$2/day)",
+            "v": "Wall mount kit (+$25/day)",
             "note": "14' pole + a bracket that screws to a wall or fence."
           }
         ]
@@ -1588,7 +1588,7 @@ export const STARTER_PRODUCTS = [
         "style": "checks",
         "values": [
           {
-            "v": "Ballast bags (+$2/day)",
+            "v": "Ballast bags (+$15/day)",
             "note": "Extra weight over the base for windy days."
           }
         ]
