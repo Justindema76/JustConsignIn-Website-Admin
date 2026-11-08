@@ -256,7 +256,7 @@ async function repriceOnce(token) {
 
 // New rentals to add once (skipped if that SKU is already there). Category follows a
 // sibling rental's category in the admin. Emptied after it has run.
-const ADD_PRODUCTS_ONCE = ['pennants', 'metalpennant', 'fluorpennant', 'gatorpennant', 'pullbow', 'giantbow', 'holidaybow'].map(slug => ({ slug }));
+const ADD_PRODUCTS_ONCE = [];
 async function addProductsOnce(token) {
   let added = 0;
   for (const { slug, categoryLike } of ADD_PRODUCTS_ONCE) {
@@ -291,7 +291,7 @@ async function fixDoubleDollars(token) {
 }
 
 // New categories to add once (skipped if already there). Emptied after it has run.
-const ADD_CATEGORIES_ONCE = ['decorations'];
+const ADD_CATEGORIES_ONCE = [];
 async function addCategoriesOnce(token) {
   let added = 0;
   for (const slug of ADD_CATEGORIES_ONCE) {
