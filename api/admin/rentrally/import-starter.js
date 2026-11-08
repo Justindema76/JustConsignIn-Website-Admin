@@ -228,7 +228,7 @@ async function updateOnce(token) {
 
 // One-time price change for add-on choices, matched by rental SKU and choice name. Only the
 // "(+$N/day)" price in that choice changes. Emptied after it has run.
-const REPRICE_ONCE = {'swooper': {'Under-tire kit': 30, 'Trailer hitch kit': 35, 'Post bracket kit': 20, 'Heavy-duty pole': 35}, 'blade': {'Under-tire kit': 35, 'Showroom kit': 30, 'Wall mount kit': 25, 'Ballast bags': 15}, 'bowflag': {'Under-tire kit': 35, 'Outdoor base kit': 30, 'Showroom kit': 30, 'Wall mount kit': 25, 'Ballast bags': 15}, 'inflsalesman': {"18' tall": 265}};
+const REPRICE_ONCE = {};
 async function repriceOnce(token) {
   let changed = 0;
   for (const [slug, prices] of Object.entries(REPRICE_ONCE)) {
