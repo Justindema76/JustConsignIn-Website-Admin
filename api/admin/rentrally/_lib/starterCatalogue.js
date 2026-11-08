@@ -136,6 +136,16 @@ export const STARTER_PRODUCTS = [
             "v": "Black"
           }
         ]
+      },
+      {
+        "label": "Extra base weights",
+        "style": "count",
+        "hint": "Four 10 kg weights hold one 10' x 10' tent in a breeze.",
+        "values": [
+          {
+            "v": "Base weights, set of 4 (+$25/day)"
+          }
+        ]
       }
     ],
     "related": [

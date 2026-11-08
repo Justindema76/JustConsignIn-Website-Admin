@@ -189,11 +189,18 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
   return <div className="rr-options">
     {value.map((option, i) => <div className="rr-option" key={i}>
       <div className="rr-row">
-        <input value={option.label} onChange={e => setOption(i, { label: e.target.value })} placeholder="Option name, e.g. Colour" aria-label="Option name"/>
+        <input value={option.label} onChange={e => setOption(i, { label: e.target.value })} placeholder="Option name, e.g. Colour or Base weights" aria-label="Option name"/>
+        <select value={option.style || ''} onChange={e => setOption(i, { style: e.target.value || undefined })} aria-label="Show as" title="How customers pick on the website">
+          <option value="">Show as: dropdown</option>
+          <option value="cards">Show as: cards (pick one)</option>
+          <option value="checks">Show as: tick boxes (add-ons, optional)</option>
+          <option value="count">Show as: how many (add-ons they can add several of)</option>
+          <option value="tiles">Show as: photo tiles (pick one)</option>
+        </select>
         <button type="button" className="rr-icon-btn" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label="Remove option"><Trash2 size={14}/></button>
       </div>
       {option.values.map((choice, k) => <div className="rr-row rr-choice" key={k}>
-        <input value={choice.v} onChange={e => setChoice(i, k, { v: e.target.value })} placeholder={"Choice, e.g. Red or 18' (+$50/day)"} aria-label="Choice"/>
+        <input value={choice.v} onChange={e => setChoice(i, k, { v: e.target.value })} placeholder={option.style === 'checks' || option.style === 'count' ? 'Add-on, e.g. Base weights, set of 4 (+$25/day)' : 'Choice, e.g. Red   or   18 ft (+$50/day)'} aria-label="Choice"/>
         <select value={choice.img || ''} onChange={e => setChoice(i, k, { img: e.target.value ? Number(e.target.value) : undefined })} aria-label="Photo for this choice">
           <option value="">No photo change</option>
           {Array.from({ length: photoCount }, (_, n) => <option key={n} value={n + 1}>Show photo {n + 1}</option>)}
@@ -204,7 +211,14 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
       <button type="button" className="site-admin-btn secondary small" onClick={() => setOption(i, { values: [...option.values, { v: '' }] })}><Plus size={13}/> Add choice</button>
     </div>)}
     <button type="button" className="site-admin-btn secondary small" onClick={() => onChange([...value, { label: '', values: [{ v: '' }] }])}><Plus size={13}/> Add option</button>
-    <small className="rr-hint">Write a price add-on inside a choice like <code>18' (+$50/day)</code> and the website adds it to the day rate.</small>
+    <small className="rr-hint">
+      <b>Prices:</b> put the extra in brackets at the end of a choice. <code>(+$25/day)</code> adds $25 to the day rate.
+      <code>(+$99 one-time)</code> charges $99 once (things they buy and keep). No brackets means no extra charge.<br/>
+      <b>Show as:</b> dropdown, cards or photo tiles make the customer pick one choice. Tick boxes are optional
+      add-ons: nothing is added unless they tick it. <i>How many</i> gives each choice a − / + counter, and the
+      price is multiplied by the number picked. Example: option <i>Extra base weights</i>, show as how many,
+      choice <code>Base weights, set of 4 (+$25/day)</code>: 3 sets adds $75/day.
+    </small>
   </div>;
 }
 
