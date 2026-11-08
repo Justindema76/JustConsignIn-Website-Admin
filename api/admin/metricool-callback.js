@@ -9,6 +9,7 @@ const SITE_LABELS = {
   justconsignin: 'JustConsignIn',
   justindematteis: 'Justin DeMatteis',
   sunwings: 'Sunwings Transport',
+  rentrally: 'Rent & Rally',
 };
 
 function cookieValue(req, name) {

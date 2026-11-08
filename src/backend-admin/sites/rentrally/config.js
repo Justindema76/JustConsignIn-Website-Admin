@@ -4,7 +4,7 @@ export default {
   name: 'Rent & Rally',
   adminLabel: 'Rent & Rally',
   domain: 'rent-and-rally.vercel.app',
-  showSocialSidebar: false,
+  showSocialSidebar: true,
   navGroups: [
     {
       id: 'catalogue',
@@ -27,6 +27,14 @@ export default {
       items: [{ to: '/admin/website/pages', label: 'Pages', icon: 'panels', ownerOnly: true }],
     },
     {
+      id: 'social',
+      label: 'Social & Marketing',
+      items: [
+        { to: '/admin/social', label: 'Social Links', icon: 'link' },
+        { to: '/admin/social-automation', label: 'Social Automation', icon: 'sparkles' },
+      ],
+    },
+    {
       id: 'settings',
       label: 'Settings',
       items: [{ to: '/admin/rentrally/settings', label: 'Website Settings', icon: 'settings', ownerOnly: true }],
@@ -38,6 +46,7 @@ export default {
       { to: '/admin/rentrally/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'See and follow up on new rental quotes' },
       { to: '/admin/rentrally/rentals', icon: 'package', title: 'Rentals', copy: 'Prices, photos, specs and options' },
       { to: '/admin/rentrally/packages', icon: 'boxes', title: 'Packages', copy: 'Bundles and package pricing' },
+      { to: '/admin/social-automation', icon: 'sparkles', title: 'Social Automation', copy: 'Create and schedule posts' },
     ],
     sections: [
       {
@@ -57,7 +66,16 @@ export default {
         items: [
           { to: '/admin/rentrally/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Every quote request, with status, quoted price and notes.' },
           { to: '/admin/website/pages', icon: 'panels', title: 'Website Pages', copy: 'Drag-and-drop editor for the homepage and How It Works.', ownerOnly: true },
-          { to: '/admin/rentrally/settings', icon: 'settings', title: 'Website Settings', copy: 'Top bar message, phone, hours, service areas, Google search and social links.', ownerOnly: true },
+          { to: '/admin/rentrally/settings', icon: 'settings', title: 'Website Settings', copy: 'Top bar message, phone, hours, service areas and Google search.', ownerOnly: true },
+        ],
+      },
+      {
+        id: 'social',
+        title: 'Social & Marketing',
+        copy: 'Social profiles and posts.',
+        items: [
+          { to: '/admin/social', icon: 'link', title: 'Social Links', copy: 'Facebook, Instagram, TikTok, YouTube and LinkedIn links (shown in the website footer).' },
+          { to: '/admin/social-automation', icon: 'sparkles', title: 'Social Automation', copy: 'Create, schedule and publish posts.' },
         ],
       },
     ],

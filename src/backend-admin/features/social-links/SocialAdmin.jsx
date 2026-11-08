@@ -47,7 +47,7 @@ export default function SocialAdmin() {
       </div>)}
     </div>
     <div className="site-admin-footer-preview">
-      <div><strong>{isSunwings ? 'Sunwings Transport' : 'JustConsignIn'}</strong><p>{isSunwings ? 'Moving, delivery and commercial transport from Toronto to Niagara.' : 'Consignment management for Shopify stores.'}</p></div>
+      <div><strong>{isSunwings ? 'Sunwings Transport' : siteKey === 'rentrally' ? 'Rent & Rally' : 'JustConsignIn'}</strong><p>{isSunwings ? 'Moving, delivery and commercial transport from Toronto to Niagara.' : siteKey === 'rentrally' ? 'Event and promo rentals in Hamilton, Niagara and the GTA.' : 'Consignment management for Shopify stores.'}</p></div>
       <div className="site-admin-social-icons">{SOCIAL_NETWORKS.filter(network => social[network.key]?.enabled !== false).map(network => <span key={network.key} className={!social[network.key]?.url ? 'disabled' : ''}><img src={network.icon} alt={network.label}/></span>)}</div>
     </div>
   </>;

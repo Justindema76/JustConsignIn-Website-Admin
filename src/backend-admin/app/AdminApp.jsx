@@ -45,6 +45,7 @@ import { getAdminSiteKey } from '../services/siteAdminService';
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
+const SOCIAL_SITES = ['justindematteis', 'justconsignin', 'rentrally'];
 const SUNWINGS = ['sunwings'];
 const RENTRALLY = ['rentrally'];
 const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings', 'rentrally'];
@@ -88,11 +89,11 @@ export default function AdminApp() {
         <Route path="/admin/ai-posts/:id" element={only(JUSTIN, <AiPostsAdmin />)} />
         <Route path="/admin/videos" element={only(STANDARD_SITES, <VideosAdmin />)} />
         <Route path="/admin/videos/:id" element={only(STANDARD_SITES, <VideosAdmin />)} />
-        <Route path="/admin/social" element={only(STANDARD_SITES, <SocialAdmin />)} />
+        <Route path="/admin/social" element={only(SOCIAL_SITES, <SocialAdmin />)} />
         <Route path="/admin/media" element={only(STANDARD_SITES, <MediaAdmin />)} />
         <Route path="/admin/social-image" element={only(JCI, <SocialImageStudio />)} />
-        <Route path="/admin/social-automation" element={only(STANDARD_SITES, <SocialAutomation />)} />
-        <Route path="/admin/social-automation/:id" element={only(STANDARD_SITES, <SocialAutomation />)} />
+        <Route path="/admin/social-automation" element={only(SOCIAL_SITES, <SocialAutomation />)} />
+        <Route path="/admin/social-automation/:id" element={only(SOCIAL_SITES, <SocialAutomation />)} />
 
         <Route path="/admin/site-builder" element={only(PAGE_BUILDER_SITES, <Navigate to="/admin/website/pages" replace />)} />
         <Route path="/admin/website/pages" element={only(PAGE_BUILDER_SITES, <WebsitePages />)} />

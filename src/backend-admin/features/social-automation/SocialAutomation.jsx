@@ -34,6 +34,8 @@ export default function SocialAutomation() {
   const socialBasePath = siteKey === 'sunwings' ? '/admin/sunwings/social-posts' : '/admin/social-automation';
   const campaignPlaceholder = siteKey === 'sunwings'
     ? 'Residential move, furniture delivery, warehouse job…'
+    : siteKey === 'rentrally'
+      ? 'Gorilla at a dealership sale, tent at a vendor market…'
     : siteKey === 'justindematteis'
       ? 'Website launch, SEO project, automation workflow…'
       : 'Create Shopify products from your phone';

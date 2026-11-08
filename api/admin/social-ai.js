@@ -36,6 +36,17 @@ const SITE_PROFILES = {
       'Use only locations, prices, guarantees or service details that are visible in the supplied media or explicitly provided in the user direction.',
     ],
   },
+  rentrally: {
+    label: 'Rent & Rally',
+    website: 'https://rent-and-rally.vercel.app',
+    context: [
+      'Rent & Rally rents event and promo equipment in Hamilton, Stoney Creek, Burlington, Niagara and the GTA.',
+      'Rentals include pop-up tents, air dancers (tube men), giant inflatables (gorilla, tire, sale arrow, inflatable salesman), banner stands and sign frames, plus packages for dealership sales, grand openings, vendor markets and backyard parties.',
+      'They deliver and set up, rent by the day, weekend or week (longer saves more), and sell some items to buy and keep.',
+      'Customers request a quote on the website. Book at least 3 days ahead.',
+      'Do not mention suppliers or manufacturers. Use only prices or details visible in the supplied media or explicitly given in the user direction.',
+    ],
+  },
 };
 
 function siteKeyFromRequest(req) {
