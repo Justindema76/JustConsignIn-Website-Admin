@@ -202,7 +202,7 @@ async function repairRenamedLinks(token) {
 
 // One-time content update for specific rentals, found by SKU (so a renamed web address still matches).
 // Keeps the name, category, photos, related rentals, status and SEO set in the admin. Emptied after it has run.
-const UPDATE_ONCE = ['aframe', 'quickie'];
+const UPDATE_ONCE = [];
 const UPDATE_ONCE_FIELDS = ['day_rate', 'buy_price', 'buy_note', 'description', 'features', 'specs', 'options'];
 async function updateOnce(token) {
   let done = 0;
