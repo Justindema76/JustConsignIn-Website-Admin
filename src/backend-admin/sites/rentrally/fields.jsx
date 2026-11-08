@@ -220,8 +220,9 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
       price is multiplied by the number picked. Example: option <i>Extra base weights</i>, show as how many,
       choice <code>Base weights, set of 4 (+$25/day)</code>: 3 sets adds $75/day.<br/>
       <b>Quantity pricing:</b> add an option shown as <i>Quantity pricing</i> with one line each, like
-      <code>Minimum 5</code>, <code>10 or more: 10% off</code>, <code>20 or more: 15% off</code>. Customers can't
-      book fewer than the minimum, and the discount comes off the day rate automatically.
+      <code>Minimum 5</code>, <code>10 or more: 10% off</code>, <code>20 or more: 15% off</code>,
+      <code>Maximum 10</code> and <code>Minimum period: weekend</code> (or <code>1 week</code>). Customers can't book fewer
+      than the minimum or more than the maximum, can't book a shorter period, and the discount comes off the day rate automatically.
     </small>
   </div>;
 }

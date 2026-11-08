@@ -1799,10 +1799,10 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A sturdy powder-coated steel A-frame that holds two 32\" x 48\" coroplast signs back to back. Folds flat with a top handle for easy moving.",
-      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs with your logo and event details, or use signs you already have."
+      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom with your logo and event details) that are yours to keep."
     ],
     "features": [
-      "Rent the frame, keep the signs",
+      "You rent the frame, signs optional",
       "Holds two 32\" x 48\" signs back to back",
       "28 stock full-colour designs",
       "Custom signs with your logo and details",
@@ -1840,33 +1840,35 @@ export const STARTER_PRODUCTS = [
         "style": "pricing",
         "values": [
           {
-            "v": "Minimum 5"
+            "v": "3 or more: 10% off"
           },
           {
-            "v": "10 or more: 10% off"
+            "v": "5 or more: 15% off"
           },
           {
-            "v": "20 or more: 15% off"
+            "v": "10 or more: 20% off"
+          },
+          {
+            "v": "Maximum 10"
           }
         ]
       },
       {
         "label": "Signs",
         "style": "cards",
-        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "hint": "You rent the frame. Signs are optional.",
         "values": [
           {
+            "v": "No signs, I'll supply my own",
+            "note": "Bring your own 32\" x 48\" signs and we put them in the frames."
+          },
+          {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $64.95 per sign."
+            "note": "Pick a design for each side below. $$64.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$189.90 one-time)",
-            "note": "2 signs at $69.95 + $50 artwork set-up. Your logo and event details."
-          },
-          {
-            "v": "I have my own 32\" x 48\" signs",
-            "note": "We put your signs in the frame.",
-            "tag": "No charge"
+            "v": "Buy custom signs, both sides (+$$189.90 one-time)",
+            "note": "2 signs at $$69.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
@@ -2088,10 +2090,10 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A compact steel A-frame with a carry handle that holds two 24\" x 32\" Quickie lot signs. It stands on its own, so it is made for pavement: in front of feature vehicles, along the curb or at the lot entrance.",
-      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs, or use signs you already have."
+      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom) that are yours to keep."
     ],
     "features": [
-      "Rent the frame, keep the signs",
+      "You rent the frame, signs optional",
       "Holds two 24\" x 32\" signs",
       "20 stock full-colour designs",
       "Stands on its own on pavement",
@@ -2130,33 +2132,38 @@ export const STARTER_PRODUCTS = [
         "style": "pricing",
         "values": [
           {
-            "v": "Minimum 5"
+            "v": "Minimum 3"
           },
           {
-            "v": "10 or more: 10% off"
+            "v": "Minimum period: weekend"
           },
           {
-            "v": "20 or more: 15% off"
+            "v": "5 or more: 10% off"
+          },
+          {
+            "v": "10 or more: 15% off"
+          },
+          {
+            "v": "Maximum 10"
           }
         ]
       },
       {
         "label": "Signs",
         "style": "cards",
-        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "hint": "You rent the frame. Signs are optional.",
         "values": [
           {
+            "v": "No signs, I'll supply my own",
+            "note": "Bring your own 24\" x 32\" signs and we put them in the frames."
+          },
+          {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $34.95 per sign."
+            "note": "Pick a design for each side below. $$34.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$123.90 one-time)",
-            "note": "2 signs at $36.95 + $50 artwork set-up. Your logo and message."
-          },
-          {
-            "v": "I have my own 24\" x 32\" signs",
-            "note": "We put your signs in the frame.",
-            "tag": "No charge"
+            "v": "Buy custom signs, both sides (+$$123.90 one-time)",
+            "note": "2 signs at $$36.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
@@ -2329,10 +2336,10 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A steel lawn stake frame for 24\" x 32\" Quickie lot signs. It pounds into the grass, so it is made for lawns and boulevards, and holds two signs back to back or one single sign.",
-      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs, or use signs you already have."
+      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom) that are yours to keep."
     ],
     "features": [
-      "Rent the frame, keep the signs",
+      "You rent the frame, signs optional",
       "Pounds into grass",
       "Holds two signs back to back, or one",
       "20 stock full-colour designs",
@@ -2370,33 +2377,38 @@ export const STARTER_PRODUCTS = [
         "style": "pricing",
         "values": [
           {
-            "v": "Minimum 5"
+            "v": "Minimum 3"
           },
           {
-            "v": "10 or more: 10% off"
+            "v": "Minimum period: weekend"
           },
           {
-            "v": "20 or more: 15% off"
+            "v": "5 or more: 10% off"
+          },
+          {
+            "v": "10 or more: 15% off"
+          },
+          {
+            "v": "Maximum 10"
           }
         ]
       },
       {
         "label": "Signs",
         "style": "cards",
-        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "hint": "You rent the frame. Signs are optional.",
         "values": [
           {
+            "v": "No signs, I'll supply my own",
+            "note": "Bring your own 24\" x 32\" signs and we put them in the frames."
+          },
+          {
             "v": "Buy stock signs",
-            "note": "Pick a design for each side below. $34.95 per sign."
+            "note": "Pick a design for each side below. $$34.95 per sign, yours to keep."
           },
           {
-            "v": "Buy custom signs, both sides (+$123.90 one-time)",
-            "note": "2 signs at $36.95 + $50 artwork set-up. Your logo and message."
-          },
-          {
-            "v": "I have my own 24\" x 32\" signs",
-            "note": "We put your signs in the frame.",
-            "tag": "No charge"
+            "v": "Buy custom signs, both sides (+$$123.90 one-time)",
+            "note": "2 signs at $$36.95 + $50 artwork set-up. Yours to keep."
           }
         ]
       },
