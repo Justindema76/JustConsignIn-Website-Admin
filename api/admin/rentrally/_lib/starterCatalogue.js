@@ -847,6 +847,74 @@ export const STARTER_PRODUCTS = [
     "sort_order": 110
   },
   {
+    "slug": "balloon-inflatable",
+    "category_slug": "inflatables",
+    "sku": "9150-9159",
+    "name": "Gigantic Balloon Shape Inflatable",
+    "images": [],
+    "day_rate": 199.99,
+    "buy_price": 749,
+    "buy_note": "",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "Park one of these on your lot and watch heads turn. A giant hot-air-balloon shape in bright rainbow colours with a big SALE band that brings a carnival feel to any sale event.",
+      "Comes with tie-down ropes and ground stakes to hold it securely. Available 16 ft or 18 ft tall. Check local bylaws before use."
+    ],
+    "features": [
+      "16' or 18' tall",
+      "Bright rainbow colours with SALE band",
+      "Tie-down ropes and ground stakes included",
+      "Blower included with rental"
+    ],
+    "specs": [
+      {
+        "label": "Height",
+        "value": "16' (9150) or 18' (9159)"
+      },
+      {
+        "label": "Anchoring",
+        "value": "Tie-down ropes & ground stakes"
+      },
+      {
+        "label": "Power",
+        "value": "Blower included (BR15), standard outlet"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor. Check local bylaws"
+      },
+      {
+        "label": "Setup",
+        "value": "Delivered & set up by our crew"
+      }
+    ],
+    "options": [
+      {
+        "label": "Size",
+        "style": "cards",
+        "values": [
+          {
+            "v": "16' tall"
+          },
+          {
+            "v": "18' tall (+$50/day)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "gorilla",
+      "arrow",
+      "tire",
+      "inflsalesman",
+      "inflblower"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 120
+  },
+  {
     "slug": "inflsalesman",
     "category_slug": "inflatables",
     "sku": "9115-9120",
@@ -1004,7 +1072,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 120
+    "sort_order": 130
   },
   {
     "slug": "inflclown",
@@ -1051,7 +1119,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 130
+    "sort_order": 140
   },
   {
     "slug": "tire",
@@ -1103,7 +1171,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 140
+    "sort_order": 150
   },
   {
     "slug": "swooper",
@@ -1313,7 +1381,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 150
+    "sort_order": 160
   },
   {
     "slug": "blade",
@@ -1515,7 +1583,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 160
+    "sort_order": 170
   },
   {
     "slug": "bowflag",
@@ -1718,7 +1786,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 170
+    "sort_order": 180
   },
   {
     "slug": "sidewalk",
@@ -1788,7 +1856,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 180
+    "sort_order": 190
   },
   {
     "slug": "aframe",
@@ -2073,7 +2141,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 190
+    "sort_order": 200
   },
   {
     "slug": "quickie",
@@ -2313,7 +2381,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 200
+    "sort_order": 210
   },
   {
     "slug": "quickiestake",
@@ -2551,7 +2619,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 210
+    "sort_order": 220
   },
   {
     "slug": "boulevard",
@@ -2660,7 +2728,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 220
+    "sort_order": 230
   },
   {
     "slug": "dbs",
@@ -2758,7 +2826,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 230
+    "sort_order": 240
   },
   {
     "slug": "xbanner",
@@ -2827,7 +2895,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 240
+    "sort_order": 250
   },
   {
     "slug": "simplebanner",
@@ -2896,7 +2964,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 250
+    "sort_order": 260
   },
   {
     "slug": "retractable",
@@ -2965,7 +3033,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 260
+    "sort_order": 270
   },
   {
     "slug": "outdoorbanner",
@@ -3051,7 +3119,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 270
+    "sort_order": 280
   },
   {
     "slug": "ramp20",
@@ -3108,7 +3176,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 280
+    "sort_order": 290
   },
   {
     "slug": "ramps",
@@ -3182,7 +3250,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 290
+    "sort_order": 300
   },
   {
     "slug": "balloonpole",
@@ -3303,7 +3371,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 300
+    "sort_order": 310
   },
   {
     "slug": "balloon3",
@@ -3424,7 +3492,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 310
+    "sort_order": 320
   },
   {
     "slug": "balloon5",
@@ -3544,7 +3612,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 320
+    "sort_order": 330
   },
   {
     "slug": "balloon30",
@@ -3658,7 +3726,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 330
+    "sort_order": 340
   },
   {
     "slug": "lightpole1",
@@ -3768,7 +3836,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 340
+    "sort_order": 350
   },
   {
     "slug": "lightpole4",
@@ -3877,7 +3945,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 350
+    "sort_order": 360
   },
   {
     "slug": "cones",
@@ -3923,7 +3991,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 360
+    "sort_order": 370
   },
   {
     "slug": "delineator",
@@ -3992,7 +4060,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 370
+    "sort_order": 380
   },
   {
     "slug": "bollard",
@@ -4068,7 +4136,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 380
+    "sort_order": 390
   },
   {
     "slug": "beltbarrier",
@@ -4139,7 +4207,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 390
+    "sort_order": 400
   },
   {
     "slug": "raffle",
@@ -4197,7 +4265,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 400
+    "sort_order": 410
   },
   {
     "slug": "pennants",
@@ -4275,7 +4343,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 410
+    "sort_order": 420
   },
   {
     "slug": "metalpennant",
@@ -4339,7 +4407,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 420
+    "sort_order": 430
   },
   {
     "slug": "fluorpennant",
@@ -4399,7 +4467,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 430
+    "sort_order": 440
   },
   {
     "slug": "gatorpennant",
@@ -4445,7 +4513,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 440
+    "sort_order": 450
   },
   {
     "slug": "pullbow",
@@ -4522,7 +4590,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 450
+    "sort_order": 460
   },
   {
     "slug": "giantbow",
@@ -4617,7 +4685,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 460
+    "sort_order": 470
   },
   {
     "slug": "holidaybow",
@@ -4692,7 +4760,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 470
+    "sort_order": 480
   }
 ];
 

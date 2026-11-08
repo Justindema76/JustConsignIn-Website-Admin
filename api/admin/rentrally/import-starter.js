@@ -256,10 +256,10 @@ async function repriceOnce(token) {
 
 // New rentals to add once (skipped if that SKU is already there). Category follows a
 // sibling rental's category in the admin. Emptied after it has run.
-const ADD_PRODUCTS_ONCE = [];
+const ADD_PRODUCTS_ONCE = [{ slug: 'balloon-inflatable', status: 'draft' }];
 async function addProductsOnce(token) {
   let added = 0;
-  for (const { slug, categoryLike } of ADD_PRODUCTS_ONCE) {
+  for (const { slug, categoryLike, status } of ADD_PRODUCTS_ONCE) {
     const row = STARTER_PRODUCTS.find(p => p.slug === slug);
     if (!row) continue;
     const have = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&sku=eq.${encodeURIComponent(row.sku)}&select=id`), `Unable to read ${slug}.`);
@@ -268,7 +268,7 @@ async function addProductsOnce(token) {
     const like = Array.isArray(sib) ? sib[0] : null;
     await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?select=id`, {
       method: 'POST', headers: { Prefer: 'return=representation' },
-      body: JSON.stringify({ ...row, category_slug: like?.category_slug || row.category_slug, day_rate: like?.day_rate ?? row.day_rate, site_key: SITE_KEY, status: 'published', published_at: new Date().toISOString() }),
+      body: JSON.stringify({ ...row, category_slug: like?.category_slug || row.category_slug, day_rate: like?.day_rate ?? row.day_rate, site_key: SITE_KEY, status: status || 'published', published_at: status === 'draft' ? null : new Date().toISOString() }),
     }), `Unable to add ${slug}.`);
     added += 1;
   }
