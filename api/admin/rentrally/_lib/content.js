@@ -106,6 +106,7 @@ function cleanOptions(value) {
       if (OPTION_STYLES.includes(option?.style)) out.style = option.style;
       if (option?.when?.option && option?.when?.has) out.when = { option: text(option.when.option, 80), has: text(option.when.has, 80) };
       if (option?.hint) out.hint = text(option.hint, 200);
+      if (option?.off) out.off = true;
       out.values = (Array.isArray(option?.values) ? option.values : [])
         .map(v => {
           const label = text(typeof v === 'string' ? v : v?.v, 120);
@@ -115,6 +116,7 @@ function cleanOptions(value) {
           if (img > 0) choice.img = img;
           if (v?.note) choice.note = text(v.note, 240);
           if (v?.tag) choice.tag = text(v.tag, 40);
+          if (v?.off) choice.off = true;
           return choice;
         })
         .filter(Boolean);

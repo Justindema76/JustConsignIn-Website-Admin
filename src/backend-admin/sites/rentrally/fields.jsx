@@ -187,8 +187,9 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
   const setOption = (i, patch) => onChange(value.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   const setChoice = (i, k, patch) => setOption(i, { values: value[i].values.map((v, j) => (j === k ? { ...v, ...patch } : v)) });
   return <div className="rr-options">
-    {value.map((option, i) => <div className="rr-option" key={i}>
+    {value.map((option, i) => <div className={`rr-option${option.off ? ' is-off' : ''}`} key={i}>
       <div className="rr-row">
+        <label className="rr-onoff" title="Untick to hide this whole option on the website (nothing is deleted)"><input type="checkbox" checked={!option.off} onChange={e => setOption(i, { off: e.target.checked ? undefined : true })}/> {option.off ? 'Off' : 'On'}</label>
         <input value={option.label} onChange={e => setOption(i, { label: e.target.value })} placeholder="Option name, e.g. Colour or Base weights" aria-label="Option name"/>
         <select value={option.style || ''} onChange={e => setOption(i, { style: e.target.value || undefined })} aria-label="Show as" title="How customers pick on the website">
           <option value="">Show as: dropdown</option>
@@ -200,7 +201,8 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
         </select>
         <button type="button" className="rr-icon-btn" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label="Remove option"><Trash2 size={14}/></button>
       </div>
-      {option.values.map((choice, k) => <div className="rr-choice-wrap" key={k}><div className="rr-row rr-choice">
+      {option.values.map((choice, k) => <div className={`rr-choice-wrap${choice.off ? ' is-off' : ''}`} key={k}><div className="rr-row rr-choice">
+        <label className="rr-onoff small" title="Untick to hide this choice on the website (nothing is deleted)"><input type="checkbox" checked={!choice.off} onChange={e => setChoice(i, k, { off: e.target.checked ? undefined : true })}/></label>
         <input value={choice.v} onChange={e => setChoice(i, k, { v: e.target.value })} placeholder={option.style === 'checks' || option.style === 'count' ? 'Add-on, e.g. Base weights, set of 4 (+$25/day)' : 'Choice, e.g. Red   or   18 ft (+$50/day)'} aria-label="Choice"/>
         <select value={choice.img || ''} onChange={e => setChoice(i, k, { img: e.target.value ? Number(e.target.value) : undefined })} aria-label="Photo for this choice">
           <option value="">No photo change</option>
@@ -218,6 +220,7 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
     </div>)}
     <button type="button" className="site-admin-btn secondary small" onClick={() => onChange([...value, { label: '', values: [{ v: '' }] }])}><Plus size={13}/> Add option</button>
     <small className="rr-hint">
+      <b>On / Off:</b> untick an option or a single choice to hide it on the website. Nothing is deleted; tick it again to bring it back.<br/>
       <b>Prices:</b> put the extra in brackets at the end of a choice. <code>(+$25/day)</code> adds $25 to the day rate.
       <code>(+$99 one-time)</code> charges $99 once (things they buy and keep). No brackets means no extra charge.<br/>
       <b>Descriptions:</b> cards, tick boxes, how many and photo tiles show a description line under each choice (it shows on the picked card). Dropdowns don't show descriptions.<br/>

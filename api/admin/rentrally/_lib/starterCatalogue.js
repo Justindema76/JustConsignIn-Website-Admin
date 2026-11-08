@@ -1799,13 +1799,11 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A sturdy powder-coated steel A-frame that holds two 32\" x 48\" coroplast signs back to back. Folds flat with a top handle for easy moving.",
-      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom with your logo and event details) that are yours to keep."
+      "Hardware rental only: signs are not included. Bring your own 32\" x 48\" coroplast signs and we set them in the frames."
     ],
     "features": [
-      "You rent the frame, signs optional",
+      "Hardware rental: signs not included",
       "Holds two 32\" x 48\" signs back to back",
-      "28 stock full-colour designs",
-      "Custom signs with your logo and details",
       "Stands on its own: pavement, concrete or indoors"
     ],
     "specs": [
@@ -1819,15 +1817,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
-        "value": "4mm coroplast, rated up to 3 years"
-      },
-      {
-        "label": "Stock sign",
-        "value": "$64.95 each, yours to keep"
-      },
-      {
-        "label": "Custom sign",
-        "value": "$69.95 each + $50 one-time artwork set-up"
+        "value": "Not included (bring your own 32\" x 48\" signs)"
       },
       {
         "label": "Use",
@@ -1855,6 +1845,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
+        "off": true,
         "style": "cards",
         "hint": "You rent the frame. Signs are optional.",
         "values": [
@@ -1874,6 +1865,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 1 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
@@ -1967,6 +1959,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 2 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
@@ -2090,15 +2083,13 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A compact steel A-frame with a carry handle that holds two 24\" x 32\" Quickie lot signs. It stands on its own, so it is made for pavement: in front of feature vehicles, along the curb or at the lot entrance.",
-      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom) that are yours to keep."
+      "Hardware rental only: signs are not included. Bring your own 24\" x 32\" coroplast signs and we set them in the frames."
     ],
     "features": [
-      "You rent the frame, signs optional",
+      "Hardware rental: signs not included",
       "Holds two 24\" x 32\" signs",
-      "20 stock full-colour designs",
       "Stands on its own on pavement",
-      "Carry handle",
-      "Custom signs with your logo and details"
+      "Carry handle"
     ],
     "specs": [
       {
@@ -2111,15 +2102,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
-        "value": "4mm coroplast, rated up to 3 years"
-      },
-      {
-        "label": "Stock sign",
-        "value": "$34.95 each, yours to keep"
-      },
-      {
-        "label": "Custom sign",
-        "value": "$36.95 each + $50 one-time artwork set-up"
+        "value": "Not included (bring your own 24\" x 32\" signs)"
       },
       {
         "label": "Use",
@@ -2150,6 +2133,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
+        "off": true,
         "style": "cards",
         "hint": "You rent the frame. Signs are optional.",
         "values": [
@@ -2169,6 +2153,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 1 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
@@ -2238,6 +2223,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 2 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
@@ -2336,14 +2322,12 @@ export const STARTER_PRODUCTS = [
     "badge": "",
     "description": [
       "A steel lawn stake frame for 24\" x 32\" Quickie lot signs. It pounds into the grass, so it is made for lawns and boulevards, and holds two signs back to back or one single sign.",
-      "You rent the frame. Signs are optional: use your own, or buy full-colour 4mm coroplast signs from us (stock designs or custom) that are yours to keep."
+      "Hardware rental only: signs are not included. Bring your own 24\" x 32\" coroplast signs and we set them in the frames."
     ],
     "features": [
-      "You rent the frame, signs optional",
+      "Hardware rental: signs not included",
       "Pounds into grass",
-      "Holds two signs back to back, or one",
-      "20 stock full-colour designs",
-      "Custom signs with your logo and details"
+      "Holds two signs back to back, or one"
     ],
     "specs": [
       {
@@ -2356,15 +2340,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
-        "value": "4mm coroplast, rated up to 3 years"
-      },
-      {
-        "label": "Stock sign",
-        "value": "$34.95 each, yours to keep"
-      },
-      {
-        "label": "Custom sign",
-        "value": "$36.95 each + $50 one-time artwork set-up"
+        "value": "Not included (bring your own 24\" x 32\" signs)"
       },
       {
         "label": "Use",
@@ -2395,6 +2371,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Signs",
+        "off": true,
         "style": "cards",
         "hint": "You rent the frame. Signs are optional.",
         "values": [
@@ -2414,6 +2391,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 1 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
@@ -2483,6 +2461,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Side 2 sign",
+        "off": true,
         "when": {
           "option": "Signs",
           "has": "stock"
