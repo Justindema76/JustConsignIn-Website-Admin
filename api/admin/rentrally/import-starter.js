@@ -305,6 +305,49 @@ async function addCategoriesOnce(token) {
   return added;
 }
 
+// One time: a "buy & keep" copy in the Shop of every rental that is on and has a buy price.
+// The copy is named like the rental, sells at its buy price, keeps its photos and plain choices
+// (colours, which dancer); rental-only choices (day-rate extras, minimums, things bought on top) are left out.
+// Web address: buy-<rental>. Skipped if it already exists. Emptied after it has run.
+const SALE_COPIES_ONCE = true;
+const SHOP_CATEGORY = 'decorations';
+async function addSaleCopies(token) {
+  if (!SALE_COPIES_ONCE) return 0;
+  const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&status=eq.published&select=*`), 'Unable to read rentals.');
+  const all = Array.isArray(rows) ? rows : [];
+  const have = new Set(all.map(r => r.slug));
+  const blower = all.find(r => /power-?blower|powerblower/.test(r.slug));
+  const inflBlower = all.find(r => /inflblower|blower-for-inflatables/.test(r.slug));
+  let added = 0;
+  for (const r of all) {
+    if (!(Number(r.day_rate) > 0) || !(Number(r.buy_price) > 0) || r.category_slug === SHOP_CATEGORY) continue;
+    const slug = `buy-${r.slug}`;
+    if (have.has(slug)) continue;
+    const isDancer = r.category_slug === 'air-dancers' && !/blower/i.test(r.slug);
+    const isInflatable = r.category_slug === 'inflatables' && !/blower/i.test(r.slug);
+    const twoSizes = (r.options || []).some(o => /size/i.test(o.label) && (o.values || []).some(v => /18'/.test(v?.v || '')));
+    const name = `${String(r.name).replace(/\s+with\s+blower/i, '')}${twoSizes ? " (12')" : ''}`;
+    const kept = (r.options || []).filter(o => !o.off && o.style !== 'pricing' && !(o.values || []).some(v => /\/day|one-time|\$/i.test(v?.v || '')));
+    const keptLabels = new Set(kept.map(o => o.label));
+    const options = kept.filter(o => !o.when || keptLabels.has(o.when.option));
+    const desc = Array.isArray(r.description) ? r.description : [String(r.description || '')];
+    const sizeNote = twoSizes ? "This price is for the 12' size. The 18' is also available: ask us for a price." : '';
+    const blowerNote = isDancer ? 'Blower sold separately (Power Blower for Air Dancers).' : isInflatable ? 'Blower sold separately (Blower for Inflatables).' : '';
+    const row = {
+      site_key: SITE_KEY, slug, category_slug: SHOP_CATEGORY, sku: r.sku, name, images: r.images || [],
+      day_rate: 0, buy_price: r.buy_price, buy_note: blowerNote ? 'blower sold separately' : 'yours to keep', buy_url: '', badge: '',
+      description: [desc[0] || '', `Buy it new and keep it. ${sizeNote} ${blowerNote} Want to try it first? It is also available to rent.`.replace(/\s+/g, ' ').trim()].filter(Boolean),
+      features: [...(r.features || []).filter(f => !/rent|rental|per day|day rate|included with rental|minimum/i.test(f)), 'Brand new, yours to keep', ...(blowerNote ? ['Blower sold separately'] : [])],
+      specs: (r.specs || []).filter(x => !/included|rent/i.test(`${x.label} ${x.value}`)),
+      options, related: [r.slug, ...(isDancer && blower ? [`buy-${blower.slug}`] : []), ...(isInflatable && inflBlower ? [`buy-${inflBlower.slug}`] : [])],
+      featured: false, seo_title: '', seo_description: '', status: 'published', sort_order: (Number(r.sort_order) || 0) + 1000, published_at: new Date().toISOString(),
+    };
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?select=slug`, { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(row) }), `Unable to add ${slug}.`);
+    added += 1;
+  }
+  return added;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -324,11 +367,13 @@ export default async function handler(req, res) {
     const newCategories = await addCategoriesOnce(owner.accessToken);
     const newProducts = await addProductsOnce(owner.accessToken);
     const dollars = await fixDoubleDollars(owner.accessToken);
+    const saleCopies = await addSaleCopies(owner.accessToken);
     return res.status(200).json({
       ok: true,
       repaired,
       relinked,
       dollars,
+      saleCopies,
       updated,
       repriced,
       added: { categories: categories + newCategories, products: products + newProducts, packages: packages + newPackages },
