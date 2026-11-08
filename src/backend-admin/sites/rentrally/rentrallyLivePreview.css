@@ -563,3 +563,25 @@
 .rr-live .bundle-nudge{margin:12px 0 0;padding:10px 12px;background:#fff4f4;border:1px dashed var(--red);font-size:13px;line-height:1.4}
 .rr-live .bundle-hint{margin-top:10px;font-size:12.5px;color:var(--grey);line-height:1.4}
 .rr-live .bundle-hint b{color:var(--red)}
+.rr-live .together{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}
+.rr-live .together-items{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.rr-live .together-item{position:relative;border:1px solid var(--line);background:#fff;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;opacity:.55;transition:opacity .15s,border-color .15s}
+.rr-live .together-item.on{opacity:1;border-color:#000}
+.rr-live .together-item input{position:absolute;top:8px;left:8px;width:18px;height:18px;accent-color:var(--red);margin:0;z-index:1}
+.rr-live .together-item img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff}
+.rr-live .together-item .t-name{font-weight:700;font-size:14px;line-height:1.25}
+.rr-live .together-item .t-name small{display:block;color:var(--red);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.rr-live .together-item .t-price{font-family:var(--head);font-weight:700}
+.rr-live .together-item .t-price small{font-weight:500;color:var(--grey);font-size:12px}
+.rr-live .together-total{border:1px solid var(--line);padding:16px;background:#fafafa}
+.rr-live .together-total b{display:block;font-family:var(--head);font-size:24px;margin:4px 0}
+.rr-live .together-total small{color:var(--grey)}
+.rr-live .together-total .t-save{font-size:13px;font-weight:700;color:var(--red);margin:6px 0 12px}
+.rr-live .together-total .t-save.muted{color:var(--grey);font-weight:500}
+@media(max-width:900px){.rr-live .together{grid-template-columns:1fr}
+.rr-live .together-items{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.rr-live .qtable .q-start{display:inline-flex;align-items:center;gap:6px;font-size:12.5px}
+.rr-live .qtable .q-start input{border:1px solid #ccc;padding:4px 6px;font:inherit;font-size:13px}
+.rr-live .qtable .q-soon{display:block;color:var(--red);font-weight:700;font-size:12px;margin-top:2px}
+.rr-live .q-policy{margin:12px 0 0;font-size:12.5px;color:var(--grey);line-height:1.45}
