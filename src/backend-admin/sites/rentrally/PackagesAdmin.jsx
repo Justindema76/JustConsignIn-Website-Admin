@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CheckCircle2, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Eye, EyeOff, Plus, Save, Trash2 } from 'lucide-react';
 import { PhotoList, SeoFields } from './fields';
 import { RENTRALLY_SITE_URL, money, packagesApi, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
@@ -23,6 +23,9 @@ function PackageList() {
   const [products, setProducts] = useState([]);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [picked, setPicked] = useState(() => new Set());
+  const [saving, setSaving] = useState(false);
 
   const refresh = () => Promise.all([packagesApi.list(), productsApi.list()])
     .then(([pk, p]) => { setRows(pk); setProducts(p); })
@@ -35,26 +38,66 @@ function PackageList() {
     try { await packagesApi.remove(row.id); refresh(); } catch (err) { setError(err.message); }
   };
 
+  // Turn packages on (published, shows on the site) or off (draft, hidden) — one or many at once.
+  const setLive = async (list, on) => {
+    const next = on ? 'published' : 'draft';
+    const todo = list.filter(r => r.status !== next);
+    if (!todo.length) return;
+    setSaving(true); setError(''); setMessage('');
+    let done = 0;
+    try {
+      for (let i = 0; i < todo.length; i += 5) {
+        const saved = await Promise.all(todo.slice(i, i + 5).map(r => packagesApi.save({ ...r, status: next })));
+        done += saved.length;
+        const byId = new Map(saved.filter(Boolean).map(r => [r.id, r]));
+        setRows(rs => rs.map(r => byId.get(r.id) || r));
+      }
+      setMessage(done === 1 ? `${todo[0].name} is ${on ? 'on. It shows on the website now.' : 'off. It is hidden from the website.'}` : `${done} packages turned ${on ? 'on. They show on the website now.' : 'off. They are hidden from the website.'}`);
+      setPicked(new Set());
+    } catch (err) {
+      setError(`${err.message} (${done} of ${todo.length} changed before the error.)`);
+      refresh();
+    } finally {
+      setSaving(false);
+    }
+  };
+  const toggle = id => setPicked(p => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const allPicked = rows.length > 0 && rows.every(r => picked.has(r.id));
+  const toggleAll = () => setPicked(allPicked ? new Set() : new Set(rows.map(r => r.id)));
+  const pickedRows = rows.filter(r => picked.has(r.id));
+  // Rentals in a package that are switched off (or deleted) don't show on the package page.
+  const offIn = r => (r.items || []).filter(i => products.find(p => p.slug === i.product)?.status !== 'published').length;
+
   return <>
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Catalogue</p>
         <h1>Packages</h1>
-        <p>Bundles of rentals at one daily price. The website shows how much customers save.</p>
+        <p>Bundles of rentals at one daily price. Packages switched On show on the website. Tick several to turn them on or off together.</p>
       </div>
       <Link className="site-admin-btn" to={`${BASE}/new`}><Plus size={15}/> New Package</Link>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
+    {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
+    {pickedRows.length > 0 && <div className="rr-bulkbar" role="region" aria-label="Bulk actions">
+      <strong>{pickedRows.length} selected</strong>
+      <button className="site-admin-btn small" type="button" onClick={() => setLive(pickedRows, true)} disabled={saving}><Eye size={13}/> Turn on</button>
+      <button className="site-admin-btn secondary small" type="button" onClick={() => setLive(pickedRows, false)} disabled={saving}><EyeOff size={13}/> Turn off</button>
+      <button className="site-admin-btn secondary small" type="button" onClick={() => setPicked(new Set())} disabled={saving}>Clear</button>
+      {saving && <small>Saving…</small>}
+    </div>}
     <div className="site-admin-card site-admin-table">
-      <div className="site-admin-table-head blogs"><span>Photo</span><span>Package</span><span>Status</span><span>Day rate</span><span>Actions</span></div>
+      <div className="site-admin-table-head rr-rentals"><span><input type="checkbox" className="rr-check" checked={allPicked} onChange={toggleAll} aria-label="Select all packages"/></span><span>Photo</span><span>Package</span><span>On website</span><span>Day rate</span><span>Actions</span></div>
       {busy && <div className="site-admin-empty">Loading packages…</div>}
       {!busy && !rows.length && <div className="site-admin-empty">No packages yet. Create one, or use “Import starter catalogue” on the Rentals page.</div>}
       {rows.map(r => {
         const list = separately(r.items || [], products);
-        return <div className="site-admin-table-row blogs" key={r.id}>
+        const off = offIn(r);
+        return <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
+          <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
           <div className="site-admin-blog-thumb">{r.hero_image ? <img src={r.hero_image} alt=""/> : '—'}</div>
-          <div><strong>{r.name}</strong><small>{(r.items || []).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > r.day_rate ? ` · saves ${money(list - r.day_rate)}/day` : ''}</small></div>
-          <span className={`site-admin-status ${r.status}`}>{r.status}</span>
+          <div><strong>{r.name}</strong><small>{(r.items || []).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > r.day_rate ? ` · saves ${money(list - r.day_rate)}/day` : ''}</small>{off > 0 && <small className="rr-warn">{off} rental{off === 1 ? ' is' : 's are'} switched off, so {off === 1 ? 'it is' : 'they are'} left out of this package on the site</small>}</div>
+          <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
           <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
