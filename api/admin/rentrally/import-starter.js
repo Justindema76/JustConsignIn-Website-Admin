@@ -364,21 +364,7 @@ async function patchOnce(token) {
 
 // One time: add a choice to rentals (found by web address) if they don't already have one with that name.
 // Their other choices are kept. Emptied after it has run.
-const ADD_OPTION_ONCE = { slugs: ["gorilla", "tire", "arrow", "balloon-inflatable"], option: {
-  "label": "Blower",
-  "style": "cards",
-  "values": [
-    {
-      "v": "BR15 blower",
-      "tag": "Included",
-      "note": "3.2 amps, 250 CFM. Standard blower, included with the rental."
-    },
-    {
-      "v": "BR35 blower (+$20/day)",
-      "note": "5.5 amps, 600 CFM. More air: stands up faster and stays firmer in wind."
-    }
-  ]
-} };
+const ADD_OPTION_ONCE = {};
 async function addOptionOnce(token) {
   const { slugs = [], option } = ADD_OPTION_ONCE;
   if (!option) return 0;
