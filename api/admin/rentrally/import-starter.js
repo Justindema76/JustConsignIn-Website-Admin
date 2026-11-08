@@ -348,6 +348,106 @@ async function addSaleCopies(token) {
   return added;
 }
 
+// One time: patch exact fields on specific rentals, found by web address. Emptied after it has run.
+const PATCH_ONCE = {
+  "inflblower": {
+    "features": [
+      "Constant airflow",
+      "Two models: BR15 (250 CFM) or BR35 (600 CFM)",
+      "Weather-resistant housing",
+      "Standard outlet"
+    ],
+    "specs": [
+      {
+        "label": "BR15",
+        "value": "3.2 amps, 250 CFM, 3200 RPM"
+      },
+      {
+        "label": "BR35",
+        "value": "5.5 amps, 600 CFM, 3200 RPM"
+      },
+      {
+        "label": "Power",
+        "value": "115V standard outdoor outlet, 6' cord"
+      },
+      {
+        "label": "Fits",
+        "value": "Giant inflatables"
+      }
+    ],
+    "options": [
+      {
+        "label": "Model",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "note": "3.2 amps, 250 CFM. Single speed 3200 RPM, 6' power cord, 115V. UL listed."
+          },
+          {
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. Single speed 3200 RPM, 6' power cord, 115V. More air for bigger inflatables."
+          }
+        ]
+      }
+    ]
+  },
+  "buy-inflblower": {
+    "features": [
+      "Constant airflow",
+      "Two models: BR15 (250 CFM) or BR35 (600 CFM)",
+      "Weather-resistant housing",
+      "Standard outlet",
+      "Brand new, yours to keep"
+    ],
+    "specs": [
+      {
+        "label": "BR15",
+        "value": "3.2 amps, 250 CFM, 3200 RPM"
+      },
+      {
+        "label": "BR35",
+        "value": "5.5 amps, 600 CFM, 3200 RPM"
+      },
+      {
+        "label": "Power",
+        "value": "115V standard outdoor outlet, 6' cord"
+      },
+      {
+        "label": "Fits",
+        "value": "Giant inflatables"
+      }
+    ],
+    "options": [
+      {
+        "label": "Model",
+        "style": "cards",
+        "values": [
+          {
+            "v": "BR15 blower",
+            "note": "3.2 amps, 250 CFM. Single speed 3200 RPM, 6' power cord, 115V. UL listed."
+          },
+          {
+            "v": "BR35 blower (+$100 one-time)",
+            "note": "5.5 amps, 600 CFM. Single speed 3200 RPM, 6' power cord, 115V. More air for bigger inflatables. $299 total."
+          }
+        ]
+      }
+    ]
+  }
+};
+async function patchOnce(token) {
+  let done = 0;
+  for (const [slug, fields] of Object.entries(PATCH_ONCE)) {
+    const rows = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=id`), `Unable to read ${slug}.`);
+    for (const live of Array.isArray(rows) ? rows : []) {
+      await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(live.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(fields) }), `Unable to update ${slug}.`);
+      done += 1;
+    }
+  }
+  return done;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -367,6 +467,7 @@ export default async function handler(req, res) {
     const newCategories = await addCategoriesOnce(owner.accessToken);
     const newProducts = await addProductsOnce(owner.accessToken);
     const dollars = await fixDoubleDollars(owner.accessToken);
+    const patched = await patchOnce(owner.accessToken);
     const saleCopies = await addSaleCopies(owner.accessToken);
     return res.status(200).json({
       ok: true,

@@ -625,18 +625,22 @@ export const STARTER_PRODUCTS = [
     ],
     "features": [
       "Constant airflow",
-      "3.2 amp and 5.5 amp models",
+      "Two models: BR15 (250 CFM) or BR35 (600 CFM)",
       "Weather-resistant housing",
       "Standard outlet"
     ],
     "specs": [
       {
-        "label": "Models",
-        "value": "3.2 amp / 5.5 amp"
+        "label": "BR15",
+        "value": "3.2 amps, 250 CFM, 3200 RPM"
+      },
+      {
+        "label": "BR35",
+        "value": "5.5 amps, 600 CFM, 3200 RPM"
       },
       {
         "label": "Power",
-        "value": "Standard outdoor outlet"
+        "value": "115V standard outdoor outlet, 6' cord"
       },
       {
         "label": "Fits",
@@ -646,12 +650,15 @@ export const STARTER_PRODUCTS = [
     "options": [
       {
         "label": "Model",
+        "style": "cards",
         "values": [
           {
-            "v": "3.2 amps"
+            "v": "BR15 blower",
+            "note": "3.2 amps, 250 CFM. Single speed 3200 RPM, 6' power cord, 115V. UL listed."
           },
           {
-            "v": "5.5 amps"
+            "v": "BR35 blower (+$20/day)",
+            "note": "5.5 amps, 600 CFM. Single speed 3200 RPM, 6' power cord, 115V. More air for bigger inflatables."
           }
         ]
       }
