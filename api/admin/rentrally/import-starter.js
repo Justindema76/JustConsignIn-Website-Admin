@@ -309,7 +309,7 @@ async function addCategoriesOnce(token) {
 // The copy is named like the rental, sells at its buy price, keeps its photos and plain choices
 // (colours, which dancer); rental-only choices (day-rate extras, minimums, things bought on top) are left out.
 // Web address: buy-<rental>. Skipped if it already exists. Emptied after it has run.
-const SALE_COPIES_ONCE = true;
+const SALE_COPIES_ONCE = false;
 const SHOP_CATEGORY = 'decorations';
 async function addSaleCopies(token) {
   if (!SALE_COPIES_ONCE) return 0;
