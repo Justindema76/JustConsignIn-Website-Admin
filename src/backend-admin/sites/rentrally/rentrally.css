@@ -126,3 +126,20 @@
 .rr-library-item img{width:100%;aspect-ratio:1;object-fit:contain}
 .rr-library-item span{font-size:11px;color:#50565c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rr-library-item i{position:absolute;top:6px;right:6px;background:#1f67b2;color:#fff;border-radius:999px;width:20px;height:20px;display:grid;place-items:center;font-style:normal}
+
+.site-admin-table-head.rr-rentals,.site-admin-table-row.rr-rentals{grid-template-columns:28px 88px minmax(220px,1.5fr) 120px 120px 200px}
+.site-admin-table-row.rr-rentals.is-picked{background:#f3f8fe}
+.site-admin-table-row.rr-rentals.is-off .site-admin-blog-thumb,.site-admin-table-row.rr-rentals.is-off>div>strong{opacity:.55}
+.rr-check{width:17px;height:17px;accent-color:#1f67b2;cursor:pointer;margin:0}
+.rr-bulkbar{position:sticky;top:78px;z-index:15;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#202223;color:#fff;border-radius:10px;padding:9px 12px;margin-bottom:10px}
+.rr-bulkbar strong{font-size:13px;margin-right:6px}
+.rr-bulkbar small{color:#c4c8cc}
+.rr-switch{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:4px 0;cursor:pointer;font:inherit;font-size:12px;font-weight:800;color:#62686e}
+.rr-switch i{width:34px;height:20px;border-radius:999px;background:#cfd5db;position:relative;transition:background .15s;flex:none}
+.rr-switch i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.rr-switch.on{color:#177245}
+.rr-switch.on i{background:#22a05a}
+.rr-switch.on i::after{transform:translateX(14px)}
+.rr-switch:disabled{opacity:.6;cursor:wait}
+.rr-switch:focus-visible{outline:2px solid #1f67b2;outline-offset:2px;border-radius:6px}
+@media(max-width:1080px){.site-admin-table-head.rr-rentals,.site-admin-table-row.rr-rentals{grid-template-columns:28px 78px minmax(180px,1fr) 100px 170px}.site-admin-table-head.rr-rentals>*:nth-child(5),.site-admin-table-row.rr-rentals>*:nth-child(5){display:none}}

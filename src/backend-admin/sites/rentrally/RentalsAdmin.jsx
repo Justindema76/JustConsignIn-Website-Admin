@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CheckCircle2, Copy, ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
+import { CheckCircle2, Copy, ExternalLink, Eye, EyeOff, Plus, Save, Trash2 } from 'lucide-react';
 import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToList } from './fields';
 import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
@@ -52,6 +52,8 @@ function RentalList() {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('all');
   const [status, setStatus] = useState('all');
+  const [picked, setPicked] = useState(() => new Set());
+  const [saving, setSaving] = useState(false);
 
   const refresh = () => {
     setBusy(true);
@@ -81,6 +83,34 @@ function RentalList() {
     }
   };
 
+  // Turn rentals on (published, shows on the site) or off (draft, hidden) — one or many at once.
+  const setLive = async (list, on) => {
+    const next = on ? 'published' : 'draft';
+    const todo = list.filter(r => r.status !== next);
+    if (!todo.length) return;
+    setSaving(true); setError(''); setMessage('');
+    let done = 0;
+    try {
+      for (let i = 0; i < todo.length; i += 5) {
+        const saved = await Promise.all(todo.slice(i, i + 5).map(r => productsApi.save({ ...r, status: next })));
+        done += saved.length;
+        const byId = new Map(saved.filter(Boolean).map(r => [r.id, r]));
+        setRows(rs => rs.map(r => byId.get(r.id) || r));
+      }
+      setMessage(done === 1 ? `${todo[0].name} is ${on ? 'on. It shows on the website now.' : 'off. It is hidden from the website.'}` : `${done} rentals turned ${on ? 'on. They show on the website now.' : 'off. They are hidden from the website.'}`);
+      setPicked(new Set());
+    } catch (err) {
+      setError(`${err.message} (${done} of ${todo.length} changed before the error.)`);
+      refresh();
+    } finally {
+      setSaving(false);
+    }
+  };
+  const toggle = id => setPicked(p => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const allShown = filtered.length > 0 && filtered.every(r => picked.has(r.id));
+  const toggleAll = () => setPicked(p => { const n = new Set(p); filtered.forEach(r => (allShown ? n.delete(r.id) : n.add(r.id))); return n; });
+  const pickedRows = rows.filter(r => picked.has(r.id));
+
   const remove = async row => {
     if (!confirm(`Delete "${row.name}"? It will disappear from the website and from any package that uses it.`)) return;
     try { await productsApi.remove(row.id); setMessage('Rental deleted.'); refresh(); } catch (err) { setError(err.message); }
@@ -91,7 +121,7 @@ function RentalList() {
       <div>
         <p className="site-admin-eyebrow">Catalogue</p>
         <h1>Rentals</h1>
-        <p>Everything customers can rent. Published items show on the website straight away.</p>
+        <p>Everything customers can rent. Rentals switched On show on the website. Tick several to turn them on or off together.</p>
       </div>
       <div className="site-admin-actions">
         <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/rentals`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
@@ -117,15 +147,23 @@ function RentalList() {
           {cats.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
         <select value={status} onChange={e => setStatus(e.target.value)} aria-label="Status">
-          <option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option>
+          <option value="all">On and off</option><option value="published">On website</option><option value="draft">Off (hidden)</option>
         </select>
       </div>
+      {pickedRows.length > 0 && <div className="rr-bulkbar" role="region" aria-label="Bulk actions">
+        <strong>{pickedRows.length} selected</strong>
+        <button className="site-admin-btn small" type="button" onClick={() => setLive(pickedRows, true)} disabled={saving}><Eye size={13}/> Turn on</button>
+        <button className="site-admin-btn secondary small" type="button" onClick={() => setLive(pickedRows, false)} disabled={saving}><EyeOff size={13}/> Turn off</button>
+        <button className="site-admin-btn secondary small" type="button" onClick={() => setPicked(new Set())} disabled={saving}>Clear</button>
+        {saving && <small>Saving…</small>}
+      </div>}
       <div className="site-admin-card site-admin-table">
-        <div className="site-admin-table-head blogs"><span>Photo</span><span>Rental</span><span>Status</span><span>Day rate</span><span>Actions</span></div>
-        {filtered.map(r => <div className="site-admin-table-row blogs" key={r.id}>
+        <div className="site-admin-table-head rr-rentals"><span><input type="checkbox" className="rr-check" checked={allShown} onChange={toggleAll} aria-label="Select all rentals shown"/></span><span>Photo</span><span>Rental</span><span>On website</span><span>Day rate</span><span>Actions</span></div>
+        {filtered.map(r => <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
+          <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
           <div className="site-admin-blog-thumb rr-thumb">{r.images?.[0] ? <img src={r.images[0]} alt=""/> : '—'}</div>
           <div><strong>{r.name}</strong><small>{catName(r.category_slug)} · SKU {r.sku || '—'}{r.featured ? ' · Popular' : ''}</small></div>
-          <span className={`site-admin-status ${r.status}`}>{r.status}</span>
+          <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
           <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
             <Link className="site-admin-btn secondary small" to={`${BASE}/${r.id}`}>Edit</Link>
