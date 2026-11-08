@@ -256,7 +256,7 @@ async function repriceOnce(token) {
 
 // New rentals to add once (skipped if that SKU is already there). Category follows a
 // sibling rental's category in the admin. Emptied after it has run.
-const ADD_PRODUCTS_ONCE = [{ slug: 'balloon-inflatable', status: 'draft' }];
+const ADD_PRODUCTS_ONCE = [];
 async function addProductsOnce(token) {
   let added = 0;
   for (const { slug, categoryLike, status } of ADD_PRODUCTS_ONCE) {
