@@ -202,8 +202,8 @@ async function repairRenamedLinks(token) {
 
 // One-time content update for specific rentals, found by SKU (so a renamed web address still matches).
 // Keeps the name, category, photos, related rentals, status and SEO set in the admin. Emptied after it has run.
-const UPDATE_ONCE = [];
-const UPDATE_ONCE_FIELDS = ['day_rate', 'buy_price', 'buy_note', 'description', 'features', 'specs', 'options'];
+const UPDATE_ONCE = ['aframe', 'quickie'];
+const UPDATE_ONCE_FIELDS = ['buy_price', 'buy_note', 'description', 'features', 'specs', 'options'];
 async function updateOnce(token) {
   let done = 0;
   for (const slug of UPDATE_ONCE) {
@@ -254,6 +254,27 @@ async function repriceOnce(token) {
   return changed;
 }
 
+// New rentals to add once (skipped if that SKU is already there). Category follows a
+// sibling rental's category in the admin. Emptied after it has run.
+const ADD_PRODUCTS_ONCE = [{ slug: 'quickiestake', categoryLike: '1083224' }];
+async function addProductsOnce(token) {
+  let added = 0;
+  for (const { slug, categoryLike } of ADD_PRODUCTS_ONCE) {
+    const row = STARTER_PRODUCTS.find(p => p.slug === slug);
+    if (!row) continue;
+    const have = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&sku=eq.${encodeURIComponent(row.sku)}&select=id`), `Unable to read ${slug}.`);
+    if (Array.isArray(have) && have.length) continue;
+    const sib = categoryLike ? await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&sku=eq.${encodeURIComponent(categoryLike)}&select=category_slug,day_rate`), 'Unable to read rentals.') : [];
+    const like = Array.isArray(sib) ? sib[0] : null;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?select=id`, {
+      method: 'POST', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ ...row, category_slug: like?.category_slug || row.category_slug, day_rate: like?.day_rate ?? row.day_rate, site_key: SITE_KEY, status: 'published', published_at: new Date().toISOString() }),
+    }), `Unable to add ${slug}.`);
+    added += 1;
+  }
+  return added;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -270,13 +291,14 @@ export default async function handler(req, res) {
     const relinked = await repairRenamedLinks(owner.accessToken);
     const updated = await updateOnce(owner.accessToken);
     const repriced = await repriceOnce(owner.accessToken);
+    const newProducts = await addProductsOnce(owner.accessToken);
     return res.status(200).json({
       ok: true,
       repaired,
       relinked,
       updated,
       repriced,
-      added: { categories, products, packages: packages + newPackages },
+      added: { categories, products: products + newProducts, packages: packages + newPackages },
       refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },
     });

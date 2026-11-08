@@ -1806,7 +1806,7 @@ export const STARTER_PRODUCTS = [
       "Holds two 32\" x 48\" signs back to back",
       "28 stock full-colour designs",
       "Custom signs with your logo and details",
-      "Ground spikes for grass at no charge"
+      "Stands on its own: pavement, concrete or indoors"
     ],
     "specs": [
       {
@@ -1847,20 +1847,6 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "20 or more: 15% off"
-          }
-        ]
-      },
-      {
-        "label": "Ground",
-        "style": "cards",
-        "values": [
-          {
-            "v": "Pavement or concrete",
-            "note": "Stands on its own."
-          },
-          {
-            "v": "Grass (ground spikes included)",
-            "note": "We add a spike to each leg."
           }
         ]
       },
@@ -2095,20 +2081,21 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/quickie-1.jpg",
       "https://rent-and-rally.vercel.app/img/quickie-2.jpg"
     ],
-    "day_rate": 45,
+    "day_rate": 40,
     "buy_price": 79.95,
     "buy_note": "frame only",
     "buy_url": "",
     "badge": "",
     "description": [
-      "A compact steel frame that holds two 24\" x 32\" Quickie lot signs. Set them in front of feature vehicles, along the curb or at the lot entrance.",
+      "A compact steel A-frame with a carry handle that holds two 24\" x 32\" Quickie lot signs. It stands on its own, so it is made for pavement: in front of feature vehicles, along the curb or at the lot entrance.",
       "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs, or use signs you already have."
     ],
     "features": [
       "Rent the frame, keep the signs",
       "Holds two 24\" x 32\" signs",
       "20 stock full-colour designs",
-      "A-frame for pavement or ground stake for grass",
+      "Stands on its own on pavement",
+      "Carry handle",
       "Custom signs with your logo and details"
     ],
     "specs": [
@@ -2118,7 +2105,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Frame",
-        "value": "Steel A-frame or ground stake"
+        "value": "Steel A-frame with carry handle"
       },
       {
         "label": "Signs",
@@ -2134,7 +2121,7 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Use",
-        "value": "Outdoor"
+        "value": "Pavement"
       }
     ],
     "options": [
@@ -2150,22 +2137,6 @@ export const STARTER_PRODUCTS = [
           },
           {
             "v": "20 or more: 15% off"
-          }
-        ]
-      },
-      {
-        "label": "Frame",
-        "style": "cards",
-        "values": [
-          {
-            "v": "A-frame",
-            "note": "Holds two signs. For pavement.",
-            "img": 1
-          },
-          {
-            "v": "Ground stake",
-            "note": "Pounds into grass. Holds two signs back to back, or one.",
-            "img": 2
           }
         ]
       },
@@ -2335,13 +2306,253 @@ export const STARTER_PRODUCTS = [
       }
     ],
     "related": [
+      "quickiestake",
       "aframe",
-      "sidewalk",
-      "ramps"
+      "sidewalk"
     ],
     "featured": false,
     "status": "published",
     "sort_order": 200
+  },
+  {
+    "slug": "quickiestake",
+    "category_slug": "flags-signs",
+    "sku": "232245",
+    "name": "Quickie Lot Sign Lawn Stake (24\" x 32\")",
+    "images": [
+      "https://rent-and-rally.vercel.app/img/quickiestake-1.jpg"
+    ],
+    "day_rate": 40,
+    "buy_price": 79.95,
+    "buy_note": "frame only",
+    "buy_url": "",
+    "badge": "",
+    "description": [
+      "A steel lawn stake frame for 24\" x 32\" Quickie lot signs. It pounds into the grass, so it is made for lawns and boulevards, and holds two signs back to back or one single sign.",
+      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs, or use signs you already have."
+    ],
+    "features": [
+      "Rent the frame, keep the signs",
+      "Pounds into grass",
+      "Holds two signs back to back, or one",
+      "20 stock full-colour designs",
+      "Custom signs with your logo and details"
+    ],
+    "specs": [
+      {
+        "label": "Sign size",
+        "value": "24\" tall x 32\" wide"
+      },
+      {
+        "label": "Frame",
+        "value": "Steel lawn stake"
+      },
+      {
+        "label": "Signs",
+        "value": "4mm coroplast, rated up to 3 years"
+      },
+      {
+        "label": "Stock sign",
+        "value": "$34.95 each, yours to keep"
+      },
+      {
+        "label": "Custom sign",
+        "value": "$36.95 each + $50 one-time artwork set-up"
+      },
+      {
+        "label": "Use",
+        "value": "Grass and lawns"
+      }
+    ],
+    "options": [
+      {
+        "label": "Quantity pricing",
+        "style": "pricing",
+        "values": [
+          {
+            "v": "Minimum 5"
+          },
+          {
+            "v": "10 or more: 10% off"
+          },
+          {
+            "v": "20 or more: 15% off"
+          }
+        ]
+      },
+      {
+        "label": "Signs",
+        "style": "cards",
+        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "values": [
+          {
+            "v": "Buy stock signs",
+            "note": "Pick a design for each side below. $34.95 per sign."
+          },
+          {
+            "v": "Buy custom signs, both sides (+$123.90 one-time)",
+            "note": "2 signs at $36.95 + $50 artwork set-up. Your logo and message."
+          },
+          {
+            "v": "I have my own 24\" x 32\" signs",
+            "note": "We put your signs in the frame.",
+            "tag": "No charge"
+          }
+        ]
+      },
+      {
+        "label": "Side 1 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
+        "values": [
+          {
+            "v": "Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "Tight On Cash? Vehicles For Every Budget (+$34.95 one-time)"
+          },
+          {
+            "v": "Certified Pre-Owned (+$34.95 one-time)"
+          },
+          {
+            "v": "No Credit No Problem (+$34.95 one-time)"
+          },
+          {
+            "v": "0% Financing (+$34.95 one-time)"
+          },
+          {
+            "v": "$0 Down (+$34.95 one-time)"
+          },
+          {
+            "v": "Truck Sale On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "Stop & Save! (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Blow-Out (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Sale On Now (+$34.95 one-time)"
+          },
+          {
+            "v": "Sale On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Clear Out: All Prices Drastically Reduced (+$34.95 one-time)"
+          },
+          {
+            "v": "Extended Warranty Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Pre-Owned Center (+$34.95 one-time)"
+          },
+          {
+            "v": "We Finance (+$34.95 one-time)"
+          },
+          {
+            "v": "Many Finance Options Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Auto Clearance On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Demo Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "All In Pricing (+$34.95 one-time)"
+          }
+        ]
+      },
+      {
+        "label": "Side 2 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
+        "values": [
+          {
+            "v": "Same design as side 1 (+$34.95 one-time)"
+          },
+          {
+            "v": "One sign only (no side 2)"
+          },
+          {
+            "v": "Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "Tight On Cash? Vehicles For Every Budget (+$34.95 one-time)"
+          },
+          {
+            "v": "Certified Pre-Owned (+$34.95 one-time)"
+          },
+          {
+            "v": "No Credit No Problem (+$34.95 one-time)"
+          },
+          {
+            "v": "0% Financing (+$34.95 one-time)"
+          },
+          {
+            "v": "$0 Down (+$34.95 one-time)"
+          },
+          {
+            "v": "Truck Sale On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "Stop & Save! (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Blow-Out (+$34.95 one-time)"
+          },
+          {
+            "v": "Used Car Sale On Now (+$34.95 one-time)"
+          },
+          {
+            "v": "Sale On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Clear Out: All Prices Drastically Reduced (+$34.95 one-time)"
+          },
+          {
+            "v": "Extended Warranty Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Pre-Owned Center (+$34.95 one-time)"
+          },
+          {
+            "v": "We Finance (+$34.95 one-time)"
+          },
+          {
+            "v": "Many Finance Options Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Auto Clearance On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Demo Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "All In Pricing (+$34.95 one-time)"
+          }
+        ]
+      }
+    ],
+    "related": [
+      "quickie",
+      "aframe",
+      "swooper"
+    ],
+    "featured": false,
+    "status": "published",
+    "sort_order": 210
   },
   {
     "slug": "boulevard",
@@ -2450,7 +2661,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 210
+    "sort_order": 220
   },
   {
     "slug": "dbs",
@@ -2548,7 +2759,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 220
+    "sort_order": 230
   },
   {
     "slug": "xbanner",
@@ -2617,7 +2828,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 230
+    "sort_order": 240
   },
   {
     "slug": "simplebanner",
@@ -2686,7 +2897,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 240
+    "sort_order": 250
   },
   {
     "slug": "retractable",
@@ -2755,7 +2966,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": true,
     "status": "published",
-    "sort_order": 250
+    "sort_order": 260
   },
   {
     "slug": "outdoorbanner",
@@ -2841,7 +3052,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 260
+    "sort_order": 270
   },
   {
     "slug": "ramp20",
@@ -2898,7 +3109,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 270
+    "sort_order": 280
   },
   {
     "slug": "ramps",
@@ -2972,7 +3183,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 280
+    "sort_order": 290
   },
   {
     "slug": "balloonpole",
@@ -3093,7 +3304,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 290
+    "sort_order": 300
   },
   {
     "slug": "balloon3",
@@ -3214,7 +3425,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 300
+    "sort_order": 310
   },
   {
     "slug": "balloon5",
@@ -3334,7 +3545,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 310
+    "sort_order": 320
   },
   {
     "slug": "balloon30",
@@ -3448,7 +3659,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 320
+    "sort_order": 330
   },
   {
     "slug": "lightpole1",
@@ -3558,7 +3769,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 330
+    "sort_order": 340
   },
   {
     "slug": "lightpole4",
@@ -3667,7 +3878,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 340
+    "sort_order": 350
   },
   {
     "slug": "cones",
@@ -3713,7 +3924,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 350
+    "sort_order": 360
   },
   {
     "slug": "delineator",
@@ -3782,7 +3993,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 360
+    "sort_order": 370
   },
   {
     "slug": "bollard",
@@ -3858,7 +4069,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 370
+    "sort_order": 380
   },
   {
     "slug": "beltbarrier",
@@ -3929,7 +4140,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 380
+    "sort_order": 390
   },
   {
     "slug": "raffle",
@@ -3987,7 +4198,7 @@ export const STARTER_PRODUCTS = [
     ],
     "featured": false,
     "status": "published",
-    "sort_order": 390
+    "sort_order": 400
   }
 ];
 

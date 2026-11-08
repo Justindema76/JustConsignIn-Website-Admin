@@ -127,7 +127,7 @@ function Slide({ s, ctx, level = 'h2' }) {
         </div>
       </div>
       <div className="hero-img">
-        {image ? <img src={image} alt={s.imageAlt || s.badgeTitle || price?.name || ''} {...(level === 'h1' ? { fetchPriority: 'high' } : { loading: 'lazy' })}/> : null}
+        {image ? <img src={image} alt={s.imageAlt || s.badgeTitle || price?.name || ''} {...(level === 'h1' ? { fetchPriority: 'high' } : {})}/> : null}
         {s.badgeTitle || price ? <A ctx={ctx} className="hero-tag" href={price?.href || s.button1Url || '/rentals'}><b>{s.badgeTitle || price?.name}</b>{price ? price.text : ''}</A> : null}
       </div>
     </div>

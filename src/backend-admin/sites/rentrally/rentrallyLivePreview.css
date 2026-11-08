@@ -497,3 +497,17 @@
 }
 @media(prefers-reduced-motion:reduce){.rr-live .rr-slide{transition:none}
 }
+@media(max-width:860px){.rr-live .rr-slider .hero-img{height:auto;align-self:start}
+.rr-live .rr-slider .hero-img img{position:static;display:block;width:100%;height:auto;max-height:none;object-fit:contain}
+.rr-live .rr-slider .hero-img:after{display:none}
+}
+.rr-live .field-pair{align-items:start}
+.rr-live .field-pair .field{min-width:0;margin-top:14px}
+.rr-live .field-pair .field label{white-space:nowrap}
+.rr-live .field-pair .field input,.rr-live .field-pair .field select{height:44px;min-width:0;width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none;margin:0}
+.rr-live .field-pair .field select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23333'/%3E%3C/svg%3E") no-repeat right 10px center;padding-right:26px}
+.rr-live .field-pair .field input[type=date]{display:block;text-align:left;line-height:44px;padding-top:0;padding-bottom:0}
+.rr-live .field-pair .field input[type=date]::-webkit-date-and-time-value{text-align:left}
+.rr-live .field-pair{margin-top:14px}
+.rr-live .field-pair .field,.rr-live .field-pair .field+.field{margin-top:0!important}
+.rr-live .footer .logo b i{color:#fff}
