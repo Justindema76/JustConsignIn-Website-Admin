@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CheckCircle2, Copy, ExternalLink, Eye, EyeOff, Plus, Save, Trash2 } from 'lucide-react';
+import { CheckCircle2, Copy, ExternalLink, Eye, EyeOff, Plus, Save, Star, Trash2 } from 'lucide-react';
 import { OptionRows, PairRows, PhotoList, SeoFields, linesToList, paragraphsToList } from './fields';
 import { RENTRALLY_SITE_URL, categoriesApi, importStarterCatalogue, money, productsApi, slugify, slugTyping } from './rentrallyAdminService';
 import './rentrally.css';
@@ -67,7 +67,7 @@ function RentalList() {
   const catName = slug => cats.find(c => c.slug === slug)?.name || slug || 'No category';
   const filtered = useMemo(() => rows.filter(r =>
     (cat === 'all' || r.category_slug === cat)
-    && (status === 'all' || r.status === status)
+    && (status === 'all' || (status === 'popular' ? r.featured : r.status === status))
     && (!q || `${r.name} ${r.sku} ${r.slug}`.toLowerCase().includes(q.toLowerCase()))), [rows, q, cat, status]);
 
   const runImport = async () => {
@@ -106,6 +106,25 @@ function RentalList() {
       setSaving(false);
     }
   };
+  // Popular = shown in "Popular Rentals" on the homepage.
+  const setPopular = async (list, on) => {
+    const todo = list.filter(r => !!r.featured !== on);
+    if (!todo.length) return;
+    setSaving(true); setError(''); setMessage('');
+    try {
+      for (let i = 0; i < todo.length; i += 5) {
+        const saved = await Promise.all(todo.slice(i, i + 5).map(r => productsApi.save({ ...r, featured: on })));
+        const byId = new Map(saved.filter(Boolean).map(r => [r.id, r]));
+        setRows(rs => rs.map(r => byId.get(r.id) || r));
+      }
+      setMessage(todo.length === 1 ? `${todo[0].name} ${on ? 'is now Popular (shown on the homepage).' : 'is no longer Popular.'}` : `${todo.length} rentals ${on ? 'marked Popular.' : 'no longer Popular.'}`);
+      setPicked(new Set());
+    } catch (err) {
+      setError(err.message); refresh();
+    } finally {
+      setSaving(false);
+    }
+  };
   const toggle = id => setPicked(p => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const allShown = filtered.length > 0 && filtered.every(r => picked.has(r.id));
   const toggleAll = () => setPicked(p => { const n = new Set(p); filtered.forEach(r => (allShown ? n.delete(r.id) : n.add(r.id))); return n; });
@@ -121,7 +140,7 @@ function RentalList() {
       <div>
         <p className="site-admin-eyebrow">Catalogue</p>
         <h1>Rentals</h1>
-        <p>Everything customers can rent. Rentals switched On show on the website. Tick several to turn them on or off together.</p>
+        <p>Everything customers can rent. Rentals switched On show on the website. ★ marks Popular rentals (shown on the homepage). Tick several to change them together.</p>
       </div>
       <div className="site-admin-actions">
         <a className="site-admin-btn secondary" href={`${RENTRALLY_SITE_URL}/rentals`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> View site</a>
@@ -147,13 +166,15 @@ function RentalList() {
           {cats.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
         <select value={status} onChange={e => setStatus(e.target.value)} aria-label="Status">
-          <option value="all">On and off</option><option value="published">On website</option><option value="draft">Off (hidden)</option>
+          <option value="all">On and off</option><option value="published">On website</option><option value="draft">Off (hidden)</option><option value="popular">★ Popular only</option>
         </select>
       </div>
       {pickedRows.length > 0 && <div className="rr-bulkbar" role="region" aria-label="Bulk actions">
         <strong>{pickedRows.length} selected</strong>
         <button className="site-admin-btn small" type="button" onClick={() => setLive(pickedRows, true)} disabled={saving}><Eye size={13}/> Turn on</button>
         <button className="site-admin-btn secondary small" type="button" onClick={() => setLive(pickedRows, false)} disabled={saving}><EyeOff size={13}/> Turn off</button>
+        <button className="site-admin-btn secondary small" type="button" onClick={() => setPopular(pickedRows, true)} disabled={saving}><Star size={13}/> Mark popular</button>
+        <button className="site-admin-btn secondary small" type="button" onClick={() => setPopular(pickedRows, false)} disabled={saving}>Unmark popular</button>
         <button className="site-admin-btn secondary small" type="button" onClick={() => setPicked(new Set())} disabled={saving}>Clear</button>
         {saving && <small>Saving…</small>}
       </div>}
@@ -161,8 +182,10 @@ function RentalList() {
         <div className="site-admin-table-head rr-rentals"><span><input type="checkbox" className="rr-check" checked={allShown} onChange={toggleAll} aria-label="Select all rentals shown"/></span><span>Photo</span><span>Rental</span><span>On website</span><span>Day rate</span><span>Actions</span></div>
         {filtered.map(r => <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
           <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
-          <div className="site-admin-blog-thumb rr-thumb">{r.images?.[0] ? <img src={r.images[0]} alt=""/> : '—'}</div>
-          <div><strong>{r.name}</strong><small>{catName(r.category_slug)} · SKU {r.sku || '—'}{r.featured ? ' · Popular' : ''}</small></div>
+          <div className="site-admin-blog-thumb rr-thumb">
+            <button type="button" className={`rr-star${r.featured ? ' on' : ''}`} onClick={() => setPopular([r], !r.featured)} disabled={saving} aria-pressed={!!r.featured} aria-label={`${r.featured ? 'Unmark' : 'Mark'} ${r.name} as Popular`} title={r.featured ? 'Popular: shown on the homepage. Click to unmark.' : 'Click to mark Popular (shown on the homepage)'}><Star size={14}/></button>
+            {r.images?.[0] ? <img src={r.images[0]} alt=""/> : '—'}</div>
+          <div><strong>{r.name}</strong><small>{catName(r.category_slug)} · SKU {r.sku || '—'}</small></div>
           <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
           <div><strong>{money(r.day_rate)}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
