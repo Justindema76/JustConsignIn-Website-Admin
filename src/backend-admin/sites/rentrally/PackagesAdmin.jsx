@@ -9,7 +9,9 @@ const BASE = '/admin/rentrally/packages';
 const EMPTY = { id: '', slug: '', tag: '', name: '', hero_image: '', day_rate: '', items: [], description: '', good_for: [], status: 'draft', sort_order: 0, seo_title: '', seo_description: '' };
 
 // Only rentals switched on count, same as the website.
-const separately = (items, products) => items.reduce((sum, item) => {
+// Add-ons are offered on the package page as extras; they are not part of the package price.
+const included = items => (items || []).filter(i => !i.addon);
+const separately = (items, products) => included(items).reduce((sum, item) => {
   const p = products.find(x => x.slug === item.product && x.status === 'published');
   return sum + (p ? Number(p.day_rate) * item.qty : 0);
 }, 0);
@@ -71,7 +73,7 @@ function PackageList() {
   const toggleAll = () => setPicked(allPicked ? new Set() : new Set(rows.map(r => r.id)));
   const pickedRows = rows.filter(r => picked.has(r.id));
   // Rentals in a package that are switched off (or deleted) don't show on the package page.
-  const offIn = r => (r.items || []).filter(i => products.find(p => p.slug === i.product)?.status !== 'published').length;
+  const offIn = r => included(r.items).filter(i => products.find(p => p.slug === i.product)?.status !== 'published').length;
 
   return <>
     <div className="site-admin-page-head">
@@ -101,7 +103,7 @@ function PackageList() {
         return <div className={`site-admin-table-row rr-rentals${picked.has(r.id) ? ' is-picked' : ''}${r.status !== 'published' ? ' is-off' : ''}`} key={r.id}>
           <span><input type="checkbox" className="rr-check" checked={picked.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`}/></span>
           <div className="site-admin-blog-thumb">{r.hero_image ? <img src={r.hero_image} alt=""/> : '—'}</div>
-          <div><strong>{r.name}</strong><small>{(r.items || []).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > autoPrice(list) ? ` · saves ${money(list - autoPrice(list))}/day` : ''}</small>{off > 0 && <small className="rr-warn">{off} rental{off === 1 ? ' is' : 's are'} switched off, so {off === 1 ? 'it is' : 'they are'} left out of this package on the site</small>}</div>
+          <div><strong>{r.name}</strong><small>{included(r.items).reduce((s, i) => s + i.qty, 0)} pieces{r.tag ? ` · ${r.tag}` : ''}{list > autoPrice(list) ? ` · saves ${money(list - autoPrice(list))}/day` : ''}</small>{off > 0 && <small className="rr-warn">{off} rental{off === 1 ? ' is' : 's are'} switched off, so {off === 1 ? 'it is' : 'they are'} left out of this package on the site</small>}</div>
           <button type="button" className={`rr-switch${r.status === 'published' ? ' on' : ''}`} role="switch" aria-checked={r.status === 'published'} aria-label={`${r.name} on website`} onClick={() => setLive([r], r.status !== 'published')} disabled={saving}><i/><span>{r.status === 'published' ? 'On' : 'Off'}</span></button>
           <div><strong>{money(autoPrice(list))}</strong><small>/day</small></div>
           <div className="site-admin-actions right">
@@ -191,6 +193,7 @@ function PackageEditor({ id }) {
           <div className="rr-photos-head"><strong>What’s included</strong><small>Pick rentals and how many of each.</small></div>
           <div className="rr-rows">
             {draft.items.map((it, i) => {
+              if (it.addon) return null;
               const p = products.find(x => x.slug === it.product);
               return <div className="rr-row rr-item-row" key={i}>
                 <div className="rr-item-thumb">{p?.images?.[0] ? <img src={p.images[0]} alt=""/> : null}</div>
@@ -204,6 +207,23 @@ function PackageEditor({ id }) {
               </div>;
             })}
             <button type="button" className="site-admin-btn secondary small" onClick={() => set('items', [...draft.items, { product: '', qty: 1 }])}><Plus size={13}/> Add rental</button>
+          </div>
+          <div className="rr-photos-head" style={{ marginTop: 18 }}><strong>Add-ons</strong><small>Extra rentals customers can add to this package at the same package discount (for example a 10' x 20' tent). Rentals from the same categories are suggested automatically too.</small></div>
+          <div className="rr-rows">
+            {draft.items.map((it, i) => {
+              if (!it.addon) return null;
+              const p = products.find(x => x.slug === it.product);
+              return <div className="rr-row rr-item-row" key={`addon-${i}`}>
+                <div className="rr-item-thumb">{p?.images?.[0] ? <img src={p.images[0]} alt=""/> : null}</div>
+                <select value={it.product} onChange={e => setItem(i, { product: e.target.value })} aria-label="Add-on rental">
+                  <option value="">Choose a rental…</option>
+                  {products.filter(x => Number(x.day_rate) > 0).map(x => <option key={x.slug} value={x.slug}>{x.name}{x.status === 'draft' ? ' (off)' : ''}</option>)}
+                </select>
+                <span className="rr-line">{p ? `${money(p.day_rate)}/day` : ''}</span>
+                <button type="button" className="rr-icon-btn" onClick={() => set('items', draft.items.filter((_, j) => j !== i))} aria-label="Remove add-on"><Trash2 size={14}/></button>
+              </div>;
+            })}
+            <button type="button" className="site-admin-btn secondary small" onClick={() => set('items', [...draft.items, { product: '', qty: 0, addon: true }])}><Plus size={13}/> Add add-on</button>
           </div>
           <div className="rr-savings">
             <div><span>Rented separately</span><b>{money(list)}/day</b></div>
@@ -230,7 +250,7 @@ function PackageEditor({ id }) {
           description={draft.seo_description || ''}
           onChange={patch => setDraft(d => ({ ...d, ...patch }))}
           autoTitle={`${draft.name || 'Package name'} Rental Package | Rent & Rally`}
-          autoDescription={`${draft.name || 'This package'}: ${draft.items.reduce((s, i) => s + i.qty, 0)} pieces from ${money(rate)}/day. Delivered and set up in Hamilton, Niagara and the GTA.`}
+          autoDescription={`${draft.name || 'This package'}: ${included(draft.items).reduce((s, i) => s + i.qty, 0)} pieces from ${money(rate)}/day. Delivered and set up in Hamilton, Niagara and the GTA.`}
           url={`rent-and-rally.vercel.app › packages › ${draft.slug || 'slug'}`}
         />
         {!isNew && <div className="site-admin-card site-admin-side-card danger-zone"><h2>Delete</h2><button className="site-admin-btn danger small" type="button" onClick={remove}><Trash2 size={13}/> Delete package</button></div>}

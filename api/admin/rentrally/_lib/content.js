@@ -154,7 +154,9 @@ export function cleanProduct(body = {}) {
 
 export function cleanPackage(body = {}) {
   const items = (Array.isArray(body.items) ? body.items : [])
-    .map(item => ({ product: slugify(item?.product), qty: Math.max(1, int(item?.qty) || 1) }))
+    .map(item => (item?.addon
+      ? { product: slugify(item?.product), qty: 0, addon: true }
+      : { product: slugify(item?.product), qty: Math.max(1, int(item?.qty) || 1) }))
     .filter(item => item.product);
   const { published_at, ...rest } = publishing(body);
   return {
