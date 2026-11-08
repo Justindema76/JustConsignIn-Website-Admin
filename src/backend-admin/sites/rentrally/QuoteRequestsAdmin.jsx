@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Mail, Phone, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { CheckCircle2, Mail, MapPin, Phone, RefreshCw, Save, Trash2 } from 'lucide-react';
 import { money, quotesApi } from './rentrallyAdminService';
 import './rentrally.css';
 
@@ -32,7 +32,7 @@ export default function QuoteRequestsAdmin() {
   const counts = useMemo(() => rows.reduce((acc, r) => ({ ...acc, [r.status]: (acc[r.status] || 0) + 1 }), {}), [rows]);
   const filtered = rows.filter(r =>
     (filter === 'all' || (filter === 'open' ? OPEN.has(r.status) : r.status === filter))
-    && (!q || `${r.name} ${r.business} ${r.email} ${r.phone} ${r.area}`.toLowerCase().includes(q.toLowerCase())));
+    && (!q || `${r.name} ${r.business} ${r.email} ${r.phone} ${r.area} ${r.notes}`.toLowerCase().includes(q.toLowerCase())));
 
   const open = r => {
     setOpenId(openId === r.id ? '' : r.id);
@@ -121,7 +121,8 @@ export default function QuoteRequestsAdmin() {
               <div className="rr-line-total"><span>Website estimate (before delivery &amp; tax)</span><b>{money(r.estimated_total)}</b></div>
             </div>
 
-            {r.notes && <div className="site-admin-note"><strong>Customer notes:</strong> {r.notes}</div>}
+            {(() => { const addr = (String(r.notes || '').match(/^Address: (.+)$/m) || [])[1]; return addr ? <div className="rr-contact"><a className="site-admin-btn secondary small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`} target="_blank" rel="noreferrer"><MapPin size={13}/> {addr} · directions &amp; distance</a></div> : null; })()}
+            {r.notes && <div className="site-admin-note" style={{ whiteSpace: 'pre-line' }}><strong>Customer details:</strong>{'\n'}{r.notes}</div>}
 
             <div className="site-admin-form rr-quote-form">
               <label>Status<select value={edit.status} onChange={e => setEdit({ ...edit, status: e.target.value })}>{STATUSES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
