@@ -236,7 +236,7 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/weights-1.jpg"
     ],
-    "day_rate": 20,
+    "day_rate": 50,
     "buy_price": 49.95,
     "buy_note": "each",
     "buy_url": "https://wheelsauto.com/ca-en/10-kg-tent-leg-weight-12099.html",
@@ -290,7 +290,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/tubeman-5.jpg",
       "https://rent-and-rally.vercel.app/img/tubeman-6.jpg"
     ],
-    "day_rate": 45,
+    "day_rate": 95,
     "buy_price": 199,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/9201-9205-gigantic-tube-man-air-dancer.html",
@@ -372,7 +372,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/salesman-5.jpg",
       "https://rent-and-rally.vercel.app/img/salesman-6.jpg"
     ],
-    "day_rate": 50,
+    "day_rate": 90,
     "buy_price": 199,
     "buy_note": "blower not included",
     "buy_url": "https://wheelsauto.com/ca-en/9101l-9105r-crazy-car-salesman-air-dancers.html",
@@ -495,7 +495,7 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/clowndancer-1.jpg"
     ],
-    "day_rate": 55,
+    "day_rate": 175,
     "buy_price": 289,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/sale-clown-air-dancer-9105.html",
@@ -545,7 +545,7 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/powerblower-1.jpg"
     ],
-    "day_rate": 25,
+    "day_rate": 70,
     "buy_price": 479.95,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/power-blower-for-air-dancers-9199.html",
@@ -597,7 +597,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/inflblower-2.jpg",
       "https://rent-and-rally.vercel.app/img/inflblower-3.jpg"
     ],
-    "day_rate": 25,
+    "day_rate": 65,
     "buy_price": 199,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/br15-br35-blower-for-inflatables.html",
@@ -655,7 +655,7 @@ export const STARTER_PRODUCTS = [
     "images": [
       "https://rent-and-rally.vercel.app/img/gorilla-1.jpg"
     ],
-    "day_rate": 350,
+    "day_rate": 375,
     "buy_price": 1595,
     "buy_note": "",
     "buy_url": "https://wheelsauto.com/ca-en/gigantic-22-inflatable-gorilla-9160.html",
@@ -841,7 +841,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/inflsalesman-5.jpg",
       "https://rent-and-rally.vercel.app/img/inflsalesman-6.jpg"
     ],
-    "day_rate": 175,
+    "day_rate": 375,
     "buy_price": 795,
     "buy_note": "banner not included",
     "buy_url": "https://wheelsauto.com/ca-en/9115-9120-inflatable-manager-salesman.html",
@@ -1097,7 +1097,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/swooper-2.jpg",
       "https://rent-and-rally.vercel.app/img/swooper-3.jpg"
     ],
-    "day_rate": 30,
+    "day_rate": 150,
     "buy_price": 139.95,
     "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/swooper-flag.html",
@@ -1308,7 +1308,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/blade-3.jpg",
       "https://rent-and-rally.vercel.app/img/blade-4.jpg"
     ],
-    "day_rate": 30,
+    "day_rate": 150,
     "buy_price": 169.95,
     "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/104101-104128sb-blade-flags.html",
@@ -1510,7 +1510,7 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/bowflag-3.jpg",
       "https://rent-and-rally.vercel.app/img/bowflag-4.jpg"
     ],
-    "day_rate": 30,
+    "day_rate": 150,
     "buy_price": 159.95,
     "buy_note": "flag + kit",
     "buy_url": "https://wheelsauto.com/ca-en/bow-flags-103101-103127.html",
@@ -3913,32 +3913,24 @@ export const STARTER_PACKAGES = [
   {
     "slug": "grand-opening",
     "tag": "Most popular",
-    "name": "Grand Opening Starter",
-    "hero_image": "https://rent-and-rally.vercel.app/img/tubeman-1.jpg",
-    "day_rate": 259,
+    "name": "Grand Opening Blowout",
+    "hero_image": "https://rent-and-rally.vercel.app/img/gorilla-1.jpg",
+    "day_rate": 1049,
     "items": [
+      {
+        "product": "gorilla",
+        "qty": 1
+      },
       {
         "product": "tubeman",
         "qty": 2
       },
       {
-        "product": "powerblower",
-        "qty": 2
-      },
-      {
         "product": "swooper",
         "qty": 4
-      },
-      {
-        "product": "aframe",
-        "qty": 1
-      },
-      {
-        "product": "raffle",
-        "qty": 1
       }
     ],
-    "description": "Everything you need to announce you're open. Two waving tube men, a row of swooper flags, an A-frame sign out front and a raffle drum for your opening-day draw. Tell us your slogans in the notes.",
+    "description": "Open with a bang. A 22' gorilla that's seen from blocks away, two 20' tube men waving traffic in and four swooper flags lining the front. Tell us your colours and flag slogans in the notes.",
     "good_for": [
       "Grand openings",
       "New locations",
@@ -3952,274 +3944,166 @@ export const STARTER_PACKAGES = [
     "slug": "dealership-weekend",
     "tag": "Dealerships",
     "name": "Dealership Sale Weekend",
-    "hero_image": "https://rent-and-rally.vercel.app/img/gorilla-1.jpg",
-    "day_rate": 659,
+    "hero_image": "https://rent-and-rally.vercel.app/img/inflsalesman-1.jpg",
+    "day_rate": 1649,
     "items": [
       {
         "product": "gorilla",
         "qty": 1
       },
       {
-        "product": "shirt",
+        "product": "inflsalesman",
         "qty": 1
       },
       {
-        "product": "arrow",
-        "qty": 1
-      },
-      {
-        "product": "inflblower",
+        "product": "crazy-salesman-air-dancers",
         "qty": 2
       },
       {
         "product": "swooper",
         "qty": 6
-      },
-      {
-        "product": "dbs",
-        "qty": 1
       }
     ],
-    "description": "The full showstopper. A 22' gorilla wearing your message, a 12' SALE arrow, six swooper flags lining the lot and a lot banner stand beside your feature vehicle.",
+    "description": "The full showstopper for a big sales weekend. The 22' gorilla, the giant inflatable manager giving two thumbs up, two Crazy Car Salesman air dancers and six swooper flags lining the lot.",
     "good_for": [
       "Sales events",
       "Truck month",
       "Clear-out weekends",
-      "Pre-owned events"
+      "Year-end events"
     ],
     "status": "published",
     "sort_order": 20
   },
   {
-    "slug": "feature-vehicle",
+    "slug": "lot-dress-up",
     "tag": "Dealerships",
-    "name": "Feature Vehicle Spotlight",
-    "hero_image": "https://rent-and-rally.vercel.app/img/ramps-1.jpg",
-    "day_rate": 199,
+    "name": "Used Car Lot Blitz",
+    "hero_image": "https://rent-and-rally.vercel.app/img/salesman-1.jpg",
+    "day_rate": 1049,
     "items": [
       {
-        "product": "ramps",
-        "qty": 1
+        "product": "crazy-salesman-air-dancers",
+        "qty": 3
       },
       {
-        "product": "dbs",
-        "qty": 1
-      },
-      {
-        "product": "bowflag",
+        "product": "swooper",
         "qty": 4
       },
       {
-        "product": "quickie",
+        "product": "bowflag",
         "qty": 2
       }
     ],
-    "description": "Make one vehicle impossible to miss. Display ramps tilt it up, a lot banner stands beside it, four bow flags frame it and two Quickie A-frames call out the deal.",
+    "description": "Make the whole lot move. Three Crazy Car Salesman air dancers (Used Cars, Auto Sale, Trucks, New Cars or plain), four swooper flags along the road and two bow flags at the entrance.",
     "good_for": [
-      "Front-line specials",
-      "Manager specials",
-      "New arrivals",
-      "Special of the week"
+      "Pre-owned events",
+      "Lot specials",
+      "Truck sales",
+      "Busy weekends"
     ],
     "status": "published",
     "sort_order": 30
   },
   {
-    "slug": "offsite-tent-sale",
-    "tag": "Off-site sales",
-    "name": "Off-Site Tent Sale",
-    "hero_image": "https://rent-and-rally.vercel.app/img/ramp20-1.jpg",
-    "day_rate": 569,
-    "items": [
-      {
-        "product": "tent20",
-        "qty": 1
-      },
-      {
-        "product": "weights",
-        "qty": 2
-      },
-      {
-        "product": "ramp20",
-        "qty": 1
-      },
-      {
-        "product": "swooper",
-        "qty": 6
-      },
-      {
-        "product": "aframe",
-        "qty": 2
-      },
-      {
-        "product": "cones",
-        "qty": 10
-      }
-    ],
-    "description": "A complete pop-up sales lot. A 10' x 20' tent for your team, a 20' aluminum podium to put a vehicle on stage, swooper flags and A-frame signs to pull people in, and cones to direct traffic.",
-    "good_for": [
-      "Mall parking lot sales",
-      "Fairs & exhibitions",
-      "Tent events",
-      "Community days"
-    ],
-    "status": "published",
-    "sort_order": 40
-  },
-  {
-    "slug": "lot-dress-up",
-    "tag": "Everyday",
-    "name": "Lot Dress-Up",
-    "hero_image": "https://rent-and-rally.vercel.app/img/bowflag-1.jpg",
-    "day_rate": 329,
-    "items": [
-      {
-        "product": "boulevard",
-        "qty": 6
-      },
-      {
-        "product": "blade",
-        "qty": 4
-      },
-      {
-        "product": "bowflag",
-        "qty": 4
-      }
-    ],
-    "description": "Make the whole lot look busy and professional. Six double-sided banners installed on your light poles, plus blade and bow flags along the front line. We install and remove everything.",
-    "good_for": [
-      "Month-long promotions",
-      "Seasonal refresh",
-      "New-to-you lots",
-      "Used car centres"
-    ],
-    "status": "published",
-    "sort_order": 50
-  },
-  {
     "slug": "tire-promo",
-    "tag": "Auto & service",
+    "tag": "Tire season",
     "name": "Tire & Service Promo",
     "hero_image": "https://rent-and-rally.vercel.app/img/tire-1.jpg",
-    "day_rate": 289,
+    "day_rate": 539,
     "items": [
       {
         "product": "tire",
         "qty": 1
       },
       {
-        "product": "inflblower",
+        "product": "tubeman",
         "qty": 1
       },
       {
         "product": "bowflag",
         "qty": 2
-      },
-      {
-        "product": "quickie",
-        "qty": 2
-      },
-      {
-        "product": "sidewalk",
-        "qty": 1
       }
     ],
-    "description": "A 17' inflatable tire that says \"Tire Sale on Now\" on both sides, backed up with Tire Sale bow flags, two Quickie lot signs and a sidewalk sign at the door.",
+    "description": "Built for tire season. The 17' inflatable tire printed with \"Tire Sale on Now\", a tube man waving at the road and two bow flags at your service entrance.",
     "good_for": [
-      "Tire season",
+      "Tire changeover season",
       "Service specials",
       "Auto shops",
       "Oil change promos"
     ],
     "status": "published",
-    "sort_order": 60
+    "sort_order": 40
   },
   {
     "slug": "attention-grabber",
     "tag": "Retail",
     "name": "Retail Attention Grabber",
-    "hero_image": "https://rent-and-rally.vercel.app/img/inflclown-1.jpg",
-    "day_rate": 335,
+    "hero_image": "https://rent-and-rally.vercel.app/img/clowndancer-1.jpg",
+    "day_rate": 599,
     "items": [
-      {
-        "product": "inflclown",
-        "qty": 1
-      },
-      {
-        "product": "inflblower",
-        "qty": 1
-      },
       {
         "product": "clowndancer",
         "qty": 1
       },
       {
-        "product": "powerblower",
+        "product": "tubeman",
+        "qty": 2
+      },
+      {
+        "product": "blade",
+        "qty": 2
+      }
+    ],
+    "description": "Turn heads at any storefront. The Sale Clown air dancer, two tube men in your colours and two blade flags that stay readable with or without wind.",
+    "good_for": [
+      "Store sales",
+      "Furniture & mattress sales",
+      "Liquidations",
+      "Weekend promos"
+    ],
+    "status": "published",
+    "sort_order": 50
+  },
+  {
+    "slug": "offsite-tent-sale",
+    "tag": "Off-site sales",
+    "name": "Off-Site Tent Sale",
+    "hero_image": "https://rent-and-rally.vercel.app/img/tent20-1.jpg",
+    "day_rate": 819,
+    "items": [
+      {
+        "product": "tent20",
+        "qty": 1
+      },
+      {
+        "product": "weights",
+        "qty": 2
+      },
+      {
+        "product": "crazy-salesman-air-dancers",
         "qty": 1
       },
       {
         "product": "swooper",
-        "qty": 3
-      },
-      {
-        "product": "aframe",
-        "qty": 1
+        "qty": 4
       }
     ],
-    "description": "Fun, bright and impossible to miss. A giant inflatable clown, a waving clown air dancer, three swooper flags and an A-frame sign on the sidewalk.",
+    "description": "A pop-up sales lot anywhere. A 10' x 20' tent for your team, anchored with base weights, a Crazy Car Salesman air dancer and four swooper flags to pull people in off the road.",
     "good_for": [
-      "Retail sales",
-      "Store anniversaries",
-      "Seasonal sales",
-      "Family events"
+      "Off-site sales",
+      "Mall lot events",
+      "Community events",
+      "Trade days"
     ],
     "status": "published",
-    "sort_order": 70
-  },
-  {
-    "slug": "event-entry",
-    "tag": "Events",
-    "name": "Event Entry & Crowd Control",
-    "hero_image": "https://rent-and-rally.vercel.app/img/delineator-1.jpg",
-    "day_rate": 185,
-    "items": [
-      {
-        "product": "beltbarrier",
-        "qty": 8
-      },
-      {
-        "product": "cones",
-        "qty": 10
-      },
-      {
-        "product": "delineator",
-        "qty": 6
-      },
-      {
-        "product": "aframe",
-        "qty": 1
-      },
-      {
-        "product": "raffle",
-        "qty": 1
-      }
-    ],
-    "description": "Keep lines tidy and parking organized. Belt barriers for the entrance or VIP area, cones and delineator posts for parking and traffic, an A-frame for directions and a raffle drum for door prizes.",
-    "good_for": [
-      "Launch events",
-      "Customer appreciation days",
-      "Fundraisers",
-      "Showroom events"
-    ],
-    "status": "published",
-    "sort_order": 80
+    "sort_order": 60
   },
   {
     "slug": "vendor-market",
-    "tag": "Vendors",
+    "tag": "Markets & fairs",
     "name": "Vendor Market Booth",
-    "hero_image": "https://rent-and-rally.vercel.app/img/tent10-2.jpg",
-    "day_rate": 155,
+    "hero_image": "https://rent-and-rally.vercel.app/img/tent10-1.jpg",
+    "day_rate": 249,
     "items": [
       {
         "product": "tent10",
@@ -4232,32 +4116,24 @@ export const STARTER_PACKAGES = [
       {
         "product": "blade",
         "qty": 1
-      },
-      {
-        "product": "sidewalk",
-        "qty": 1
-      },
-      {
-        "product": "retractable",
-        "qty": 1
       }
     ],
-    "description": "A complete booth for markets, fairs and pop-ups: tent, weights, a blade flag to be seen from the aisle, a sidewalk sign and a roll-up banner stand for your own banner.",
+    "description": "Everything for a standout booth. A 10' x 10' tent with base weights and a blade flag so people can find you from across the market.",
     "good_for": [
       "Farmers markets",
       "Craft fairs",
-      "Pop-up shops",
+      "Festivals",
       "Trade shows"
     ],
     "status": "published",
-    "sort_order": 90
+    "sort_order": 70
   },
   {
     "slug": "backyard-party",
-    "tag": "Parties",
+    "tag": "Parties & events",
     "name": "Backyard Party & Event",
-    "hero_image": "https://rent-and-rally.vercel.app/img/tent20-1.jpg",
-    "day_rate": 199,
+    "hero_image": "https://rent-and-rally.vercel.app/img/tent20-2.jpg",
+    "day_rate": 309,
     "items": [
       {
         "product": "tent20",
@@ -4269,17 +4145,51 @@ export const STARTER_PACKAGES = [
       },
       {
         "product": "weights",
-        "qty": 2
+        "qty": 3
       }
     ],
-    "description": "Shade and shelter for your guests. A 10' x 20' tent for seating, a 10' x 10' for food or drinks, and weights to keep them secure.",
+    "description": "Cover the party, rain or shine. A 10' x 20' tent for seating and a 10' x 10' for food or the bar, delivered, set up and anchored with base weights.",
     "good_for": [
       "Birthdays",
       "Graduations",
       "Family reunions",
-      "Community events"
+      "Backyard weddings"
     ],
     "status": "published",
-    "sort_order": 100
+    "sort_order": 80
+  },
+  {
+    "slug": "event-entry",
+    "tag": "Events",
+    "name": "Event Entry & Crowd Control",
+    "hero_image": "https://rent-and-rally.vercel.app/img/beltbarrier-1.jpg",
+    "day_rate": 269,
+    "items": [
+      {
+        "product": "beltbarrier",
+        "qty": 8
+      },
+      {
+        "product": "delineator",
+        "qty": 10
+      },
+      {
+        "product": "tent10",
+        "qty": 1
+      },
+      {
+        "product": "weights",
+        "qty": 1
+      }
+    ],
+    "description": "Run a clean entrance. Eight belt stanchions to form the line, ten delineator posts to mark parking and walkways, and a 10' x 10' check-in tent.",
+    "good_for": [
+      "Ticketed events",
+      "Launch days",
+      "Festivals",
+      "Parking control"
+    ],
+    "status": "published",
+    "sort_order": 90
   }
 ];

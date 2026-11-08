@@ -39,7 +39,7 @@ const REFRESH_FROM_STARTER = [];
 const REFRESH_FIELDS = ['category_slug', 'sku', 'name', 'images', 'buy_price', 'buy_note', 'buy_url', 'description', 'features', 'specs', 'options', 'related'];
 
 // Packages rebuilt around the full catalogue: refreshed from the starter list (status, sort order and SEO kept).
-const REFRESH_PACKAGES = [];
+const REFRESH_PACKAGES = ['grand-opening', 'dealership-weekend', 'lot-dress-up', 'tire-promo', 'attention-grabber', 'offsite-tent-sale', 'vendor-market', 'backyard-party', 'event-entry'];
 const PACKAGE_FIELDS = ['tag', 'name', 'hero_image', 'day_rate', 'items', 'description', 'good_for'];
 
 async function patchRows(token, table, slugs, starter, fields) {
@@ -47,11 +47,18 @@ async function patchRows(token, table, slugs, starter, fields) {
   for (const slug of slugs) {
     const row = starter.find(p => p.slug === slug);
     if (!row) continue;
+    const where = `${table}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}`;
+    const found = await parseSupabase(await supabaseUserRest(token, `${where}&select=hero_image`), `Unable to read ${slug}.`);
+    const existing = Array.isArray(found) ? found[0] : null;
+    if (!existing) continue;
+    const patch = Object.fromEntries(fields.map(key => [key, row[key]]));
+    // Keep a main photo uploaded in the admin; only swap the starter photos.
+    if (existing.hero_image && !/rent-and-rally\.vercel\.app\/img\//.test(existing.hero_image)) delete patch.hero_image;
     const updated = await parseSupabase(
-      await supabaseUserRest(token, `${table}?site_key=eq.${SITE_KEY}&slug=eq.${encodeURIComponent(slug)}&select=slug`, {
+      await supabaseUserRest(token, `${where}&select=slug`, {
         method: 'PATCH',
         headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(Object.fromEntries(fields.map(key => [key, row[key]]))),
+        body: JSON.stringify(patch),
       }),
       `Unable to refresh ${slug}.`,
     );
