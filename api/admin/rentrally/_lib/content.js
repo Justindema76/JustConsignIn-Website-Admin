@@ -97,7 +97,7 @@ function cleanSpecs(value) {
 
 // Keeps how each option shows on the site: style (tiles / cards / checks), "only show when"
 // rules, the hint line, and each choice's photo number, note and price tag.
-const OPTION_STYLES = ['tiles', 'cards', 'checks', 'count'];
+const OPTION_STYLES = ['tiles', 'cards', 'checks', 'count', 'pricing'];
 function cleanOptions(value) {
   if (!Array.isArray(value)) return [];
   return value

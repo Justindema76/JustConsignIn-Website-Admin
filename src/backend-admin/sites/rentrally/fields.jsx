@@ -195,6 +195,7 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
           <option value="cards">Show as: cards (pick one)</option>
           <option value="checks">Show as: tick boxes (add-ons, optional)</option>
           <option value="count">Show as: how many (add-ons they can add several of)</option>
+          <option value="pricing">Quantity pricing (minimum + bulk discounts, not a choice)</option>
           <option value="tiles">Show as: photo tiles (pick one)</option>
         </select>
         <button type="button" className="rr-icon-btn" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label="Remove option"><Trash2 size={14}/></button>
@@ -217,7 +218,10 @@ export function OptionRows({ value = [], onChange, photoCount = 0, photos = [] }
       <b>Show as:</b> dropdown, cards or photo tiles make the customer pick one choice. Tick boxes are optional
       add-ons: nothing is added unless they tick it. <i>How many</i> gives each choice a − / + counter, and the
       price is multiplied by the number picked. Example: option <i>Extra base weights</i>, show as how many,
-      choice <code>Base weights, set of 4 (+$25/day)</code>: 3 sets adds $75/day.
+      choice <code>Base weights, set of 4 (+$25/day)</code>: 3 sets adds $75/day.<br/>
+      <b>Quantity pricing:</b> add an option shown as <i>Quantity pricing</i> with one line each, like
+      <code>Minimum 5</code>, <code>10 or more: 10% off</code>, <code>20 or more: 15% off</code>. Customers can't
+      book fewer than the minimum, and the discount comes off the day rate automatically.
     </small>
   </div>;
 }

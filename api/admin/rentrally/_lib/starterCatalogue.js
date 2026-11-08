@@ -1792,21 +1792,21 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/aframe-2.jpg",
       "https://rent-and-rally.vercel.app/img/aframe-3.jpg"
     ],
-    "day_rate": 25,
+    "day_rate": 60,
     "buy_price": 109.95,
-    "buy_note": "",
+    "buy_note": "frame only",
     "buy_url": "",
     "badge": "",
     "description": [
-      "A steel sandwich-board sign that holds two 32\" x 48\" coroplast signs, one on each side. Folds flat with a top handle for easy moving.",
-      "Choose a stock sign for each side, or order custom signs that are yours to keep."
+      "A sturdy powder-coated steel A-frame that holds two 32\" x 48\" coroplast signs back to back. Folds flat with a top handle for easy moving.",
+      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs with your logo and event details, or use signs you already have."
     ],
     "features": [
-      "Sturdy black steel frame",
-      "Holds two 32\" x 48\" signs",
-      "Stock signs included with the rental",
-      "Folds flat, top handle",
-      "Indoor & outdoor use"
+      "Rent the frame, keep the signs",
+      "Holds two 32\" x 48\" signs back to back",
+      "28 stock full-colour designs",
+      "Custom signs with your logo and details",
+      "Ground spikes for grass at no charge"
     ],
     "specs": [
       {
@@ -1815,268 +1815,264 @@ export const STARTER_PRODUCTS = [
       },
       {
         "label": "Frame",
-        "value": "Black painted steel"
+        "value": "Powder-coated steel"
       },
       {
         "label": "Signs",
-        "value": "4mm coroplast, one per side"
+        "value": "4mm coroplast, rated up to 3 years"
+      },
+      {
+        "label": "Stock sign",
+        "value": "$64.95 each, yours to keep"
       },
       {
         "label": "Custom sign",
         "value": "$69.95 each + $50 one-time artwork set-up"
+      },
+      {
+        "label": "Use",
+        "value": "Indoor & outdoor"
       }
     ],
     "options": [
       {
-        "label": "Side 1 sign",
+        "label": "Quantity pricing",
+        "style": "pricing",
         "values": [
           {
-            "v": "$0 Down"
+            "v": "Minimum 5"
           },
           {
-            "v": "Auto Clearance Event"
+            "v": "10 or more: 10% off"
           },
           {
-            "v": "Big Storewide Sale"
+            "v": "20 or more: 15% off"
+          }
+        ]
+      },
+      {
+        "label": "Ground",
+        "style": "cards",
+        "values": [
+          {
+            "v": "Pavement or concrete",
+            "note": "Stands on its own."
           },
           {
-            "v": "Black Friday"
+            "v": "Grass (ground spikes included)",
+            "note": "We add a spike to each leg."
+          }
+        ]
+      },
+      {
+        "label": "Signs",
+        "style": "cards",
+        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "values": [
+          {
+            "v": "Buy stock signs",
+            "note": "Pick a design for each side below. $64.95 per sign."
           },
           {
-            "v": "Buy Here Pay Here"
+            "v": "Buy custom signs, both sides (+$189.90 one-time)",
+            "note": "2 signs at $69.95 + $50 artwork set-up. Your logo and event details."
           },
           {
-            "v": "Canada Day Savings Event"
+            "v": "I have my own 32\" x 48\" signs",
+            "note": "We put your signs in the frame.",
+            "tag": "No charge"
+          }
+        ]
+      },
+      {
+        "label": "Side 1 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
+        "values": [
+          {
+            "v": "We Pay Cash For Your Car! (+$64.95 one-time)"
           },
           {
-            "v": "Cash For Your Car"
+            "v": "Sale On Now! (+$64.95 one-time)"
           },
           {
-            "v": "Certified Pre-Owned Center"
+            "v": "Used Car Sale On Now! (+$64.95 one-time)"
           },
           {
-            "v": "Extended Warranty"
+            "v": "Tight On Cash? Vehicles For Every Budget (+$64.95 one-time)"
           },
           {
-            "v": "Finance Options"
+            "v": "Certified Pre-Owned Center (+$64.95 one-time)"
           },
           {
-            "v": "Many Finance Options"
+            "v": "Many Finance Options Available (+$64.95 one-time)"
           },
           {
-            "v": "Free Warranty"
+            "v": "Top Dollar Paid For Your Trade-In (+$64.95 one-time)"
           },
           {
-            "v": "Nobody Sells for Less"
+            "v": "We Buy & Sell Quality Pre-Owned Vehicles (+$64.95 one-time)"
           },
           {
-            "v": "Now Open"
+            "v": "Pre-Owned Vehicle Centre (+$64.95 one-time)"
           },
           {
-            "v": "Open During Construction"
+            "v": "Pre-Owned Centre (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Centre"
+            "v": "Open During Construction (green) (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Truck Sale"
+            "v": "Open During Construction (yellow) (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Vehicle Sale"
+            "v": "Extended Warranty Available (+$64.95 one-time)"
           },
           {
-            "v": "Red Hot Clear the Lot"
+            "v": "Truck Centre (+$64.95 one-time)"
           },
           {
-            "v": "Sale On Now"
+            "v": "Pre-Owned Truck Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Save a Bundle"
+            "v": "Truck Event! (+$64.95 one-time)"
           },
           {
-            "v": "Save Big"
+            "v": "Truck Sale Extravaganza (+$64.95 one-time)"
           },
           {
-            "v": "Sharp Pencils"
+            "v": "Store-Wide Vehicle Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Stop And Save"
+            "v": "Store-Wide Sale (blue) (+$64.95 one-time)"
           },
           {
-            "v": "Storewide Sale"
+            "v": "Store-Wide Sale! (burst) (+$64.95 one-time)"
           },
           {
-            "v": "Storewide Vehicle Sale"
+            "v": "Red Hot Clear The Lot! (your dates) (+$64.95 one-time)"
           },
           {
-            "v": "Supersale Event"
+            "v": "Red Hot Clear The Lot (car) (+$64.95 one-time)"
           },
           {
-            "v": "Tight On Cash"
+            "v": "Sale On Now (yellow) (+$64.95 one-time)"
           },
           {
-            "v": "Tire Sale"
+            "v": "Sale On Now (red) (+$64.95 one-time)"
           },
           {
-            "v": "Tires"
+            "v": "Pre-Owned Vehicles Sale On Now (+$64.95 one-time)"
           },
           {
-            "v": "Top Dollar Paid"
+            "v": "Tires: Tire Sale (+$64.95 one-time)"
           },
           {
-            "v": "Truck Center"
+            "v": "Tire Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Truck Event"
-          },
-          {
-            "v": "Truck Sale Extravaganza"
-          },
-          {
-            "v": "Used Car Sale"
-          },
-          {
-            "v": "Used Car Sale on Now"
-          },
-          {
-            "v": "Vehicles For Every Budget"
-          },
-          {
-            "v": "We Buy & Sell"
-          },
-          {
-            "v": "We Finance"
-          },
-          {
-            "v": "Custom 32\" x 48\" sign (+$119.95 one-time)"
+            "v": "Tire Sale! (service bay) (+$64.95 one-time)"
           }
         ]
       },
       {
         "label": "Side 2 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
         "values": [
           {
-            "v": "Same as side 1"
+            "v": "Same design as side 1 (+$64.95 one-time)"
           },
           {
-            "v": "$0 Down"
+            "v": "Leave side 2 blank"
           },
           {
-            "v": "Auto Clearance Event"
+            "v": "We Pay Cash For Your Car! (+$64.95 one-time)"
           },
           {
-            "v": "Big Storewide Sale"
+            "v": "Sale On Now! (+$64.95 one-time)"
           },
           {
-            "v": "Black Friday"
+            "v": "Used Car Sale On Now! (+$64.95 one-time)"
           },
           {
-            "v": "Buy Here Pay Here"
+            "v": "Tight On Cash? Vehicles For Every Budget (+$64.95 one-time)"
           },
           {
-            "v": "Canada Day Savings Event"
+            "v": "Certified Pre-Owned Center (+$64.95 one-time)"
           },
           {
-            "v": "Cash For Your Car"
+            "v": "Many Finance Options Available (+$64.95 one-time)"
           },
           {
-            "v": "Certified Pre-Owned Center"
+            "v": "Top Dollar Paid For Your Trade-In (+$64.95 one-time)"
           },
           {
-            "v": "Extended Warranty"
+            "v": "We Buy & Sell Quality Pre-Owned Vehicles (+$64.95 one-time)"
           },
           {
-            "v": "Finance Options"
+            "v": "Pre-Owned Vehicle Centre (+$64.95 one-time)"
           },
           {
-            "v": "Many Finance Options"
+            "v": "Pre-Owned Centre (+$64.95 one-time)"
           },
           {
-            "v": "Free Warranty"
+            "v": "Open During Construction (green) (+$64.95 one-time)"
           },
           {
-            "v": "Nobody Sells for Less"
+            "v": "Open During Construction (yellow) (+$64.95 one-time)"
           },
           {
-            "v": "Now Open"
+            "v": "Extended Warranty Available (+$64.95 one-time)"
           },
           {
-            "v": "Open During Construction"
+            "v": "Truck Centre (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Centre"
+            "v": "Pre-Owned Truck Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Truck Sale"
+            "v": "Truck Event! (+$64.95 one-time)"
           },
           {
-            "v": "Pre-Owned Vehicle Sale"
+            "v": "Truck Sale Extravaganza (+$64.95 one-time)"
           },
           {
-            "v": "Red Hot Clear the Lot"
+            "v": "Store-Wide Vehicle Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Sale On Now"
+            "v": "Store-Wide Sale (blue) (+$64.95 one-time)"
           },
           {
-            "v": "Save a Bundle"
+            "v": "Store-Wide Sale! (burst) (+$64.95 one-time)"
           },
           {
-            "v": "Save Big"
+            "v": "Red Hot Clear The Lot! (your dates) (+$64.95 one-time)"
           },
           {
-            "v": "Sharp Pencils"
+            "v": "Red Hot Clear The Lot (car) (+$64.95 one-time)"
           },
           {
-            "v": "Stop And Save"
+            "v": "Sale On Now (yellow) (+$64.95 one-time)"
           },
           {
-            "v": "Storewide Sale"
+            "v": "Sale On Now (red) (+$64.95 one-time)"
           },
           {
-            "v": "Storewide Vehicle Sale"
+            "v": "Pre-Owned Vehicles Sale On Now (+$64.95 one-time)"
           },
           {
-            "v": "Supersale Event"
+            "v": "Tires: Tire Sale (+$64.95 one-time)"
           },
           {
-            "v": "Tight On Cash"
+            "v": "Tire Sale! (+$64.95 one-time)"
           },
           {
-            "v": "Tire Sale"
-          },
-          {
-            "v": "Tires"
-          },
-          {
-            "v": "Top Dollar Paid"
-          },
-          {
-            "v": "Truck Center"
-          },
-          {
-            "v": "Truck Event"
-          },
-          {
-            "v": "Truck Sale Extravaganza"
-          },
-          {
-            "v": "Used Car Sale"
-          },
-          {
-            "v": "Used Car Sale on Now"
-          },
-          {
-            "v": "Vehicles For Every Budget"
-          },
-          {
-            "v": "We Buy & Sell"
-          },
-          {
-            "v": "We Finance"
-          },
-          {
-            "v": "Custom 32\" x 48\" sign (+$119.95 one-time)"
+            "v": "Tire Sale! (service bay) (+$64.95 one-time)"
           }
         ]
       }
@@ -2099,165 +2095,241 @@ export const STARTER_PRODUCTS = [
       "https://rent-and-rally.vercel.app/img/quickie-1.jpg",
       "https://rent-and-rally.vercel.app/img/quickie-2.jpg"
     ],
-    "day_rate": 15,
+    "day_rate": 45,
     "buy_price": 79.95,
-    "buy_note": "",
+    "buy_note": "frame only",
     "buy_url": "",
     "badge": "",
     "description": [
-      "A compact A-frame that holds two 24\" x 32\" Quickie lot signs. Set them in front of feature vehicles or along the curb.",
-      "Choose a stock black Quickie sign for each side, or order custom signs that are yours to keep."
+      "A compact steel frame that holds two 24\" x 32\" Quickie lot signs. Set them in front of feature vehicles, along the curb or at the lot entrance.",
+      "You rent the frame. The signs are full-colour 4mm coroplast that you buy and keep: pick a stock design for each side, order custom signs, or use signs you already have."
     ],
     "features": [
+      "Rent the frame, keep the signs",
       "Holds two 24\" x 32\" signs",
-      "18 stock black Quickie slogans",
-      "Stock signs included with the rental",
-      "Great on pavement",
-      "Carry handle"
+      "20 stock full-colour designs",
+      "A-frame for pavement or ground stake for grass",
+      "Custom signs with your logo and details"
     ],
     "specs": [
       {
         "label": "Sign size",
-        "value": "24\" x 32\""
+        "value": "24\" tall x 32\" wide"
+      },
+      {
+        "label": "Frame",
+        "value": "Steel A-frame or ground stake"
       },
       {
         "label": "Signs",
-        "value": "4mm coroplast, one per side"
+        "value": "4mm coroplast, rated up to 3 years"
       },
       {
-        "label": "Use",
-        "value": "Outdoor"
+        "label": "Stock sign",
+        "value": "$34.95 each, yours to keep"
       },
       {
         "label": "Custom sign",
         "value": "$36.95 each + $50 one-time artwork set-up"
+      },
+      {
+        "label": "Use",
+        "value": "Outdoor"
       }
     ],
     "options": [
       {
-        "label": "Side 1 sign",
+        "label": "Quantity pricing",
+        "style": "pricing",
         "values": [
           {
-            "v": "$0 Down"
+            "v": "Minimum 5"
           },
           {
-            "v": "0% Financing"
+            "v": "10 or more: 10% off"
           },
           {
-            "v": "Auto Clearance On Now"
+            "v": "20 or more: 15% off"
+          }
+        ]
+      },
+      {
+        "label": "Frame",
+        "style": "cards",
+        "values": [
+          {
+            "v": "A-frame",
+            "note": "Holds two signs. For pavement.",
+            "img": 1
           },
           {
-            "v": "Certified Pre-Owned"
+            "v": "Ground stake",
+            "note": "Pounds into grass. Holds two signs back to back, or one.",
+            "img": 2
+          }
+        ]
+      },
+      {
+        "label": "Signs",
+        "style": "cards",
+        "hint": "The frame is the rental. Signs are bought and yours to keep.",
+        "values": [
+          {
+            "v": "Buy stock signs",
+            "note": "Pick a design for each side below. $34.95 per sign."
           },
           {
-            "v": "Clear Out All Prices"
+            "v": "Buy custom signs, both sides (+$123.90 one-time)",
+            "note": "2 signs at $36.95 + $50 artwork set-up. Your logo and message."
           },
           {
-            "v": "Demo Sale"
+            "v": "I have my own 24\" x 32\" signs",
+            "note": "We put your signs in the frame.",
+            "tag": "No charge"
+          }
+        ]
+      },
+      {
+        "label": "Side 1 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
+        "values": [
+          {
+            "v": "Sale (+$34.95 one-time)"
           },
           {
-            "v": "Extended Warranty"
+            "v": "Tight On Cash? Vehicles For Every Budget (+$34.95 one-time)"
           },
           {
-            "v": "Many Finance Options"
+            "v": "Certified Pre-Owned (+$34.95 one-time)"
           },
           {
-            "v": "No Credit No Problem"
+            "v": "No Credit No Problem (+$34.95 one-time)"
           },
           {
-            "v": "Pre-Owned Center"
+            "v": "0% Financing (+$34.95 one-time)"
           },
           {
-            "v": "Sale"
+            "v": "$0 Down (+$34.95 one-time)"
           },
           {
-            "v": "Sale On Now"
+            "v": "Truck Sale On Now! (+$34.95 one-time)"
           },
           {
-            "v": "Stop And Save"
+            "v": "Used Car Sale (+$34.95 one-time)"
           },
           {
-            "v": "Tight On Cash"
+            "v": "Stop & Save! (+$34.95 one-time)"
           },
           {
-            "v": "Truck Sale On Now"
+            "v": "Used Car Blow-Out (+$34.95 one-time)"
           },
           {
-            "v": "Used Car Blow Out"
+            "v": "Used Car Sale On Now (+$34.95 one-time)"
           },
           {
-            "v": "Used Car Sale"
+            "v": "Sale On Now! (+$34.95 one-time)"
           },
           {
-            "v": "We Finance"
+            "v": "Clear Out: All Prices Drastically Reduced (+$34.95 one-time)"
           },
           {
-            "v": "Custom 24\" x 32\" sign (+$86.95 one-time)"
+            "v": "Extended Warranty Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Pre-Owned Center (+$34.95 one-time)"
+          },
+          {
+            "v": "We Finance (+$34.95 one-time)"
+          },
+          {
+            "v": "Many Finance Options Available (+$34.95 one-time)"
+          },
+          {
+            "v": "Auto Clearance On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Demo Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "All In Pricing (+$34.95 one-time)"
           }
         ]
       },
       {
         "label": "Side 2 sign",
+        "when": {
+          "option": "Signs",
+          "has": "stock"
+        },
         "values": [
           {
-            "v": "Same as side 1"
+            "v": "Same design as side 1 (+$34.95 one-time)"
           },
           {
-            "v": "$0 Down"
+            "v": "Leave side 2 blank"
           },
           {
-            "v": "0% Financing"
+            "v": "Sale (+$34.95 one-time)"
           },
           {
-            "v": "Auto Clearance On Now"
+            "v": "Tight On Cash? Vehicles For Every Budget (+$34.95 one-time)"
           },
           {
-            "v": "Certified Pre-Owned"
+            "v": "Certified Pre-Owned (+$34.95 one-time)"
           },
           {
-            "v": "Clear Out All Prices"
+            "v": "No Credit No Problem (+$34.95 one-time)"
           },
           {
-            "v": "Demo Sale"
+            "v": "0% Financing (+$34.95 one-time)"
           },
           {
-            "v": "Extended Warranty"
+            "v": "$0 Down (+$34.95 one-time)"
           },
           {
-            "v": "Many Finance Options"
+            "v": "Truck Sale On Now! (+$34.95 one-time)"
           },
           {
-            "v": "No Credit No Problem"
+            "v": "Used Car Sale (+$34.95 one-time)"
           },
           {
-            "v": "Pre-Owned Center"
+            "v": "Stop & Save! (+$34.95 one-time)"
           },
           {
-            "v": "Sale"
+            "v": "Used Car Blow-Out (+$34.95 one-time)"
           },
           {
-            "v": "Sale On Now"
+            "v": "Used Car Sale On Now (+$34.95 one-time)"
           },
           {
-            "v": "Stop And Save"
+            "v": "Sale On Now! (+$34.95 one-time)"
           },
           {
-            "v": "Tight On Cash"
+            "v": "Clear Out: All Prices Drastically Reduced (+$34.95 one-time)"
           },
           {
-            "v": "Truck Sale On Now"
+            "v": "Extended Warranty Available (+$34.95 one-time)"
           },
           {
-            "v": "Used Car Blow Out"
+            "v": "Pre-Owned Center (+$34.95 one-time)"
           },
           {
-            "v": "Used Car Sale"
+            "v": "We Finance (+$34.95 one-time)"
           },
           {
-            "v": "We Finance"
+            "v": "Many Finance Options Available (+$34.95 one-time)"
           },
           {
-            "v": "Custom 24\" x 32\" sign (+$86.95 one-time)"
+            "v": "Auto Clearance On Now! (+$34.95 one-time)"
+          },
+          {
+            "v": "Demo Sale (+$34.95 one-time)"
+          },
+          {
+            "v": "All In Pricing (+$34.95 one-time)"
           }
         ]
       }
