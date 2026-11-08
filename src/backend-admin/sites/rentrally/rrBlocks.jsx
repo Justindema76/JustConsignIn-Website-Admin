@@ -142,7 +142,8 @@ function HeroSliderBlock({ p, ctx }) {
   const slides = list.map((s, i) => ({ key: `${i}-${s.rental || s.title}`, content: <Slide s={s} ctx={ctx} level={i === 0 ? (p.headingLevel || 'h1') : 'h2'}/> }));
   const S = ctx?.Slider;
   if (S) return <S slides={slides}/>;
-  return <section className="hero rr-slider"><div className="rr-slides"><div className="rr-slide is-active">{slides[0].content}</div></div></section>;
+  // Admin preview: every slide one under another, numbered, so each edit is visible.
+  return <>{slides.map((sl, i) => <section className="hero rr-slider rr-slider-preview" key={sl.key}><div className="rr-slides"><div className="rr-slide is-active">{sl.content}</div></div><span className="rr-slide-no">Slide {i + 1} of {slides.length}</span></section>)}</>;
 }
 
 function Hero({ p, ctx }) {
@@ -367,6 +368,7 @@ export const DEFAULT_PAGES = {
       }),
       block('RRCategoriesBlock', 'rr-home-cats', { heading: 'Shop by Category', linkText: 'View all rentals →', linkUrl: '/rentals', background: 'white' }),
       block('RRPackagesBlock', 'rr-home-pkgs', { heading: 'Rental Packages', linkText: 'All packages →', linkUrl: '/packages', limit: '8', tight: true, background: 'white' }),
+      block('RRCtaBlock', 'rr-home-bundle', { heading: 'Build your own bundle', text: 'Mix any rentals you like. Rent 3 different items and save 5%, 4 save 7%, 5 or more save 10%. The discount comes off automatically on your quote.', buttonText: 'Start Your Bundle', buttonUrl: '/rentals', button2Text: 'Ready-made packages', button2Url: '/packages', tight: true }),
       block('RRPopularBlock', 'rr-home-popular', { heading: 'Popular Rentals', linkText: 'Shop all →', linkUrl: '/rentals', limit: '10', source: 'featured', tight: true, background: 'white' }),
       block('RRStepsBlock', 'rr-home-steps', {
         heading: 'How Renting Works', background: 'white',
