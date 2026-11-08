@@ -173,6 +173,33 @@ async function addPackages(token) {
   return added;
 }
 
+// Links to a rental whose web address was changed before renames were handled: find the rental by
+// its SKU and point packages and "related rentals" at its current address.
+async function repairRenamedLinks(token) {
+  const live = await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&select=id,slug,sku,related`), 'Unable to read rentals.');
+  const slugs = new Set((live || []).map(p => p.slug));
+  const now = old => {
+    if (slugs.has(old)) return old;
+    const sku = STARTER_PRODUCTS.find(p => p.slug === old)?.sku;
+    return (sku && (live || []).find(p => p.sku === sku)?.slug) || old;
+  };
+  let fixed = 0;
+  const packages = await parseSupabase(await supabaseUserRest(token, `${TABLES.packages}?site_key=eq.${SITE_KEY}&select=id,items`), 'Unable to read packages.');
+  for (const pk of packages || []) {
+    const items = (pk.items || []).map(i => ({ ...i, product: now(i.product) }));
+    if (JSON.stringify(items) === JSON.stringify(pk.items)) continue;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.packages}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(pk.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ items }) }), 'Unable to fix a package.');
+    fixed += 1;
+  }
+  for (const p of live || []) {
+    const related = [...new Set((p.related || []).map(now))];
+    if (JSON.stringify(related) === JSON.stringify(p.related || [])) continue;
+    await parseSupabase(await supabaseUserRest(token, `${TABLES.products}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(p.id)}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ related }) }), 'Unable to fix related rentals.');
+    fixed += 1;
+  }
+  return fixed;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireWebsiteOwner(req, res);
@@ -186,9 +213,11 @@ export default async function handler(req, res) {
     const refreshedPackages = await patchRows(owner.accessToken, TABLES.packages, REFRESH_PACKAGES, STARTER_PACKAGES, PACKAGE_FIELDS);
     const repaired = await repairOptionLooks(owner.accessToken);
     const newPackages = await addPackages(owner.accessToken);
+    const relinked = await repairRenamedLinks(owner.accessToken);
     return res.status(200).json({
       ok: true,
       repaired,
+      relinked,
       added: { categories, products, packages: packages + newPackages },
       refreshed: { products: refreshed, packages: refreshedPackages },
       available: { categories: STARTER_CATEGORIES.length, products: STARTER_PRODUCTS.length, packages: STARTER_PACKAGES.length },

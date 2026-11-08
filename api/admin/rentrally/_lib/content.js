@@ -215,7 +215,25 @@ export async function deleteRow(accessToken, table, id) {
 
 // One handler shape for categories / products / packages:
 // GET (list or ?id=), POST (create or update with body.id), DELETE ?id=
-export function crudHandler({ table, fields, cleaner, key, label }) {
+// A rental's web address changed: point packages and "related rentals" at the new address,
+// otherwise the rental silently drops out of those packages.
+export async function relinkRental(accessToken, from, to) {
+  const patch = (table, id, body) => supabaseUserRest(accessToken, `${table}?site_key=eq.${SITE_KEY}&id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(body),
+  }).then(r => parseSupabase(r, 'Unable to update links to the renamed rental.'));
+  const packages = await listRows(accessToken, TABLES.packages, 'id,items');
+  for (const pk of packages || []) {
+    if ((pk.items || []).some(i => i?.product === from)) {
+      await patch(TABLES.packages, pk.id, { items: pk.items.map(i => (i?.product === from ? { ...i, product: to } : i)) });
+    }
+  }
+  const products = await listRows(accessToken, TABLES.products, 'id,related');
+  for (const p of products || []) {
+    if ((p.related || []).includes(from)) await patch(TABLES.products, p.id, { related: p.related.map(s => (s === from ? to : s)) });
+  }
+}
+
+export function crudHandler({ table, fields, cleaner, key, label, onRename }) {
   return async function handler(req, res, access) {
     try {
       if (req.method === 'GET') {
@@ -225,7 +243,11 @@ export function crudHandler({ table, fields, cleaner, key, label }) {
       if (req.method === 'DELETE') {
         return res.status(200).json(await deleteRow(access.accessToken, table, text(req.query?.id, 100)));
       }
+      // Remember the old web address so anything pointing at it can follow a rename.
+      const id = text(req.body?.id, 100);
+      const before = onRename && id ? (await listRows(access.accessToken, table, 'slug', { id }))?.[0]?.slug || '' : '';
       const row = await saveRow(access.accessToken, table, fields, req.body || {}, cleaner);
+      if (onRename && before && row?.slug && before !== row.slug) await onRename(access.accessToken, before, row.slug);
       return res.status(200).json({ row });
     } catch (error) {
       console.error(`[rentrally] ${label} failed`, error);
