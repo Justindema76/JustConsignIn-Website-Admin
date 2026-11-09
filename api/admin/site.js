@@ -104,14 +104,22 @@ function publicMediaUrl(bucket, name) {
 }
 
 async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset = false }, prefix = '') {
-  const response = await supabaseUserStorage(accessToken, `object/list/${bucket}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prefix, limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } }),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data?.message || data?.error || `Unable to load ${mediaType} media`);
-  return (Array.isArray(data) ? data : [])
+  // Page through the folder (200 per request, up to 2,000 files) so older uploads still show.
+  const PAGE = 200;
+  const data = [];
+  for (let offset = 0; offset < 2000; offset += PAGE) {
+    const response = await supabaseUserStorage(accessToken, `object/list/${bucket}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefix, limit: PAGE, offset, sortBy: { column: 'created_at', order: 'desc' } }),
+    });
+    const page = await response.json();
+    if (!response.ok) throw new Error(page?.message || page?.error || `Unable to load ${mediaType} media`);
+    if (!Array.isArray(page)) break;
+    data.push(...page);
+    if (page.length < PAGE) break;
+  }
+  return data
     .filter(item => item?.name && item.name !== '.emptyFolderPlaceholder')
     .map(item => {
       const path = prefix ? `${prefix.replace(/\/$/, '')}/${item.name}` : item.name;
