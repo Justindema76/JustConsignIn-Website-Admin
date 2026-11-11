@@ -33,6 +33,7 @@ import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
 import PromotionsAdmin from '../sites/sunwings/PromotionsAdmin';
 import CommissionAdmin from '../sites/sunwings/CommissionAdmin';
 import PartnerJobsAdmin from '../sites/sunwings/PartnerJobsAdmin';
+import JobCalendarAdmin from '../sites/sunwings/JobCalendarAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
 import TeamAdmin from '../sites/sunwings/TeamAdmin';
 import RentalsAdmin from '../sites/rentrally/RentalsAdmin';
@@ -120,6 +121,7 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/locations/:id" element={only(SUNWINGS, <LocationPostsAdmin />)} />
         <Route path="/admin/sunwings/analytics" element={only(SUNWINGS, <SunwingsAnalytics />)} />
         <Route path="/admin/sunwings/quotes" element={only(SUNWINGS, <QuoteRequestsAdmin />)} />
+        <Route path="/admin/sunwings/calendar" element={only(SUNWINGS, <JobCalendarAdmin />)} />
         <Route path="/admin/sunwings/settings" element={only(SUNWINGS, <SunwingsSettingsAdmin />)} />
         <Route path="/admin/sunwings/promotions" element={only(SUNWINGS, <PromotionsAdmin />)} />
         <Route path="/admin/sunwings/commission" element={only(SUNWINGS, <CommissionAdmin />)} />

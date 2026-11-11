@@ -54,6 +54,7 @@ export default {
       label: 'Leads',
       items: [
         { to: '/admin/sunwings/quotes', label: 'Quote Requests', icon: 'inbox' },
+        { to: '/admin/sunwings/calendar', label: 'Job Calendar', icon: 'calendar' },
         { to: '/admin/sunwings/commission', label: 'My Commission & Investment', icon: 'briefcase', ownerOnly: true },
         // Only partners (Marius) see this; they see nothing else.
         { to: '/admin/sunwings/jobs', label: 'Jobs from Justin', icon: 'truck', partnerOnly: true },
@@ -68,6 +69,7 @@ export default {
       { to: '/admin/sunwings/locations', icon: 'map', title: 'Location Posts', copy: 'Add and edit service areas' },
       { to: '/admin/sunwings/blog', icon: 'book', title: 'Moving Tips Posts', copy: 'Add and edit moving articles' },
       { to: '/admin/sunwings/quotes', icon: 'inbox', title: 'Quote Requests', copy: 'Review incoming leads' },
+      { to: '/admin/sunwings/calendar', icon: 'calendar', title: 'Job Calendar', copy: 'Schedule booked jobs on a calendar' },
       { to: '/admin/sunwings/analytics', icon: 'chart', title: 'Analytics', copy: 'Review verified website leads and phone tracking' },
       { to: '/admin/sunwings/promotions', icon: 'sparkles', title: 'Pop-up, Slider & Banners', copy: 'Edit the pop-up, homepage slider, page banners and prices', ownerOnly: true },
     ],

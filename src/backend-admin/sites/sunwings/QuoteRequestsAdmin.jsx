@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, Eye, EyeOff, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
 import { autoCommissionRate, commissionFor, money } from './commission';
@@ -163,7 +164,9 @@ export default function QuoteRequestsAdmin() {
   // Editors (Marius) only get jobs Justin sent them; the server enforces this too.
   const isOwner = !user?.role || user.role === 'owner';
   const [requests, setRequests] = useState([]);
-  const [selectedId, setSelectedId] = useState('');
+  const [searchParams] = useSearchParams();
+  // The Job Calendar links here with ?id= to open that job.
+  const [selectedId, setSelectedId] = useState(() => searchParams.get('id') || '');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('active');
   const [serviceFilter, setServiceFilter] = useState('all');

@@ -22,6 +22,9 @@ const NEW_FIELDS = [
 ];
 // Added by migrations 20261105 (quote photos) and 20261106 (where the quote came from).
 const PHOTO_FIELDS = ['photos', 'lead_source'];
+// Added by migration 20261111 (Job Calendar): the day, time and crew a job is booked for.
+const SCHEDULE_FIELDS = ['scheduled_date', 'scheduled_start', 'scheduled_hours', 'crew', 'truck', 'crew_notes'];
+const SCHEDULED_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCHEDULE_FIELDS].join(',');
 const ALL_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS].join(',');
 const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
 const OLD_FIELDS = BASE_FIELDS.join(',');
@@ -30,7 +33,7 @@ const OLD_FIELDS = BASE_FIELDS.join(',');
 // (Postgres error 42703), run it again with only the original fields.
 async function withFieldFallback(token, buildPath, options) {
   let response;
-  for (const fields of [ALL_FIELDS, FIELDS, OLD_FIELDS]) {
+  for (const fields of [SCHEDULED_FIELDS, ALL_FIELDS, FIELDS, OLD_FIELDS]) {
     response = await supabaseUserRest(token, buildPath(fields), options);
     if (response.status !== 400) return response;
     const text = await response.clone().text().catch(() => '');
@@ -245,6 +248,25 @@ export default async function handler(req, res) {
     if (has('commissionPaidAt')) payload.commission_paid_at = nullableDate(body.commissionPaidAt);
     if (has('commissionPaidMethod')) payload.commission_paid_method = clean(body.commissionPaidMethod, 40);
 
+    // Job Calendar: book a date/time/crew, or clear it (scheduledDate: '').
+    if (has('scheduledDate')) {
+      payload.scheduled_date = nullableDate(body.scheduledDate);
+      if (!activity) activity = payload.scheduled_date ? `Scheduled for ${payload.scheduled_date}` : 'Date removed from calendar';
+    }
+    if (has('scheduledStart')) {
+      const raw = clean(body.scheduledStart, 8);
+      payload.scheduled_start = /^\d{2}:\d{2}(:\d{2})?$/.test(raw) ? raw.slice(0, 5) : null;
+    }
+    if (has('scheduledHours')) {
+      const raw = clean(body.scheduledHours, 8);
+      const hours = raw ? Number(raw) : null;
+      if (hours !== null && (!Number.isFinite(hours) || hours <= 0 || hours > 24)) return res.status(400).json({ error: 'Enter hours between 0.5 and 24.' });
+      payload.scheduled_hours = hours;
+    }
+    if (has('crew')) payload.crew = clean(body.crew, 120);
+    if (has('truck')) payload.truck = clean(body.truck, 120);
+    if (has('crewNotes')) payload.crew_notes = clean(body.crewNotes, 2000);
+
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextAction')) payload.next_action = clean(req.body.nextAction, 1000) || null;
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'nextActionDueAt')) payload.next_action_due_at = nullableIso(req.body.nextActionDueAt);
 
@@ -277,6 +299,10 @@ export default async function handler(req, res) {
           last_activity_at: now,
         });
       }
+    }
+    if (response.status === 400 && SCHEDULE_FIELDS.some(key => key in payload)) {
+      const text = await response.clone().text().catch(() => '');
+      if (/scheduled_|crew|truck|PGRST204/.test(text)) return res.status(400).json({ error: 'The calendar database update has not been run yet, so dates cannot be saved.' });
     }
     const rows = await parseSupabase(response, 'Unable to update Sunwings quote request.');
     const row = Array.isArray(rows) ? rows[0] || null : rows;

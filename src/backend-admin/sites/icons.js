@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  CalendarDays,
   Boxes,
   ChartNoAxesCombined,
   BriefcaseBusiness,
@@ -26,6 +27,7 @@ import {
 
 const ICONS = {
   book: BookOpen,
+  calendar: CalendarDays,
   boxes: Boxes,
   chart: ChartNoAxesCombined,
   briefcase: BriefcaseBusiness,
