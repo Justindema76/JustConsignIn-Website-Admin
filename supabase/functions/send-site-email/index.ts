@@ -1153,9 +1153,12 @@ async function sendCustomerAck(record: any) {
 }
 
 // Justin sends a follow-up from the Job Calendar.
+// Called by Website Admin's server (which has already checked Justin or Marius may see this job),
+// or directly by Justin.
 async function sendSunwingsFollowUp(req: Request, body: any) {
-  const ownerAuth = await requireOwner(req);
-  if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
+  const allowed = isServerCaller(req) || Boolean(await requireOwner(req));
+  if (!allowed) return Response.json({ error: 'Not found' }, { status: 404 });
+  const sentBy = clean(body.sentBy, 20) === 'Marius' ? 'Marius' : 'Justin';
 
   const requestId = clean(body.requestId, 80);
   const subject = clean(body.subject, 240);
@@ -1195,7 +1198,7 @@ async function sendSunwingsFollowUp(req: Request, body: any) {
   const columns = await followUpColumns(requestId);
   const patch: Record<string, unknown> = {
     updated_at: now,
-    last_activity: 'Follow-up email sent',
+    last_activity: `Follow-up email sent by ${sentBy}`,
     last_activity_at: now,
     next_action: null,
     next_action_due_at: null,

@@ -186,3 +186,13 @@
   .jc-stage:last-child{grid-column:auto}
   .jc-board{gap:12px}
 }
+
+/* Desktop: the calendar stays put while the side lists (which can get long) scroll. */
+@media (min-width:1101px){
+  .jc-board>.jc-card{position:sticky;top:86px}
+  .jc-month .jc-day{min-height:96px}
+}
+/* "Coming up this week" rows: keep names on one line */
+.jc-arow.compact .t{width:84px}
+.jc-arow.compact .who b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jc-arow.compact .who span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

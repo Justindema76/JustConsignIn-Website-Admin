@@ -74,7 +74,17 @@
 }
 
 /* Phone quick-action bar (AdminLayout renders it when the site config has mobileTabs). */
+/* Desktop: the same quick menu, as a small bar floating at the bottom centre. The Menu button is phone-only. */
 .site-admin-tabbar{display:none}
+@media(min-width:761px){
+  .site-admin-shell.site-sunwings .site-admin-tabbar{display:flex;gap:4px;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:90;background:var(--sw-dark);border-radius:16px;padding:6px;box-shadow:0 12px 32px rgba(16,24,40,.28)}
+  .site-admin-shell.site-sunwings .site-admin-tabbar a{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:11px;color:#c8c8cc;font-size:13.5px;font-weight:700;text-decoration:none;white-space:nowrap}
+  .site-admin-shell.site-sunwings .site-admin-tabbar a:hover{background:var(--sw-dark-raised);color:#fff}
+  .site-admin-shell.site-sunwings .site-admin-tabbar a.active{background:var(--sw-orange);color:#fff}
+  .site-admin-shell.site-sunwings .site-admin-tabbar button{display:none}
+  .site-admin-shell.site-sunwings .site-admin-main{padding-bottom:96px}
+  .site-admin-shell.site-sunwings .jc-toast{bottom:84px}
+}
 @media(max-width:760px){
   .site-admin-shell.site-sunwings .site-admin-tabbar{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);position:fixed;left:0;right:0;bottom:0;z-index:110;background:var(--sw-dark);border-top:1px solid #2b2b2e;padding:6px 4px max(6px,env(safe-area-inset-bottom));box-shadow:0 -8px 24px rgba(0,0,0,.18)}
   .site-admin-shell.site-sunwings .site-admin-tabbar a,
@@ -85,4 +95,39 @@
   /* Room so the bar never covers the bottom of a page, and lift the calendar toast/drawer footers above it. */
   .site-admin-shell.site-sunwings .site-admin-main{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   .site-admin-shell.site-sunwings .jc-toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+
+/* Every Sunwings page on phones: short headers, buttons on one row, tabs that scroll sideways. */
+@media(max-width:760px){
+  .site-admin-shell.site-sunwings .site-admin-main{padding-left:14px;padding-right:14px;padding-top:16px}
+  .site-admin-shell.site-sunwings .site-admin-page-head{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:12px}
+  .site-admin-shell.site-sunwings .site-admin-page-head h1{font-size:24px}
+  .site-admin-shell.site-sunwings .site-admin-page-head p:not(.site-admin-eyebrow){display:none}
+  .site-admin-shell.site-sunwings .site-admin-page-head>.site-admin-btn{align-self:flex-start}
+  .site-admin-shell.site-sunwings .settings-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:0 14px}
+  .site-admin-shell.site-sunwings .settings-tabs::-webkit-scrollbar{display:none}
+  .site-admin-shell.site-sunwings .settings-tab{flex:0 0 auto;white-space:nowrap}
+  .site-admin-shell.site-sunwings .site-admin-header{padding:0 12px}
+  /* Analytics */
+  .site-admin-shell.site-sunwings .an{padding-top:0}
+  .site-admin-shell.site-sunwings .an-head h1{font-size:24px}
+  .site-admin-shell.site-sunwings .an-head p{font-size:13.5px}
+  .site-admin-shell.site-sunwings .an-tools{width:100%}
+  .site-admin-shell.site-sunwings .an-periods{width:100%}
+  .site-admin-shell.site-sunwings .an-periods button{flex:1;padding:7px 4px}
+  .site-admin-shell.site-sunwings .an-kpis{gap:8px}
+  .site-admin-shell.site-sunwings .an-kpi{padding:11px 12px}
+  .site-admin-shell.site-sunwings .an-kpi b{font-size:21px}
+  .site-admin-shell.site-sunwings .an-card{padding:14px 12px}
+  .site-admin-shell.site-sunwings .an-funnel{gap:8px}
+  .site-admin-shell.site-sunwings .an-step{padding:10px 12px}
+  .site-admin-shell.site-sunwings .an-step b{font-size:20px}
+  .site-admin-shell.site-sunwings .an-table{font-size:13px}
+  .site-admin-shell.site-sunwings .an-table th:nth-child(3),.site-admin-shell.site-sunwings .an-table td:nth-child(3){display:none}
+}
+@media(max-width:760px){
+  .site-admin-shell.site-sunwings .site-admin-page-head>.site-admin-btn{width:auto!important;align-self:flex-start!important}
+  /* Side panels open above the bottom bar */
+  .site-admin-shell.site-sunwings .service-request-drawer-overlay{z-index:140!important}
+  .site-admin-shell.site-sunwings .service-request-drawer{z-index:141!important}
 }

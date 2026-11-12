@@ -102,8 +102,8 @@ export default function CommissionAdmin() {
   return <>
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Leads &amp; money</p>
-        <h1>My Commission &amp; Investment</h1>
+        <p className="site-admin-eyebrow">Money</p>
+        <h1>Commission &amp; Investment</h1>
         <p>What Marius owes you, what he’s paid, and what you’ve put into Sunwings. Commission is 10% on jobs up to $800 and 20% on jobs over $800.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
@@ -129,22 +129,24 @@ export default function CommissionAdmin() {
     {tab === 'jobs' && <section className="site-admin-card money-panel">
       <div className="money-panel-head">
         <h2>Commission by job</h2>
-        <select value={filter} onChange={event => setFilter(event.target.value)}>
+        <select className="money-select" value={filter} onChange={event => setFilter(event.target.value)}>
           <option value="all">All jobs</option><option value="owed">Owed (completed)</option><option value="pending">Coming (not finished)</option><option value="paid">Paid</option>
         </select>
       </div>
       {!visible.length ? <p className="job-hint">No jobs here yet. A job shows up once it has a price (Marius’s price, the final price or a quote amount).</p> :
         <div className="money-table-wrap"><table className="money-table">
-          <thead><tr><th>Customer</th><th>Service</th><th>Job status</th><th className="num">Job price</th><th className="num">Rate</th><th className="num">Commission</th><th>Commission</th><th></th></tr></thead>
+          <thead><tr><th>Customer</th><th>Service</th><th>Job</th><th className="num">Job price</th><th className="num">Rate</th><th className="num">Commission</th><th>Status</th><th></th></tr></thead>
           <tbody>{visible.map(({ request, price, rate, amount }) => <tr key={request.id}>
-            <td><Link to="/admin/sunwings/quotes"><b>{request.name}</b></Link></td>
-            <td>{request.service || '—'}</td>
-            <td>{String(request.status || 'new').replace(/_/g, ' ')}</td>
-            <td className="num">{money(price)}</td>
-            <td className="num">{rate}%</td>
-            <td className="num"><b>{money(amount)}</b></td>
-            <td><span className={`job-chip ${request.commission_status === 'paid' ? 'paid' : 'attention'}`}>{request.commission_status === 'paid' ? `Paid${request.commission_paid_at ? ` ${request.commission_paid_at}` : ''}` : 'Owed'}</span></td>
-            <td>{request.commission_status !== 'paid' && request.status === 'complete' ? <button className="site-admin-btn small" type="button" onClick={() => markPaid(request)}>Mark paid</button> : null}</td>
+            <td className="m-name"><Link className="money-name" to={`/admin/sunwings/quotes?id=${encodeURIComponent(request.id)}`}>{request.name}</Link></td>
+            <td className="m-service">{request.service || '—'}</td>
+            <td className="m-job" data-label="Job">{String(request.status || 'new').replace(/_/g, ' ')}</td>
+            <td className="num m-price" data-label="Price">{money(price)}</td>
+            <td className="num m-rate" data-label="Rate">{rate}%</td>
+            <td className="num m-amount"><b>{money(amount)}</b></td>
+            <td className="m-status">{request.commission_status === 'paid'
+              ? <span className="job-chip paid">Paid{request.commission_paid_at ? ` ${request.commission_paid_at}` : ''}</span>
+              : request.status === 'complete' ? <span className="job-chip attention">Owed</span> : <span className="job-chip muted">Coming</span>}</td>
+            <td className="m-action">{request.commission_status !== 'paid' && request.status === 'complete' ? <button className="site-admin-btn small" type="button" onClick={() => markPaid(request)}>Mark paid</button> : null}</td>
           </tr>)}</tbody>
         </table></div>}
     </section>}

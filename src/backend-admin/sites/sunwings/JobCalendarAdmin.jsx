@@ -106,7 +106,7 @@ export default function JobCalendarAdmin() {
   const truckOptions = [...new Set([...DEFAULT_TRUCKS, ...jobs.map(job => job.truck).filter(Boolean)])];
 
   const now = Date.now();
-  const followUps = isOwner ? jobs.map(job => ({ job, due: followUpOf(job, now) })).filter(item => item.due)
+  const followUps = true ? jobs.map(job => ({ job, due: followUpOf(job, now) })).filter(item => item.due)
     .sort((a, b) => a.due.rank - b.due.rank || Date.parse(a.job.row.created_at) - Date.parse(b.job.row.created_at)) : [];
 
   const open = jobs.find(job => job.id === openId) || null;
@@ -299,15 +299,15 @@ export default function JobCalendarAdmin() {
   return <div className="jc">
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Leads</p>
-        <h1>Job Calendar</h1>
+        <p className="site-admin-eyebrow">Jobs</p>
+        <h1>Jobs</h1>
         <p>Every booked job on one calendar. Accepted jobs without a day wait in “Needs a date”.</p>
       </div>
       <div className="jc-head-actions">
         <div className="jc-seg" role="tablist">
           {[['month', 'Month'], ['week', 'Week'], ['list', 'List']].map(([key, label]) => <button key={key} type="button" className={view === key ? 'on' : ''} onClick={() => setView(key)}>{label}</button>)}
         </div>
-        <button className="site-admin-btn secondary" type="button" onClick={() => navigate('/admin/sunwings/quotes')}>All quotes</button>
+        <button className="site-admin-btn secondary" type="button" onClick={() => navigate('/admin/sunwings/quotes')}>Quotes</button>
         <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
       </div>
     </div>
@@ -336,7 +336,7 @@ export default function JobCalendarAdmin() {
       </section>
 
       <aside className="jc-stack">
-        {isOwner ? <div className="jc-card jc-panel jc-follow">
+        {jobs.length || !loading ? <div className="jc-card jc-panel jc-follow">
           <h3>Follow up <span className="n">{followUps.length}</span></h3>
           <p className="jc-hint">New requests to answer within 24 hours, and quotes with no answer after {QUOTE_WAIT_DAYS} days.</p>
           {followUps.length ? followUps.map(({ job, due }) => <div key={job.id} className={`jc-todo jc-fu ${due.kind}`}>
@@ -397,7 +397,7 @@ export default function JobCalendarAdmin() {
             {open.row.move_size ? <><dt>Size</dt><dd>{open.row.move_size}</dd></> : null}
             {open.row.partner_status || open.row.partner_note ? <><dt>Marius says</dt><dd>{[MARIUS_LABEL[open.row.partner_status] || open.row.partner_status, open.row.partner_note].filter(Boolean).join(' · ')}</dd></> : null}
           </dl>
-          {isOwner ? (() => {
+          {(() => {
             const r = open.row;
             const due = followUpOf(open, now);
             const hasEmail = validEmail(r.email);
@@ -424,7 +424,7 @@ export default function JobCalendarAdmin() {
                 {due ? <button type="button" className="jc-btn" disabled={saving} onClick={() => snooze(open)}>Snooze 3 days</button> : null}
               </div>}
             </div>;
-          })() : null}
+          })()}
           {canSchedule ? <div className={`jc-sched${open.date ? ' ok' : ''}`}>
             <h4>{open.date ? '✓ Scheduled' : 'Schedule this job'}</h4>
             <div className="jc-grid2">

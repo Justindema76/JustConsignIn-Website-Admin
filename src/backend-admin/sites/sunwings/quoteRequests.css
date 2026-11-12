@@ -1,0 +1,71 @@
+/* Sunwings Quotes page: its own list styles (not shared with the other sites). */
+.qr-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
+.qr-stat{display:grid;gap:2px;text-align:left;background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:12px 14px;font:inherit;color:#101828;cursor:pointer}
+.qr-stat b{font-size:24px;line-height:1.1}
+.qr-stat span{font-size:13px;font-weight:600;color:#475467}
+.qr-stat.attn{border-color:#fdba74;background:#fff7ed}
+.qr-stat.attn b{color:#b54708}
+.qr-stat.on{box-shadow:0 0 0 2px #fb690a inset}
+.qr-stat.jobs{background:#ecfdf3;border-color:#abefc6}
+.qr-stat.jobs b,.qr-stat.jobs span{color:#067647}
+
+.qr-list{background:#fff;border:1px solid #e4e7ec;border-radius:14px;overflow:hidden}
+.qr-head,.qr-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1.4fr) 128px 90px 100px 20px;gap:14px;align-items:center;padding:12px 16px}
+.qr-head{background:#f9fafb;border-bottom:1px solid #e4e7ec;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#667085}
+.qr-head span:last-child{grid-column:span 2}
+.qr-row{width:100%;border:0;border-bottom:1px solid #f0f2f5;background:#fff;text-align:left;font:inherit;color:#101828;cursor:pointer}
+.qr-row:last-child{border-bottom:0}
+.qr-row:hover{background:#fcfcfd}
+.qr-row.s-new{box-shadow:inset 3px 0 0 #fb690a}
+.qr-who,.qr-job{display:grid;gap:2px;min-width:0}
+.qr-who b,.qr-job b{font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qr-who small,.qr-job small{font-size:13px;color:#667085;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qr-route{font-size:13.5px;color:#344054;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}
+.qr-route .job-chip{font-size:11.5px;padding:2px 8px}
+.qr-status .demo-request-status{font-size:12px;padding:4px 10px;white-space:nowrap}
+.qr-price{font-weight:700;font-size:14px}
+.qr-date{font-size:13px;color:#667085;white-space:nowrap}
+.num{text-align:right}
+.qr-chev{color:#98a2b3}
+.qr-empty{padding:28px 16px;text-align:center;color:#667085;font-size:14px}
+
+/* Quote side panel: the save bar no longer covers the section below it */
+.service-request-drawer .job-save-bar{margin:4px -16px 16px;border-bottom:1px solid #e4e7ec}
+.service-request-drawer .service-request-compact-details dt{font-size:11px}
+.service-request-drawer .service-request-compact-details dd{font-size:14px;color:#101828}
+
+@media (max-width:1100px){
+  .qr-head,.qr-row{grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) 128px 90px 20px}
+  .qr-route,.qr-date,.qr-head span:nth-child(3),.qr-head span:nth-child(6){display:none}
+  .qr-head span:nth-child(5){grid-column:span 2}
+}
+@media (max-width:760px){
+  .qr-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:10px}
+  .qr-stat{padding:8px 6px;text-align:center}
+  .qr-stat b{font-size:20px}
+  .qr-stat span{font-size:11px;line-height:1.2}
+  .qr-head{display:none}
+  .qr-list{background:none;border:0;border-radius:0;overflow:visible;display:grid;gap:8px}
+  .qr-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who status" "job price" "route route";gap:4px 10px;padding:12px;border:1px solid #e4e7ec;border-radius:12px}
+  .qr-row:last-child{border-bottom:1px solid #e4e7ec}
+  .qr-row.s-new{box-shadow:inset 4px 0 0 #fb690a}
+  .qr-who{grid-area:who}
+  .qr-who small{display:none}
+  .qr-who b{font-size:15.5px}
+  .qr-status{grid-area:status;justify-self:end}
+  .qr-job{grid-area:job}
+  .qr-job b{font-size:13.5px;font-weight:600;color:#344054}
+  .qr-job small{display:none}
+  .qr-price{grid-area:price;align-self:center}
+  .qr-route{grid-area:route;display:flex;font-size:13px;color:#667085}
+  .qr-date,.qr-chev{display:none}
+  .service-request-drawer .job-save-bar{margin:4px -10px 14px}
+}
+.qr-pill{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:700;white-space:nowrap;background:#f2f4f7;color:#344054;border:1px solid #e4e7ec}
+.qr-pill.new{background:#fff7ed;color:#b54708;border-color:#fed7aa}
+.qr-pill.forwarded,.qr-pill.reviewing,.qr-pill.contacted,.qr-pill.needs_quote{background:#f9fafb;color:#344054}
+.qr-pill.priced{background:#f4f3ff;color:#5925dc;border-color:#d9d6fe}
+.qr-pill.quote_sent{background:#eff8ff;color:#175cd3;border-color:#b2ddff}
+.qr-pill.accepted{background:#fffaeb;color:#b54708;border-color:#fedf89}
+.qr-pill.booked,.qr-pill.complete{background:#ecfdf3;color:#067647;border-color:#abefc6}
+.qr-pill.declined,.qr-pill.cancelled{background:#fef3f2;color:#b42318;border-color:#fecdca}

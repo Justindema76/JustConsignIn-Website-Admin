@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CalendarDays, ChevronRight, RefreshCw } from 'lucide-react';
+import { CalendarDays, ChevronRight, Inbox, RefreshCw, Truck } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { getSiteIcon } from '../icons';
 import { loadSunwingsQuotes } from './sunwingsAdminService';
@@ -24,7 +24,7 @@ function contactJob(row) {
 }
 
 // Everything that needs Justin, as one ordered list. Each job appears once, with its most urgent reason.
-function buildTodo(rows, now) {
+function buildTodo(rows, now, isOwner) {
   const items = [];
   for (const row of rows) {
     if (CLOSED.has(row.status)) continue;
@@ -41,7 +41,13 @@ function buildTodo(rows, now) {
       why: job.contact ? `Contact message ${ago(now - Date.parse(row.created_at))}.` : due.text,
       cta: canEmail ? 'Reply' : 'Open', to: canEmail ? calLink(true) : quoteLink,
     });
-    if (row.partner_update_unseen) reasons.push({
+    // Marius: jobs Justin sent that still need his price.
+    if (!isOwner && ['forwarded', 'reviewing', 'needs_quote'].includes(row.status) && row.partner_price == null) reasons.push({
+      rank: 1, tag: ['amber', 'Needs your price'],
+      why: `Sent to you ${ago(now - Date.parse(row.forwarded_at || row.created_at))}.`,
+      cta: 'Price it', to: quoteLink,
+    });
+    if (isOwner && row.partner_update_unseen) reasons.push({
       rank: 1, tag: ['blue', 'Marius updated'],
       why: row.partner_note || 'New price or status from Marius.',
       cta: 'Review', to: quoteLink,
@@ -81,7 +87,7 @@ export default function SunwingsDashboard({ quick = [], sections = [] }) {
   useEffect(() => { refresh(); }, [accessToken]);
 
   const now = Date.now();
-  const todo = useMemo(() => buildTodo(rows, now), [rows]);
+  const todo = useMemo(() => buildTodo(rows, now, isOwner), [rows, isOwner]);
   const jobs = useMemo(() => rows.map(toJob).filter(Boolean), [rows]);
   const today = iso(new Date());
   const weekEnd = iso(addDays(new Date(), 7));
@@ -159,14 +165,16 @@ export default function SunwingsDashboard({ quick = [], sections = [] }) {
     </div>
 
     <section className="swd-card swd-links">
-      <div className="swd-card-head"><h2>Website</h2><span>Pages, posts and settings</span></div>
+      <div className="swd-card-head"><h2>{isOwner ? 'Website' : 'Go to'}</h2>{isOwner ? <span>Pages, posts and settings</span> : null}</div>
       <div className="swd-link-grid">
-        <Link to="/admin/sunwings/calendar" className="swd-link"><CalendarDays size={16}/> Job Calendar</Link>
-        {quick.filter(item => isOwner || !item.ownerOnly).map(item => {
+        <Link to="/admin/sunwings/calendar" className="swd-link"><CalendarDays size={16}/> Jobs calendar</Link>
+        {!isOwner ? <Link to="/admin/sunwings/quotes" className="swd-link"><Inbox size={16}/> Quotes</Link> : null}
+        {!isOwner ? <Link to="/admin/sunwings/jobs" className="swd-link"><Truck size={16}/> Jobs from Justin</Link> : null}
+        {isOwner && quick.filter(item => !item.ownerOnly || isOwner).map(item => {
           const Icon = getSiteIcon(item.icon);
           return <Link key={item.to} to={item.to} className="swd-link"><Icon size={16}/> {item.title}</Link>;
         })}
-        {sections.flatMap(section => section.items).filter(item => (isOwner || !item.ownerOnly) && !quick.some(q => q.to === item.to) && item.to !== '/admin/sunwings/calendar').map(item => {
+        {isOwner && sections.flatMap(section => section.items).filter(item => !item.partnerOnly && !quick.some(q => q.to === item.to) && item.to !== '/admin/sunwings/calendar').map(item => {
           const Icon = getSiteIcon(item.icon);
           return <Link key={item.to} to={item.to} className="swd-link"><Icon size={16}/> {item.title}</Link>;
         })}

@@ -6,20 +6,21 @@ export default {
   showSocialSidebar: true,
   // Phone-only bar fixed to the bottom of the screen (plus a Menu button for everything else).
   mobileTabs: [
-    { to: '/admin', label: 'Home', icon: 'home', end: true },
-    { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox' },
-    { to: '/admin/sunwings/calendar', label: 'Calendar', icon: 'calendar' },
+    { to: '/admin', label: 'Home', icon: 'home', end: true, partner: true },
+    { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
+    { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
     { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
     { to: '/admin/sunwings/jobs', label: 'My jobs', icon: 'truck', partnerOnly: true },
   ],
   navGroups: [
     {
       id: 'leads',
-      label: 'Leads',
+      label: 'Quotes & Jobs',
       items: [
-        { to: '/admin/sunwings/quotes', label: 'Quote Requests', icon: 'inbox' },
-        { to: '/admin/sunwings/calendar', label: 'Job Calendar', icon: 'calendar' },
-        { to: '/admin/sunwings/commission', label: 'My Commission & Investment', icon: 'briefcase', ownerOnly: true },
+        // partner: true = Marius sees these too (only the jobs Justin sent him).
+        { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
+        { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
+        { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
         // Only partners (Marius) see this; they see nothing else.
         { to: '/admin/sunwings/jobs', label: 'Jobs from Justin', icon: 'truck', partnerOnly: true },
       ],

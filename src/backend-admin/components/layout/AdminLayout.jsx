@@ -37,7 +37,7 @@ export default function AdminLayout() {
   const navGroups = useMemo(() => {
     // Partners (Marius) only see partner pages; everyone else never sees them.
     const isPartner = user?.role === 'partner';
-    const keep = item => isPartner ? item.partnerOnly : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly);
+    const keep = item => isPartner ? item.partnerOnly || item.partner : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly);
     return siteConfig.navGroups
       .map(group => ({ ...group, items: group.items.filter(keep) }))
       .filter(group => group.items.length > 0);
@@ -233,7 +233,7 @@ export default function AdminLayout() {
       </header>
       <main className={`site-admin-main ${/\/pages\/[^/]+$|\/global\/(header|footer)$/.test(location.pathname) ? 'site-admin-main-wide' : ''}`}><Outlet /></main>
       {siteConfig.mobileTabs ? <nav className="site-admin-tabbar" aria-label="Quick actions">
-        {siteConfig.mobileTabs.filter(item => (user?.role === 'partner' ? item.partnerOnly || item.to === '/admin' : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly))).map(item => {
+        {siteConfig.mobileTabs.filter(item => (user?.role === 'partner' ? item.partnerOnly || item.partner : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly))).map(item => {
           const Icon = item.icon === 'home' ? Home : getSiteIcon(item.icon);
           return <NavLink key={item.to} to={item.to} end={item.end}><Icon size={21}/><span>{item.label}</span></NavLink>;
         })}

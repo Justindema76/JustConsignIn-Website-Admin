@@ -133,3 +133,37 @@
   .site-sunwings .service-request-service small::before{content:" · "}
   .site-sunwings .service-request-service small{font-size:12px}
 }
+
+/* ---- Commission page cleanup ---- */
+.money-name{color:#101828;font-weight:700;text-decoration:none}
+.money-name:hover{color:#d95700;text-decoration:underline}
+.money-select{min-height:38px;border:1px solid #d0d5dd;border-radius:10px;background:#fff;padding:0 30px 0 12px;font:inherit;font-size:14px;color:#101828}
+.money-panel{padding:18px}
+.money-panel h2{margin:0;font-size:18px}
+.money-table td{vertical-align:middle;color:#344054}
+.money-table td.m-job{text-transform:capitalize}
+.money-table td.m-action{text-align:right;white-space:nowrap}
+.money-stat b{font-size:21px}
+@media (min-width:901px) and (max-width:1250px){
+  .money-stats{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:760px){
+  .money-stats{gap:8px}
+  .money-stat{padding:10px 12px}
+  .money-stat b{font-size:19px}
+  .money-panel{padding:14px 12px}
+  .money-panel-head{flex-wrap:wrap}
+  /* Table becomes one card per job */
+  .money-table-wrap{overflow:visible}
+  .money-table thead{display:none}
+  .money-table,.money-table tbody{display:block}
+  .money-table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name amount" "service status" "meta action";gap:3px 10px;padding:12px 0;border-bottom:1px solid #f0f2f5}
+  .money-table td{display:block;padding:0;border:0;font-size:13.5px}
+  .money-table td.m-name{grid-area:name;font-size:15px}
+  .money-table td.m-amount{grid-area:amount;font-size:15px}
+  .money-table td.m-service{grid-area:service;color:#667085}
+  .money-table td.m-status{grid-area:status;text-align:right}
+  .money-table td.m-job,.money-table td.m-price,.money-table td.m-rate{grid-area:meta;display:none}
+  .money-table td.m-action{grid-area:action}
+  .money-table td.m-action:empty{display:none}
+}

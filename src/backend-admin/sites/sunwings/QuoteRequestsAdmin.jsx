@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronRight, Eye, EyeOff, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
 import { autoCommissionRate, commissionFor, money } from './commission';
 import '../../styles/serviceRequests.css';
 import './sunwingsJobs.css';
+import './quoteRequests.css';
 
 const STATUS_OPTIONS = [
   ['new', 'New'],
@@ -75,6 +76,18 @@ function JobFlags({ row }) {
     <span className="job-chip intercity" title={`${flags.from} → ${flags.to}`}>Intercity</span>
     {flags.priority ? <span className="job-chip priority-lead">Priority</span> : null}
   </>;
+}
+
+// Quotes = still waiting for the customer to say yes. Jobs = accepted or booked. Closed = done or dead.
+const QUOTE_STATUSES = new Set(['new', 'reviewing', 'forwarded', 'priced', 'needs_quote', 'contacted', 'quote_sent']);
+const JOB_STATUSES = new Set(['accepted', 'booked']);
+const CLOSED_STATUSES = new Set(['complete', 'declined', 'cancelled']);
+
+function rowPrice(row) {
+  for (const value of [row.final_price, row.partner_price, row.quote_amount]) {
+    if (value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value))) return Number(value);
+  }
+  return null;
 }
 
 function statusLabel(value) {
@@ -168,7 +181,8 @@ export default function QuoteRequestsAdmin() {
   // The Job Calendar links here with ?id= to open that job.
   const [selectedId, setSelectedId] = useState(() => searchParams.get('id') || '');
   const [query, setQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('active');
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get('show') || 'quotes');
+  const navigate = useNavigate();
   const [serviceFilter, setServiceFilter] = useState('all');
   const [requestTypeFilter, setRequestTypeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -278,8 +292,11 @@ export default function QuoteRequestsAdmin() {
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return requests.filter(request => {
-      if (statusFilter === 'active' && ['complete','declined','cancelled'].includes(request.status)) return false;
-      if (statusFilter !== 'active' && statusFilter !== 'all' && request.status !== statusFilter) return false;
+      const status = request.status || 'new';
+      if (statusFilter === 'quotes' && !QUOTE_STATUSES.has(status)) return false;
+      if (statusFilter === 'jobs' && !JOB_STATUSES.has(status)) return false;
+      if (statusFilter === 'closed' && !CLOSED_STATUSES.has(status)) return false;
+      if (!['quotes', 'jobs', 'closed', 'all'].includes(statusFilter) && status !== statusFilter) return false;
       if (serviceFilter !== 'all' && request.service !== serviceFilter) return false;
       if (requestTypeFilter !== 'all' && (request.request_type || 'quote') !== requestTypeFilter) return false;
       if (!needle) return true;
@@ -293,10 +310,10 @@ export default function QuoteRequestsAdmin() {
   }, [requests, query, statusFilter, serviceFilter, requestTypeFilter]);
 
   const counts = useMemo(() => ({
-    new: requests.filter(item => item.status === 'new').length,
-    active: requests.filter(item => !['complete','declined','cancelled'].includes(item.status)).length,
-    needsQuote: requests.filter(item => item.status === 'needs_quote').length,
-    high: requests.filter(item => item.priority === 'high' && !['complete','declined','cancelled'].includes(item.status)).length,
+    new: requests.filter(item => (item.status || 'new') === 'new').length,
+    open: requests.filter(item => QUOTE_STATUSES.has(item.status || 'new')).length,
+    sent: requests.filter(item => item.status === 'quote_sent').length,
+    jobs: requests.filter(item => JOB_STATUSES.has(item.status)).length,
   }), [requests]);
 
   // The Marius/commission columns exist only after the 20261103 database setup has run.
@@ -356,12 +373,12 @@ export default function QuoteRequestsAdmin() {
   return <div className="service-request-page">
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Leads & Quotes</p>
-        <h1>Quote Requests</h1>
+        <p className="site-admin-eyebrow">Quotes</p>
+        <h1>Quotes</h1>
         <p>{isOwner ? 'Track Sunwings enquiries from the website through review, quote, acceptance and booking.' : 'Jobs Justin sent you, with the customer’s full details. Update the step and your price as the job goes.'}</p>
       </div>
       <div className="quote-head-actions">
-        <Link className="site-admin-btn" to="/admin/sunwings/calendar"><CalendarDays size={15}/> Calendar view</Link>
+        <Link className="site-admin-btn" to="/admin/sunwings/calendar"><CalendarDays size={15}/> Jobs calendar</Link>
         <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
       </div>
     </div>
@@ -369,11 +386,11 @@ export default function QuoteRequestsAdmin() {
     {error && <div className="site-admin-alert error">{error}</div>}
     {success && !selected && <div className="site-admin-alert success">{success}</div>}
 
-    <div className="demo-request-stats service-request-stats">
-      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('new')}><span>New</span><strong>{counts.new}</strong></button>
-      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('active')}><span>Open / Active</span><strong>{counts.active}</strong></button>
-      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('needs_quote')}><span>Needs Quote</span><strong>{counts.needsQuote}</strong></button>
-      <button type="button" className="site-admin-card service-request-stat" onClick={() => setStatusFilter('active')}><span>High Priority</span><strong>{counts.high}</strong></button>
+    <div className="qr-stats">
+      <button type="button" className={`qr-stat${counts.new ? ' attn' : ''}${statusFilter === 'new' ? ' on' : ''}`} onClick={() => setStatusFilter('new')}><b>{counts.new}</b><span>New</span></button>
+      <button type="button" className={`qr-stat${statusFilter === 'quotes' ? ' on' : ''}`} onClick={() => setStatusFilter('quotes')}><b>{counts.open}</b><span>Open quotes</span></button>
+      <button type="button" className={`qr-stat${statusFilter === 'quote_sent' ? ' on' : ''}`} onClick={() => setStatusFilter('quote_sent')}><b>{counts.sent}</b><span>Quote sent</span></button>
+      <button type="button" className="qr-stat jobs" onClick={() => navigate('/admin/sunwings/calendar')}><b>{counts.jobs}</b><span>Jobs →</span></button>
     </div>
 
     <div className="site-admin-toolbar demo-request-toolbar service-request-toolbar">
@@ -389,35 +406,31 @@ export default function QuoteRequestsAdmin() {
         {services.map(service => <option value={service} key={service}>{service}</option>)}
       </select>
       <select value={statusFilter} onChange={event => setStatusFilter(event.target.value)} aria-label="Filter by status">
-        <option value="active">Open / active</option>
-        <option value="all">All requests</option>
+        <option value="quotes">Open quotes</option>
+        <option value="jobs">Jobs (accepted &amp; booked)</option>
+        <option value="closed">Closed (done, declined)</option>
+        <option value="all">Everything</option>
         {STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
       </select>
     </div>
 
     {loading ? <div className="site-admin-card site-admin-empty large"><p>Loading quote requests…</p></div> :
       requests.length === 0 ? <div className="site-admin-card site-admin-empty large"><Workflow size={30}/><h2>{isOwner ? 'No requests yet' : 'No jobs yet'}</h2><p>{isOwner ? 'Full Quote, Quick Quote and Contact submissions will all appear here.' : 'Jobs Justin sends you will show up here.'}</p></div> :
-      <section className="site-admin-card service-request-queue" aria-label="Quote request queue">
-        <div className="service-request-queue-head">
-          <span>Customer</span><span>Form / Service</span><span>Route</span><span>Status</span><span>Priority</span><span>Received</span><span aria-hidden="true"></span>
-        </div>
-        {filtered.length === 0 ? <div className="site-admin-empty service-request-empty">No requests match these filters.</div> :
-          filtered.map(request => <button key={request.id} type="button" className="service-request-queue-row" onClick={() => setSelectedId(request.id)}>
-            <span className="service-request-customer">
-              <strong>{request.name}</strong>
-              <small>{request.email || request.phone}</small>
-            </span>
-            <span className="service-request-service">
-              <strong>{requestTypeLabel(request.request_type)}</strong>
-              <small>{request.request_type === 'contact' ? 'General Contact' : (request.service || 'Not specified')}</small>
-            </span>
-            <span className="service-request-department unassigned">{routeSummary(request)}<span className="job-flags"><JobFlags row={request}/></span></span>
-            <span><span className={`demo-request-status ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
-            <span><span className={`service-request-priority ${request.priority || 'normal'}`}>{request.priority || 'normal'}</span></span>
-            <span className="service-request-date">{shortDate(request.created_at)}</span>
-            <ChevronRight className="service-request-open-icon" size={18}/>
-          </button>)
-        }
+      <section className="qr-list" aria-label="Quotes">
+        <div className="qr-head"><span>Customer</span><span>Job</span><span>Route</span><span>Status</span><span className="num">Price</span><span>Received</span></div>
+        {filtered.length === 0 ? <div className="qr-empty">{statusFilter === 'quotes' ? 'No open quotes. New requests show up here.' : 'Nothing matches these filters.'}</div> :
+          filtered.map(request => {
+            const price = rowPrice(request);
+            return <button key={request.id} type="button" className={`qr-row s-${request.status || 'new'}`} onClick={() => setSelectedId(request.id)}>
+              <span className="qr-who"><b>{request.name}</b><small>{request.email || request.phone}</small></span>
+              <span className="qr-job"><b>{request.request_type === 'contact' ? 'Contact message' : (request.service || 'Not specified')}</b><small>{requestTypeLabel(request.request_type)}</small></span>
+              <span className="qr-route">{request.request_type === 'contact' ? '—' : routeSummary(request)}<JobFlags row={request}/></span>
+              <span className="qr-status"><span className={`qr-pill ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
+              <span className="qr-price num">{price == null ? '—' : money(price)}</span>
+              <span className="qr-date">{shortDate(request.created_at)}</span>
+              <ChevronRight className="qr-chev" size={18}/>
+            </button>;
+          })}
       </section>
     }
 
