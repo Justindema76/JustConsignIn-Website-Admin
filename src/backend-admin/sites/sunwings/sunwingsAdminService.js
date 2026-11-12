@@ -20,6 +20,19 @@ export async function updateSunwingsQuote(accessToken, request) {
   return payload.request || null;
 }
 
+// Email a follow-up to the customer (Job Calendar). Returns the updated quote request.
+export async function sendSunwingsFollowUp(accessToken, { id, subject, message }) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/quote-follow-up', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, subject, message }),
+    }, accessToken),
+    'Unable to send the follow-up email.',
+  );
+  return payload.request || null;
+}
+
 export async function deleteSunwingsQuote(accessToken, id) {
   await parseJsonResponse(
     await adminFetch(`/api/admin/sunwings/quote-requests?id=${encodeURIComponent(id)}`, {

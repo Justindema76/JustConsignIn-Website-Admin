@@ -1,6 +1,17 @@
 {
   "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/sunwings-follow-ups",
+      "schedule": "0 14 * * *"
+    }
   ]
 }

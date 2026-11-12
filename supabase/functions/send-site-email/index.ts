@@ -1046,7 +1046,8 @@ async function sendQuoteRequest(body: any) {
       .eq('id', requestId)
       .eq('site_key', 'sunwings');
 
-    return Response.json({ ok: true, sent: true });
+    const customerAck = await sendCustomerAck(record);
+    return Response.json({ ok: true, sent: true, customerAck });
   } catch (error) {
     const message = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
     await admin
@@ -1055,8 +1056,238 @@ async function sendQuoteRequest(body: any) {
       .eq('id', requestId)
       .eq('site_key', 'sunwings');
     console.error('Sunwings quote email failed', message);
+    // The customer still gets their thank-you even if Justin's copy failed.
+    await sendCustomerAck(record);
     return Response.json({ error: message }, { status: 502 });
   }
+}
+
+// ---------- Sunwings customer emails: thank-you, follow-ups, automatic reminder ----------
+
+function firstNameOf(name: unknown) {
+  return clean(name, 120).split(/\s+/)[0] || 'there';
+}
+
+function sunwingsDate(value: unknown) {
+  const raw = clean(value, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return '';
+  return new Date(`${raw}T12:00:00Z`).toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+}
+
+// Branded wrapper used for every email a Sunwings customer receives.
+function sunwingsCustomerHtml(paragraphs: string[], summary: [string, string][] = [], after: string[] = []) {
+  const para = (text: string) => `<p style="margin:0 0 14px;line-height:1.6">${escapeHtml(text).replace(/\n/g, '<br>')}</p>`;
+  const body = paragraphs.map(para).join('');
+  const rows = summary.filter(([, value]) => value).map(([label, value]) =>
+    `<tr><td style="padding:6px 12px;color:#5B6B82;font-weight:700;vertical-align:top;width:120px">${escapeHtml(label)}</td><td style="padding:6px 12px;color:#14213D;vertical-align:top">${escapeHtml(value)}</td></tr>`).join('');
+  const table = rows ? `<table role="presentation" style="width:100%;border-collapse:collapse;background:#F6F8FB;border-radius:10px;margin:4px 0 18px">${rows}</table>` : '';
+  return `<div style="font-family:Arial,sans-serif;background:#F6F8FB;padding:24px;color:#14213D"><div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #E3E9F2;border-radius:14px;overflow:hidden"><div style="background:#0B2545;color:#fff;padding:18px 24px"><div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#FDB833">Sunwings Transport</div></div><div style="padding:24px">${body}${table}${after.map(para).join('')}<p style="margin:0;line-height:1.6">Thanks,<br>The Sunwings Transport team<br><a href="https://www.sunwingstransport.ca" style="color:#0B2545">sunwingstransport.ca</a></p></div></div></div>`;
+}
+
+function jobSummary(record: any): [string, string][] {
+  const from = [record.pickup_city, record.pickup_postal_code].filter(Boolean).join(' ') || clean(record.move_from, 200);
+  const to = [record.dropoff_city, record.dropoff_postal_code].filter(Boolean).join(' ') || clean(record.move_to, 200);
+  return [
+    ['Service', clean(record.service, 160)],
+    ['Date', sunwingsDate(record.preferred_date)],
+    ['Time', clean(record.preferred_time, 80)],
+    ['From', from],
+    ['To', to],
+  ];
+}
+
+// The automatic thank-you, sent once when a quote or contact request comes in.
+function customerAckMessage(record: any) {
+  const isContact = record.request_type === 'contact';
+  const first = firstNameOf(record.name);
+  const paragraphs = isContact
+    ? [`Hi ${first},`, 'Thanks for contacting Sunwings Transport. We’ve received your message and will get back to you within 24 hours.', 'If you need to add anything in the meantime, just reply to this email.']
+    : [`Hi ${first},`, 'Thanks for choosing Sunwings Transport. We’ve received your quote request and will get back to you within 24 hours.', 'Here’s what you sent us:'];
+  const closing = isContact ? [] : ['If anything changes or you’d like to add details or photos, just reply to this email.'];
+  const summary = isContact ? [] : jobSummary(record);
+  const text = [...paragraphs, ...summary.filter(([, v]) => v).map(([l, v]) => `${l}: ${v}`), '', ...closing, '', 'Thanks,', 'The Sunwings Transport team', 'sunwingstransport.ca'].join('\n');
+  const html = sunwingsCustomerHtml(paragraphs, summary, closing);
+  return {
+    subject: isContact ? 'Thanks for contacting Sunwings Transport' : 'We got your quote request – Sunwings Transport',
+    text,
+    html,
+  };
+}
+
+// Reads the new follow-up columns separately so nothing breaks before that SQL has run.
+async function followUpColumns(requestId: string) {
+  const { data, error } = await admin
+    .from('sunwings_quote_requests')
+    .select('customer_ack_sent_at,follow_up_count,last_follow_up_at,auto_nudge_sent_at')
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings')
+    .maybeSingle();
+  return error ? null : data;
+}
+
+async function sendCustomerAck(record: any) {
+  const to = clean(record.email, 320).toLowerCase();
+  if (!validEmail(to)) return { skipped: 'no email' };
+  const columns = await followUpColumns(record.id);
+  if (columns?.customer_ack_sent_at) return { skipped: 'already sent' };
+  try {
+    const settings = await loadSettings('sunwings');
+    const message = customerAckMessage(record);
+    await transportFor(settings).sendMail({ from: fromAddress(settings), to, ...message });
+    if (columns) {
+      await admin.from('sunwings_quote_requests')
+        .update({ customer_ack_sent_at: new Date().toISOString(), customer_ack_error: null })
+        .eq('id', record.id).eq('site_key', 'sunwings');
+    }
+    return { sent: true };
+  } catch (error) {
+    const message = clean(error instanceof Error ? error.message : error, 1000) || 'Email delivery failed.';
+    console.error('Sunwings customer thank-you failed', message);
+    if (columns) {
+      await admin.from('sunwings_quote_requests')
+        .update({ customer_ack_error: message })
+        .eq('id', record.id).eq('site_key', 'sunwings');
+    }
+    return { error: message };
+  }
+}
+
+// Justin sends a follow-up from the Job Calendar.
+async function sendSunwingsFollowUp(req: Request, body: any) {
+  const ownerAuth = await requireOwner(req);
+  if (!ownerAuth) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  const requestId = clean(body.requestId, 80);
+  const subject = clean(body.subject, 240);
+  const message = clean(body.message, 8000);
+  if (!validUuid(requestId)) return Response.json({ error: 'A valid request ID is required.' }, { status: 400 });
+  if (!subject) return Response.json({ error: 'Add a subject.' }, { status: 400 });
+  if (!message) return Response.json({ error: 'Write a message.' }, { status: 400 });
+
+  const { data: record, error } = await admin
+    .from('sunwings_quote_requests')
+    .select('id,name,email,status,contacted_at')
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings')
+    .maybeSingle();
+  if (error) return Response.json({ error: 'Unable to load the job.' }, { status: 500 });
+  if (!record) return Response.json({ error: 'Job not found.' }, { status: 404 });
+  const to = clean(record.email, 320).toLowerCase();
+  if (!validEmail(to)) return Response.json({ error: 'This customer has no valid email address.' }, { status: 400 });
+
+  try {
+    const settings = await loadSettings('sunwings');
+    const paragraphs = message.replace(/\n*Thanks,?\s*\n+The Sunwings Transport team\s*$/i, '').split(/\n{2,}/);
+    await transportFor(settings).sendMail({
+      from: fromAddress(settings),
+      to,
+      subject,
+      text: message,
+      html: sunwingsCustomerHtml(paragraphs),
+    });
+  } catch (sendError) {
+    const errorMessage = clean(sendError instanceof Error ? sendError.message : sendError, 1000) || 'Email delivery failed.';
+    console.error('Sunwings follow-up failed', errorMessage);
+    return Response.json({ error: errorMessage }, { status: 502 });
+  }
+
+  const now = new Date().toISOString();
+  const columns = await followUpColumns(requestId);
+  const patch: Record<string, unknown> = {
+    updated_at: now,
+    last_activity: 'Follow-up email sent',
+    last_activity_at: now,
+    next_action: null,
+    next_action_due_at: null,
+  };
+  if (record.status === 'new') { patch.status = 'contacted'; patch.status_changed_at = now; }
+  if (!record.contacted_at) patch.contacted_at = now;
+  if (columns) { patch.follow_up_count = Number(columns.follow_up_count || 0) + 1; patch.last_follow_up_at = now; }
+  const { data: updated } = await admin
+    .from('sunwings_quote_requests')
+    .update(patch)
+    .eq('id', requestId)
+    .eq('site_key', 'sunwings')
+    .select('*')
+    .maybeSingle();
+  return Response.json({ ok: true, sent: true, request: updated || null });
+}
+
+// Only the scheduled job (it signs with the project's secret key) may run the automatic reminders.
+function isServerCaller(req: Request) {
+  const auth = req.headers.get('authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!token) return false;
+  const keys = [Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''];
+  try { keys.push(...Object.values(JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}')).map(String)); } catch { /* none */ }
+  return keys.some(key => key && key === token);
+}
+
+const NUDGE_AFTER_DAYS = 3;
+
+function nudgeMessage(record: any) {
+  const first = firstNameOf(record.name);
+  const service = clean(record.service, 160).toLowerCase() || 'job';
+  const date = sunwingsDate(record.preferred_date);
+  const paragraphs = [
+    `Hi ${first},`,
+    `Just checking in on the quote we sent for your ${service}${date ? ` on ${date}` : ''}.`,
+    'If you’d like to go ahead, reply to this email and we’ll lock in your date. If you have questions or anything has changed, let us know and we’ll update the quote.',
+  ];
+  return {
+    subject: 'Following up on your Sunwings Transport quote',
+    text: [...paragraphs.join('\n\n').split('\n'), '', 'Thanks,', 'The Sunwings Transport team', 'sunwingstransport.ca'].join('\n'),
+    html: sunwingsCustomerHtml(paragraphs),
+  };
+}
+
+// One automatic reminder, 3 days after the quote was sent, if the customer hasn't answered
+// and nobody has followed up by hand since. Never for quotes older than 3 weeks or past move dates.
+async function sendSunwingsAutoNudges(req: Request, body: any) {
+  if (!isServerCaller(req)) return Response.json({ error: 'Not found' }, { status: 404 });
+  const dryRun = body.dryRun === true;
+  const now = Date.now();
+  const cutoff = new Date(now - NUDGE_AFTER_DAYS * 86400000).toISOString();
+  const oldest = new Date(now - 21 * 86400000).toISOString();
+  const today = new Date(now).toISOString().slice(0, 10);
+
+  const { data, error } = await admin
+    .from('sunwings_quote_requests')
+    .select('id,request_type,name,email,service,preferred_date,status,status_changed_at,last_follow_up_at,auto_nudge_sent_at')
+    .eq('site_key', 'sunwings')
+    .eq('status', 'quote_sent')
+    .is('auto_nudge_sent_at', null)
+    .lte('status_changed_at', cutoff)
+    .gte('status_changed_at', oldest)
+    .limit(25);
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+
+  const due = (data || []).filter((row: any) =>
+    row.request_type !== 'contact'
+    && validEmail(clean(row.email, 320))
+    && (!row.preferred_date || String(row.preferred_date) >= today)
+    && (!row.last_follow_up_at || row.last_follow_up_at <= cutoff));
+  if (dryRun) return Response.json({ ok: true, dryRun: true, due: due.map((row: any) => ({ id: row.id, name: row.name })) });
+  if (!due.length) return Response.json({ ok: true, sent: 0 });
+
+  const settings = await loadSettings('sunwings');
+  const transport = transportFor(settings);
+  const results = [];
+  for (const row of due) {
+    try {
+      await transport.sendMail({ from: fromAddress(settings), to: clean(row.email, 320).toLowerCase(), ...nudgeMessage(row) });
+      const sentAt = new Date().toISOString();
+      await admin.from('sunwings_quote_requests')
+        .update({ auto_nudge_sent_at: sentAt, last_activity: 'Automatic follow-up email sent', last_activity_at: sentAt })
+        .eq('id', row.id).eq('site_key', 'sunwings');
+      results.push({ id: row.id, sent: true });
+    } catch (sendError) {
+      const message = clean(sendError instanceof Error ? sendError.message : sendError, 500);
+      console.error('Sunwings automatic follow-up failed', row.id, message);
+      results.push({ id: row.id, error: message });
+    }
+  }
+  return Response.json({ ok: true, sent: results.filter(item => item.sent).length, results });
 }
 
 async function sendTest(req: Request, body: any) {
@@ -1096,6 +1327,8 @@ Deno.serve(async (req: Request) => {
   if (body.action === 'service_submit') return submitServiceRequest(body);
   if (body.action === 'hiring_contact_submit') return submitHiringContact(body);
   if (body.action === 'quote_request') return sendQuoteRequest(body);
+  if (body.action === 'sunwings_follow_up') return sendSunwingsFollowUp(req, body);
+  if (body.action === 'sunwings_auto_nudges') return sendSunwingsAutoNudges(req, body);
   if (body.action === 'service_request') return sendServiceRequestNotification(body);
   if (body.action === 'reply') return sendReply(req, body);
   if (body.action === 'service_reply') return sendServiceRequestReply(req, body);

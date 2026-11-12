@@ -134,6 +134,21 @@
 .jc-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(140px);background:#111;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;z-index:210;transition:transform .25s;max-width:calc(100% - 32px)}
 .jc-toast.on{transform:translateX(-50%)}
 
+/* Follow-ups */
+.jc-follow{border-color:#fdba74}
+.jc-fu{cursor:default}
+.jc-todo .row a.jc-btn{flex:1;font-size:12px;padding:5px 8px;text-decoration:none}
+.jc-mail{border:1px solid var(--jc-line);border-radius:12px;padding:12px;margin-bottom:14px;background:#fcfcfd}
+.jc-mail.due{border-color:#fdba74;background:var(--jc-orange-soft)}
+.jc-mail h4{margin:0 0 8px;font-size:14px;display:flex;gap:8px;align-items:center}
+.jc-mail-log{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:4px;font-size:12.5px}
+.jc-mail-log li{display:flex;justify-content:space-between;gap:10px}
+.jc-mail-log span{color:var(--jc-grey)}
+.jc-mail-log b{text-align:right}
+.jc-mail-actions{display:flex;gap:8px;flex-wrap:wrap}
+.jc-mail-actions a.jc-btn{text-decoration:none}
+.jc-grid2 input[readonly]{background:#f2f4f7;color:var(--jc-grey)}
+
 @media (max-width:1100px){
   .jc-board{grid-template-columns:minmax(0,1fr)}
   .jc-pipeline{grid-template-columns:repeat(3,minmax(0,1fr))}

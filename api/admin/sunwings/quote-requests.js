@@ -25,6 +25,9 @@ const PHOTO_FIELDS = ['photos', 'lead_source'];
 // Added by migration 20261111 (Job Calendar): the day, time and crew a job is booked for.
 const SCHEDULE_FIELDS = ['scheduled_date', 'scheduled_start', 'scheduled_hours', 'crew', 'truck', 'crew_notes'];
 const SCHEDULED_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCHEDULE_FIELDS].join(',');
+// Added by migration 20261112 (follow-ups): thank-you email, follow-ups sent, automatic reminder.
+const FOLLOW_UP_FIELDS = ['customer_ack_sent_at', 'customer_ack_error', 'follow_up_count', 'last_follow_up_at', 'auto_nudge_sent_at'];
+const FOLLOW_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCHEDULE_FIELDS, ...FOLLOW_UP_FIELDS].join(',');
 const ALL_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS].join(',');
 const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
 const OLD_FIELDS = BASE_FIELDS.join(',');
@@ -33,7 +36,7 @@ const OLD_FIELDS = BASE_FIELDS.join(',');
 // (Postgres error 42703), run it again with only the original fields.
 async function withFieldFallback(token, buildPath, options) {
   let response;
-  for (const fields of [SCHEDULED_FIELDS, ALL_FIELDS, FIELDS, OLD_FIELDS]) {
+  for (const fields of [FOLLOW_FIELDS, SCHEDULED_FIELDS, ALL_FIELDS, FIELDS, OLD_FIELDS]) {
     response = await supabaseUserRest(token, buildPath(fields), options);
     if (response.status !== 400) return response;
     const text = await response.clone().text().catch(() => '');
