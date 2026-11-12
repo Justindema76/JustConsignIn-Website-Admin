@@ -196,3 +196,36 @@
 .jc-arow.compact .t{width:84px}
 .jc-arow.compact .who b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .jc-arow.compact .who span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Cards open the job's details when clicked */
+.jc-todo[role="button"]{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.jc-todo[role="button"]:hover{border-color:#fdba74;box-shadow:0 4px 12px rgba(16,24,40,.06)}
+.jc-todo[draggable="true"]{cursor:pointer}
+.jc dd a{color:#d95700;text-decoration:none;font-weight:600}
+.jc-pre{white-space:pre-wrap;max-height:180px;overflow:auto}
+.jc-todo-note{font-weight:700;color:#b54708}
+
+/* Jobs list view */
+@media (min-width:1101px){ .jc-board>.jc-card.is-list{position:static} }
+.jc-jlist{padding:0 0 8px}
+.jc-jhead,.jc-jrow{display:grid;grid-template-columns:130px minmax(0,1fr) 140px 90px 120px;gap:14px;align-items:center;padding:10px 16px}
+.jc-jhead{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--jc-grey);border-bottom:1px solid var(--jc-line);background:#f9fafb}
+.jc-jhead .r,.jc-jrow .amt{text-align:right}
+.jc-jgroup h3{margin:0;padding:14px 16px 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--jc-grey);display:flex;gap:8px;align-items:center}
+.jc-jgroup h3 span{background:#f2f4f7;color:#344054;border-radius:999px;padding:1px 8px;font-size:11px}
+.jc-jgroup .jc-hint{padding:0 16px}
+.jc-jrow{width:100%;border:0;border-top:1px solid #f0f2f5;background:#fff;text-align:left;color:var(--jc-ink)}
+.jc-jrow:hover{background:#fcfcfd}
+.jc-jrow.need{box-shadow:inset 3px 0 0 #f79009}
+.jc-jrow.up{box-shadow:inset 3px 0 0 var(--jc-green)}
+.jc-jrow.done{opacity:.8}
+.jc-jrow .d b,.jc-jrow .who b{display:block;font-size:14px}
+.jc-jrow .d small,.jc-jrow .who small,.jc-jrow .crew small{display:block;color:var(--jc-grey);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jc-jrow .who{min-width:0}
+.jc-jrow .crew{font-size:13.5px;min-width:0}
+.jc-jrow .amt{font-weight:800}
+@media (max-width:760px){
+  .jc-jhead{display:none}
+  .jc-jrow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who amt" "d st" "crew crew";gap:3px 10px;padding:12px}
+  .jc-jrow .who{grid-area:who}.jc-jrow .amt{grid-area:amt}.jc-jrow .d{grid-area:d;display:flex;gap:6px;align-items:baseline}.jc-jrow .st{grid-area:st;justify-self:end}.jc-jrow .crew{grid-area:crew;color:var(--jc-grey);font-size:12.5px;display:flex;gap:6px}
+  .jc-jrow .d b{font-size:13px}.jc-jrow .crew small{display:inline}
+}

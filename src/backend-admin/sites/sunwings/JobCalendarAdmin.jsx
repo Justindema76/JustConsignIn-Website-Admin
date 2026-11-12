@@ -51,7 +51,11 @@ export default function JobCalendarAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
-  const [view, setView] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 760 ? 'list' : 'month'));
+  const [view, setViewState] = useState(() => {
+    try { const saved = window.localStorage.getItem('sunwings-jobs-view'); if (['month', 'week', 'list'].includes(saved)) return saved; } catch { /* ignore */ }
+    return typeof window !== 'undefined' && window.innerWidth < 760 ? 'list' : 'month';
+  });
+  const setView = value => { setViewState(value); try { window.localStorage.setItem('sunwings-jobs-view', value); } catch { /* ignore */ } };
   const [cursor, setCursor] = useState(() => new Date());
   const [showReq, setShowReq] = useState(true);
   const [openId, setOpenId] = useState('');
@@ -266,29 +270,30 @@ export default function JobCalendarAdmin() {
     </div></div>;
   }
 
+  // A plain list of jobs: needs a date, upcoming (by date), and done in the last 60 days.
   function listView() {
-    const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-    const now = new Date();
-    const start = cursor.getFullYear() === now.getFullYear() && cursor.getMonth() === now.getMonth() ? parse(today) : monthStart;
-    const end = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
-    const groups = [];
-    for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
-      const items = itemsOn(iso(d));
-      if (items.length) groups.push([new Date(d), items]);
-    }
-    if (!groups.length) return <p className="jc-hint jc-pad">No jobs for the rest of this month.</p>;
-    return <div className="jc-agenda">{groups.map(([d, items]) => {
-      const isToday = iso(d) === today;
-      return <div key={iso(d)}>
-        <h3 className={isToday ? 'today' : ''}>{d.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })}{isToday ? ' · Today' : ''}</h3>
-        {items.map(({ job, kind }) => <button key={job.id} type="button" className={`jc-arow ${kind}`} onClick={() => openJob(job)}>
-          <span className="t">{job.start ? fmtTime(job.start) : kind === 'quoted' ? 'Quoted' : 'Requested'}<small>{job.start ? `${job.hours} hrs` : job.reqTime}</small></span>
-          <span className="who"><b>{job.name}</b><span>{job.service}{job.from ? ` · ${job.from}` : ''}{job.to ? ` → ${job.to}` : ''}</span></span>
-          {clashesOf(job).length ? <span className="jc-tag red">Clash</span> : null}
-          <span className="amt">{money(job.price)}</span>
-        </button>)}
-      </div>;
-    })}</div>;
+    const recentCutoff = iso(addDays(new Date(), -60));
+    const upcomingJobs = jobs.filter(job => job.stage === 'booked' && job.date)
+      .sort((a, b) => (a.date + (a.start || '')).localeCompare(b.date + (b.start || '')));
+    const doneJobs = jobs.filter(job => job.stage === 'complete' && (job.date || String(job.row.status_changed_at || '').slice(0, 10)) >= recentCutoff)
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const row = (job, kind) => <button key={job.id} type="button" className={`jc-jrow ${kind}`} onClick={() => openJob(job)}>
+      <span className="d">{job.date ? <><b>{job.date === today ? 'Today' : longDate(job.date)}</b><small>{job.start ? `${fmtTime(job.start)} · ${job.hours} hrs` : 'No time'}</small></> : <><b>No date</b><small>{job.requested ? `Asked ${longDate(job.requested)}` : 'Not requested'}</small></>}</span>
+      <span className="who"><b>{job.name}</b><small>{job.service}{job.from ? ` · ${job.from}` : ''}{job.to ? ` → ${job.to}` : ''}</small></span>
+      <span className="crew">{job.crew || '—'}{job.truck ? <small>{job.truck}</small> : null}</span>
+      <span className="amt">{money(job.price) || '—'}</span>
+      <span className="st">{clashesOf(job).length ? <span className="jc-tag red">Clash</span> : <span className={`jc-tag ${kind === 'need' ? 'amber' : kind === 'done' ? 'grey' : 'green'}`}>{kind === 'need' ? 'Needs a date' : kind === 'done' ? 'Done' : job.date < today ? 'Overdue' : 'Booked'}</span>}</span>
+    </button>;
+    const group = (title, list, kind, empty) => <div className="jc-jgroup">
+      <h3>{title} <span>{list.length}</span></h3>
+      {list.length ? list.map(job => row(job, kind)) : <p className="jc-hint">{empty}</p>}
+    </div>;
+    return <div className="jc-jlist">
+      <div className="jc-jhead"><span>Date</span><span>Customer &amp; job</span><span>Crew</span><span className="r">Price</span><span>Status</span></div>
+      {group('Needs a date', needDate, 'need', 'Every accepted job has a date.')}
+      {group('Upcoming', upcomingJobs, 'up', 'No booked jobs yet.')}
+      {group('Done (last 60 days)', doneJobs, 'done', 'Nothing finished yet.')}
+    </div>;
   }
 
   const clash = open && form ? booked.filter(other => other.id !== open.id && form.crew.trim() && other.crew.trim().toLowerCase() === form.crew.trim().toLowerCase()
@@ -321,8 +326,8 @@ export default function JobCalendarAdmin() {
     })}</div>
 
     <div className="jc-board">
-      <section className="jc-card">
-        <div className="jc-cal-head">
+      <section className={`jc-card${view === 'list' ? ' is-list' : ''}`}>
+        {view === 'list' ? <div className="jc-cal-head"><h2>All jobs</h2><span className="jc-hint" style={{ margin: 0 }}>Click a job to open it.</span></div> : <div className="jc-cal-head">
           <button type="button" className="jc-btn icon" onClick={() => step(-1)} aria-label="Previous"><ChevronLeft size={16}/></button>
           <button type="button" className="jc-btn" onClick={() => setCursor(new Date())}>Today</button>
           <button type="button" className="jc-btn icon" onClick={() => step(1)} aria-label="Next"><ChevronRight size={16}/></button>
@@ -331,7 +336,7 @@ export default function JobCalendarAdmin() {
           <div className="jc-legend">
             <span><i className="booked"/>Booked</span><span><i className="quoted"/>Quoted</span><span><i className="requested"/>Requested date</span><span><i className="complete"/>Done</span>
           </div>
-        </div>
+        </div>}
         {view === 'month' ? monthView() : view === 'week' ? weekView() : listView()}
       </section>
 
@@ -339,7 +344,7 @@ export default function JobCalendarAdmin() {
         {jobs.length || !loading ? <div className="jc-card jc-panel jc-follow">
           <h3>Follow up <span className="n">{followUps.length}</span></h3>
           <p className="jc-hint">New requests to answer within 24 hours, and quotes with no answer after {QUOTE_WAIT_DAYS} days.</p>
-          {followUps.length ? followUps.map(({ job, due }) => <div key={job.id} className={`jc-todo jc-fu ${due.kind}`}>
+          {followUps.length ? followUps.map(({ job, due }) => <div key={job.id} className={`jc-todo jc-fu ${due.kind}`} role="button" tabIndex={0} title="Open details" onClick={event => { if (!event.target.closest('button,a')) openJob(job); }} onKeyDown={event => { if (event.key === 'Enter' && event.target === event.currentTarget) openJob(job); }}>
             <b>{job.name} <span className={`jc-tag ${due.tag[0]}`}>{due.tag[1]}</span></b>
             <span>{job.service}{job.price != null ? ` · ${money(job.price)}` : ''}</span>
             <span>{due.text}</span>
@@ -355,7 +360,7 @@ export default function JobCalendarAdmin() {
         <div className="jc-card jc-panel">
           <h3>Needs a date <span className="n">{needDate.length}</span></h3>
           <p className="jc-hint">Accepted, but no day set yet. Drag onto the calendar or tap Schedule.</p>
-          {needDate.length ? needDate.map(job => <div key={job.id} className="jc-todo" draggable onDragStart={event => event.dataTransfer.setData('text/plain', job.id)}>
+          {needDate.length ? needDate.map(job => <div key={job.id} className="jc-todo" role="button" tabIndex={0} title="Open details" draggable onDragStart={event => event.dataTransfer.setData('text/plain', job.id)} onClick={event => { if (!event.target.closest('button,a')) openJob(job); }} onKeyDown={event => { if (event.key === 'Enter' && event.target === event.currentTarget) openJob(job); }}>
             <b>{job.name} <span className="jc-tag amber">{job.stage === 'booked' ? 'Booked' : 'Accepted'}</span></b>
             <span>{job.service}{job.price != null ? ` · ${money(job.price)}` : ''}</span>
             {job.requested ? <span>Asked for {longDate(job.requested)}{job.reqTime ? `, ${job.reqTime.toLowerCase()}` : ''}</span> : <span>No date requested</span>}
@@ -391,10 +396,17 @@ export default function JobCalendarAdmin() {
         <div className="jc-dbody">
           <div className="jc-flow">{FLOW.map(([key, label], i) => <div key={key} className={i < flowAt ? 'done' : i === flowAt ? 'now' : ''}>{i < flowAt ? '✓ ' : ''}{label}</div>)}</div>
           <dl>
+            {open.row.next_action ? <><dt>To do</dt><dd className="jc-todo-note">{open.row.next_action}{open.row.next_action_due_at ? ` · due ${shortDay(open.row.next_action_due_at)}` : ''}</dd></> : null}
+            {open.row.phone ? <><dt>Phone</dt><dd><a href={`tel:${open.row.phone}`}>{open.row.phone}</a></dd></> : null}
+            {open.row.email ? <><dt>Email</dt><dd><a href={`mailto:${open.row.email}`}>{open.row.email}</a></dd></> : null}
             <dt>Customer asked</dt><dd>{open.requested ? longDate(open.requested) : 'No date'}{open.reqTime ? ` · ${open.reqTime}` : ''}</dd>
             {open.from ? <><dt>Pickup</dt><dd>{open.from}</dd></> : null}
             {open.to ? <><dt>Drop-off</dt><dd>{open.to}</dd></> : null}
             {open.row.move_size ? <><dt>Size</dt><dd>{open.row.move_size}</dd></> : null}
+            {open.row.quote_amount != null || open.row.partner_price != null || open.row.final_price != null ? <><dt>Price</dt><dd>{[open.row.quote_amount != null && `Quoted ${money(open.row.quote_amount)}`, open.row.partner_price != null && `Marius ${money(open.row.partner_price)}`, open.row.final_price != null && `Final ${money(open.row.final_price)}`].filter(Boolean).join(' · ')}</dd></> : null}
+            {open.row.item_list ? <><dt>Items</dt><dd className="jc-pre">{open.row.item_list}</dd></> : null}
+            {open.row.message ? <><dt>Customer said</dt><dd className="jc-pre">{open.row.message}</dd></> : null}
+            {open.row.last_activity ? <><dt>Last activity</dt><dd>{open.row.last_activity}{open.row.last_activity_at ? ` · ${shortDay(open.row.last_activity_at)}` : ''}</dd></> : null}
             {open.row.partner_status || open.row.partner_note ? <><dt>Marius says</dt><dd>{[MARIUS_LABEL[open.row.partner_status] || open.row.partner_status, open.row.partner_note].filter(Boolean).join(' · ')}</dd></> : null}
           </dl>
           {(() => {
