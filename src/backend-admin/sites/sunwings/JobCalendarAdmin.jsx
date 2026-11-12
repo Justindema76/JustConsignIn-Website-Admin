@@ -91,7 +91,7 @@ export default function JobCalendarAdmin() {
     const list = jobs.filter(job => job.date === dayIso && (job.stage === 'booked' || job.stage === 'complete'))
       .map(job => ({ job, kind: job.stage === 'complete' ? 'complete' : 'booked' }));
     if (showReq) {
-      jobs.filter(job => !job.date && job.requested === dayIso && ['new', 'quoted', 'accepted'].includes(job.stage))
+      jobs.filter(job => !job.date && job.requested === dayIso && ['new', 'quoted', 'accepted', 'booked'].includes(job.stage))
         .forEach(job => list.push({ job, kind: job.stage === 'quoted' ? 'quoted' : 'requested' }));
     }
     return list.sort((a, b) => (a.job.start || '99').localeCompare(b.job.start || '99'));
