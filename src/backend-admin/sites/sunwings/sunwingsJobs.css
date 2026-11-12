@@ -112,3 +112,24 @@
 .job-chip.priority-lead{background:#fef3f2;color:#b42318;border:1px solid #fecdca}
 .service-request-drawer-title .job-chip{margin-left:6px}
 .job-lead-source{margin:4px 0 0;font-size:12px;color:#475467}
+
+/* ---- Quote Requests on phones: get the list on screen sooner ---- */
+.quote-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:760px){
+  .site-sunwings .service-request-page .site-admin-page-head{flex-direction:column;gap:10px;margin-bottom:12px}
+  .site-sunwings .service-request-page .site-admin-page-head p:not(.site-admin-eyebrow){display:none}
+  .site-sunwings .service-request-page .site-admin-page-head h1{font-size:24px}
+  .site-sunwings .quote-head-actions{width:100%}
+  .site-sunwings .quote-head-actions>*{flex:1}
+  .site-sunwings .service-request-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;margin-bottom:10px!important}
+  .site-sunwings .service-request-stat{padding:8px 6px!important;min-height:0!important;text-align:center}
+  .site-sunwings .service-request-stat span{font-size:10px!important;line-height:1.2;display:block}
+  .site-sunwings .service-request-stat strong{font-size:19px!important}
+  .site-sunwings .service-request-toolbar{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px!important}
+  .site-sunwings .service-request-toolbar .site-admin-search{grid-column:1/-1}
+  .site-sunwings .service-request-toolbar select{min-height:38px;font-size:13px;padding:0 6px;min-width:0;width:100%}
+}
+@media (max-width:760px){
+  .site-sunwings .service-request-service small::before{content:" · "}
+  .site-sunwings .service-request-service small{font-size:12px}
+}

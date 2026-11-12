@@ -7,6 +7,7 @@ import { getSiteIcon } from '../../sites/icons';
 import { loadDashboardData } from './dashboardData';
 import './dashboard.css';
 import PartnerJobsAdmin from '../../sites/sunwings/PartnerJobsAdmin';
+import SunwingsDashboard from '../../sites/sunwings/SunwingsDashboard';
 
 // Permanent safety net: this account always gets the full admin, no matter
 // what the server-reported role says.
@@ -99,6 +100,11 @@ export default function Dashboard() {
   const { user } = useAuth();
   // Partners (Marius) only have "Jobs from Justin".
   if (user?.role === 'partner') return <PartnerJobsAdmin/>;
+  // Sunwings gets a to-do style dashboard: what needs doing, most urgent first.
+  if (getAdminSiteKey() === 'sunwings') {
+    const { dashboard } = getSiteConfig('sunwings');
+    return <SunwingsDashboard quick={dashboard.quick} sections={dashboard.sections}/>;
+  }
   return <OwnerDashboard/>;
 }
 

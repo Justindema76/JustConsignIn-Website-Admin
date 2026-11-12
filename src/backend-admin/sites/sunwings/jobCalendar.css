@@ -167,3 +167,22 @@
   .jc-arow{gap:10px;padding:10px}
   .jc-arow .t{width:62px}
 }
+
+/* ---- Calendar on phones: compact header and a one-line status strip ---- */
+@media (max-width:760px){
+  .jc .site-admin-page-head{flex-direction:column;gap:10px;margin-bottom:12px}
+  .jc .site-admin-page-head p:not(.site-admin-eyebrow){display:none}
+  .jc .site-admin-page-head h1{font-size:24px}
+  .jc-head-actions{width:100%;flex-wrap:nowrap;gap:6px}
+  .jc-head-actions .jc-seg{flex:1}
+  .jc-head-actions .jc-seg button{flex:1;padding:6px 4px}
+  .jc-head-actions .site-admin-btn{padding:0 10px;font-size:12px;white-space:nowrap}
+  .jc-head-actions .site-admin-btn svg{display:none}
+  .jc-pipeline{display:flex!important;overflow-x:auto;gap:6px;margin:0 -16px 12px;padding:0 16px;scrollbar-width:none}
+  .jc-pipeline::-webkit-scrollbar{display:none}
+  .jc-stage{flex:0 0 auto;padding:7px 10px;display:flex;align-items:baseline;gap:6px}
+  .jc-stage b{font-size:17px;display:inline}
+  .jc-stage small{display:none}
+  .jc-stage:last-child{grid-column:auto}
+  .jc-board{gap:12px}
+}

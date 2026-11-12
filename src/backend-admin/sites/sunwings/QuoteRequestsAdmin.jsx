@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronRight, Eye, EyeOff, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { CalendarDays, ChevronRight, Eye, EyeOff, Mail, Phone, RefreshCw, Search, Send, Trash2, Workflow, X } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
 import { autoCommissionRate, commissionFor, money } from './commission';
@@ -360,7 +360,10 @@ export default function QuoteRequestsAdmin() {
         <h1>Quote Requests</h1>
         <p>{isOwner ? 'Track Sunwings enquiries from the website through review, quote, acceptance and booking.' : 'Jobs Justin sent you, with the customer’s full details. Update the step and your price as the job goes.'}</p>
       </div>
-      <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
+      <div className="quote-head-actions">
+        <Link className="site-admin-btn" to="/admin/sunwings/calendar"><CalendarDays size={15}/> Calendar view</Link>
+        <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
+      </div>
     </div>
 
     {error && <div className="site-admin-alert error">{error}</div>}

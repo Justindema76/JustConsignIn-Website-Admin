@@ -232,6 +232,13 @@ export default function AdminLayout() {
         </div>
       </header>
       <main className={`site-admin-main ${/\/pages\/[^/]+$|\/global\/(header|footer)$/.test(location.pathname) ? 'site-admin-main-wide' : ''}`}><Outlet /></main>
+      {siteConfig.mobileTabs ? <nav className="site-admin-tabbar" aria-label="Quick actions">
+        {siteConfig.mobileTabs.filter(item => (user?.role === 'partner' ? item.partnerOnly || item.to === '/admin' : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly))).map(item => {
+          const Icon = item.icon === 'home' ? Home : getSiteIcon(item.icon);
+          return <NavLink key={item.to} to={item.to} end={item.end}><Icon size={21}/><span>{item.label}</span></NavLink>;
+        })}
+        <button type="button" onClick={() => setMobileNavOpen(true)}><Menu size={21}/><span>Menu</span></button>
+      </nav> : null}
     </div>
   </div>;
 }
