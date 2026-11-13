@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 
 // Banner photo position, like Code Studio's picture controls, for desktop and for phones.
-// Desktop: the photo fills the whole banner (about 2:1 on a laptop). Phones: a full-width 3:2 box
+// Desktop: the photo fills the whole banner (about 2:1 on a laptop). Phones: a full-width 5:4 box
 // above the text (globals.css .hero-slide::before). Drag the photo or use the sliders.
 // Saves "X% Y%" positions and "W% auto" sizes (blank = just fill the box).
 
 export const VIEWS = {
   desktop: { label: 'Desktop', ratio: 2, def: { x: 50, y: 50 }, posKey: 'desktopPosition', sizeKey: 'desktopSize' },
-  phone: { label: 'Phone', ratio: 3 / 2, def: { x: 50, y: 80 }, posKey: 'mobilePosition', sizeKey: 'mobileSize' },
+  phone: { label: 'Phone', ratio: 5 / 4, def: { x: 50, y: 80 }, posKey: 'mobilePosition', sizeKey: 'mobileSize' },
 };
 
 const WORDS = { left: 0, top: 0, center: 50, right: 100, bottom: 100 };
@@ -88,10 +88,10 @@ function PhotoBox({ view, image, position, size, onChange }) {
 
   const bgSize = zoom > 100 ? `${photoWidth}% auto` : 'cover';
 
-  const phone = view === VIEWS.phone;
+  const phone = view.posKey === VIEWS.phone.posKey;
   return <div className={`phone-photo ${phone ? 'is-phone' : 'is-desktop'}`}>
     <h4>{view.label}</h4>
-    <div className="phone-photo-frame">
+    <div className="phone-photo-frame" style={phone ? { '--phone-ratio': view.ratio } : undefined}>
       <div className="phone-photo-bar"/>
       <div
         ref={boxRef}
@@ -115,12 +115,13 @@ function PhotoBox({ view, image, position, size, onChange }) {
 }
 
 // Both views side by side. `item` holds the four saved values; `onChange` gets the changed ones.
-export default function PhotoPositionField({ image, item = {}, onChange }) {
+// phoneRatio: 3/2 for slider slides (homepage), 5/4 for single page banners.
+export default function PhotoPositionField({ image, item = {}, onChange, phoneRatio = 5 / 4 }) {
   return <div className="photo-position">
     <p className="photo-position-help">Drag a photo, or use its sliders, to choose what shows. Desktop and phones are set separately.</p>
     <div className="photo-position-views">
       {[VIEWS.desktop, VIEWS.phone].map(view => (
-        <PhotoBox key={view.posKey} view={view} image={image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
+        <PhotoBox key={view.posKey} view={view === VIEWS.phone ? { ...view, ratio: phoneRatio } : view} image={image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
       ))}
     </div>
   </div>;

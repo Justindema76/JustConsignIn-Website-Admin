@@ -72,7 +72,7 @@ const SECTIONS = [
       { name: 'enabled', label: 'Show this slide', type: 'toggle' },
       { name: 'slug', label: 'Service', type: 'select', options: SERVICES, hint: 'Sets the photo, the quote form service and the default “learn more” link.' },
       { name: 'image', label: 'Photo', type: 'image', hint: PHOTO_HINT },
-      POSITION_FIELD,
+      { ...POSITION_FIELD, phoneRatio: 3 / 2 },
       { name: 'eyebrow', label: 'Small tag above the headline' },
       { name: 'heading', label: 'Headline (white)' },
       { name: 'accent', label: 'Second line (orange)' },
@@ -270,7 +270,7 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
     return <label>{label}<textarea rows={Math.max(3, (value || []).length + 1)} value={(value || []).join('\n')} onChange={event => onChange(event.target.value.split('\n'))} onBlur={event => onChange(event.target.value.split('\n').map(line => line.trim()).filter(Boolean))}/>{hint}</label>;
   }
   if (field.type === 'photo-position') {
-    return <PositionField item={item} groupKey={groupKey} onItemChange={onItemChange}/>;
+    return <PositionField item={item} groupKey={groupKey} onItemChange={onItemChange} phoneRatio={field.phoneRatio}/>;
   }
   if (field.type === 'image') {
     return <div className="promo-field">{label}<ImageField value={value} onChange={onChange} onPickMedia={onPickMedia}/>{hint}</div>;
@@ -281,12 +281,12 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
   return <label>{label}<input value={value ?? ''} onChange={event => onChange(event.target.value)}/>{hint}</label>;
 }
 
-function PositionField({ item = {}, groupKey, onItemChange }) {
+function PositionField({ item = {}, groupKey, onItemChange, phoneRatio }) {
   const photos = useContext(ServicePhotos);
   const image = item.image || photos[item.slug] || photos[groupKey] || '';
   return <div className="promo-field">
     <span className="promo-label">Photo position</span>
-    <PhotoPositionField image={image} item={item} onChange={changes => onItemChange({ ...item, ...changes })}/>
+    <PhotoPositionField image={image} item={item} phoneRatio={phoneRatio || (item.showServiceSlides ? 3 / 2 : 5 / 4)} onChange={changes => onItemChange({ ...item, ...changes })}/>
     {!image ? <small>No photo set here. Pick one above (or in the Pages editor) to position it.</small> : null}
   </div>;
 }

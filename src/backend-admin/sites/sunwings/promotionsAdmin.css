@@ -32,7 +32,7 @@
 .phone-photo-frame{border:6px solid #111827;border-radius:14px;overflow:hidden;background:#0B2545}
 .phone-photo.is-phone .phone-photo-frame{border-radius:26px;max-width:260px}
 .phone-photo-bar{height:10px;background:#0B2545}
-.phone-photo-box{position:relative;aspect-ratio:3/2;background:#1f2937 no-repeat;display:grid;place-items:center;color:#cbd5e1;font-size:12px;touch-action:none;user-select:none}
+.phone-photo-box{position:relative;aspect-ratio:var(--phone-ratio,1.25);background:#1f2937 no-repeat;display:grid;place-items:center;color:#cbd5e1;font-size:12px;touch-action:none;user-select:none}
 .phone-photo.is-desktop .phone-photo-box{aspect-ratio:2/1}
 .phone-photo-box.can-drag{cursor:grab}.phone-photo-box.can-drag:active{cursor:grabbing}
 .phone-photo-fade{position:absolute;inset:0;pointer-events:none}
