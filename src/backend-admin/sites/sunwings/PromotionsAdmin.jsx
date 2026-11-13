@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, CheckCircle2, Library, Plus, RotateCcw, Save, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
 import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 import { PROMOTIONS_DEFAULTS } from './promotionsDefaults';
+import PhotoPositionField from './PhotoPositionField';
+import { loadServicePosts } from './sunwingsPostStore';
 import '../../features/settings/settings.css';
 import '../../features/work-posts/workPosts.css';
 import './promotionsAdmin.css';
@@ -23,19 +25,11 @@ const SERVICES = [
   ['junk-removal', 'Junk Removal'],
 ];
 
-const PHONE_POSITIONS = [
-  ['', 'Default (right of centre)'],
-  ['center', 'Centre'],
-  ['left center', 'Left'],
-  ['30% center', 'Left of centre'],
-  ['70% center', 'Right of centre'],
-  ['right center', 'Right'],
-  ['center top', 'Top'],
-  ['center bottom', 'Bottom'],
-];
-
 const PHOTO_HINT = 'Leave blank to use the service’s own photo.';
-const POSITION_FIELD = { name: 'mobilePosition', label: 'Photo position on phones', type: 'select', options: PHONE_POSITIONS, hint: 'Which part of the photo stays in view on a phone screen.' };
+const POSITION_FIELD = { name: 'photoPosition', label: 'Photo position', type: 'photo-position' };
+
+// Service slug → its banner photo, so the position editor can show the right picture.
+const ServicePhotos = createContext({});
 
 const BANNER_FIELDS = [
   { name: 'eyebrow', label: 'Small tag above the headline' },
@@ -51,9 +45,9 @@ const SECTIONS = [
   {
     key: 'promo_popup',
     title: 'Pop-up',
-    intro: 'The card that slides up in the bottom-left corner on every page. Closing it leaves a small tab that reopens it.',
+    intro: 'The offer shown in the top bar on every page (it flips with the usual top bar line) and as a small tab in the bottom-left corner of its service page on computers. Turn it off below to hide both.',
     fields: [
-      { name: 'enabled', label: 'Show the pop-up', type: 'toggle' },
+      { name: 'enabled', label: 'ON / OFF: show this offer (top bar + pop-up tab)', type: 'toggle' },
       { name: 'serviceSlug', label: 'Service it promotes', type: 'select', options: SERVICES, hint: 'Its quote form opens with this service picked.' },
       { name: 'image', label: 'Photo', type: 'image', hint: PHOTO_HINT },
       { name: 'eyebrow', label: 'Small tag' },
@@ -73,7 +67,7 @@ const SECTIONS = [
     intro: 'The homepage slider, in order. Services, Service Areas and Pricing show these after their own banner.',
     list: true,
     itemLabel: item => `${SERVICES.find(([slug]) => slug === item.slug)?.[1] || 'Slide'}: ${item.heading || ''} ${item.accent || ''}`,
-    newItem: { enabled: true, slug: 'residential-moving', image: '', mobilePosition: '', eyebrow: '', heading: 'New slide', accent: '', text: '', primary: 'Get a quote', plan: '', secondary: 'Learn more', secondaryHref: '', badgeFromPrice: false, badgeTop: '', badgeMain: '', badgeBottom: '' },
+    newItem: { enabled: true, slug: 'residential-moving', image: '', desktopPosition: '', desktopSize: '', mobilePosition: '', mobileSize: '', eyebrow: '', heading: 'New slide', accent: '', text: '', primary: 'Get a quote', plan: '', secondary: 'Learn more', secondaryHref: '', badgeFromPrice: false, badgeTop: '', badgeMain: '', badgeBottom: '' },
     fields: [
       { name: 'enabled', label: 'Show this slide', type: 'toggle' },
       { name: 'slug', label: 'Service', type: 'select', options: SERVICES, hint: 'Sets the photo, the quote form service and the default “learn more” link.' },
@@ -106,6 +100,13 @@ const SECTIONS = [
       ['privacy', 'Privacy Policy'],
     ],
     fields: BANNER_FIELDS,
+  },
+  {
+    key: 'service_banners',
+    title: 'Service page photos',
+    intro: 'Which part of each service page’s banner photo shows, on desktop and on phones. The photo itself is set in Service Posts.',
+    groups: [...SERVICES, ['client-assist-moving-delivery', 'Client Assist Moving & Delivery']],
+    fields: [POSITION_FIELD],
   },
   {
     key: 'pricing_panel',
@@ -252,7 +253,7 @@ function ImageField({ value, onChange, onPickMedia }) {
   </div>;
 }
 
-function Field({ field, value, onChange, onPickMedia }) {
+function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChange }) {
   const label = <span className="promo-label">{field.label}</span>;
   const hint = field.hint ? <small>{field.hint}</small> : null;
 
@@ -268,6 +269,9 @@ function Field({ field, value, onChange, onPickMedia }) {
   if (field.type === 'lines') {
     return <label>{label}<textarea rows={Math.max(3, (value || []).length + 1)} value={(value || []).join('\n')} onChange={event => onChange(event.target.value.split('\n'))} onBlur={event => onChange(event.target.value.split('\n').map(line => line.trim()).filter(Boolean))}/>{hint}</label>;
   }
+  if (field.type === 'photo-position') {
+    return <PositionField item={item} groupKey={groupKey} onItemChange={onItemChange}/>;
+  }
   if (field.type === 'image') {
     return <div className="promo-field">{label}<ImageField value={value} onChange={onChange} onPickMedia={onPickMedia}/>{hint}</div>;
   }
@@ -277,10 +281,21 @@ function Field({ field, value, onChange, onPickMedia }) {
   return <label>{label}<input value={value ?? ''} onChange={event => onChange(event.target.value)}/>{hint}</label>;
 }
 
-function Fields({ fields, value, onChange, onPickMedia }) {
+function PositionField({ item = {}, groupKey, onItemChange }) {
+  const photos = useContext(ServicePhotos);
+  const image = item.image || photos[item.slug] || photos[groupKey] || '';
+  return <div className="promo-field">
+    <span className="promo-label">Photo position</span>
+    <PhotoPositionField image={image} item={item} onChange={changes => onItemChange({ ...item, ...changes })}/>
+    {!image ? <small>No photo set here. Pick one above (or in the Pages editor) to position it.</small> : null}
+  </div>;
+}
+
+function Fields({ fields, value, onChange, onPickMedia, groupKey }) {
   return <div className="promo-fields">
     {fields.map(field => (
       <Field key={field.name} field={field} value={value?.[field.name]} onPickMedia={onPickMedia}
+        item={value} groupKey={groupKey} onItemChange={onChange}
         onChange={next => onChange({ ...value, [field.name]: next })}/>
     ))}
   </div>;
@@ -318,6 +333,7 @@ export default function PromotionsAdmin() {
   const [message, setMessage] = useState('');
   const [picker, setPicker] = useState(null);
   const [media, setMedia] = useState([]);
+  const [servicePhotos, setServicePhotos] = useState({});
 
   useEffect(() => {
     if (!accessToken) return;
@@ -326,6 +342,9 @@ export default function PromotionsAdmin() {
       .then(settings => setValues(Object.fromEntries(Object.entries(PROMOTIONS_DEFAULTS).map(([key, fallback]) => [key, parse(settings?.[key], structuredClone(fallback))]))))
       .catch(err => setError(err.message))
       .finally(() => setBusy(false));
+    loadServicePosts(accessToken)
+      .then(posts => setServicePhotos(Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage]))))
+      .catch(() => {});
   }, [accessToken]);
 
   const section = SECTIONS.find(item => item.key === tab);
@@ -359,7 +378,7 @@ export default function PromotionsAdmin() {
 
   const value = values[section.key];
 
-  return <>
+  return <ServicePhotos.Provider value={servicePhotos}>
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Sunwings Transport</p>
@@ -392,7 +411,7 @@ export default function PromotionsAdmin() {
         section.groups.map(([groupKey, groupLabel]) => (
           <details className="promo-group" key={groupKey}>
             <summary>{groupLabel}</summary>
-            <Fields fields={section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia}
+            <Fields fields={section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia} groupKey={groupKey}
               onChange={next => update(section.key, { ...value, [groupKey]: next })}/>
           </details>
         ))
@@ -406,5 +425,5 @@ export default function PromotionsAdmin() {
       onClose={() => setPicker(null)}
       onSelect={item => { picker(item.url); setPicker(null); }}
     />}
-  </>;
+  </ServicePhotos.Provider>;
 }

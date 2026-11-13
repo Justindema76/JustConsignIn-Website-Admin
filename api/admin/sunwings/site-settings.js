@@ -23,6 +23,7 @@ const ALLOWED_KEYS = new Set([
   'promo_popup',
   'hero_slides',
   'page_banners',
+  'service_banners',
   'pricing_panel',
   'price_match',
   'trust_links',

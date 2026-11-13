@@ -97,6 +97,16 @@ export const PROMOTIONS_DEFAULTS = {
       "secondaryHref": "/services/snow-removal#plans"
     }
   ],
+  "service_banners": {
+    "residential-moving": { "mobilePosition": "" },
+    "furniture-delivery": { "mobilePosition": "" },
+    "commercial-transport": { "mobilePosition": "50% 50%" },
+    "snow-removal": { "mobilePosition": "" },
+    "packing-protection": { "mobilePosition": "" },
+    "warehouse-container-unloading": { "mobilePosition": "" },
+    "junk-removal": { "mobilePosition": "" },
+    "client-assist-moving-delivery": { "mobilePosition": "50% 50%" }
+  },
   "page_banners": {
     "services": {
       "eyebrow": "Our services",
