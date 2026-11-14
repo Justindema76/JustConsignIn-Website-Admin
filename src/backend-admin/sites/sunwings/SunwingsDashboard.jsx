@@ -5,7 +5,7 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { getSiteIcon } from '../icons';
 import { loadSunwingsQuotes } from './sunwingsAdminService';
 import { commissionFor } from './commission';
-import { addDays, ago, fmtTime, followUpOf, iso, longDate, money, toJob, validEmail } from './jobModel';
+import { addDays, ago, fmtTime, followUpOf, iso, longDate, money, reviewAsked, toJob, validEmail } from './jobModel';
 import './sunwingsDashboard.css';
 
 // The Sunwings dashboard: one list of what needs doing, most urgent first.
@@ -27,6 +27,16 @@ function contactJob(row) {
 function buildTodo(rows, now, isOwner) {
   const items = [];
   for (const row of rows) {
+    // Finished jobs: one job left, asking the customer for a Google review.
+    if (row.status === 'complete' && isOwner && validEmail(row.email) && !reviewAsked(row)) {
+      const job = toJob(row);
+      if (job) items.push({
+        job, rank: 4, tag: ['green', 'Ask for review'], more: [],
+        why: `Job done${row.status_changed_at ? ` ${ago(now - Date.parse(row.status_changed_at))}` : ''}. Send the Google review request.`,
+        cta: 'Ask for review', to: `/admin/sunwings/calendar?job=${encodeURIComponent(job.id)}&email=1`,
+      });
+      continue;
+    }
     if (CLOSED.has(row.status)) continue;
     const job = row.request_type === 'contact' ? contactJob(row) : toJob(row);
     if (!job) continue;

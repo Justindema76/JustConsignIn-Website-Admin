@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, RefreshCw, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadSunwingsQuotes, sendSunwingsFollowUp, updateSunwingsQuote } from './sunwingsAdminService';
-import { addDays, DAY, DEFAULT_HOURS, fmtTime, followUpDraft, followUpOf, hhmm, iso, longDate, minutes, money, pad, parse, QUOTE_WAIT_DAYS, shortDay, toJob, validEmail } from './jobModel';
+import { addDays, DAY, DEFAULT_HOURS, fmtTime, followUpDraft, followUpOf, hhmm, reviewAsked, iso, longDate, minutes, money, pad, parse, QUOTE_WAIT_DAYS, shortDay, toJob, validEmail } from './jobModel';
 import './jobCalendar.css';
 
 const STAGES = [
@@ -418,6 +418,7 @@ export default function JobCalendarAdmin() {
               <h4>Follow-up {due ? <span className={`jc-tag ${due.tag[0]}`}>{due.tag[1]}</span> : null}</h4>
               <ul className="jc-mail-log">
                 <li><span>Thank-you email</span><b>{r.customer_ack_sent_at ? `Sent ${shortDay(r.customer_ack_sent_at)}` : r.customer_ack_error ? 'Failed' : !hasEmail ? 'No email address' : tracked ? 'Not sent' : '—'}</b></li>
+                {open.stage === 'complete' ? <li><span>Google review request</span><b>{!hasEmail ? 'No email address' : reviewAsked(r) ? `Sent ${shortDay(r.last_follow_up_at)}` : 'Not sent yet'}</b></li> : null}
                 <li><span>Your follow-ups</span><b>{Number(r.follow_up_count) ? `${r.follow_up_count} · last ${shortDay(r.last_follow_up_at)}` : 'None yet'}</b></li>
                 <li><span>Automatic reminder</span><b>{r.auto_nudge_sent_at ? `Sent ${shortDay(r.auto_nudge_sent_at)}` : open.stage === 'quoted' ? `${QUOTE_WAIT_DAYS} days after the quote, if no answer` : 'Only after a quote is sent'}</b></li>
                 {r.next_action_due_at && Date.parse(r.next_action_due_at) > now ? <li><span>Snoozed until</span><b>{shortDay(r.next_action_due_at)}</b></li> : null}
@@ -431,7 +432,7 @@ export default function JobCalendarAdmin() {
                   <button type="button" className="jc-btn" disabled={sending} onClick={() => setMail(null)}>Cancel</button>
                 </div>
               </div> : <div className="jc-mail-actions">
-                {hasEmail ? <button type="button" className="jc-btn primary" onClick={() => setMail(followUpDraft(open))}>Write follow-up email</button> : null}
+                {hasEmail ? <button type="button" className="jc-btn primary" onClick={() => setMail(followUpDraft(open))}>{open.stage === 'complete' ? (reviewAsked(r) ? 'Ask for a Google review again' : 'Ask for a Google review') : 'Write follow-up email'}</button> : null}
                 {r.phone ? <a className="jc-btn" href={`tel:${r.phone}`}>Call {r.phone}</a> : null}
                 {due ? <button type="button" className="jc-btn" disabled={saving} onClick={() => snooze(open)}>Snooze 3 days</button> : null}
               </div>}

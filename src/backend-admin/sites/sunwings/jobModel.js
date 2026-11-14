@@ -86,6 +86,14 @@ export function followUpOf(job, now) {
   return null;
 }
 
+// Opens Google's "write a review" box for the Sunwings Transport listing.
+export const GOOGLE_REVIEW_LINK = 'https://search.google.com/local/writereview?placeid=ChIJXTBVHE3zTkcRiUEmU5P3CsI';
+
+// A finished job has had its review request once a follow-up email went out after it was marked complete.
+export function reviewAsked(row) {
+  return Boolean(row?.last_follow_up_at && (!row.status_changed_at || Date.parse(row.last_follow_up_at) >= Date.parse(row.status_changed_at)));
+}
+
 export function followUpDraft(job) {
   const first = String(job.name || '').trim().split(/\s+/)[0] || 'there';
   const what = `your ${String(job.service || 'move').toLowerCase()}${job.requested ? ` on ${longDate(job.requested)}` : ''}`;
@@ -97,6 +105,10 @@ export function followUpDraft(job) {
   if (job.stage === 'new') return {
     subject: 'Your Sunwings Transport quote request',
     message: `Hi ${first},\n\nThanks for your quote request for ${what}. We’d love to help. Is there a good time to call you to go over the details and your price?${sign}`,
+  };
+  if (job.stage === 'complete') return {
+    subject: 'How did we do? A quick favour from Sunwings Transport',
+    message: `Hi ${first},\n\nThank you for choosing Sunwings Transport for ${what}. We hope everything went smoothly.\n\nWe’re a small local business and reviews make a big difference. If you were happy with the job, would you take 30 seconds to leave us a Google review?\n\n${GOOGLE_REVIEW_LINK}\n\nIf anything wasn’t right, just reply to this email and we’ll make it right.${sign}`,
   };
   return { subject: 'Your Sunwings Transport job', message: `Hi ${first},\n\n${sign.trim()}` };
 }

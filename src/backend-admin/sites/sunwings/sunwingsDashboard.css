@@ -68,3 +68,4 @@
   .swd-link{padding:10px;font-size:13px}
   .swd-date{width:78px}
 }
+.swd-tag.green{background:var(--green-soft);color:var(--green)}
