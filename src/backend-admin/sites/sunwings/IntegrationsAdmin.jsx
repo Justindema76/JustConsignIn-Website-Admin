@@ -138,6 +138,25 @@ function IntegrationCard({ provider, data, accessToken, onSave }) {
   </div>;
 }
 
+// Facebook page tokens made the quick way expire after ~60 days. Explain how to get one that doesn't.
+const FB_TOKEN_EXPIRED = /access token|session has expired|OAuthException/i;
+
+function FacebookTokenHelp({ detail }) {
+  return <div className="site-admin-alert error sunwings-fb-help">
+    <div>
+      <strong>Facebook stopped working: the saved Facebook token has expired.</strong>
+      <p>Posts can't sync until a new token is saved. Get one that never expires:</p>
+      <ol>
+        <li>Open the <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noreferrer">Facebook Graph API Explorer</a>, pick your app, click <b>Generate Access Token</b> and allow <code>pages_show_list</code>, <code>pages_read_engagement</code> and <code>pages_read_user_content</code>.</li>
+        <li>Click the ⓘ next to the token → <b>Open in Access Token Tool</b> → <b>Extend Access Token</b>. Copy the long one it gives you.</li>
+        <li>Back in the Explorer, paste it in the token box and run <code>me/accounts</code>. Copy the <code>access_token</code> under Sunwings. That one never expires.</li>
+        <li>Paste it into <b>Page access token</b> below, then <b>Test Connection</b> → <b>Save</b> → <b>Sync Facebook Posts</b>.</li>
+      </ol>
+      {detail ? <small>Facebook said: {detail}</small> : null}
+    </div>
+  </div>;
+}
+
 export default function IntegrationsAdmin() {
   const { accessToken } = useAuth();
   const [integrations, setIntegrations] = useState({});
@@ -187,7 +206,7 @@ export default function IntegrationsAdmin() {
       </div>
     </div>
 
-    {error && <div className="site-admin-alert error">{error}</div>}
+    {error && (FB_TOKEN_EXPIRED.test(error) ? <FacebookTokenHelp detail={error}/> : <div className="site-admin-alert error">{error}</div>)}
     {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
 
     <div className="sunwings-integration-grid">
