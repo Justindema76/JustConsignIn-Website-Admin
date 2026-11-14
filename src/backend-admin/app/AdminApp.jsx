@@ -36,6 +36,9 @@ import PartnerJobsAdmin from '../sites/sunwings/PartnerJobsAdmin';
 import JobCalendarAdmin from '../sites/sunwings/JobCalendarAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
 import TeamAdmin from '../sites/sunwings/TeamAdmin';
+import BannerStudio from '../features/code-studio/BannerStudio';
+import BannerStudioEditor from '../features/code-studio/BannerStudioEditor';
+import sunwingsCodeStudio from '../sites/sunwings/codeStudio';
 import RentalsAdmin from '../sites/rentrally/RentalsAdmin';
 import RentrallyPackagesAdmin from '../sites/rentrally/PackagesAdmin';
 import RentrallyCategoriesAdmin from '../sites/rentrally/CategoriesAdmin';
@@ -124,6 +127,8 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/calendar" element={only(SUNWINGS, <JobCalendarAdmin />)} />
         <Route path="/admin/sunwings/settings" element={only(SUNWINGS, <SunwingsSettingsAdmin />)} />
         <Route path="/admin/sunwings/promotions" element={only(SUNWINGS, <PromotionsAdmin />)} />
+        <Route path="/admin/sunwings/banner-studio" element={only(SUNWINGS, <BannerStudio studio={sunwingsCodeStudio} />)} />
+        <Route path="/admin/sunwings/banner-studio/:id" element={only(SUNWINGS, <BannerStudioEditor studio={sunwingsCodeStudio} />)} />
         <Route path="/admin/sunwings/commission" element={only(SUNWINGS, <CommissionAdmin />)} />
         <Route path="/admin/sunwings/jobs" element={only(SUNWINGS, <PartnerJobsAdmin />)} />
         <Route path="/admin/sunwings/integrations" element={only(SUNWINGS, <IntegrationsAdmin />)} />

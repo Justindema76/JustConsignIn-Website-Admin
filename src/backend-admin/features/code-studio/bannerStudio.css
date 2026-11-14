@@ -1,0 +1,40 @@
+/* Banner Studio (Code Studio banners) */
+.banner-studio{display:grid;gap:16px;min-width:0}
+.banner-studio .site-admin-page-head{margin-bottom:0}
+.bs-card{padding:18px;min-width:0}
+.bs-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.bs-card-head h2{margin:0;font-size:17px}
+.bs-card-head p{margin:3px 0 0;color:#64748b;font-size:13px}
+.bs-empty{margin:0;color:#64748b}
+.bs-list{display:grid;gap:10px}
+.bs-item{display:grid;grid-template-columns:112px minmax(0,1fr) auto;align-items:center;gap:14px;padding:10px;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+.bs-thumb{display:flex;align-items:center;justify-content:center;width:112px;height:63px;border-radius:8px;overflow:hidden;background:#f1f5f9;color:#94a3b8}
+.bs-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.bs-info{min-width:0;display:grid;gap:4px}
+.bs-title{font-weight:700;color:#0f172a;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bs-title:hover{text-decoration:underline}
+.bs-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:#64748b;font-size:12.5px}
+.bs-chips{display:flex;flex-wrap:wrap;gap:5px}
+.bs-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:11.5px;font-weight:600}
+.bs-chip.warn{background:#fef3c7;color:#92400e}
+.bs-actions{display:flex;gap:6px;align-items:center}
+.bs-actions .site-admin-btn{white-space:nowrap;text-decoration:none}
+.bs-spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px 14px}
+.bs-spot{display:grid;gap:5px;font-size:13px;font-weight:600;color:#334155;min-width:0}
+.bs-spot select{width:100%;min-width:0;height:40px;padding:0 10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font:inherit;font-weight:500;color:#0f172a}
+.bs-help{margin:14px 0 0;color:#64748b;font-size:12.5px}
+@media (max-width:640px){
+  .bs-card{padding:14px}
+  .bs-card-head{flex-direction:column;align-items:stretch}
+  .bs-card-head .site-admin-btn{justify-content:center}
+  .bs-item{grid-template-columns:84px minmax(0,1fr);gap:10px}
+  .bs-thumb{width:84px;height:56px}
+  .bs-actions{grid-column:1/-1}
+  .bs-actions .site-admin-btn:first-child{flex:1;justify-content:center}
+  .bs-hide-sm{display:none}
+  .bs-spots{grid-template-columns:1fr}
+}
+/* The editor opens full screen over the admin. */
+.bs-editor-shell{position:fixed;inset:0;z-index:1000;overflow:auto;background:#f4f4f5}
+.bs-editor-loading{padding:40px;text-align:center;font:600 14px Inter,system-ui,sans-serif;color:#52525b}
+.bs-editor-shell.bs-one-lang .cs-langs{display:none}

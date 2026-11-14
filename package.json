@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --open /",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:code-studio": "bash scripts/sync-code-studio-editor.sh"
   },
   "dependencies": {
     "@puckeditor/core": "^0.23.0",
