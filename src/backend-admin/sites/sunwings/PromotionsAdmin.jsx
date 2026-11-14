@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, CheckCircle2, Library, Plus, RotateCcw, Save, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminMedia, loadAdminSitePage, uploadSunwingsImage } from '../../services/siteAdminService';
+import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
 import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 import { PROMOTIONS_DEFAULTS } from './promotionsDefaults';
@@ -30,6 +30,7 @@ const POSITION_FIELD = { name: 'photoPosition', label: 'Photo position', type: '
 
 // Service slug → its banner photo, so the position editor can show the right picture.
 const ServicePhotos = createContext({});
+const SITE_URL = 'https://www.sunwingstransport.ca';
 
 const BANNER_FIELDS = [
   { name: 'eyebrow', label: 'Small tag above the headline' },
@@ -283,8 +284,10 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
 
 function PositionField({ item = {}, groupKey, onItemChange, phoneRatio }) {
   const photos = useContext(ServicePhotos);
-  // The homepage's first slide shows the Home page banner photo when the slide has none of its own.
-  const image = item.image || (groupKey === '__home' && photos.__home) || photos[item.slug] || photos[groupKey] || '';
+  // A photo picked here wins; otherwise preview the exact photo the live site shows for this banner.
+  // (Old WordPress photo links are swapped out by the site, so they're skipped here too.)
+  const own = /sunwingstransport\.ca\/wp-content\//.test(item.image || '') ? '' : item.image;
+  const image = own || photos[groupKey] || photos[item.slug] || '';
   return <div className="promo-field">
     <span className="promo-label">Photo position</span>
     <PhotoPositionField image={image} item={item} phoneRatio={phoneRatio || (item.showServiceSlides ? 3 / 2 : 5 / 4)} onChange={changes => onItemChange({ ...item, ...changes })}/>
@@ -317,7 +320,7 @@ function Repeat({ field, items, onChange, onPickMedia }) {
             <button type="button" className="site-admin-btn secondary small" onClick={() => { if (window.confirm('Remove this item?')) onChange(items.filter((_, i) => i !== index)); }} aria-label="Remove"><Trash2 size={13}/></button>
           </div>
         </div>
-        {open === index ? <Fields fields={field.fields} value={item} groupKey={index === 0 ? '__home' : undefined} onPickMedia={onPickMedia} onChange={next => onChange(items.map((entry, i) => i === index ? next : entry))}/> : null}
+        {open === index ? <Fields fields={field.fields} value={item} groupKey={index === 0 ? "__home" : undefined} onPickMedia={onPickMedia} onChange={next => onChange(items.map((entry, i) => i === index ? next : entry))}/> : null}
       </div>
     ))}
     <button type="button" className="site-admin-btn secondary small" onClick={() => { onChange([...items, structuredClone(field.newItem)]); setOpen(items.length); }}><Plus size={13}/> Add</button>
@@ -344,13 +347,21 @@ export default function PromotionsAdmin() {
       .catch(err => setError(err.message))
       .finally(() => setBusy(false));
     loadServicePosts(accessToken)
-      .then(posts => setServicePhotos(current => ({ ...current, ...Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage])) })))
+      .then(posts => setServicePhotos(current => ({ ...Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage])), ...current })))
       .catch(() => {});
-    loadAdminSitePage(accessToken, 'home')
-      .then(({ published, draft }) => {
-        const blocks = (published?.content || draft?.content)?.content || [];
-        const hero = blocks.find(block => block?.type === 'SunwingsHeroBlock' || block?.type === 'HeroBlock');
-        if (hero?.props?.image) setServicePhotos(current => ({ ...current, __home: hero.props.image }));
+    // The photo each banner really shows on the live site (same rules as the site itself).
+    fetch(`${SITE_URL}/api/content/banner-photos`, { cache: 'no-store' })
+      .then(response => (response.ok ? response.json() : null))
+      .then(data => {
+        if (!data) return;
+        const full = url => (url && url.startsWith('/') ? `${SITE_URL}${url}` : url);
+        setServicePhotos(current => ({
+          ...current,
+          ...Object.fromEntries(Object.entries(data.services || {}).map(([key, url]) => [key, full(url)])),
+          ...Object.fromEntries(Object.entries(data.pages || {}).map(([key, url]) => [key, full(url)])),
+          // The first slide shows the Home page photo when it has none of its own.
+          ...(data.slides?.[0] ? { __home: full(data.slides[0]) } : {}),
+        }));
       })
       .catch(() => {});
   }, [accessToken]);
