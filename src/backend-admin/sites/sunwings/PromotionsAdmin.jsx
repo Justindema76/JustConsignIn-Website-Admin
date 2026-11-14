@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, CheckCircle2, Library, Plus, RotateCcw, Save, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
+import { loadAdminMedia, loadAdminSitePage, uploadSunwingsImage } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
 import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 import { PROMOTIONS_DEFAULTS } from './promotionsDefaults';
@@ -283,7 +283,8 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
 
 function PositionField({ item = {}, groupKey, onItemChange, phoneRatio }) {
   const photos = useContext(ServicePhotos);
-  const image = item.image || photos[item.slug] || photos[groupKey] || '';
+  // The homepage's first slide shows the Home page banner photo when the slide has none of its own.
+  const image = item.image || (groupKey === '__home' && photos.__home) || photos[item.slug] || photos[groupKey] || '';
   return <div className="promo-field">
     <span className="promo-label">Photo position</span>
     <PhotoPositionField image={image} item={item} phoneRatio={phoneRatio || (item.showServiceSlides ? 3 / 2 : 5 / 4)} onChange={changes => onItemChange({ ...item, ...changes })}/>
@@ -316,7 +317,7 @@ function Repeat({ field, items, onChange, onPickMedia }) {
             <button type="button" className="site-admin-btn secondary small" onClick={() => { if (window.confirm('Remove this item?')) onChange(items.filter((_, i) => i !== index)); }} aria-label="Remove"><Trash2 size={13}/></button>
           </div>
         </div>
-        {open === index ? <Fields fields={field.fields} value={item} onPickMedia={onPickMedia} onChange={next => onChange(items.map((entry, i) => i === index ? next : entry))}/> : null}
+        {open === index ? <Fields fields={field.fields} value={item} groupKey={index === 0 ? '__home' : undefined} onPickMedia={onPickMedia} onChange={next => onChange(items.map((entry, i) => i === index ? next : entry))}/> : null}
       </div>
     ))}
     <button type="button" className="site-admin-btn secondary small" onClick={() => { onChange([...items, structuredClone(field.newItem)]); setOpen(items.length); }}><Plus size={13}/> Add</button>
@@ -343,7 +344,14 @@ export default function PromotionsAdmin() {
       .catch(err => setError(err.message))
       .finally(() => setBusy(false));
     loadServicePosts(accessToken)
-      .then(posts => setServicePhotos(Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage]))))
+      .then(posts => setServicePhotos(current => ({ ...current, ...Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage])) })))
+      .catch(() => {});
+    loadAdminSitePage(accessToken, 'home')
+      .then(({ published, draft }) => {
+        const blocks = (published?.content || draft?.content)?.content || [];
+        const hero = blocks.find(block => block?.type === 'SunwingsHeroBlock' || block?.type === 'HeroBlock');
+        if (hero?.props?.image) setServicePhotos(current => ({ ...current, __home: hero.props.image }));
+      })
       .catch(() => {});
   }, [accessToken]);
 
