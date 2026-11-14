@@ -258,7 +258,7 @@ export default function IntegrationsAdmin() {
             </div>
           </article>)}
         </div>
-        : <div className="site-admin-empty">No Google reviews synced yet.</div>}
+        : <div className="site-admin-empty">{googleReviews?.note || 'No Google reviews synced yet.'}</div>}
     </div>
 
     <div className="site-admin-card sunwings-social-sync-card">

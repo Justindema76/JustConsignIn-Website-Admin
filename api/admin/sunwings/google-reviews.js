@@ -12,8 +12,9 @@ async function parseSupabase(response, fallback) {
 }
 
 export async function fetchGoogleReviews(placeId, apiKey) {
-  const response = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
-    headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': 'id,displayName,rating,userRatingCount,reviews,googleMapsUri' },
+  // languageCode: without it Google can leave the reviews out of the reply.
+  const response = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=en&regionCode=CA`, {
+    headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': 'id,displayName,rating,userRatingCount,reviews,googleMapsUri,pureServiceAreaBusiness' },
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data?.error?.message || 'Google connection failed.');
@@ -32,6 +33,10 @@ export async function fetchGoogleReviews(placeId, apiKey) {
         published_at: review.publishTime || '',
       }))
       .filter(review => review.text),
+    // Why there are no reviews, if Google sent none (shown in the admin).
+    note: data.reviews?.length ? '' : (data.pureServiceAreaBusiness
+      ? 'Google sent the rating but no review text. It does this for some service-area businesses (no public address).'
+      : 'Google sent the rating but no review text this time.'),
     synced_at: new Date().toISOString(),
   };
 }
