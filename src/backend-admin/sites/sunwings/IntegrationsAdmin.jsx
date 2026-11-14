@@ -4,6 +4,8 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import {
   loadSunwingsFacebookPosts,
   loadSunwingsGoogleReviews,
+  loadSunwingsSettings,
+  saveSunwingsSettings,
   syncSunwingsGoogleReviews,
   loadSunwingsIntegrations,
   saveSunwingsIntegration,
@@ -170,6 +172,8 @@ export default function IntegrationsAdmin() {
   const [syncing, setSyncing] = useState(false);
   const [googleReviews, setGoogleReviews] = useState(null);
   const [googleSyncing, setGoogleSyncing] = useState(false);
+  const [trustindex, setTrustindex] = useState('');
+  const [trustSaving, setTrustSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -183,6 +187,7 @@ export default function IntegrationsAdmin() {
       })
       .catch(err => setError(err.message));
     loadSunwingsGoogleReviews(accessToken).then(setGoogleReviews).catch(() => {});
+    loadSunwingsSettings(accessToken).then(settings => setTrustindex(settings.trustindex_widget_id || '')).catch(() => {});
   }, [accessToken]);
 
   const handleSave = (provider, integration) => {
@@ -202,6 +207,23 @@ export default function IntegrationsAdmin() {
       setError(err.message);
     } finally {
       setSyncing(false);
+    }
+  };
+
+  // Accepts the widget ID or the whole embed code Trustindex gives you.
+  const saveTrustindex = async () => {
+    const text = trustindex.trim();
+    const id = (text.match(/loader\.js\?([a-z0-9]+)/i) || [])[1] || (/^[a-z0-9]{6,}$/i.test(text) ? text : '');
+    if (text && !id) return setError('That doesn’t look like Trustindex code. Paste the code from Trustindex (it contains “loader.js?”).');
+    setTrustSaving(true); setError(''); setMessage('');
+    try {
+      await saveSunwingsSettings(accessToken, { trustindex_widget_id: id });
+      setTrustindex(id);
+      setMessage(id ? 'Trustindex reviews saved. They show on the homepage within about a minute.' : 'Trustindex removed from the homepage.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setTrustSaving(false);
     }
   };
 
@@ -259,6 +281,14 @@ export default function IntegrationsAdmin() {
           </article>)}
         </div>
         : <div className="site-admin-empty">{googleReviews?.note || 'No Google reviews synced yet.'}</div>}
+      <div className="site-admin-form sunwings-trustindex">
+        <label>
+          Trustindex widget (shows the review text)
+          <input value={trustindex} onChange={event => setTrustindex(event.target.value)} placeholder="Paste the Trustindex code or widget ID"/>
+        </label>
+        <small>{trustindex ? 'The homepage shows your Google reviews through Trustindex. Clear the box and save to remove it.' : 'Google leaves out review text for Sunwings, so the homepage uses Trustindex for it. Paste the code Trustindex gives you and save.'}</small>
+        <button className="site-admin-btn" type="button" disabled={trustSaving} onClick={saveTrustindex}>{trustSaving ? 'Saving…' : 'Save Trustindex'}</button>
+      </div>
     </div>
 
     <div className="site-admin-card sunwings-social-sync-card">
