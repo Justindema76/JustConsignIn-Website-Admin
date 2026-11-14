@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ArrowDown, ArrowUp, CheckCircle2, Library, Plus, RotateCcw, Save, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadAdminMedia, uploadSunwingsImage } from '../../services/siteAdminService';
@@ -305,11 +306,13 @@ function Fields({ fields, value, onChange, onPickMedia, groupKey }) {
   </div>;
 }
 
-function Repeat({ field, items, onChange, onPickMedia }) {
-  const [open, setOpen] = useState(null);
+function Repeat({ field, items, onChange, onPickMedia, initialOpen = null }) {
+  const [open, setOpen] = useState(initialOpen);
+  const openRef = useRef(null);
+  useEffect(() => { if (initialOpen != null) setTimeout(() => openRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }, [initialOpen]);
   return <div className="promo-repeat">
     {items.map((item, index) => (
-      <div className={`promo-item ${open === index ? 'open' : ''} ${item?.enabled === false ? 'off' : ''}`} key={index}>
+      <div ref={index === initialOpen ? openRef : null} className={`promo-item ${open === index ? 'open' : ''} ${item?.enabled === false ? 'off' : ''}`} key={index}>
         <div className="promo-item-head">
           <button type="button" className="promo-item-title" onClick={() => setOpen(open === index ? null : index)}>
             <b>{index + 1}.</b> {field.itemLabel?.(item) || `Item ${index + 1}`}{item?.enabled === false ? <em> (hidden)</em> : null}
@@ -329,7 +332,13 @@ function Repeat({ field, items, onChange, onPickMedia }) {
 
 export default function PromotionsAdmin() {
   const { accessToken } = useAuth();
-  const [tab, setTab] = useState(SECTIONS[0].key);
+  // Links like ?tab=hero_slides&open=0 (from Pages › Edit banner) open that banner directly.
+  const [params] = useSearchParams();
+  const linkTab = SECTIONS.some(item => item.key === params.get('tab')) ? params.get('tab') : null;
+  const linkOpen = params.get('open');
+  const [tab, setTab] = useState(linkTab || SECTIONS[0].key);
+  const groupRef = useRef(null);
+  useEffect(() => { if (linkTab && linkOpen) setTimeout(() => groupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }, [linkTab, linkOpen]);
   const [values, setValues] = useState(() => structuredClone(PROMOTIONS_DEFAULTS));
   const [dirty, setDirty] = useState({});
   const [busy, setBusy] = useState(false);
@@ -425,10 +434,11 @@ export default function PromotionsAdmin() {
       </div>
 
       {section.list ? (
-        <Repeat field={section} items={value} onChange={next => update(section.key, next)} onPickMedia={pickMedia}/>
+        <Repeat key={section.key} field={section} items={value} onChange={next => update(section.key, next)} onPickMedia={pickMedia}
+          initialOpen={tab === linkTab && linkOpen != null && /^\d+$/.test(linkOpen) ? Number(linkOpen) : null}/>
       ) : section.groups ? (
         section.groups.map(([groupKey, groupLabel]) => (
-          <details className="promo-group" key={groupKey}>
+          <details className="promo-group" key={`${section.key}-${groupKey}`} open={tab === linkTab && linkOpen === groupKey ? true : undefined} ref={tab === linkTab && linkOpen === groupKey ? groupRef : null}>
             <summary>{groupLabel}</summary>
             <Fields fields={section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia} groupKey={groupKey}
               onChange={next => update(section.key, { ...value, [groupKey]: next })}/>

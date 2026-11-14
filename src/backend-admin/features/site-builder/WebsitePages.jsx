@@ -4,6 +4,7 @@ import {
   ExternalLink,
   FileText,
   FormInput,
+  Image,
   LayoutTemplate,
   Pencil,
   Scale,
@@ -82,6 +83,9 @@ export default function WebsitePages() {
         {target ? <Link className="site-admin-btn" to={target}>
           <Pencil size={14}/> {page.editor === 'blog' ? 'Manage Blog' : 'Edit Page'}
         </Link> : <span className="jci-custom-page-note">{customPageNote(page)}</span>}
+        {page.bannerTarget ? <Link className="site-admin-btn" to={page.bannerTarget}>
+          <Image size={14}/> Edit banner
+        </Link> : null}
         <a className="site-admin-btn secondary" href={livePageUrl(page.path, siteKey)} target="_blank" rel="noreferrer">
           Open Live <ExternalLink size={13}/>
         </a>

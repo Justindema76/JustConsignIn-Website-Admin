@@ -219,6 +219,7 @@ export const SUNWINGS_PAGES = [
     kind: 'marketing',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/home',
+    bannerTarget: '/admin/sunwings/promotions?tab=hero_slides&open=0',
     description: 'Sunwings homepage. Services and locations are pulled from their post types.',
   },
   {
@@ -229,6 +230,7 @@ export const SUNWINGS_PAGES = [
     kind: 'marketing',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/services',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=services',
     description: 'Main services index page. Individual services stay in Service Posts.',
   },
   {
@@ -239,6 +241,7 @@ export const SUNWINGS_PAGES = [
     kind: 'marketing',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/locations',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=locations',
     description: 'Main service-area index page. Individual areas stay in Location Posts.',
   },
   {
@@ -249,6 +252,7 @@ export const SUNWINGS_PAGES = [
     kind: 'marketing',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/pricing',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=pricing',
     description: 'Pricing, quote guidance and price-match messaging.',
   },
   {
@@ -259,6 +263,7 @@ export const SUNWINGS_PAGES = [
     kind: 'form',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/contact',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=contact',
     description: 'Contact information and the Sunwings quote-request form.',
   },
   {
@@ -269,6 +274,7 @@ export const SUNWINGS_PAGES = [
     kind: 'content',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/blog',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=blog',
     description: 'Moving Tips index page.',
   },
   {
@@ -279,6 +285,7 @@ export const SUNWINGS_PAGES = [
     kind: 'legal',
     editor: 'visual',
     editorTarget: '/admin/sunwings/pages/privacy',
+    bannerTarget: '/admin/sunwings/promotions?tab=page_banners&open=privacy',
     description: 'Sunwings privacy policy.',
   },
 ];

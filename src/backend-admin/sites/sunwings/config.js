@@ -40,6 +40,7 @@ export default {
       label: 'Website',
       items: [
         { to: '/admin/sunwings/pages', label: 'Pages', icon: 'panels', ownerOnly: true },
+        { to: '/admin/sunwings/promotions?tab=hero_slides&open=0', label: 'Homepage banner', icon: 'image', ownerOnly: true },
         { to: '/admin/sunwings/promotions', label: 'Pop-up, Slider & Banners', icon: 'sparkles', ownerOnly: true },
         { to: '/admin/sunwings/banner-studio', label: 'Banner Studio', icon: 'image', ownerOnly: true },
         { to: '/admin/sunwings/blocks', label: 'Block Library', icon: 'library', ownerOnly: true },
