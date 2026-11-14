@@ -98,6 +98,21 @@ export async function syncSunwingsFacebookPosts(accessToken) {
   return { count: payload.count || 0, posts: Array.isArray(payload.posts) ? payload.posts : [] };
 }
 
+export async function loadSunwingsGoogleReviews(accessToken) {
+  const payload = await parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/google-reviews', {}, accessToken),
+    'Unable to load Google reviews.',
+  );
+  return payload.reviews || null;
+}
+
+export async function syncSunwingsGoogleReviews(accessToken) {
+  return parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/google-reviews', { method: 'POST' }, accessToken),
+    'Unable to sync Google reviews.',
+  );
+}
+
 export async function loadCollaborators(accessToken, siteKey) {
   const payload = await parseJsonResponse(
     await adminFetch(`/api/admin/collaborators?site=${encodeURIComponent(siteKey)}`, {}, accessToken),

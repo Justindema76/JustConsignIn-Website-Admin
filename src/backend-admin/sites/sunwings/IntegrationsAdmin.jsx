@@ -3,6 +3,8 @@ import { CheckCircle2, ExternalLink, Facebook, RefreshCw, Star } from 'lucide-re
 import { useAuth } from '../../auth/AdminAuthContext';
 import {
   loadSunwingsFacebookPosts,
+  loadSunwingsGoogleReviews,
+  syncSunwingsGoogleReviews,
   loadSunwingsIntegrations,
   saveSunwingsIntegration,
   syncSunwingsFacebookPosts,
@@ -17,7 +19,8 @@ const PROVIDERS = {
     secretKey: 'api_key',
     secretLabel: 'Google Places API key',
     configFields: [
-      { key: 'place_id', label: 'Google Place ID' },
+      // Sunwings' Google Business listing (same ID the site's "Google reviews" link uses).
+      { key: 'place_id', label: 'Google Place ID', default: 'ChIJXTBVHE3zTkcRiUEmU5P3CsI' },
     ],
   },
   facebook: {
@@ -47,7 +50,9 @@ function IntegrationCard({ provider, data, accessToken, onSave }) {
   const [localError, setLocalError] = useState('');
 
   useEffect(() => {
-    setForm({ config: { ...(data?.config || {}) }, secret: '', enabled: Boolean(data?.enabled) });
+    const defaults = Object.fromEntries(meta.configFields.filter(field => field.default).map(field => [field.key, field.default]));
+    const saved = Object.fromEntries(Object.entries(data?.config || {}).filter(([, value]) => value !== '' && value != null));
+    setForm({ config: { ...defaults, ...saved }, secret: '', enabled: Boolean(data?.enabled) });
   }, [data]);
 
   const updateConfig = (key, value) => setForm(current => ({ ...current, config: { ...current.config, [key]: value } }));
@@ -163,6 +168,8 @@ export default function IntegrationsAdmin() {
   const [facebookPosts, setFacebookPosts] = useState([]);
   const [feedEnabled, setFeedEnabled] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [googleReviews, setGoogleReviews] = useState(null);
+  const [googleSyncing, setGoogleSyncing] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -175,6 +182,7 @@ export default function IntegrationsAdmin() {
         setFeedEnabled(feed.enabled);
       })
       .catch(err => setError(err.message));
+    loadSunwingsGoogleReviews(accessToken).then(setGoogleReviews).catch(() => {});
   }, [accessToken]);
 
   const handleSave = (provider, integration) => {
@@ -197,6 +205,21 @@ export default function IntegrationsAdmin() {
     }
   };
 
+  const syncGoogle = async () => {
+    setGoogleSyncing(true); setError(''); setMessage('');
+    try {
+      const result = await syncSunwingsGoogleReviews(accessToken);
+      setGoogleReviews(result.reviews || null);
+      setMessage(result.enabled
+        ? `Google reviews updated: ${result.reviews?.rating ?? '–'}★ from ${result.reviews?.count ?? 0} ratings, ${result.reviews?.reviews?.length ?? 0} reviews on the website.`
+        : 'Google reviews are off ("Show this on the Sunwings website" is unticked), so they were removed from the website.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setGoogleSyncing(false);
+    }
+  };
+
   return <>
     <div className="site-admin-page-head">
       <div>
@@ -212,6 +235,30 @@ export default function IntegrationsAdmin() {
     <div className="sunwings-integration-grid">
       <IntegrationCard provider="google_reviews" data={integrations.google_reviews} accessToken={accessToken} onSave={handleSave}/>
       <IntegrationCard provider="facebook" data={integrations.facebook} accessToken={accessToken} onSave={handleSave}/>
+    </div>
+
+    <div className="site-admin-card sunwings-social-sync-card">
+      <div className="sunwings-social-sync-head">
+        <div>
+          <h3>Google Reviews on the website</h3>
+          <small>{googleReviews?.rating
+            ? `Showing ${googleReviews.rating}★ (${googleReviews.count} ratings) on the homepage. Last updated ${new Date(googleReviews.synced_at).toLocaleString()}.`
+            : 'Save the Place ID and API key above, tick "Show this on the Sunwings website", then press Sync.'}</small>
+        </div>
+        <button className="site-admin-btn secondary" type="button" disabled={googleSyncing} onClick={syncGoogle}>
+          <RefreshCw size={14}/> {googleSyncing ? 'Syncing…' : 'Sync Google Reviews'}
+        </button>
+      </div>
+      {googleReviews?.reviews?.length
+        ? <div className="sunwings-social-feed-preview">
+          {googleReviews.reviews.map((review, index) => <article className="sunwings-social-preview-card" key={index}>
+            <div>
+              <small>{'★'.repeat(review.stars)} · {review.name}{review.when ? ` · ${review.when}` : ''}</small>
+              <p>{review.text}</p>
+            </div>
+          </article>)}
+        </div>
+        : <div className="site-admin-empty">No Google reviews synced yet.</div>}
     </div>
 
     <div className="site-admin-card sunwings-social-sync-card">
