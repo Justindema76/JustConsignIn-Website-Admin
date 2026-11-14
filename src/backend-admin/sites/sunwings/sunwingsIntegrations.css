@@ -48,3 +48,12 @@
 .sunwings-trustindex{display:grid;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid #eee}
 .sunwings-trustindex small{color:#6b7280}
 .sunwings-trustindex .site-admin-btn{justify-self:start}
+.sunwings-featured-reviews{display:grid;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid #eee}
+.sunwings-featured-reviews h4{margin:0;font-size:15px}
+.sunwings-featured-reviews>small{color:#6b7280}
+.sunwings-featured-review{display:grid;gap:8px;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
+.sunwings-featured-review label{display:grid;gap:4px;font-size:12px;font-weight:700}
+.sunwings-featured-review input,.sunwings-featured-review select,.sunwings-featured-review textarea{font:inherit;font-weight:500;font-size:14px;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;background:#fff;width:100%;box-sizing:border-box}
+.sunwings-featured-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.sunwings-featured-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){.sunwings-featured-row{grid-template-columns:1fr 1fr}.sunwings-featured-row label:first-child{grid-column:1/-1}}

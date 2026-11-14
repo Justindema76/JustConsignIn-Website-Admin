@@ -174,6 +174,8 @@ export default function IntegrationsAdmin() {
   const [googleSyncing, setGoogleSyncing] = useState(false);
   const [trustindex, setTrustindex] = useState('');
   const [trustSaving, setTrustSaving] = useState(false);
+  const [featured, setFeatured] = useState([]);
+  const [featuredSaving, setFeaturedSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -187,7 +189,10 @@ export default function IntegrationsAdmin() {
       })
       .catch(err => setError(err.message));
     loadSunwingsGoogleReviews(accessToken).then(setGoogleReviews).catch(() => {});
-    loadSunwingsSettings(accessToken).then(settings => setTrustindex(settings.trustindex_widget_id || '')).catch(() => {});
+    loadSunwingsSettings(accessToken).then(settings => {
+      setTrustindex(settings.trustindex_widget_id || '');
+      try { setFeatured(JSON.parse(settings.featured_reviews || '[]')); } catch { setFeatured([]); }
+    }).catch(() => {});
   }, [accessToken]);
 
   const handleSave = (provider, integration) => {
@@ -224,6 +229,24 @@ export default function IntegrationsAdmin() {
       setError(err.message);
     } finally {
       setTrustSaving(false);
+    }
+  };
+
+  // Featured reviews: real Google reviews copied in by hand (Google's feed leaves the text out for Sunwings).
+  const updateReview = (index, changes) => setFeatured(list => list.map((item, i) => (i === index ? { ...item, ...changes } : item)));
+  const saveFeatured = async () => {
+    const clean = featured
+      .map(item => ({ name: String(item.name || '').trim(), stars: Math.min(5, Math.max(1, Number(item.stars) || 5)), text: String(item.text || '').trim(), when: String(item.when || '').trim() }))
+      .filter(item => item.name && item.text);
+    setFeaturedSaving(true); setError(''); setMessage('');
+    try {
+      await saveSunwingsSettings(accessToken, { featured_reviews: JSON.stringify(clean) });
+      setFeatured(clean);
+      setMessage(clean.length ? `${clean.length} reviews saved. They show on the homepage within about a minute.` : 'Featured reviews cleared.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setFeaturedSaving(false);
     }
   };
 
@@ -281,6 +304,26 @@ export default function IntegrationsAdmin() {
           </article>)}
         </div>
         : <div className="site-admin-empty">{googleReviews?.note || 'No Google reviews synced yet.'}</div>}
+      <div className="sunwings-featured-reviews">
+        <h4>Featured reviews on the homepage</h4>
+        <small>Copy your best Google reviews here. The homepage shows the first 3 next to your live Google rating.</small>
+        {featured.map((review, index) => <div className="sunwings-featured-review" key={index}>
+          <div className="sunwings-featured-row">
+            <label>Name<input value={review.name || ''} onChange={event => updateReview(index, { name: event.target.value })} placeholder="e.g. Robert S."/></label>
+            <label>Stars<select value={review.stars || 5} onChange={event => updateReview(index, { stars: Number(event.target.value) })}>{[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{'★'.repeat(n)}</option>)}</select></label>
+            <label>When<input value={review.when || ''} onChange={event => updateReview(index, { when: event.target.value })} placeholder="e.g. Aug 2026"/></label>
+          </div>
+          <label>Review<textarea rows="3" value={review.text || ''} onChange={event => updateReview(index, { text: event.target.value })}/></label>
+          <div className="sunwings-featured-actions">
+            <button type="button" className="site-admin-btn secondary small" disabled={index === 0} onClick={() => setFeatured(list => { const next = [...list]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; return next; })}>Move up</button>
+            <button type="button" className="site-admin-btn secondary small" onClick={() => setFeatured(list => list.filter((_, i) => i !== index))}>Remove</button>
+          </div>
+        </div>)}
+        <div className="sunwings-featured-actions">
+          <button type="button" className="site-admin-btn secondary" onClick={() => setFeatured(list => [...list, { name: '', stars: 5, text: '', when: '' }])}>Add a review</button>
+          <button type="button" className="site-admin-btn" disabled={featuredSaving} onClick={saveFeatured}>{featuredSaving ? 'Saving…' : 'Save reviews'}</button>
+        </div>
+      </div>
       <div className="site-admin-form sunwings-trustindex">
         <label>
           Trustindex widget (shows the review text)

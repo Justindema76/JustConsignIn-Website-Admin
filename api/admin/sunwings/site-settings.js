@@ -20,6 +20,7 @@ const ALLOWED_KEYS = new Set([
   'hero_cta_url',
   'favicon_url',
   'trustindex_widget_id',
+  'featured_reviews',
   // Promotions & Banners: JSON values, see src/backend-admin/sites/sunwings/PromotionsAdmin.jsx
   'promo_popup',
   'hero_slides',
