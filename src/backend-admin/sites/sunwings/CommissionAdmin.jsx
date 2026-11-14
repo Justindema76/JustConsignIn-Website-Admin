@@ -7,7 +7,9 @@ import {
   loadSunwingsQuotes, removePartner, updateSunwingsQuote,
 } from './sunwingsAdminService';
 import { commissionFor, money } from './commission';
+import { BOOKED_STATUSES, branchOf } from './branch';
 import './sunwingsJobs.css';
+import './branch.css';
 
 // Justin's money from Sunwings: commission owed/paid per job (10% up to $800, 20% over),
 // money put into the business, and who has partner access to "Jobs from Justin".
@@ -57,6 +59,21 @@ export default function CommissionAdmin() {
   const invested = investments.reduce((total, item) => total + Number(item.amount || 0), 0);
   const thisMonth = new Date().toISOString().slice(0, 7);
   const earnedThisMonth = sum(jobs.filter(job => String(job.request.commission_paid_at || job.request.updated_at || '').startsWith(thisMonth) && job.request.status === 'complete'));
+
+  // Hamilton & Niagara branch: leads that came through Justin's section, and what they turned into.
+  const [branchPeriod, setBranchPeriod] = useState('month');
+  const branch = useMemo(() => {
+    const inPeriod = row => branchPeriod === 'all' || String(row.created_at || '').startsWith(thisMonth);
+    const tagged = quotes.map(request => ({ request, kind: branchOf(request), ...commissionFor(request) })).filter(item => item.kind && inPeriod(item.request))
+      .sort((a, b) => String(b.request.created_at || '').localeCompare(String(a.request.created_at || '')));
+    const credit = tagged.filter(item => item.kind === 'credit');
+    const booked = credit.filter(item => BOOKED_STATUSES.has(item.request.status));
+    const done = credit.filter(item => item.request.status === 'complete');
+    return { credit, area: tagged.filter(item => item.kind === 'area'), booked, done,
+      revenue: done.reduce((total, item) => total + (item.price || 0), 0),
+      earned: done.reduce((total, item) => total + item.amount, 0),
+      coming: booked.filter(item => item.request.status !== 'complete').reduce((total, item) => total + item.amount, 0) };
+  }, [quotes, branchPeriod, thisMonth]);
 
   const visible = filter === 'owed' ? owedJobs : filter === 'pending' ? pendingJobs : filter === 'paid' ? paidJobs : jobs;
 
@@ -121,7 +138,7 @@ export default function CommissionAdmin() {
     </div>
 
     <div className="settings-tabs" role="tablist">
-      {[['jobs', 'Commission by job'], ['investments', 'My investment'], ['partner', 'Marius’s access']].map(([key, label]) => (
+      {[['jobs', 'Commission by job'], ['branch', 'Hamilton & Niagara'], ['investments', 'My investment'], ['partner', 'Marius’s access']].map(([key, label]) => (
         <button key={key} type="button" role="tab" aria-selected={tab === key} className={`settings-tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>{label}</button>
       ))}
     </div>
@@ -149,6 +166,48 @@ export default function CommissionAdmin() {
             <td className="m-action">{request.commission_status !== 'paid' && request.status === 'complete' ? <button className="site-admin-btn small" type="button" onClick={() => markPaid(request)}>Mark paid</button> : null}</td>
           </tr>)}</tbody>
         </table></div>}
+    </section>}
+
+    {tab === 'branch' && <section className="site-admin-card money-panel">
+      <div className="money-panel-head">
+        <h2>Hamilton &amp; Niagara: your branch</h2>
+        <select className="money-select" value={branchPeriod} onChange={event => setBranchPeriod(event.target.value)}>
+          <option value="month">This month</option><option value="all">All time</option>
+        </select>
+      </div>
+      <p className="job-hint">Leads that came through sunwingstransport.ca/hamilton-niagara, an ad pointing there, or from someone who visited that section in the last 90 days. They show <b>Hamilton &amp; Niagara · Credit: Justin</b> on the quote.</p>
+      <div className="money-stats branch-stats">
+        <div className="money-stat"><span>Leads</span><b>{branch.credit.length}</b><small>quote requests</small></div>
+        <div className="money-stat"><span>Booked</span><b>{branch.booked.length}</b><small>{branch.credit.length ? Math.round(branch.booked.length / branch.credit.length * 100) : 0}% of leads</small></div>
+        <div className="money-stat"><span>Done</span><b>{branch.done.length}</b><small>finished jobs</small></div>
+        <div className="money-stat"><span>Job revenue</span><b>{money(branch.revenue)}</b><small>finished jobs</small></div>
+        <div className="money-stat attention"><span>Your commission</span><b>{money(branch.earned)}</b><small>{money(branch.coming)} more on booked jobs</small></div>
+      </div>
+      {!branch.credit.length ? <p className="job-hint">No branch leads {branchPeriod === 'month' ? 'this month' : 'yet'}. They’ll show up here as soon as someone sends a quote from your Hamilton &amp; Niagara pages.</p> :
+        <div className="money-table-wrap"><table className="money-table">
+          <thead><tr><th>Customer</th><th>Service</th><th>Job</th><th className="num">Job price</th><th className="num">Commission</th><th>Came from</th></tr></thead>
+          <tbody>{branch.credit.map(({ request, price, amount }) => <tr key={request.id}>
+            <td className="m-name"><Link className="money-name" to={`/admin/sunwings/quotes?id=${encodeURIComponent(request.id)}`}>{request.name}</Link></td>
+            <td className="m-service">{request.service || '—'}</td>
+            <td className="m-job" data-label="Job">{String(request.status || 'new').replace(/_/g, ' ')}</td>
+            <td className="num m-price" data-label="Price">{price === null ? '—' : money(price)}</td>
+            <td className="num m-amount"><b>{price === null ? '—' : money(amount)}</b></td>
+            <td className="m-source" data-label="From">{request.lead_source || '—'}</td>
+          </tr>)}</tbody>
+        </table></div>}
+      {branch.area.length ? <>
+        <h3 className="branch-sub">Main-site leads in Hamilton &amp; Niagara towns ({branch.area.length})</h3>
+        <p className="job-hint">These came from the main site, not your section, so they aren’t counted above. They’re listed so you can see the demand in your area.</p>
+        <div className="money-table-wrap"><table className="money-table">
+          <thead><tr><th>Customer</th><th>Service</th><th>Job</th><th className="num">Job price</th></tr></thead>
+          <tbody>{branch.area.map(({ request, price }) => <tr key={request.id}>
+            <td className="m-name"><Link className="money-name" to={`/admin/sunwings/quotes?id=${encodeURIComponent(request.id)}`}>{request.name}</Link></td>
+            <td className="m-service">{request.service || '—'}</td>
+            <td className="m-job" data-label="Job">{String(request.status || 'new').replace(/_/g, ' ')}</td>
+            <td className="num m-price" data-label="Price">{price === null ? '—' : money(price)}</td>
+          </tr>)}</tbody>
+        </table></div>
+      </> : null}
     </section>}
 
     {tab === 'investments' && <section className="site-admin-card money-panel">

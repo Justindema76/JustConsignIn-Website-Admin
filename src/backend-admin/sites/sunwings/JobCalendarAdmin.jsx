@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadSunwingsQuotes, sendSunwingsFollowUp, updateSunwingsQuote } from './sunwingsAdminService';
 import { addDays, DAY, DEFAULT_HOURS, fmtTime, followUpDraft, followUpOf, hhmm, reviewAsked, iso, longDate, minutes, money, pad, parse, QUOTE_WAIT_DAYS, shortDay, toJob, validEmail } from './jobModel';
+import { BranchChip } from './BranchChip';
 import './jobCalendar.css';
 
 const STAGES = [
@@ -389,7 +390,7 @@ export default function JobCalendarAdmin() {
           <div>
             <span className={`jc-tag ${TAG[open.stage][0]}`}>{open.stage === 'booked' && !open.date ? 'Booked · needs a date' : TAG[open.stage][1]}</span>
             <h2>{open.name}</h2>
-            <div className="jc-sub">{open.service}{open.price != null ? ` · ${money(open.price)}` : ''}</div>
+            <div className="jc-sub">{open.service}{open.price != null ? ` · ${money(open.price)}` : ''}{isOwner ? <BranchChip row={open.row}/> : null}</div>
           </div>
           <button type="button" className="jc-x" onClick={closeJob} aria-label="Close"><X size={18}/></button>
         </div>

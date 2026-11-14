@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
 import { autoCommissionRate, commissionFor, money } from './commission';
+import { BranchChip } from './BranchChip';
 import '../../styles/serviceRequests.css';
 import './sunwingsJobs.css';
 import './quoteRequests.css';
@@ -424,7 +425,7 @@ export default function QuoteRequestsAdmin() {
             return <button key={request.id} type="button" className={`qr-row s-${request.status || 'new'}`} onClick={() => setSelectedId(request.id)}>
               <span className="qr-who"><b>{request.name}</b><small>{request.email || request.phone}</small></span>
               <span className="qr-job"><b>{request.request_type === 'contact' ? 'Contact message' : (request.service || 'Not specified')}</b><small>{requestTypeLabel(request.request_type)}</small></span>
-              <span className="qr-route">{request.request_type === 'contact' ? '—' : routeSummary(request)}<JobFlags row={request}/></span>
+              <span className="qr-route">{request.request_type === 'contact' ? '—' : routeSummary(request)}<JobFlags row={request}/>{isOwner ? <BranchChip row={request}/> : null}</span>
               <span className="qr-status"><span className={`qr-pill ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
               <span className="qr-price num">{price == null ? '—' : money(price)}</span>
               <span className="qr-date">{shortDate(request.created_at)}</span>
@@ -444,6 +445,7 @@ export default function QuoteRequestsAdmin() {
               <h2>{selected.name}</h2>
               <span className={`demo-request-status ${selected.status || 'new'}`}>{statusLabel(selected.status)}</span>
               <JobFlags row={selected}/>
+              {isOwner ? <BranchChip row={selected}/> : null}
             </div>
             <p>{formatDate(selected.created_at)} · {routeSummary(selected)}</p>
             {selected.lead_source ? <p className="job-lead-source">Came from: {selected.lead_source}</p> : null}

@@ -1,0 +1,9 @@
+/* Hamilton & Niagara branch: chips and report */
+.job-chip.branch-credit,.job-chip.branch-area{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+.job-chip.branch-credit{background:#fff4e5;color:#b54708;border:1px solid #fdb022;margin-left:6px}
+.job-chip.branch-area{background:#f2f4f7;color:#475467;border:1px solid #d0d5dd;margin-left:6px}
+.jc-sub .job-chip{font-size:11px;padding:2px 8px;vertical-align:middle}
+.branch-stats{margin:12px 0 16px}
+.branch-sub{margin:22px 0 4px;font-size:15px}
+.money-table .m-source{font-size:12px;color:#667085;max-width:280px}
+@media (max-width:760px){.money-table td.m-source{display:none}}
