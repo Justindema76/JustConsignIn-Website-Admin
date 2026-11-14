@@ -43,6 +43,15 @@ const BANNER_FIELDS = [
   { name: 'showServiceSlides', label: 'Rotate through the service slides after this banner', type: 'toggle' },
 ];
 
+const HN_SERVICE_FIELDS = [
+  { name: 'eyebrow', label: 'Small tag above the headline' },
+  { name: 'heading', label: 'Headline (white)', hint: 'Leave blank to use the main site’s Service Post.' },
+  { name: 'accent', label: 'Second line (orange)' },
+  { name: 'text', label: 'Subtitle', type: 'textarea', hint: 'Leave blank to use the main site’s Service Post.' },
+  { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank to use the main site’s Service Post photo.' },
+  POSITION_FIELD,
+];
+
 const SECTIONS = [
   {
     key: 'hero_slides',
@@ -199,7 +208,55 @@ const SECTIONS = [
       { name: 'faq', label: 'FAQs', type: 'repeat', itemLabel: item => item.question, newItem: { question: '', answer: '' }, fields: [{ name: 'question', label: 'Question' }, { name: 'answer', label: 'Answer', type: 'textarea' }] },
     ],
   },
+  {
+    key: 'hn_content',
+    title: 'Hamilton & Niagara',
+    intro: 'Your Hamilton & Niagara section (/hamilton-niagara): its banners, photos, service boxes and questions, plus the Long-Distance Moving card on the main site’s service lists. Town pages use their Location Post (Location Posts).',
+    groups: [
+      ['servicesCard', 'Long-Distance card on the main site (Services page)', [
+        { name: 'enabled', label: 'Show the Long-Distance Moving card after the other services', type: 'toggle' },
+        { name: 'title', label: 'Card title' },
+        { name: 'text', label: 'Card text', type: 'textarea' },
+        { name: 'image', label: 'Card photo', type: 'image' },
+        { name: 'linkText', label: 'Link text' },
+        { name: 'url', label: 'Card opens', hint: 'Normally /hamilton-niagara/long-distance.' },
+      ]],
+      ['home', 'Main page banner, boxes & questions', [
+        { name: 'eyebrow', label: 'Small tag above the headline' },
+        { name: 'heading', label: 'Headline (white)' },
+        { name: 'accent', label: 'Second line (orange)' },
+        { name: 'text', label: 'Subtitle', type: 'textarea' },
+        { name: 'image', label: 'Banner photo', type: 'image' },
+        POSITION_FIELD,
+        { name: 'cards', label: 'Service boxes (“What we do here”)', type: 'repeat', itemLabel: item => item.title, newItem: { title: 'New box', text: '', href: '/hamilton-niagara/long-distance', cta: 'Learn more' }, fields: [{ name: 'title', label: 'Title' }, { name: 'text', label: 'Text', type: 'textarea' }, { name: 'cta', label: 'Link text' }, { name: 'href', label: 'Link', hint: 'E.g. /hamilton-niagara/furniture-delivery' }] },
+        { name: 'faqs', label: 'Questions', type: 'repeat', itemLabel: item => item.question, newItem: { question: '', answer: '' }, fields: [{ name: 'question', label: 'Question' }, { name: 'answer', label: 'Answer', type: 'textarea' }] },
+      ]],
+      ['long-distance', 'Long-Distance Moving page', [
+        { name: 'eyebrow', label: 'Small tag above the headline' },
+        { name: 'heading', label: 'Headline (white)' },
+        { name: 'accent', label: 'Second line (orange)' },
+        { name: 'text', label: 'Subtitle', type: 'textarea' },
+        { name: 'image', label: 'Banner photo', type: 'image' },
+        POSITION_FIELD,
+        { name: 'sendList', label: '“What to send for your quote” list', type: 'lines', hint: 'One per line. Empty hides the list.' },
+      ]],
+      ['furniture-delivery', 'Furniture Delivery page', HN_SERVICE_FIELDS],
+      ['commercial-transport', 'Commercial Transport page', HN_SERVICE_FIELDS],
+      ['routes', 'Route pages (e.g. Grimsby → Toronto)', [
+        { name: 'image', label: 'Banner photo for every route page', type: 'image', hint: 'Leave blank for the moving-truck photo.' },
+        POSITION_FIELD,
+      ]],
+    ],
+  },
 ];
+
+// The site swaps some old photos for newer ones. Show (and save) the photo that's really live.
+function swapRetired(value, retired) {
+  if (typeof value === 'string') return retired[value] || value;
+  if (Array.isArray(value)) return value.map(item => swapRetired(item, retired));
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, swapRetired(item, retired)]));
+  return value;
+}
 
 function parse(raw, fallback) {
   if (!raw) return fallback;
@@ -337,6 +394,8 @@ export default function PromotionsAdmin() {
   const linkTab = SECTIONS.some(item => item.key === params.get('tab')) ? params.get('tab') : null;
   const linkOpen = params.get('open');
   const [tab, setTab] = useState(linkTab || SECTIONS[0].key);
+  // Menu links to a tab (Homepage banner, Hamilton & Niagara) switch tabs while already on this page.
+  useEffect(() => { if (linkTab) setTab(linkTab); }, [linkTab]);
   const groupRef = useRef(null);
   useEffect(() => { if (linkTab && linkOpen) setTimeout(() => groupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }, [linkTab, linkOpen]);
   const [values, setValues] = useState(() => structuredClone(PROMOTIONS_DEFAULTS));
@@ -347,12 +406,13 @@ export default function PromotionsAdmin() {
   const [picker, setPicker] = useState(null);
   const [media, setMedia] = useState([]);
   const [servicePhotos, setServicePhotos] = useState({});
+  const retiredRef = useRef({});
 
   useEffect(() => {
     if (!accessToken) return;
     setBusy(true);
     loadSunwingsSettings(accessToken)
-      .then(settings => setValues(Object.fromEntries(Object.entries(PROMOTIONS_DEFAULTS).map(([key, fallback]) => [key, parse(settings?.[key], structuredClone(fallback))]))))
+      .then(settings => setValues(swapRetired(Object.fromEntries(Object.entries(PROMOTIONS_DEFAULTS).map(([key, fallback]) => [key, parse(settings?.[key], structuredClone(fallback))])), retiredRef.current)))
       .catch(err => setError(err.message))
       .finally(() => setBusy(false));
     loadServicePosts(accessToken)
@@ -364,6 +424,9 @@ export default function PromotionsAdmin() {
       .then(data => {
         if (!data) return;
         const full = url => (url && url.startsWith('/') ? `${SITE_URL}${url}` : url);
+        const retired = Object.fromEntries(Object.entries(data.retired || {}).map(([from, to]) => [from, full(to)]));
+        retiredRef.current = retired;
+        if (Object.keys(retired).length) setValues(current => swapRetired(current, retired));
         setServicePhotos(current => ({
           ...current,
           ...Object.fromEntries(Object.entries(data.services || {}).map(([key, url]) => [key, full(url)])),
@@ -401,7 +464,7 @@ export default function PromotionsAdmin() {
 
   const resetSection = () => {
     if (!window.confirm(`Put “${section.title}” back to the original content? This takes effect when you save.`)) return;
-    update(section.key, structuredClone(PROMOTIONS_DEFAULTS[section.key]));
+    update(section.key, swapRetired(structuredClone(PROMOTIONS_DEFAULTS[section.key]), retiredRef.current));
   };
 
   const value = values[section.key];
@@ -437,10 +500,10 @@ export default function PromotionsAdmin() {
         <Repeat key={section.key} field={section} items={value} onChange={next => update(section.key, next)} onPickMedia={pickMedia}
           initialOpen={tab === linkTab && linkOpen != null && /^\d+$/.test(linkOpen) ? Number(linkOpen) : null}/>
       ) : section.groups ? (
-        section.groups.map(([groupKey, groupLabel]) => (
+        section.groups.map(([groupKey, groupLabel, groupFields]) => (
           <details className="promo-group" key={`${section.key}-${groupKey}`} open={tab === linkTab && linkOpen === groupKey ? true : undefined} ref={tab === linkTab && linkOpen === groupKey ? groupRef : null}>
             <summary>{groupLabel}</summary>
-            <Fields fields={section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia} groupKey={groupKey}
+            <Fields fields={groupFields || section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia} groupKey={groupKey}
               onChange={next => update(section.key, { ...value, [groupKey]: next })}/>
           </details>
         ))

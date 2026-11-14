@@ -301,5 +301,89 @@ export const PROMOTIONS_DEFAULTS = {
     "bullets": [],
     "body_html": "",
     "faq": []
+  },
+  "hn_content": {
+    "home": {
+      "eyebrow": "Hamilton · Burlington · Grimsby · Niagara",
+      "heading": "Hamilton & Niagara",
+      "accent": "movers & transport.",
+      "text": "Long-distance moves, furniture delivery and large-item transport across Hamilton and the Niagara Region, and to Toronto and the GTA. Tell us where it’s going and get a tailored quote.",
+      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1792805164536-image.png",
+      "cards": [
+        {
+          "title": "Long-distance moves",
+          "text": "Full home moves between Hamilton or Niagara and Toronto, Mississauga and the GTA, planned around access at both ends.",
+          "href": "/hamilton-niagara/long-distance",
+          "cta": "Long-distance moving"
+        },
+        {
+          "title": "Furniture & store delivery",
+          "text": "Store pickups, Marketplace finds and single large items brought from anywhere in the region and placed in the room you want.",
+          "href": "/hamilton-niagara/furniture-delivery",
+          "cta": "Furniture delivery"
+        },
+        {
+          "title": "Commercial & large-item transport",
+          "text": "Office moves, equipment, inventory and business deliveries between cities, one-off or on a schedule.",
+          "href": "/hamilton-niagara/commercial-transport",
+          "cta": "Commercial transport"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Do you move between Niagara and Toronto?",
+          "answer": "Yes. Moves and deliveries between the Niagara Region, Hamilton and Toronto or the GTA are our main long-distance routes. Send both addresses and your date for a tailored quote."
+        },
+        {
+          "question": "Which towns do you cover in Hamilton and Niagara?",
+          "answer": "Hamilton, Stoney Creek, Ancaster, Dundas, Waterdown, Burlington, Grimsby, Lincoln, St. Catharines, Niagara Falls, Welland, Thorold and Fort Erie, plus nearby towns on request."
+        },
+        {
+          "question": "Can you deliver one large item from Hamilton or Niagara to Toronto?",
+          "answer": "Yes. Furniture, appliances and other large items can be picked up and delivered between cities. Tell us the item, size, stairs and both addresses."
+        },
+        {
+          "question": "How is a long-distance quote priced?",
+          "answer": "It depends on the route, the amount being moved, the crew and vehicle needed, and access at both ends. You get a written quote before anything is booked."
+        }
+      ]
+    },
+    "long-distance": {
+      "eyebrow": "Hamilton & Niagara",
+      "heading": "Long-distance moving",
+      "accent": "Hamilton & Niagara ↔ Toronto.",
+      "text": "Full home moves between Hamilton, Burlington, Grimsby, St. Catharines, Niagara Falls and Toronto, Mississauga and the GTA. Planned around access at both ends, quoted in writing before you book.",
+      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794229390663-IMG_8141.jpeg",
+      "sendList": [
+        "Pickup and delivery cities and addresses, and your moving date.",
+        "Home size or item list, with photos of large or awkward pieces.",
+        "Stairs, elevators, parking and carrying distance at both ends."
+      ]
+    },
+    "furniture-delivery": {
+      "eyebrow": "Hamilton & Niagara",
+      "heading": "",
+      "accent": "Hamilton & Niagara.",
+      "text": "",
+      "image": ""
+    },
+    "commercial-transport": {
+      "eyebrow": "Hamilton & Niagara",
+      "heading": "",
+      "accent": "Hamilton & Niagara.",
+      "text": "",
+      "image": ""
+    },
+    "routes": {
+      "image": ""
+    },
+    "servicesCard": {
+      "enabled": true,
+      "title": "Long-Distance Moving",
+      "text": "Moving between Hamilton, Niagara and Toronto or the GTA? One crew loads, drives and unloads, with a written quote before you book.",
+      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794229390663-IMG_8141.jpeg",
+      "linkText": "Learn more →",
+      "url": "/hamilton-niagara/long-distance"
+    }
   }
 };
