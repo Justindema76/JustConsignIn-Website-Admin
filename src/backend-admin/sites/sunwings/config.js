@@ -10,6 +10,7 @@ export default {
     { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
     { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
     { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
+    { to: '/admin/sunwings/analytics', label: 'Analytics', icon: 'chart', ownerOnly: true },
     { to: '/admin/sunwings/jobs', label: 'My jobs', icon: 'truck', partnerOnly: true },
   ],
   navGroups: [
