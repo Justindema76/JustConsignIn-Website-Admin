@@ -302,6 +302,7 @@ export default function SunwingsPostEditor({ type }) {
           <div className="work-post-panel-head">
             <div><span>2</span><div><h2>Banner</h2><p>Uses the Sunwings full-width image banner template.</p></div></div>
             <div className="site-admin-actions">
+              {type === 'service' && draft.slug ? <Link className="site-admin-btn small" to={`/admin/sunwings/promotions?tab=service_banners&open=${encodeURIComponent(draft.slug)}`}>Position photo (phone &amp; desktop)</Link> : null}
               <button className="site-admin-btn secondary small" type="button" onClick={chooseMedia} disabled={mediaLoading}><Library size={13}/>{mediaLoading ? 'Loading…' : 'Choose Media'}</button>
               <button className="site-admin-btn secondary small" type="button" onClick={() => imageRef.current?.click()} disabled={uploading}><Upload size={13}/>{uploading ? 'Uploading…' : 'Upload Banner'}</button>
             </div>

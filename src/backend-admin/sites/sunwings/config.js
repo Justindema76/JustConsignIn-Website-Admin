@@ -40,8 +40,8 @@ export default {
       label: 'Website',
       items: [
         { to: '/admin/sunwings/pages', label: 'Pages', icon: 'panels', ownerOnly: true },
-        { to: '/admin/sunwings/promotions?tab=hero_slides&open=0', label: 'Homepage banner', icon: 'image', ownerOnly: true },
-        { to: '/admin/sunwings/promotions', label: 'Pop-up, Slider & Banners', icon: 'sparkles', ownerOnly: true },
+        { to: '/admin/sunwings/promotions?tab=hero_slides&open=0', label: 'Homepage banner', icon: 'sparkles', ownerOnly: true },
+        { to: '/admin/sunwings/promotions', label: 'All banners & pop-up', icon: 'sparkles', ownerOnly: true },
         { to: '/admin/sunwings/banner-studio', label: 'Banner Studio', icon: 'image', ownerOnly: true },
         { to: '/admin/sunwings/blocks', label: 'Block Library', icon: 'library', ownerOnly: true },
         { to: '/admin/sunwings/styles', label: 'Global Styles', icon: 'palette', ownerOnly: true },
@@ -102,7 +102,7 @@ export default {
         copy: 'Pages, reusable blocks and global website controls.',
         items: [
           { to: '/admin/sunwings/pages', icon: 'panels', title: 'Pages', copy: 'Open and edit the main public pages.', ownerOnly: true },
-          { to: '/admin/sunwings/promotions', icon: 'sparkles', title: 'Pop-up, Slider & Banners', copy: 'Pop-up, homepage slider, page banners, price match and snow removal plans.', ownerOnly: true },
+          { to: '/admin/sunwings/promotions', icon: 'sparkles', title: 'All banners & pop-up', copy: 'Homepage banner, every page and service banner, the offer pop-up, price match and snow plans.', ownerOnly: true },
           { to: '/admin/sunwings/banner-studio', icon: 'image', title: 'Banner Studio', copy: 'Design banners with Code Studio and pick which pages show them.', ownerOnly: true },
           { to: '/admin/sunwings/blocks', icon: 'library', title: 'Block Library', copy: 'Browse the reusable Sunwings page-builder blocks.', ownerOnly: true },
           { to: '/admin/sunwings/styles', icon: 'palette', title: 'Global Styles', copy: 'Control colours, typography, spacing, cards and buttons.', ownerOnly: true },

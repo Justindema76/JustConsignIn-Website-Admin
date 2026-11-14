@@ -45,28 +45,9 @@ const BANNER_FIELDS = [
 
 const SECTIONS = [
   {
-    key: 'promo_popup',
-    title: 'Pop-up',
-    intro: 'The offer shown in the top bar on every page (it flips with the usual top bar line) and as a small tab in the bottom-left corner of its service page on computers. Turn it off below to hide both.',
-    fields: [
-      { name: 'enabled', label: 'ON / OFF: show this offer (top bar + pop-up tab)', type: 'toggle' },
-      { name: 'serviceSlug', label: 'Service it promotes', type: 'select', options: SERVICES, hint: 'Its quote form opens with this service picked.' },
-      { name: 'image', label: 'Photo', type: 'image', hint: PHOTO_HINT },
-      { name: 'eyebrow', label: 'Small tag' },
-      { name: 'heading', label: 'Headline' },
-      { name: 'price', label: 'Price badge', hint: 'Leave blank to show the featured plan’s price, e.g. “from $175/month”.' },
-      { name: 'text', label: 'Text', type: 'textarea' },
-      { name: 'primary', label: 'Main button text' },
-      { name: 'plan', label: 'Plan picked in the quote form', hint: 'Must match a plan name, e.g. “Seasonal plan”. Optional.' },
-      { name: 'secondary', label: 'Second link text' },
-      { name: 'secondaryHref', label: 'Second link goes to', hint: 'E.g. /services/snow-removal#plans opens the snow plans.' },
-      { name: 'tabLabel', label: 'Closed tab text', hint: 'Leave blank for “[Service] [price]”.' },
-    ],
-  },
-  {
     key: 'hero_slides',
-    title: 'Slides',
-    intro: 'The homepage slider, in order. Services, Service Areas and Pricing show these after their own banner.',
+    title: 'Homepage banner',
+    intro: 'The sliding banner at the top of the homepage, in order. Slide 1 shows the homepage photo (the van) unless you pick another. Services, Service Areas and Pricing also show these slides after their own banner.',
     list: true,
     itemLabel: item => `${SERVICES.find(([slug]) => slug === item.slug)?.[1] || 'Slide'}: ${item.heading || ''} ${item.accent || ''}`,
     newItem: { enabled: true, slug: 'residential-moving', image: '', desktopPosition: '', desktopSize: '', mobilePosition: '', mobileSize: '', eyebrow: '', heading: 'New slide', accent: '', text: '', primary: 'Get a quote', plan: '', secondary: 'Learn more', secondaryHref: '', badgeFromPrice: false, badgeTop: '', badgeMain: '', badgeBottom: '' },
@@ -91,8 +72,8 @@ const SECTIONS = [
   },
   {
     key: 'page_banners',
-    title: 'Page banners',
-    intro: 'The banner at the top of each main page.',
+    title: 'Other page banners',
+    intro: 'The banner at the top of Services, Service Areas, Pricing, Moving Tips, Contact and Privacy Policy. Open a page to change its photo, text and how the photo sits on desktop and phones.',
     groups: [
       ['services', 'Services'],
       ['locations', 'Service Areas'],
@@ -105,10 +86,29 @@ const SECTIONS = [
   },
   {
     key: 'service_banners',
-    title: 'Service page photos',
-    intro: 'Which part of each service page’s banner photo shows, on desktop and on phones. The photo itself is set in Service Posts.',
+    title: 'Service page banners',
+    intro: 'The banner at the top of each service page (Residential Moving, Junk Removal, etc.). Move and zoom the photo for desktop and phones here. To swap the photo itself, use Service Posts.',
     groups: [...SERVICES, ['client-assist-moving-delivery', 'Client Assist Moving & Delivery']],
     fields: [POSITION_FIELD],
+  },
+  {
+    key: 'promo_popup',
+    title: 'Offer pop-up',
+    intro: 'The offer shown in the top bar on every page (it flips with the usual top bar line) and as a small tab in the bottom-left corner of its service page on computers. Turn it off below to hide both.',
+    fields: [
+      { name: 'enabled', label: 'ON / OFF: show this offer (top bar + pop-up tab)', type: 'toggle' },
+      { name: 'serviceSlug', label: 'Service it promotes', type: 'select', options: SERVICES, hint: 'Its quote form opens with this service picked.' },
+      { name: 'image', label: 'Photo', type: 'image', hint: PHOTO_HINT },
+      { name: 'eyebrow', label: 'Small tag' },
+      { name: 'heading', label: 'Headline' },
+      { name: 'price', label: 'Price badge', hint: 'Leave blank to show the featured plan’s price, e.g. “from $175/month”.' },
+      { name: 'text', label: 'Text', type: 'textarea' },
+      { name: 'primary', label: 'Main button text' },
+      { name: 'plan', label: 'Plan picked in the quote form', hint: 'Must match a plan name, e.g. “Seasonal plan”. Optional.' },
+      { name: 'secondary', label: 'Second link text' },
+      { name: 'secondaryHref', label: 'Second link goes to', hint: 'E.g. /services/snow-removal#plans opens the snow plans.' },
+      { name: 'tabLabel', label: 'Closed tab text', hint: 'Leave blank for “[Service] [price]”.' },
+    ],
   },
   {
     key: 'pricing_panel',
@@ -410,8 +410,8 @@ export default function PromotionsAdmin() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Sunwings Transport</p>
-        <h1>Pop-up, Slider &amp; Banners</h1>
-        <p>Edit the slider, page banners, the slide-up pop-up, the price match and the snow removal plans. Changes go live about a minute after you save.</p>
+        <h1>Banners &amp; Pop-up</h1>
+        <p>Every banner on the website, plus the offer pop-up, price match and snow plans. Changes go live about a minute after you save.</p>
       </div>
       <button className="site-admin-btn" type="button" onClick={save} disabled={busy}><Save size={15}/> {busy ? 'Saving…' : Object.keys(dirty).length ? `Save ${Object.keys(dirty).length} change${Object.keys(dirty).length > 1 ? 's' : ''}` : 'Save'}</button>
     </div>
