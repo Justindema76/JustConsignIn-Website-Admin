@@ -5,45 +5,16 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteAdminMedia, getAdminSiteKey, loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from '../../sites/sunwings/sunwingsAdminService';
 import './mediaAdmin.css';
+import { FOLDERS, SUNWINGS_SITE, formatBytes, guessFolder, keyOf, previewUrl, sizeOf } from './mediaUtils';
 
 // Media library: every stored image, video and audio file for this site, with its size, the total
 // space used, sorting, folders, "In use / Not used" tags (Sunwings: checked against the live site)
 // and bulk select/delete. Big photos are shrunk to web size before uploading.
 
-const FOLDERS = ['Banners', 'Job photos', 'Locations', 'Logos', 'Social', 'Website assets', 'Other'];
-// Local preview (vite dev) checks the local site copy.
-const SUNWINGS_SITE = import.meta.env.DEV ? 'http://localhost:3099' : 'https://www.sunwingstransport.ca';
-const keyOf = item => `${item.bucket || 'media'}:${item.path || item.url}`;
-const sizeOf = item => Number(item.metadata?.size || item.metadata?.contentLength || 0) || 0;
-
-export function formatBytes(bytes) {
-  if (!bytes) return '0 KB';
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
-}
-
-// Folder a file starts in until someone moves it.
-function guessFolder(item) {
-  const name = String(item.name || '').toLowerCase();
-  if (item.mediaType === 'video' || item.mediaType === 'audio' || /social|-\d+x\d+\./.test(name)) return 'Social';
-  if (/logo|favicon|icon/.test(name)) return 'Logos';
-  if (item.bucket === 'site-assets') return 'Website assets';
-  if (/^\d+-(img|dsc|pxl|photo)[_-]?\d+/i.test(name) || /^\d+-image\./.test(name)) return 'Job photos';
-  if (/banner|hero|highway|bridge|panorama/.test(name)) return 'Banners';
-  return 'Other';
-}
-
-// Small preview instead of the full-size original (Supabase image resizing).
-function previewUrl(item) {
-  if ((item.mediaType || 'image') !== 'image' || !/\/storage\/v1\/object\/public\//.test(item.url || '') || /\.gif$/i.test(item.url)) return item.url;
-  return `${item.url.replace('/object/public/', '/render/image/public/')}?width=480&quality=70`;
-}
-
 // Photos bigger than this get resized and saved as WebP before uploading (GIFs are left alone).
 const MAX_SIDE = 2000;
 const SHRINK_OVER = 700 * 1024;
-async function shrinkImage(file) {
+export async function shrinkImage(file) {
   if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) return { file, saved: 0 };
   const bitmap = await createImageBitmap(file).catch(() => null);
   if (!bitmap) return { file, saved: 0 };
@@ -60,7 +31,9 @@ async function shrinkImage(file) {
   return { file: new File([blob], name, { type: 'image/webp' }), saved: file.size - blob.size };
 }
 
-export default function MediaAdmin() {
+// onPick: opened from a "Choose from Media" button. Same page, plus "Use this image" on every file
+// (no deleting or bulk actions in that mode).
+export default function MediaAdmin({ onPick = null, pickTypes = null }) {
   const { accessToken, user } = useAuth();
   // Space used and file sizes are for the owner only (not partners like Marius).
   const isOwner = !user?.role || user.role === 'owner';
@@ -120,6 +93,7 @@ export default function MediaAdmin() {
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     let list = !term ? items : items.filter(item => `${item.name || ''} ${item.url || ''} ${item.mediaType || ''} ${item.bucket || ''}`.toLowerCase().includes(term));
+    if (pickTypes) list = list.filter(item => pickTypes.includes(item.mediaType || 'image'));
     if (folder === 'unused') list = list.filter(item => !item.protectedAsset && usedOf(item) === false);
     else if (folder !== 'all') list = list.filter(item => folderOf(item) === folder);
     const by = {
@@ -214,11 +188,11 @@ export default function MediaAdmin() {
 
   return <>
     <div className="site-admin-page-head">
-      <div><p className="site-admin-eyebrow">Assets</p><h1>Media</h1><p>{isSunwings ? 'Images and files for the Sunwings website. Big photos are shrunk to web size when you upload them.' : 'Shared Supabase media for blog articles and social campaigns. Store images, MP4 videos and music in one reusable library.'}</p></div>
+      <div><p className="site-admin-eyebrow">Assets</p><h1>{onPick ? 'Choose an image' : 'Media'}</h1><p>{onPick ? 'Click a photo, or upload a new one (big photos are shrunk to web size).' : isSunwings ? 'Images and files for the Sunwings website. Big photos are shrunk to web size when you upload them.' : 'Shared Supabase media for blog articles and social campaigns. Store images, MP4 videos and music in one reusable library.'}</p></div>
       <div className="site-admin-actions">{!isSunwings && <Link className="site-admin-btn secondary" to="/admin/social-image"><WandSparkles size={15}/> Image Studio</Link>}<label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Media'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,.mp4,audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" multiple onChange={upload} disabled={uploading}/></label></div>
     </div>
 
-    {isOwner ? <div className="media-stats">
+    {isOwner && !onPick ? <div className="media-stats">
       <div><HardDrive size={18}/><span><b>{formatBytes(totals.all)}</b> used by {totals.count} file{totals.count === 1 ? '' : 's'}{isSunwings ? ' (Sunwings only)' : ''}</span></div>
       {inUse ? <button type="button" className={folder === 'unused' ? 'on' : ''} onClick={() => setFolder(folder === 'unused' ? 'all' : 'unused')}><b>{totals.unusedCount}</b> not used on the live site · {formatBytes(totals.unusedSize)} you could free</button> : null}
     </div> : null}
@@ -240,10 +214,10 @@ export default function MediaAdmin() {
         {isOwner ? <option value="largest">Largest first</option> : null}
         <option value="name">Name</option>
       </select>
-      <button type="button" className="site-admin-btn secondary small" onClick={() => setSelected(allShownSelected ? new Set() : new Set(filtered.map(keyOf)))}>{allShownSelected ? <CheckSquare size={14}/> : <Square size={14}/>} {allShownSelected ? 'Unselect all' : 'Select all shown'}</button>
+      {onPick ? null : <button type="button" className="site-admin-btn secondary small" onClick={() => setSelected(allShownSelected ? new Set() : new Set(filtered.map(keyOf)))}>{allShownSelected ? <CheckSquare size={14}/> : <Square size={14}/>} {allShownSelected ? 'Unselect all' : 'Select all shown'}</button>}
     </div>
 
-    {selectedItems.length ? <div className="media-bulk">
+    {selectedItems.length && !onPick ? <div className="media-bulk">
       <b>{selectedItems.length} selected{isOwner ? ` · ${formatBytes(selectedItems.reduce((sum, item) => sum + sizeOf(item), 0))}` : ''}</b>
       {isSunwings ? <label><FolderInput size={14}/><select value="" onChange={event => moveTo(selectedItems, event.target.value)}><option value="">Move to folder…</option>{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select></label> : null}
       <button type="button" className="site-admin-btn secondary small danger" onClick={() => deleteMany(selectedItems)}><Trash2 size={14}/> Delete selected</button>
@@ -257,23 +231,24 @@ export default function MediaAdmin() {
         const used = usedOf(item);
         return <div className={`site-admin-card site-admin-media-card ${selected.has(key) ? 'is-selected' : ''}`} key={key}>
           <div className="site-admin-media-image">
-            <button type="button" className="media-check" onClick={() => toggle(item)} aria-label={selected.has(key) ? 'Unselect' : 'Select'}>{selected.has(key) ? <CheckSquare size={18}/> : <Square size={18}/>}</button>
+            {onPick ? null : <button type="button" className="media-check" onClick={() => toggle(item)} aria-label={selected.has(key) ? 'Unselect' : 'Select'}>{selected.has(key) ? <CheckSquare size={18}/> : <Square size={18}/>}</button>}
             {used !== null && !item.protectedAsset ? <span className={`media-use ${used ? 'yes' : 'no'}`}>{used ? 'In use' : 'Not used'}</span> : null}
             {type === 'video'
               ? <video src={item.url} controls playsInline preload="metadata"/>
               : type === 'audio'
                 ? <div style={{ width: '100%', padding: 18, display: 'grid', gap: 12, justifyItems: 'center' }}><Music2 size={28}/><audio controls preload="metadata" src={item.url} style={{ width: '100%' }}/></div>
-                : <img src={previewUrl(item)} alt={item.name || 'Uploaded media'} loading="lazy" decoding="async"/>}
+                : <img src={previewUrl(item)} alt={item.name || 'Uploaded media'} loading="lazy" decoding="async" onClick={onPick ? () => onPick(item) : undefined} style={onPick ? { cursor: 'pointer' } : undefined}/>}
           </div>
           <div className="site-admin-media-copy">
             <strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong>
             <small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>}{isOwner ? <> · <b className={sizeOf(item) > 1024 * 1024 ? 'media-big' : ''}>{formatBytes(sizeOf(item))}</b></> : null}{item.createdAt ? ` · ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small>
             {isSunwings ? <small className="media-by">{item.uploadedBy ? `Uploaded by ${item.uploadedBy}` : 'Uploader not recorded (older file)'}</small> : null}
             {isSunwings ? <select className="media-folder-select" value={folderOf(item)} onChange={event => moveTo([item], event.target.value)} aria-label="Folder">{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select> : null}
-            <div className="site-admin-media-url-row">
+            {onPick ? null : <div className="site-admin-media-url-row">
               <input className="site-admin-media-url" value={item.url || ''} readOnly aria-label={`Public URL for ${item.name || 'media'}`} onFocus={event => event.target.select()}/>
-            </div>
-            <div className="site-admin-media-actions">
+            </div>}
+            {onPick ? <button type="button" className="site-admin-btn media-use-btn" onClick={() => onPick(item)}><Check size={15}/> Use this image</button> : null}
+            {onPick ? null : <div className="site-admin-media-actions">
               <button type="button" className="site-admin-media-action" onClick={() => copyUrl(item)} disabled={!item.url}>
                 {copiedKey === key ? <Check size={14}/> : <Copy size={14}/>}
                 {copiedKey === key ? 'Copied' : 'Copy URL'}
@@ -288,7 +263,7 @@ export default function MediaAdmin() {
               >
                 <Trash2 size={14}/> {item.protectedAsset ? 'Protected' : deletingKey === key ? 'Deleting…' : 'Delete'}
               </button>
-            </div>
+            </div>}
           </div>
         </div>;
       })}

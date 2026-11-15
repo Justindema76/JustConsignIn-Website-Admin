@@ -1,21 +1,15 @@
 import { X } from 'lucide-react';
-import MediaPreview from '../../../components/media/MediaPreview';
+import MediaAdmin from '../../media/MediaAdmin';
+import '../../media/mediaAdmin.css';
 
-export default function MediaPickerModal({ items = [], onSelect, onClose }) {
-  const selectable = items.filter(item => (item.mediaType || 'image') !== 'audio');
-
-  return <div className="social-modal" onClick={onClose}>
-    <div className="social-modal-card" onClick={event => event.stopPropagation()}>
-      <div className="social-modal-head">
-        <div><strong>Supabase Media Library</strong><small>{selectable.length} images & videos</small></div>
-        <button type="button" onClick={onClose}><X size={18}/></button>
-      </div>
-      <div className="social-media-grid">
-        {selectable.map(item => <button key={`${item.bucket || 'media'}:${item.path || item.url}`} type="button" onClick={() => onSelect(item)}>
-          <MediaPreview url={item.url} type={item.mediaType || 'image'} controls={false} muted/>
-          <span>{item.name}</span>
-        </button>)}
-      </div>
+// "Choose from Media": opens the full Media page (folders, search, sort, In use tags, upload)
+// in a large window; click a photo or "Use this image" to pick it.
+// `items` is kept for older callers; the page loads the library itself.
+export default function MediaPickerModal({ onSelect, onClose, types = ['image', 'video'] }) {
+  return <div className="social-modal media-picker-overlay" onClick={onClose}>
+    <div className="social-modal-card media-picker-full" onClick={event => event.stopPropagation()}>
+      <button type="button" className="media-picker-close" onClick={onClose} aria-label="Close"><X size={20}/></button>
+      <MediaAdmin onPick={item => onSelect(item)} pickTypes={types}/>
     </div>
   </div>;
 }

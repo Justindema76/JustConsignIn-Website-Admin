@@ -7,6 +7,7 @@ import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminServi
 import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 import { PROMOTIONS_DEFAULTS } from './promotionsDefaults';
 import PhotoPositionField from './PhotoPositionField';
+import { shrinkImage } from '../../features/media/MediaAdmin';
 import { loadServicePosts } from './sunwingsPostStore';
 import '../../features/settings/settings.css';
 import '../../features/work-posts/workPosts.css';
@@ -31,7 +32,8 @@ const POSITION_FIELD = { name: 'photoPosition', label: 'Photo position', type: '
 
 // Service slug → its banner photo, so the position editor can show the right picture.
 const ServicePhotos = createContext({});
-const SITE_URL = 'https://www.sunwingstransport.ca';
+// Local preview (vite dev) reads the local site copy.
+const SITE_URL = import.meta.env.DEV ? 'http://localhost:3099' : 'https://www.sunwingstransport.ca';
 
 const BANNER_FIELDS = [
   { name: 'eyebrow', label: 'Small tag above the headline' },
@@ -233,6 +235,20 @@ const SECTIONS = [
     ],
   },
   {
+    key: 'hn_town_banners',
+    title: 'H&N town pages',
+    intro: 'The banner on each Hamilton & Niagara town page (/hamilton-niagara/<town>). Blank fields use that town’s Location Post. The list comes from your Location Posts in the Hamilton, Niagara and Halton regions.',
+    groupsFrom: 'hnTowns',
+    fields: [
+      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank to use the town’s Location Post photo.' },
+      POSITION_FIELD,
+      { name: 'eyebrow', label: 'Small tag above the headline' },
+      { name: 'heading', label: 'Headline (white)', hint: 'Blank = “<Town> movers”.' },
+      { name: 'accent', label: 'Second line (orange)' },
+      { name: 'text', label: 'Subtitle', type: 'textarea', hint: 'Blank = the Location Post’s text.' },
+    ],
+  },
+  {
     key: 'hn_content',
     title: 'Hamilton & Niagara',
     intro: 'Your Hamilton & Niagara section (/hamilton-niagara): its banners, photos, service boxes and questions, plus the Long-Distance Moving card on the main site’s service lists. Town pages use their Location Post (Location Posts).',
@@ -327,7 +343,8 @@ function ImageField({ value, onChange, onPickMedia }) {
     if (!file) return;
     setUploading(true); setError('');
     try {
-      onChange(await uploadSunwingsImage(accessToken, file));
+      // Big photos are resized to web size first (same as Admin › Media).
+      onChange(await uploadSunwingsImage(accessToken, (await shrinkImage(file)).file));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -453,6 +470,8 @@ export default function PromotionsAdmin() {
   const [picker, setPicker] = useState(null);
   const [media, setMedia] = useState([]);
   const [servicePhotos, setServicePhotos] = useState({});
+  // Lists that come from the live site (e.g. the Hamilton & Niagara towns).
+  const [dynamicGroups, setDynamicGroups] = useState({});
   const retiredRef = useRef({});
 
   useEffect(() => {
@@ -472,6 +491,7 @@ export default function PromotionsAdmin() {
         if (!data) return;
         const full = url => (url && url.startsWith('/') ? `${SITE_URL}${url}` : url);
         const retired = Object.fromEntries(Object.entries(data.retired || {}).map(([from, to]) => [from, full(to)]));
+        if (data.hnTowns) setDynamicGroups(current => ({ ...current, hnTowns: data.hnTowns.map(town => [town.slug, `${town.title}${town.region ? ` · ${town.region.replace(' Region', '')}` : ''}`]) }));
         retiredRef.current = retired;
         if (Object.keys(retired).length) setValues(current => swapRetired(current, retired));
         setServicePhotos(current => ({
@@ -479,6 +499,7 @@ export default function PromotionsAdmin() {
           ...Object.fromEntries(Object.entries(data.services || {}).map(([key, url]) => [key, full(url)])),
           ...Object.fromEntries(Object.entries(data.pages || {}).map(([key, url]) => [key, full(url)])),
           ...Object.fromEntries(Object.entries(data.routes || {}).map(([key, url]) => [key, full(url)])),
+          ...Object.fromEntries((data.hnTowns || []).filter(town => town.image).map(town => [town.slug, full(town.image)])),
           // The first slide shows the Home page photo when it has none of its own.
           ...(data.slides?.[0] ? { __home: full(data.slides[0]) } : {}),
         }));
@@ -547,8 +568,8 @@ export default function PromotionsAdmin() {
       {section.list ? (
         <Repeat key={section.key} field={section} items={value} onChange={next => update(section.key, next)} onPickMedia={pickMedia}
           initialOpen={tab === linkTab && linkOpen != null && /^\d+$/.test(linkOpen) ? Number(linkOpen) : null}/>
-      ) : section.groups ? (
-        section.groups.map(([groupKey, groupLabel, groupFields]) => (
+      ) : (section.groups || section.groupsFrom) ? (
+        (section.groups || dynamicGroups[section.groupsFrom] || []).map(([groupKey, groupLabel, groupFields]) => (
           <details className="promo-group" key={`${section.key}-${groupKey}`} open={tab === linkTab && linkOpen === groupKey ? true : undefined} ref={tab === linkTab && linkOpen === groupKey ? groupRef : null}>
             <summary>{groupLabel}</summary>
             <Fields fields={groupFields || section.fields} value={value?.[groupKey] || {}} onPickMedia={pickMedia} groupKey={groupKey}

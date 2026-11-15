@@ -411,5 +411,6 @@ export const PROMOTIONS_DEFAULTS = {
     "toronto-to-st-catharines": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
     "niagara-falls-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
     "toronto-to-niagara-falls": {"image":"","eyebrow":"","heading":"","accent":"","text":""}
-  }
+  },
+  "hn_town_banners": {}
 };
