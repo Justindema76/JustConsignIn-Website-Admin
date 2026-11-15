@@ -33,10 +33,12 @@ function parse(raw) {
   return value && typeof value === 'object' ? value : {};
 }
 
-export default function HnSeoPages() {
+export default function HnSeoPages({ open: openProp, onOpen, onLoaded }) {
   const { accessToken } = useAuth();
   const [seo, setSeo] = useState({});
-  const [open, setOpen] = useState('');
+  const [ownOpen, setOwnOpen] = useState('');
+  const open = openProp ?? ownOpen;
+  const setOpen = onOpen || setOwnOpen;
   const [picking, setPicking] = useState('');
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(true);
@@ -44,7 +46,7 @@ export default function HnSeoPages() {
 
   useEffect(() => {
     if (!accessToken) return;
-    loadSunwingsSettings(accessToken).then(settings => setSeo(parse(settings?.hn_seo))).catch(err => setNote(err.message)).finally(() => setBusy(false));
+    loadSunwingsSettings(accessToken).then(settings => { const saved = parse(settings?.hn_seo); setSeo(saved); onLoaded?.(saved); }).catch(err => setNote(err.message)).finally(() => setBusy(false));
   }, [accessToken]);
 
   const set = (id, key, value) => { setSeo(current => ({ ...current, [id]: { ...current[id], [key]: value } })); setDirty(true); setNote(''); };
@@ -53,13 +55,13 @@ export default function HnSeoPages() {
     setBusy(true); setNote('');
     try {
       await saveSunwingsSettings(accessToken, { hn_seo: JSON.stringify(seo) });
-      setDirty(false); setNote('Saved. Google sees the new text the next time it visits.');
+      setDirty(false); onLoaded?.(seo); setNote('Saved. Google sees the new text the next time it visits.');
     } catch (err) { setNote(err.message); } finally { setBusy(false); }
   };
 
   return <div className="site-admin-card hn-seo-card" id="hamilton-niagara" style={{ marginTop: 24 }}>
     <div className="sunwings-pages-toolbar">
-      <div><h2 style={{ margin: 0 }}>Hamilton &amp; Niagara pages</h2><small>Click a page to edit its Google title, description and share image. Blank = the grey default.</small></div>
+      <div><h2 style={{ margin: 0 }}>Google search text (SEO)</h2><small>Click a page to edit its Google title, description and share image. Blank = the grey default.</small></div>
       <button className="site-admin-btn" type="button" onClick={save} disabled={busy || !dirty}><Save size={15}/> {busy ? 'Working…' : dirty ? 'Save SEO' : 'Saved'}</button>
     </div>
     {note && <div className="site-admin-alert success">{note}</div>}

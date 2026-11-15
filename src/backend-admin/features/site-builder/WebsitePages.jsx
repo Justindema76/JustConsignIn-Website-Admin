@@ -11,11 +11,12 @@ import {
   Search,
   ShieldCheck,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { getWebsitePages, livePageUrl } from './websitePagesData';
+import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { SUNWINGS_HN_PAGES, getWebsitePages, livePageUrl } from './websitePagesData';
 import { getAdminSiteKey } from '../../services/siteAdminService';
 import './websitePages.css';
-import HnSeoPages from '../../sites/sunwings/HnSeoPages';
+import HnSeoPages, { HN_PAGES } from '../../sites/sunwings/HnSeoPages';
 
 const kindMeta = {
   marketing: { label: 'Marketing page', icon: LayoutTemplate },
@@ -34,6 +35,7 @@ function editTarget(page) {
 }
 
 function editorLabel(page) {
+  if (page.editor === 'section') return 'Hamilton & Niagara';
   if (page.editor === 'visual') return 'Visual editor';
   if (page.editor === 'blog') return 'Blog manager';
   if (page.editor === 'work-post') return 'Work Post editor';
@@ -52,7 +54,19 @@ function customPageNote(page) {
 
 export default function WebsitePages() {
   const siteKey = getAdminSiteKey();
-  const pages = getWebsitePages(siteKey);
+  // Sunwings: switch between the main site (Toronto & GTA) and the Hamilton & Niagara section.
+  const [params, setParams] = useSearchParams();
+  const area = siteKey === 'sunwings' && params.get('area') === 'hn' ? 'hn' : 'main';
+  const setArea = next => setParams(next === 'hn' ? { area: 'hn' } : {}, { replace: true });
+  const [seoOpen, setSeoOpen] = useState('');
+  const [hnSeo, setHnSeo] = useState({});
+  // Google title and description for a Hamilton & Niagara page: saved text, or the default.
+  const seoFor = id => { const def = HN_PAGES.find(row => row[0] === id) || []; return { title: hnSeo[id]?.title || def[3] || '', description: hnSeo[id]?.description || def[4] || '', custom: Boolean(hnSeo[id]?.title || hnSeo[id]?.description) }; };
+  const openSeo = id => {
+    setSeoOpen(id);
+    setTimeout(() => document.getElementById('hamilton-niagara')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
+  const pages = area === 'hn' ? SUNWINGS_HN_PAGES : getWebsitePages(siteKey);
   const websiteUrl = livePageUrl('/', siteKey);
   const workChildren = siteKey === 'justindematteis'
     ? pages.filter(page => page.path.startsWith('/work/') && page.path !== '/work')
@@ -80,13 +94,22 @@ export default function WebsitePages() {
         {page.aliases?.length ? <small>Also: {page.aliases.join(', ')}</small> : null}
       </div>
 
+      {page.seo ? (() => { const seo = seoFor(page.seo); return <button type="button" className="jci-seo-preview" onClick={() => openSeo(page.seo)} title="Edit SEO">
+        <span>Google shows{seo.custom ? '' : ' (default)'}</span>
+        <strong>{seo.title}</strong>
+        <em>{seo.description}</em>
+      </button>; })() : null}
+
       <div className="jci-page-card-actions">
         {target ? <Link className="site-admin-btn" to={target}>
-          <Pencil size={14}/> {page.editor === 'blog' ? 'Manage Blog' : 'Edit Page'}
+          <Pencil size={14}/> {page.editLabel || (page.editor === 'blog' ? 'Manage Blog' : 'Edit Page')}
         </Link> : <span className="jci-custom-page-note">{customPageNote(page)}</span>}
         {page.bannerTarget ? <Link className="site-admin-btn" to={page.bannerTarget}>
           <Image size={14}/> Edit banner
         </Link> : null}
+        {page.seo ? <button className="site-admin-btn secondary" type="button" onClick={() => openSeo(page.seo)}>
+          <Search size={14}/> Edit SEO
+        </button> : null}
         <a className="site-admin-btn secondary" href={livePageUrl(page.path, siteKey)} target="_blank" rel="noreferrer">
           Open Live <ExternalLink size={13}/>
         </a>
@@ -128,7 +151,7 @@ export default function WebsitePages() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Website</p>
-        <h1>Pages</h1>
+        <h1>{area === 'hn' ? 'Hamilton & Niagara pages' : 'Pages'}</h1>
         <p>Edit visual pages here. Structured, form, and application pages stay separate when they require special behaviour.</p>
       </div>
       <div className="site-admin-actions">
@@ -137,6 +160,11 @@ export default function WebsitePages() {
         </a>
       </div>
     </div>
+
+    {siteKey === 'sunwings' ? <div className="jci-area-switch" role="tablist" aria-label="Which site">
+      <button type="button" role="tab" aria-selected={area === 'main'} className={area === 'main' ? 'active' : ''} onClick={() => setArea('main')}>Toronto &amp; GTA</button>
+      <button type="button" role="tab" aria-selected={area === 'hn'} className={area === 'hn' ? 'active' : ''} onClick={() => setArea('hn')}>Hamilton &amp; Niagara</button>
+    </div> : null}
 
     <div className="jci-page-sync-note">
       <ShieldCheck size={18}/>
@@ -150,6 +178,6 @@ export default function WebsitePages() {
       {visiblePages.map(renderPageCard)}
     </div>
 
-    {siteKey === 'sunwings' ? <HnSeoPages/> : null}
+    {area === 'hn' ? <HnSeoPages open={seoOpen} onOpen={setSeoOpen} onLoaded={setHnSeo}/> : null}
   </div>;
 }
