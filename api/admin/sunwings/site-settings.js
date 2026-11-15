@@ -36,6 +36,8 @@ const ALLOWED_KEYS = new Set([
   'route_banners',
   'media_folders',
   'hn_town_banners',
+  'site_sections',
+  'hn_seo',
 ]);
 
 export default async function handler(req, res) {

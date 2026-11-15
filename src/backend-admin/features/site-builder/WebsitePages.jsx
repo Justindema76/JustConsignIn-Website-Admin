@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { getWebsitePages, livePageUrl } from './websitePagesData';
 import { getAdminSiteKey } from '../../services/siteAdminService';
 import './websitePages.css';
+import HnSeoPages from '../../sites/sunwings/HnSeoPages';
 
 const kindMeta = {
   marketing: { label: 'Marketing page', icon: LayoutTemplate },
@@ -148,5 +149,7 @@ export default function WebsitePages() {
     <div className="jci-website-page-grid">
       {visiblePages.map(renderPageCard)}
     </div>
+
+    {siteKey === 'sunwings' ? <HnSeoPages/> : null}
   </div>;
 }

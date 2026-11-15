@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { BLOG_STATUS, createEmptyPost, deleteAdminBlogPost, loadAdminBlogPosts, saveAdminBlogPost, slugify } from './blogStore';
 import { getAdminSiteKey, loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
+import ShowOnField from '../../sites/sunwings/ShowOnField';
 
 function toTags(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
@@ -198,7 +199,7 @@ export default function BlogAdmin() {
         <label className="wide">Article body<textarea rows="20" value={draft.body} onChange={event => update('body', event.target.value)} placeholder={isSunwings ? 'Write the article here. Use ## for main section headings, ### for subheadings, and - for bullet points.' : 'Write the article here. Separate paragraphs with a blank line.'}/>{isSunwings && <small>Sunwings turns ## headings into the article’s “On this page” table of contents automatically.</small>}</label>
       </form>
       <aside>
-        <div className="site-admin-card site-admin-side-card"><h2>Publishing</h2><label>Status<select value={draft.status} onChange={event => update('status', event.target.value)}><option value={BLOG_STATUS.DRAFT}>Draft</option><option value={BLOG_STATUS.PUBLISHED}>Published</option></select></label>{draft.publishedAt && <p>Published {new Date(draft.publishedAt).toLocaleDateString()}</p>}</div>
+        <div className="site-admin-card site-admin-side-card"><h2>Publishing</h2>{isSunwings && draft.id ? <ShowOnField kind="blog" slug={draft.slug}/> : null}<label>Status<select value={draft.status} onChange={event => update('status', event.target.value)}><option value={BLOG_STATUS.DRAFT}>Draft</option><option value={BLOG_STATUS.PUBLISHED}>Published</option></select></label>{draft.publishedAt && <p>Published {new Date(draft.publishedAt).toLocaleDateString()}</p>}</div>
         <div className="site-admin-card site-admin-side-card"><h2>Live URL</h2><p>/blog/{draft.slug || 'article-slug'}</p>{draft.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View Live</a>}</div>
         {draft.id && <div className="site-admin-card site-admin-side-card danger-zone"><h2>Danger Zone</h2><p>Delete this article permanently.</p><button className="site-admin-btn danger small" type="button" onClick={() => remove(draft)} disabled={busy}><Trash2 size={13}/> Delete Article</button></div>}
       </aside>

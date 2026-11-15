@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ShowOnField from './ShowOnField';
 import { CheckCircle2, ExternalLink, Library, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
@@ -295,6 +296,7 @@ export default function SunwingsPostEditor({ type }) {
             {type === 'location' && <label>Region<input value={draft.region} onChange={event => update('region', event.target.value)} placeholder="Hamilton Region"/></label>}
             <label>Eyebrow<input value={draft.eyebrow} onChange={event => update('eyebrow', event.target.value)} placeholder="Hamilton Moving & Transport"/></label>
             <label>Sort order<input type="number" value={draft.sortOrder} onChange={event => update('sortOrder', Number(event.target.value) || 0)}/></label>
+            {type === 'service' && draft.id ? <ShowOnField kind="services" slug={draft.slug}/> : null}
           </div>
         </div>
 

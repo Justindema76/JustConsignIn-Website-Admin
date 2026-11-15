@@ -184,3 +184,9 @@
   font-size:.82rem;
   font-weight:700;
 }
+
+/* Hamilton & Niagara SEO list (HnSeoPages.jsx) */
+.hn-seo-card .hn-seo-edit{background:#faf7f2;border-radius:12px;margin:0 8px 12px}
+.hn-seo-card .hn-seo-edit label{display:grid;gap:6px;font-weight:700;font-size:13px}
+.hn-seo-card .hn-seo-edit label small{font-weight:500;color:#8a7d6b}
+.hn-seo-card .hn-seo-edit input,.hn-seo-card .hn-seo-edit textarea{width:100%;box-sizing:border-box;font:500 14px/1.4 inherit;font-family:inherit;padding:10px 12px;border:1px solid #ddd3c4;border-radius:10px;background:#fff}
