@@ -221,6 +221,7 @@ const SECTIONS = [
         { name: 'accentInk', label: 'Text on orange buttons', type: 'color', fallback: '#1b1300' },
         { name: 'navy', label: 'Dark blue (dark sections, headings)', type: 'color', fallback: '#0B2545' },
         { name: 'topbar', label: 'Top bar background', type: 'color', fallback: '#0B2545' },
+        { name: 'topbarInk', label: 'Top bar text', type: 'color', fallback: '#CFE0F5', hint: 'Blank = light blue text with an orange first part, like the main site.' },
         { name: 'header', label: 'Header background', type: 'color', fallback: '#FFFFFF' },
         { name: 'blue', label: 'Links', type: 'color', fallback: '#1F5FA8' },
       ]],

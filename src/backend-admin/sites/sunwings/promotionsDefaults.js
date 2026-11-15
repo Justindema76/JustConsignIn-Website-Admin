@@ -312,6 +312,7 @@ export const PROMOTIONS_DEFAULTS = {
       "navy": "",
       "blue": "",
       "topbar": "",
+      "topbarInk": "",
       "header": ""
     },
     "home": {
