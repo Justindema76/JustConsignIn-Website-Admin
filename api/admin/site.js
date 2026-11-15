@@ -429,6 +429,8 @@ export default async function handler(req, res) {
         const right = new Date(b.createdAt || 0).getTime() || 0;
         return right - left;
       });
+      // Only the owner sees file sizes / space used (partners don't).
+      if (user.role !== 'owner') media.forEach(item => { item.metadata = {}; });
       if (siteKey === 'sunwings') {
         const uploads = await readMediaUploads().catch(() => ({}));
         media.forEach(item => { item.uploadedBy = uploads[`${item.bucket}/${item.path}`]?.by || ''; });

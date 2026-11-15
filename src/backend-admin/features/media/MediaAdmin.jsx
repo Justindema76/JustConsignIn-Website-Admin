@@ -61,7 +61,9 @@ async function shrinkImage(file) {
 }
 
 export default function MediaAdmin() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  // Space used and file sizes are for the owner only (not partners like Marius).
+  const isOwner = !user?.role || user.role === 'owner';
   const siteKey = getAdminSiteKey();
   const isSunwings = siteKey === 'sunwings';
   const [items, setItems] = useState([]);
@@ -157,7 +159,7 @@ export default function MediaAdmin() {
     const size = deletable.reduce((sum, item) => sum + sizeOf(item), 0);
     const warning = used.length ? `\n\nWARNING: ${used.length} of these ${used.length === 1 ? 'is' : 'are'} used on the live site and will show as broken images.` : '';
     const label = deletable.length === 1 ? `"${deletable[0].name}"` : `${deletable.length} files`;
-    if (!window.confirm(`Permanently delete ${label} (${formatBytes(size)})? This can't be undone.${warning}`)) return;
+    if (!window.confirm(`Permanently delete ${label}${isOwner ? ` (${formatBytes(size)})` : ''}? This can't be undone.${warning}`)) return;
     setError(''); setNotice('');
     let done = 0;
     for (const item of deletable) {
@@ -173,7 +175,7 @@ export default function MediaAdmin() {
     }
     setDeletingKey('');
     setSelected(new Set());
-    if (done) setNotice(`Deleted ${done} file${done === 1 ? '' : 's'}, freed ${formatBytes(deletable.slice(0, done).reduce((sum, item) => sum + sizeOf(item), 0))}.`);
+    if (done) setNotice(`Deleted ${done} file${done === 1 ? '' : 's'}${isOwner ? `, freed ${formatBytes(deletable.slice(0, done).reduce((sum, item) => sum + sizeOf(item), 0))}` : ''}.`);
   };
 
   const moveTo = async (list, target) => {
@@ -204,7 +206,7 @@ export default function MediaAdmin() {
         else if (type.startsWith('audio/')) await uploadSocialAudio(accessToken, original);
         else throw new Error(`${original.name}: unsupported media type.`);
       }
-      if (saved) setNotice(`Uploaded. Photos were shrunk to web size, saving ${formatBytes(saved)}.`);
+      if (saved) setNotice(isOwner ? `Uploaded. Photos were shrunk to web size, saving ${formatBytes(saved)}.` : 'Uploaded.');
       await refresh();
     } catch (err) { setError(err.message); }
     finally { setUploading(false); event.target.value = ''; }
@@ -216,10 +218,10 @@ export default function MediaAdmin() {
       <div className="site-admin-actions">{!isSunwings && <Link className="site-admin-btn secondary" to="/admin/social-image"><WandSparkles size={15}/> Image Studio</Link>}<label className="site-admin-btn upload-button"><Upload size={15}/> {uploading ? 'Uploading…' : 'Upload Media'}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,.mp4,audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/x-m4a,audio/ogg,.mp3,.m4a,.wav,.aac,.ogg" multiple onChange={upload} disabled={uploading}/></label></div>
     </div>
 
-    <div className="media-stats">
+    {isOwner ? <div className="media-stats">
       <div><HardDrive size={18}/><span><b>{formatBytes(totals.all)}</b> used by {totals.count} file{totals.count === 1 ? '' : 's'}{isSunwings ? ' (Sunwings only)' : ''}</span></div>
       {inUse ? <button type="button" className={folder === 'unused' ? 'on' : ''} onClick={() => setFolder(folder === 'unused' ? 'all' : 'unused')}><b>{totals.unusedCount}</b> not used on the live site · {formatBytes(totals.unusedSize)} you could free</button> : null}
-    </div>
+    </div> : null}
 
     {error && <div className="site-admin-alert error">{error}</div>}
     {notice && <div className="site-admin-alert success">{notice}</div>}
@@ -235,14 +237,14 @@ export default function MediaAdmin() {
       <select value={sort} onChange={event => setSort(event.target.value)} aria-label="Sort">
         <option value="newest">Newest first</option>
         <option value="oldest">Oldest first</option>
-        <option value="largest">Largest first</option>
+        {isOwner ? <option value="largest">Largest first</option> : null}
         <option value="name">Name</option>
       </select>
       <button type="button" className="site-admin-btn secondary small" onClick={() => setSelected(allShownSelected ? new Set() : new Set(filtered.map(keyOf)))}>{allShownSelected ? <CheckSquare size={14}/> : <Square size={14}/>} {allShownSelected ? 'Unselect all' : 'Select all shown'}</button>
     </div>
 
     {selectedItems.length ? <div className="media-bulk">
-      <b>{selectedItems.length} selected · {formatBytes(selectedItems.reduce((sum, item) => sum + sizeOf(item), 0))}</b>
+      <b>{selectedItems.length} selected{isOwner ? ` · ${formatBytes(selectedItems.reduce((sum, item) => sum + sizeOf(item), 0))}` : ''}</b>
       {isSunwings ? <label><FolderInput size={14}/><select value="" onChange={event => moveTo(selectedItems, event.target.value)}><option value="">Move to folder…</option>{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select></label> : null}
       <button type="button" className="site-admin-btn secondary small danger" onClick={() => deleteMany(selectedItems)}><Trash2 size={14}/> Delete selected</button>
       <button type="button" className="site-admin-btn secondary small" onClick={() => setSelected(new Set())}>Clear</button>
@@ -265,7 +267,7 @@ export default function MediaAdmin() {
           </div>
           <div className="site-admin-media-copy">
             <strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong>
-            <small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>} · <b className={sizeOf(item) > 1024 * 1024 ? 'media-big' : ''}>{formatBytes(sizeOf(item))}</b>{item.createdAt ? ` · ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small>
+            <small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>}{isOwner ? <> · <b className={sizeOf(item) > 1024 * 1024 ? 'media-big' : ''}>{formatBytes(sizeOf(item))}</b></> : null}{item.createdAt ? ` · ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small>
             {isSunwings ? <small className="media-by">{item.uploadedBy ? `Uploaded by ${item.uploadedBy}` : 'Uploader not recorded (older file)'}</small> : null}
             {isSunwings ? <select className="media-folder-select" value={folderOf(item)} onChange={event => moveTo([item], event.target.value)} aria-label="Folder">{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select> : null}
             <div className="site-admin-media-url-row">
