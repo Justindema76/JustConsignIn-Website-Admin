@@ -98,14 +98,30 @@ export const PROMOTIONS_DEFAULTS = {
     }
   ],
   "service_banners": {
-    "residential-moving": { "mobilePosition": "" },
-    "furniture-delivery": { "mobilePosition": "" },
-    "commercial-transport": { "mobilePosition": "50% 50%" },
-    "snow-removal": { "mobilePosition": "" },
-    "packing-protection": { "mobilePosition": "" },
-    "warehouse-container-unloading": { "mobilePosition": "" },
-    "junk-removal": { "mobilePosition": "" },
-    "client-assist-moving-delivery": { "mobilePosition": "50% 50%" }
+    "residential-moving": {
+      "mobilePosition": ""
+    },
+    "furniture-delivery": {
+      "mobilePosition": ""
+    },
+    "commercial-transport": {
+      "mobilePosition": "50% 50%"
+    },
+    "snow-removal": {
+      "mobilePosition": ""
+    },
+    "packing-protection": {
+      "mobilePosition": ""
+    },
+    "warehouse-container-unloading": {
+      "mobilePosition": ""
+    },
+    "junk-removal": {
+      "mobilePosition": ""
+    },
+    "client-assist-moving-delivery": {
+      "mobilePosition": "50% 50%"
+    }
   },
   "page_banners": {
     "services": {
@@ -373,6 +389,63 @@ export const PROMOTIONS_DEFAULTS = {
         "Pickup and delivery cities and addresses, and your moving date.",
         "Home size or item list, with photos of large or awkward pieces.",
         "Stairs, elevators, parking and carrying distance at both ends."
+      ],
+      "intro": "Moving between Hamilton or Niagara and Toronto is a full day on the QEW, not a local job. Sunwings plans these moves as one trip with one crew: we load at your old place, drive it ourselves and unload at the new one, so your things never sit in a warehouse or change hands. You get a written quote first, based on your home, your date and the access at both ends.",
+      "handleTitle": "What we move",
+      "handle": [
+        "Apartments, condos and townhouses",
+        "Houses, including basements and garages",
+        "Partial moves: a room, a storage unit, a few big pieces",
+        "Students and seniors moving to or from Hamilton and Niagara",
+        "Furniture bought or sold between the two regions",
+        "Office and small business moves"
+      ],
+      "stepsTitle": "How a long-distance move works",
+      "steps": [
+        {
+          "title": "Tell us the move",
+          "text": "Both addresses, your date and the size of the home or a list of the big pieces. Photos help."
+        },
+        {
+          "title": "Get a written quote",
+          "text": "We plan the truck, crew and drive time, and send the price in writing before anything is booked."
+        },
+        {
+          "title": "Moving day",
+          "text": "We wrap and load at your old place, drive the QEW or 403 ourselves, and unload into the rooms you choose."
+        },
+        {
+          "title": "Set up",
+          "text": "Beds and tables we took apart go back together, and we take the blankets with us."
+        }
+      ],
+      "localTitle": "Moving between Hamilton, Niagara and the GTA",
+      "local": "The drive is the part people underestimate. Traffic on the QEW, the Burlington Skyway and the Gardiner can turn a one-hour trip into three, so we plan the start time around it and tell you when to expect us at the other end.\n\nAccess matters at both ends. Toronto condos usually need the elevator and loading dock booked, and some ask for a certificate of insurance. Older homes in Hamilton and Niagara often have narrow stairs or tight doorways. Tell us about both places and we plan the crew and equipment for them.",
+      "quoteTitle": "What your quote is based on",
+      "quoteFactors": [
+        "The size of the home or the list of large items",
+        "The distance and drive time between the two addresses",
+        "Stairs, elevators, parking and how far we carry at each end",
+        "Your date and time (weekends and month-end book up first)",
+        "Extra work: disassembly, packing, a storage stop or a second drop-off"
+      ],
+      "faqs": [
+        {
+          "question": "Do you move from Hamilton or Niagara to Toronto in one day?",
+          "answer": "Most moves between the two regions are done in one day with one crew and one truck. Larger homes or difficult access can take longer, and your quote will say so."
+        },
+        {
+          "question": "Do you move the other way, from Toronto to Hamilton or Niagara?",
+          "answer": "Yes. We run moves in both directions, from Toronto, Mississauga and the GTA to Hamilton, Burlington and the Niagara Region too."
+        },
+        {
+          "question": "Will my things be transferred to another truck?",
+          "answer": "No. The crew that loads your things drives them and unloads them. Nothing goes through a warehouse unless you ask for storage."
+        },
+        {
+          "question": "How do I get a price?",
+          "answer": "Send both addresses, your date and the home size or item list. You get a written quote before you book, with nothing to pay to ask."
+        }
       ]
     },
     "furniture-delivery": {
@@ -380,14 +453,115 @@ export const PROMOTIONS_DEFAULTS = {
       "heading": "",
       "accent": "Hamilton & Niagara.",
       "text": "",
-      "image": ""
+      "image": "",
+      "intro": "Bought a couch on Marketplace in Grimsby, or a dining set from a store in Burlington? Sunwings picks up furniture across Hamilton and the Niagara Region and delivers it to your door, or to Toronto and the GTA. Two careful movers, blankets and straps, and the piece goes into the room you want, not left at the curb.",
+      "handleTitle": "What we deliver",
+      "handle": [
+        "Marketplace and Kijiji pickups",
+        "Furniture store and consignment shop purchases",
+        "Sofas, sectionals and recliners",
+        "Beds, mattresses and dressers",
+        "Dining tables, cabinets and bookcases",
+        "Appliances and other large single items"
+      ],
+      "stepsTitle": "How furniture delivery works",
+      "steps": [
+        {
+          "title": "Send the details",
+          "text": "A photo or link of the piece, its size, and the pickup and delivery addresses."
+        },
+        {
+          "title": "Get a written quote",
+          "text": "We confirm the van fits the piece, check the access at both ends and send the price before you book."
+        },
+        {
+          "title": "Pickup",
+          "text": "We meet the seller or store, check the piece, wrap it and strap it in the van."
+        },
+        {
+          "title": "Delivery and placement",
+          "text": "We carry it in, place it in the room you choose and take the packing with us."
+        }
+      ],
+      "localTitle": "Furniture delivery around Hamilton and Niagara",
+      "local": "A lot of what we deliver here is bought second-hand or from local shops, across towns that are spread out along the QEW. We pick up from Hamilton, Stoney Creek, Burlington, Grimsby, St. Catharines, Niagara Falls and the towns between, and deliver anywhere in the region or into Toronto and the GTA.\n\nIf you are buying from a private seller, tell us when they are home and whether the piece is upstairs or in a basement. For store pickups, send the order number and pickup window so we can book it with the store.",
+      "quoteTitle": "What your quote is based on",
+      "quoteFactors": [
+        "How many pieces, and how big and heavy they are",
+        "The distance between the pickup and the delivery",
+        "Stairs, elevators and tight corners at either end",
+        "Whether anything needs taking apart or putting back together",
+        "Your date and pickup window"
+      ],
+      "faqs": [
+        {
+          "question": "Can you pick up from a Marketplace seller?",
+          "answer": "Yes. Send us the listing or a photo, the seller’s address and when they are home, and we handle the pickup and delivery."
+        },
+        {
+          "question": "Do you deliver from Hamilton or Niagara to Toronto?",
+          "answer": "Yes. We deliver within Hamilton and Niagara and to Toronto, Mississauga and the rest of the GTA."
+        },
+        {
+          "question": "Will you bring it inside and up the stairs?",
+          "answer": "Yes. We carry it in and place it in the room you choose. Tell us about stairs, elevators and narrow doors so we bring the right crew."
+        },
+        {
+          "question": "Can you take apart a bed or table to get it in?",
+          "answer": "Yes, when it is designed to come apart. Mention it when you ask for a quote."
+        }
+      ]
     },
     "commercial-transport": {
       "eyebrow": "Hamilton & Niagara",
       "heading": "",
       "accent": "Hamilton & Niagara.",
       "text": "",
-      "image": ""
+      "image": "",
+      "intro": "Sunwings moves goods for retailers, offices, contractors and property managers across Hamilton, Burlington and the Niagara Region, and to Toronto and the GTA. One-off jobs or a regular route, with a written quote before we start.",
+      "handleTitle": "What we transport",
+      "handle": [
+        "Store deliveries and stock transfers between locations",
+        "Office furniture and equipment",
+        "Building materials and contractor supplies",
+        "Property turnovers: furniture in or out of units",
+        "Event and display equipment",
+        "Recurring routes between Hamilton, Niagara and the GTA"
+      ],
+      "stepsTitle": "How it works",
+      "steps": [
+        {
+          "title": "Tell us the job",
+          "text": "What is moving, how much of it, the addresses and your timing."
+        },
+        {
+          "title": "Get a written quote",
+          "text": "We plan the vehicle and crew and send the price before you book."
+        },
+        {
+          "title": "On the day",
+          "text": "We load, transport and unload, and keep you posted if anything changes."
+        }
+      ],
+      "localTitle": "Commercial transport in Hamilton and Niagara",
+      "local": "Businesses here often need goods moved between their own locations, or between the region and Toronto. We plan around loading docks, building hours and traffic on the QEW so your delivery arrives when someone is there to receive it.",
+      "quoteTitle": "What your quote is based on",
+      "quoteFactors": [
+        "What is being moved, how much and how heavy",
+        "Distance and drive time between the stops",
+        "Loading access: docks, elevators, stairs and parking",
+        "One-off job or a regular schedule"
+      ],
+      "faqs": [
+        {
+          "question": "Can you do a regular route?",
+          "answer": "Yes. Tell us the stops and how often, and we quote it as a recurring job."
+        },
+        {
+          "question": "Do you work outside business hours?",
+          "answer": "Evenings and weekends are possible when the job needs it. Mention it when you ask for a quote."
+        }
+      ]
     },
     "towns": {
       "image": ""
@@ -405,15 +579,69 @@ export const PROMOTIONS_DEFAULTS = {
     }
   },
   "route_banners": {
-    "long-distance": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "hamilton-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "toronto-to-hamilton": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "stoney-creek-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "hamilton-to-mississauga": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "st-catharines-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "toronto-to-st-catharines": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "niagara-falls-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
-    "toronto-to-niagara-falls": {"image":"","eyebrow":"","heading":"","accent":"","text":""}
+    "long-distance": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "hamilton-to-toronto": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "toronto-to-hamilton": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "stoney-creek-to-toronto": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "hamilton-to-mississauga": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "st-catharines-to-toronto": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "toronto-to-st-catharines": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "niagara-falls-to-toronto": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    },
+    "toronto-to-niagara-falls": {
+      "image": "",
+      "eyebrow": "",
+      "heading": "",
+      "accent": "",
+      "text": ""
+    }
   },
   "hn_town_banners": {}
 };

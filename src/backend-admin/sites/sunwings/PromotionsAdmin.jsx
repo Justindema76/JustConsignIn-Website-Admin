@@ -45,6 +45,20 @@ const BANNER_FIELDS = [
   { name: 'showServiceSlides', label: 'Rotate through the service slides after this banner', type: 'toggle' },
 ];
 
+// The page content under the banner on the Hamilton & Niagara service pages. Empty = hidden.
+const HN_PAGE_SECTION_FIELDS = [
+  { name: 'intro', label: 'Opening paragraph', type: 'textarea', hint: 'The first thing under the banner. Say who it is for and what you do in Hamilton and Niagara.' },
+  { name: 'handleTitle', label: '“What we handle” heading' },
+  { name: 'handle', label: '“What we handle” list', type: 'lines', hint: 'One per line. Shown with check marks.' },
+  { name: 'stepsTitle', label: '“How it works” heading' },
+  { name: 'steps', label: '“How it works” steps', type: 'repeat', itemLabel: item => item.title, newItem: { title: 'New step', text: '' }, fields: [{ name: 'title', label: 'Step' }, { name: 'text', label: 'What happens', type: 'textarea' }] },
+  { name: 'localTitle', label: 'Local section heading' },
+  { name: 'local', label: 'Local section text', type: 'textarea', hint: 'What is different here: towns, highways, access. Leave a blank line between paragraphs.' },
+  { name: 'quoteTitle', label: '“What your quote is based on” heading' },
+  { name: 'quoteFactors', label: '“What your quote is based on” list', type: 'lines', hint: 'One per line.' },
+  { name: 'faqs', label: 'Questions (also shown to Google)', type: 'repeat', itemLabel: item => item.question, newItem: { question: '', answer: '' }, fields: [{ name: 'question', label: 'Question' }, { name: 'answer', label: 'Answer', type: 'textarea' }] },
+];
+
 const HN_SERVICE_FIELDS = [
   { name: 'eyebrow', label: 'Small tag above the headline' },
   { name: 'heading', label: 'Headline (white)', hint: 'Leave blank to use the main site’s Service Post.' },
@@ -52,6 +66,7 @@ const HN_SERVICE_FIELDS = [
   { name: 'text', label: 'Subtitle', type: 'textarea', hint: 'Leave blank to use the main site’s Service Post.' },
   { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank to use the main site’s Service Post photo.' },
   POSITION_FIELD,
+  ...HN_PAGE_SECTION_FIELDS,
 ];
 
 const SECTIONS = [
@@ -293,6 +308,7 @@ const SECTIONS = [
         { name: 'text', label: 'Subtitle', type: 'textarea' },
         { name: 'image', label: 'Banner photo', type: 'image' },
         POSITION_FIELD,
+        ...HN_PAGE_SECTION_FIELDS,
         { name: 'sendList', label: '“What to send for your quote” list', type: 'lines', hint: 'One per line. Empty hides the list.' },
       ]],
       ['furniture-delivery', 'Furniture Delivery page', HN_SERVICE_FIELDS],
