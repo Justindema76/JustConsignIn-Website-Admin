@@ -215,9 +215,9 @@ const SECTIONS = [
     groups: [
       ['theme', 'Look & colours (whole section)', [
         { name: 'scheme', label: 'Colour scheme', type: 'select', options: [['blackgold', 'Hamilton black & gold (no blue anywhere)'], ['main', 'Same as the main site (orange & navy)']], hint: 'Black & gold: black top bar, white header, gold buttons, black text and footer. The colours below change single parts on top of the scheme.' },
-        { name: 'badge', label: 'Label next to the logo', hint: 'Clicking it opens the Hamilton & Niagara main page. Leave blank to hide it.' },
-        { name: 'mainBadge', label: 'Label next to the logo on the MAIN site', hint: 'E.g. Toronto & GTA. Leave blank to hide it.' },
-        { name: 'backLabel', label: 'Menu button back to the main site', hint: 'First item in the menu (and the phone menu). The logo also goes back to the main site. Leave blank to hide the button.' },
+        { name: 'badge', label: 'Area switch beside the logo: Hamilton & Niagara name', hint: 'The switch beside the logo on both sites flips between the two areas.' },
+        { name: 'mainBadge', label: 'Area switch beside the logo: main site name', hint: 'E.g. Toronto & GTA. Leave either name blank to hide the switch.' },
+        { name: 'backLabel', label: 'Extra menu button back to the main site (optional)', hint: 'Adds a first item to the Hamilton & Niagara menu, e.g. “Main site”. Blank = no button (the logo and the area switch already go back).' },
         { name: 'topbarLine', label: 'Top bar text' },
         { name: 'accent', label: 'Buttons, headline second line, label', type: 'color', fallback: '#F7931E' },
         { name: 'accent2', label: 'Button and label fade', type: 'color', fallback: '#FDB833' },
