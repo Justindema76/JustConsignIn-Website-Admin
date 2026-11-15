@@ -6,6 +6,7 @@ import MediaPickerModal from '../social-automation/components/MediaPickerModal';
 import { loadAdminMedia, loadAdminVideos, uploadSiteImage } from '../../services/siteAdminService';
 import { FALLBACK_VIDEOS } from '../../config/siteContent';
 import { loadServicePosts } from '../../sites/sunwings/sunwingsPostStore';
+import { listBanners } from '../code-studio/codeStudioService';
 
 function useSunwingsPublishedServices() {
   const { accessToken } = useAuth();
@@ -112,6 +113,56 @@ function ImageLibraryField({ field, value, onChange, fallbackImage = '', fallbac
     />}
   </>;
 }
+
+// Sunwings page banners: the live banner usually does NOT come from this block's fields.
+// It comes from (in order) a Banner Studio banner placed on the page, the Homepage banner slides
+// (home), or Banners & Pop-up › Other page banners (other pages; Services, Service Areas and
+// Pricing also add the homepage slides after it). This box says which, with a button to go there.
+const SUNWINGS_PAGE_NAMES = { home: 'Homepage', services: 'Services', locations: 'Service Areas', pricing: 'Pricing', blog: 'Moving Tips', contact: 'Contact', privacy: 'Privacy Policy' };
+const PAGES_WITH_SERVICE_SLIDES = ['services', 'locations', 'pricing'];
+
+function bannerPageId() {
+  if (typeof window === 'undefined') return '';
+  return (window.location.pathname.match(/\/admin\/sunwings\/pages\/([^/?#]+)/) || [])[1] || '';
+}
+
+function BannerSourceBox() {
+  const { accessToken } = useAuth();
+  const pageId = bannerPageId();
+  const [studio, setStudio] = useState(undefined);
+  useEffect(() => {
+    let live = true;
+    listBanners(accessToken, 'sunwings')
+      .then(list => { if (live) setStudio(list.find(banner => (banner.placements || []).includes(pageId)) || null); })
+      .catch(() => { if (live) setStudio(null); });
+    return () => { live = false; };
+  }, [accessToken, pageId]);
+
+  const name = SUNWINGS_PAGE_NAMES[pageId] || pageId || 'this page';
+  const go = to => event => { event.preventDefault(); window.location.assign(to); };
+  const button = { display: 'block', width: '100%', padding: '11px 12px', marginTop: 8, borderRadius: 10, border: 0, background: '#F7931E', color: '#1b1300', fontWeight: 800, fontSize: 14, textAlign: 'center', textDecoration: 'none', cursor: 'pointer' };
+  const ghost = { ...button, background: '#fff', color: '#0B2545', border: '1px solid #D5DEEA' };
+  const studioUrl = studio ? `/admin/sunwings/banner-studio/${studio.id}` : '/admin/sunwings/banner-studio';
+  const oldUrl = pageId === 'home' ? '/admin/sunwings/promotions?tab=hero_slides&open=0' : `/admin/sunwings/promotions?tab=page_banners&open=${pageId}`;
+
+  return <div style={{ padding: 14, borderRadius: 12, background: '#FFF6EA', border: '2px solid #F7931E', color: '#0B2545', fontSize: 14, lineHeight: 1.45 }}>
+    <b style={{ display: 'block', fontSize: 15, marginBottom: 4 }}>Where this banner lives</b>
+    {studio === undefined ? <span>Checking…</span> : studio ? <>
+      <span>The {name} banner on the live site is the Banner Studio banner <b>“{studio.title || 'Untitled'}”</b>. Edit its slides, photos and text there.</span>
+      <a href={studioUrl} onClick={go(studioUrl)} style={button}>Open it in Banner Studio</a>
+    </> : <>
+      <span>{pageId === 'home'
+        ? <>The live homepage banner is the <b>Homepage banner</b> slides.</>
+        : <>The live {name} banner is set in <b>Banners &amp; Pop-up › Other page banners › {name}</b>{PAGES_WITH_SERVICE_SLIDES.includes(pageId) ? <>, followed by the <b>Homepage banner</b> slides</> : null}.</>}</span>
+      <a href={oldUrl} onClick={go(oldUrl)} style={button}>{pageId === 'home' ? 'Open the Homepage banner slides' : `Open the ${name} banner`}</a>
+      {PAGES_WITH_SERVICE_SLIDES.includes(pageId) ? <a href="/admin/sunwings/promotions?tab=hero_slides&open=0" onClick={go('/admin/sunwings/promotions?tab=hero_slides&open=0')} style={ghost}>Open the slides that follow it</a> : null}
+      <a href={studioUrl} onClick={go(studioUrl)} style={ghost}>Or design it in Banner Studio</a>
+    </>}
+    <small style={{ display: 'block', marginTop: 10, color: '#5B6B82' }}>The fields below only show when that banner has no text or photo of its own.</small>
+  </div>;
+}
+
+const bannerSourceField = { type: 'custom', label: 'Where this banner lives', render: () => <BannerSourceBox/> };
 
 export const imageField = {
   type: 'custom',
@@ -1305,6 +1356,7 @@ export const siteBuilderConfig = {
     SunwingsHeroBlock: {
       label: 'Sunwings Hero',
       fields: {
+        bannerSource: bannerSourceField,
         eyebrow: { type: 'text', label: 'Eyebrow' },
         heading: { type: 'text', label: 'Heading' },
         accent: { type: 'text', label: 'Accent text' },
@@ -1346,7 +1398,10 @@ export const siteBuilderConfig = {
         showBreadcrumbs: true,
         background: 'white',
       },
-      render: p => <section style={{background:'linear-gradient(160deg,#0B2545,#13315C)',color:'#fff',padding:'58px 44px',borderRadius:18}}>
+      render: p => <section style={{position:'relative',background:'linear-gradient(160deg,#0B2545,#13315C)',color:'#fff',padding:'58px 44px',borderRadius:18}}>
+        <div style={{position:'absolute',top:12,right:12,left:12,display:'flex',justifyContent:'flex-end'}}>
+          <span style={{background:'#F7931E',color:'#1b1300',fontWeight:800,fontSize:13,padding:'8px 12px',borderRadius:999,boxShadow:'0 6px 16px rgba(0,0,0,.25)'}}>Preview only · click this banner to see where the live one is edited</span>
+        </div>
         <div style={{fontSize:12,fontWeight:800,letterSpacing:'.12em',textTransform:'uppercase',color:'#FDB833',marginBottom:12}}>{p.eyebrow}</div>
         <h1 style={{fontSize:44,lineHeight:1.05,margin:'0 0 16px'}}>{p.heading} {p.accent && <span style={{color:'#FDB833'}}>{p.accent}</span>}</h1>
         {p.text && <p style={{maxWidth:760,color:'#d6e4f5',fontSize:17}}>{p.text}</p>}
