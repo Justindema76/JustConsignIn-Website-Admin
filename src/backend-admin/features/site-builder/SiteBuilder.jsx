@@ -13,7 +13,7 @@ import {
 } from '../../services/siteAdminService';
 import { siteBuilderConfig } from './siteBuilderConfig';
 import { RENTRALLY_BLOCK_NAMES, rentrallyBuilderCategories, rentrallyBuilderComponents } from '../../sites/rentrally/builderBlocks';
-import { getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePagesData';
+import { SUNWINGS_HN_BUILDER_PAGES, getInitialPageBuilderData, getWebsitePage, getWebsitePages, livePageUrl } from './websitePagesData';
 import { globalStylesForSite, globalStyleVars, normalizeGlobalStyles } from './globalStyles';
 import './siteBuilder.css';
 
@@ -114,7 +114,7 @@ export default function SiteBuilder() {
   const siteKey = getAdminSiteKey();
   const page = getWebsitePage(pageId, siteKey);
   const editorPages = useMemo(
-    () => getWebsitePages(siteKey).filter(item => item.editor === 'visual'),
+    () => [...getWebsitePages(siteKey), ...(siteKey === 'sunwings' ? SUNWINGS_HN_BUILDER_PAGES : [])].filter(item => item.editor === 'visual'),
     [siteKey]
   );
   const { accessToken } = useAuth();
@@ -518,6 +518,12 @@ export default function SiteBuilder() {
             data = localDraft;
             migratedLocal = true;
           }
+        }
+
+        // A Hamilton & Niagara page that was never saved starts as a copy of its main-site page.
+        if (!data && page.copyFrom) {
+          const base = await loadAdminSitePage(accessToken, page.copyFrom).catch(() => null);
+          data = base?.published?.content || base?.draft?.content || getInitialPageBuilderData(page.copyFrom, siteKey);
         }
 
         data ||= fallbackData;

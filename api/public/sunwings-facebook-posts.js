@@ -35,7 +35,12 @@ export default async function handler(req, res) {
     const setting = await feedSettings();
     // If the settings can't be read, still show synced posts (default 6) rather than breaking the site.
     if (setting && !setting.enabled) return res.status(200).json({ enabled: false, posts: [] });
-    const limit = Math.min(Math.max(Number(setting?.config?.display_limit || 6), 1), 12);
+    // ?limit= asks for a set number (the 'See all posts' page asks for up to 50);
+    // otherwise the home-page count chosen in Admin › Integrations.
+    const asked = Number(req.query?.limit);
+    const limit = asked > 0
+      ? Math.min(Math.floor(asked), 50)
+      : Math.min(Math.max(Number(setting?.config?.display_limit || 6), 1), 12);
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({ enabled: true, posts: await publicPosts(limit) });
   } catch (error) {

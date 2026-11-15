@@ -335,6 +335,14 @@ export const RENTRALLY_PAGES = [
 
 export const WEBSITE_PAGES = JUSTCONSIGNIN_PAGES;
 
+// Hamilton & Niagara section pages built with the page builder. Not listed in the main grid; the
+// Hamilton & Niagara list on the Pages screen links to them. Until one is saved it starts as a copy
+// of its main-site page (copyFrom), and the website shows the main page.
+export const SUNWINGS_HN_BUILDER_PAGES = [
+  { id: 'hn-pricing', title: 'Hamilton & Niagara Pricing', path: '/hamilton-niagara/pricing', source: 'shared page builder', kind: 'marketing', editor: 'visual', editorTarget: '/admin/sunwings/pages/hn-pricing', copyFrom: 'pricing', description: 'Pricing page in the Hamilton & Niagara section.' },
+  { id: 'hn-contact', title: 'Hamilton & Niagara Contact', path: '/hamilton-niagara/contact', source: 'shared page builder + quote form', kind: 'form', editor: 'visual', editorTarget: '/admin/sunwings/pages/hn-contact', copyFrom: 'contact', description: 'Contact page in the Hamilton & Niagara section.' },
+];
+
 export function getWebsitePages(siteKey = 'justconsignin') {
   if (siteKey === 'justindematteis') return JUSTINDEMATTEIS_PAGES;
   if (siteKey === 'sunwings') return SUNWINGS_PAGES;
@@ -343,7 +351,9 @@ export function getWebsitePages(siteKey = 'justconsignin') {
 }
 
 export function getWebsitePage(id, siteKey = 'justconsignin') {
-  return getWebsitePages(siteKey).find(page => page.id === id) || null;
+  return getWebsitePages(siteKey).find(page => page.id === id)
+    || (siteKey === 'sunwings' ? SUNWINGS_HN_BUILDER_PAGES.find(page => page.id === id) : null)
+    || null;
 }
 
 export function livePageUrl(path, siteKey = 'justconsignin') {

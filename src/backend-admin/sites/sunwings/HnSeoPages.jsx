@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ExternalLink, Image, Save } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadSunwingsSettings, saveSunwingsSettings } from './sunwingsAdminService';
@@ -21,6 +22,10 @@ export const HN_PAGES = [
   ['facebook', 'Latest from Sunwings (Facebook)', `${HN}/facebook`, 'Latest from Sunwings | Hamilton & Niagara', 'Recent jobs, open spots and news from Sunwings Transport.'],
   ['partners', 'Store partners', `${HN}/partners`, 'Furniture Delivery Partners in Hamilton & Niagara | Sunwings Transport', 'Furniture stores and consignment shops in Hamilton, Burlington, Grimsby and the Niagara Region: free delivery partner program with written quotes for your customers.'],
 ];
+
+// Where each page's banner and content are edited.
+const BANNER_GROUP = { home: 'home', 'long-distance': 'long-distance', 'furniture-delivery': 'furniture-delivery', 'commercial-transport': 'commercial-transport' };
+const BUILDER_PAGE = { pricing: 'hn-pricing', contact: 'hn-contact' };
 
 function parse(raw) {
   let value = raw;
@@ -68,6 +73,8 @@ export default function HnSeoPages() {
           <div><strong>{own.title || defTitle}</strong></div>
           <span className={`site-admin-status ${edited ? 'published' : 'system'}`}>{edited ? 'Custom SEO' : 'Default SEO'}</span>
           <div className="site-admin-actions right" onClick={event => event.stopPropagation()}>
+            {BUILDER_PAGE[id] ? <Link className="site-admin-btn small" to={`/admin/sunwings/pages/${BUILDER_PAGE[id]}`}>Edit Page</Link> : null}
+            {BANNER_GROUP[id] ? <Link className="site-admin-btn secondary small" to={`/admin/sunwings/promotions?tab=hn_content&open=${BANNER_GROUP[id]}`}>Edit banner</Link> : null}
             <button className="site-admin-btn secondary small" type="button" onClick={() => setOpen(open === id ? '' : id)}>{open === id ? 'Close' : 'Edit SEO'}</button>
             <a className="site-admin-btn secondary small" href={`${PUBLIC_BASE}${path}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>
           </div>
