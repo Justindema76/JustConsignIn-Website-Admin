@@ -303,6 +303,17 @@ export const PROMOTIONS_DEFAULTS = {
     "faq": []
   },
   "hn_content": {
+    "theme": {
+      "badge": "Hamilton & Niagara",
+      "topbarLine": "Hamilton & Niagara moving and transport",
+      "accent": "",
+      "accent2": "",
+      "accentInk": "",
+      "navy": "",
+      "blue": "",
+      "topbar": "",
+      "header": ""
+    },
     "home": {
       "eyebrow": "Hamilton · Burlington · Grimsby · Niagara",
       "heading": "Hamilton & Niagara",

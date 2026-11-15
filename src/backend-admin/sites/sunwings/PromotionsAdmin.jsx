@@ -213,6 +213,17 @@ const SECTIONS = [
     title: 'Hamilton & Niagara',
     intro: 'Your Hamilton & Niagara section (/hamilton-niagara): its banners, photos, service boxes and questions, plus the Long-Distance Moving card on the main site’s service lists. Town pages use their Location Post (Location Posts).',
     groups: [
+      ['theme', 'Look & colours (whole section)', [
+        { name: 'badge', label: 'Label next to the logo', hint: 'Leave blank to hide it.' },
+        { name: 'topbarLine', label: 'Top bar text' },
+        { name: 'accent', label: 'Orange (buttons, orange headline line, label)', type: 'color', fallback: '#F7931E' },
+        { name: 'accent2', label: 'Second orange (button and label fade)', type: 'color', fallback: '#FDB833' },
+        { name: 'accentInk', label: 'Text on orange buttons', type: 'color', fallback: '#1b1300' },
+        { name: 'navy', label: 'Dark blue (dark sections, headings)', type: 'color', fallback: '#0B2545' },
+        { name: 'topbar', label: 'Top bar background', type: 'color', fallback: '#0B2545' },
+        { name: 'header', label: 'Header background', type: 'color', fallback: '#FFFFFF' },
+        { name: 'blue', label: 'Links', type: 'color', fallback: '#1F5FA8' },
+      ]],
       ['servicesCard', 'Long-Distance card on the main site (Services page)', [
         { name: 'enabled', label: 'Show the Long-Distance Moving card after the other services', type: 'toggle' },
         { name: 'title', label: 'Card title' },
@@ -330,6 +341,14 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
   }
   if (field.type === 'photo-position') {
     return <PositionField item={item} groupKey={groupKey} onItemChange={onItemChange} phoneRatio={field.phoneRatio}/>;
+  }
+  if (field.type === 'color') {
+    const shown = /^#[0-9a-f]{6}$/i.test(value || '') ? value : (field.fallback || '#000000');
+    return <label>{label}<span className="promo-color">
+      <input type="color" value={shown} onChange={event => onChange(event.target.value)}/>
+      <input value={value || ''} placeholder={`Main site colour (${field.fallback})`} onChange={event => onChange(event.target.value.trim())}/>
+      {value ? <button className="site-admin-btn secondary small" type="button" onClick={() => onChange('')}>Use main site colour</button> : null}
+    </span>{hint || <small>Blank = same as the main site.</small>}</label>;
   }
   if (field.type === 'image') {
     return <div className="promo-field">{label}<ImageField value={value} onChange={onChange} onPickMedia={onPickMedia}/>{hint}</div>;

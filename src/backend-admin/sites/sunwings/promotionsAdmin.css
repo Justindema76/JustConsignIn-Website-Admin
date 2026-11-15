@@ -49,3 +49,8 @@
 .phone-photo-controls output{font-size:12px;color:#6b7280;text-align:right}
 .phone-photo-controls button{justify-self:start}
 @media (max-width:900px){.photo-position-views{grid-template-columns:1fr}}
+
+/* Colour picker field (Hamilton & Niagara › Look & colours) */
+.promo-color{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.promo-color input[type=color]{width:44px;height:36px;padding:2px;border-radius:8px;cursor:pointer;flex:none}
+.promo-color input:not([type=color]){flex:1;min-width:160px}
