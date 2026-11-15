@@ -1,4 +1,4 @@
-import { supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
+import { supabaseRest, supabaseUserRest, supabaseUserStorage, supabaseUrl } from '../_lib/supabase.js';
 import { requireSiteAccess, requireWebsiteOwner } from '../_lib/websiteAdmin.js';
 
 // Only these resources are open to site collaborators (not just the owner).
@@ -135,6 +135,22 @@ async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset 
       protectedAsset,
     };
     });
+}
+
+// Who uploaded each Sunwings media file: { "bucket/path": { by: "Marius (partner)", at } }.
+// Kept in the media_uploads setting; only a first name and role are stored.
+async function readMediaUploads() {
+  const response = await supabaseRest('sunwings_site_settings?site_key=eq.sunwings&key=eq.media_uploads&select=value&limit=1', { method: 'GET' });
+  if (!response.ok) return {};
+  const rows = await response.json().catch(() => []);
+  try { return JSON.parse(rows?.[0]?.value || '{}') || {}; } catch { return {}; }
+}
+
+function uploaderLabel(user) {
+  const meta = user?.user_metadata || {};
+  const first = String(meta.full_name || meta.name || '').trim().split(/\s+/)[0];
+  const role = user?.role === 'owner' ? 'owner' : (user?.role || 'partner');
+  return first ? `${first} (${role})` : role.charAt(0).toUpperCase() + role.slice(1);
 }
 
 export default async function handler(req, res) {
@@ -413,7 +429,28 @@ export default async function handler(req, res) {
         const right = new Date(b.createdAt || 0).getTime() || 0;
         return right - left;
       });
+      if (siteKey === 'sunwings') {
+        const uploads = await readMediaUploads().catch(() => ({}));
+        media.forEach(item => { item.uploadedBy = uploads[`${item.bucket}/${item.path}`]?.by || ''; });
+      }
       return res.status(200).json({ media });
+    }
+
+    // Records who uploaded a file (called by the admin right after every upload).
+    if (req.method === 'POST' && resource === 'media') {
+      const bucket = String(req.body?.bucket || '').trim();
+      const objectPath = String(req.body?.path || '').trim();
+      if (!MEDIA_BUCKETS.some(item => item.bucket === bucket) || !objectPath || objectPath.includes('..')) return res.status(400).json({ error: 'Invalid media path' });
+      if (siteKey !== 'sunwings' && !objectPath.startsWith('sunwings/')) return res.status(200).json({ ok: true });
+      const uploads = await readMediaUploads();
+      uploads[`${bucket}/${objectPath}`] = { by: uploaderLabel(user), at: new Date().toISOString() };
+      const response = await supabaseRest('sunwings_site_settings?on_conflict=site_key,key', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify([{ site_key: 'sunwings', key: 'media_uploads', value: JSON.stringify(uploads), updated_at: new Date().toISOString() }]),
+      });
+      if (!response.ok) throw new Error('Unable to record the upload');
+      return res.status(200).json({ ok: true });
     }
 
     if (req.method === 'DELETE' && resource === 'media') {

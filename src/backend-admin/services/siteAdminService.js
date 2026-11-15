@@ -84,6 +84,8 @@ async function uploadPublicAsset(accessToken, file, { bucket, allowedTypes, maxB
     throw new Error(payload.message || payload.error || `Supabase upload failed (${response.status})`);
   }
 
+  // Record who uploaded it (Admin › Media shows "Uploaded by"). Never blocks the upload.
+  adminFetch(siteAdminUrl('/api/admin/site?resource=media'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bucket, path: objectName }) }, accessToken || currentAccessToken()).catch(() => {});
   return publicMediaUrl(bucket, objectName);
 }
 

@@ -34,6 +34,7 @@ const ALLOWED_KEYS = new Set([
   'hn_content',
   'referral_partners',
   'route_banners',
+  'media_folders',
 ]);
 
 export default async function handler(req, res) {
