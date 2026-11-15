@@ -389,6 +389,9 @@ export const PROMOTIONS_DEFAULTS = {
       "text": "",
       "image": ""
     },
+    "towns": {
+      "image": ""
+    },
     "routes": {
       "image": ""
     },

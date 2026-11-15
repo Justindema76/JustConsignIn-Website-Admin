@@ -240,7 +240,7 @@ const SECTIONS = [
     intro: 'The banner on each Hamilton & Niagara town page (/hamilton-niagara/<town>). Blank fields use that town’s Location Post. The list comes from your Location Posts in the Hamilton, Niagara and Halton regions.',
     groupsFrom: 'hnTowns',
     fields: [
-      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank for the default: the van on an Ontario road.' },
+      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank for the default photo for all towns (Hamilton & Niagara › Town pages).' },
       POSITION_FIELD,
       { name: 'eyebrow', label: 'Small tag above the headline' },
       { name: 'heading', label: 'Headline (white)', hint: 'Blank = “<Town> movers”.' },
@@ -297,6 +297,10 @@ const SECTIONS = [
       ]],
       ['furniture-delivery', 'Furniture Delivery page', HN_SERVICE_FIELDS],
       ['commercial-transport', 'Commercial Transport page', HN_SERVICE_FIELDS],
+      ['towns', 'Town pages: default photo for all towns (each town can have its own under H&N town banners)', [
+        { name: 'image', label: 'Banner photo for every town page', type: 'image', hint: 'Leave blank for the Sunwings van on a lakeside drive.' },
+        POSITION_FIELD,
+      ]],
       ['routes', 'Route pages: default photo for all routes (each route can have its own under Route page banners)', [
         { name: 'image', label: 'Banner photo for every route page', type: 'image', hint: 'Leave blank for the moving-truck photo.' },
         POSITION_FIELD,
@@ -491,7 +495,8 @@ export default function PromotionsAdmin() {
         const towns = (posts || []).filter(post => post.slug && HN_REGIONS.includes(post.region));
         setDynamicGroups(current => ({ ...current, hnTowns: towns.map(town => [town.slug, `${town.title}${town.region ? ` · ${town.region.replace(' Region', '')}` : ''}`]) }));
         // Town pages default to the van-on-an-Ontario-road photo.
-        setServicePhotos(current => ({ ...Object.fromEntries(towns.map(town => [town.slug, 'https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794048719650-moving-van-on-an-ontario-road.webp'])), ...current }));
+        const LAKESIDE = 'https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/site-assets/sunwings/1794722532665-Sunwings-Transport-Lakeside-Drive.webp';
+        setServicePhotos(current => ({ towns: LAKESIDE, ...Object.fromEntries(towns.map(town => [town.slug, LAKESIDE])), ...current }));
       })
       .catch(() => {});
     // The photo each banner really shows on the live site (same rules as the site itself).
