@@ -169,6 +169,11 @@ export async function loadAdminMedia(accessToken) {
   return Array.isArray(payload.media) ? payload.media : [];
 }
 
+// Which stored files the Sunwings site uses (checked by the admin's own server).
+export async function loadMediaInUse(accessToken) {
+  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=media-in-use'), {}, accessToken));
+}
+
 export async function deleteAdminMedia(accessToken, item) {
   const bucket = String(item?.bucket || '').trim();
   const path = String(item?.path || '').trim();

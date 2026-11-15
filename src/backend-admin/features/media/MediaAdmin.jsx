@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Check, CheckSquare, Copy, ExternalLink, FolderInput, HardDrive, Image, Music2, Square, Trash2, Upload, Video, WandSparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { deleteAdminMedia, getAdminSiteKey, loadAdminMedia, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
+import { deleteAdminMedia, getAdminSiteKey, loadAdminMedia, loadMediaInUse, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
 import { loadSunwingsSettings, saveSunwingsSettings } from '../../sites/sunwings/sunwingsAdminService';
 import './mediaAdmin.css';
-import { FOLDERS, SUNWINGS_SITE, formatBytes, guessFolder, keyOf, previewUrl, sizeOf } from './mediaUtils';
+import { FOLDERS, formatBytes, guessFolder, keyOf, previewUrl, sizeOf } from './mediaUtils';
 
 // Media library: every stored image, video and audio file for this site, with its size, the total
 // space used, sorting, folders, "In use / Not used" tags (Sunwings: checked against the live site)
@@ -69,8 +69,7 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
     loadSunwingsSettings(accessToken)
       .then(settings => { try { setFolders(JSON.parse(settings?.media_folders || '{}') || {}); } catch { setFolders({}); } })
       .catch(() => {});
-    fetch(`${SUNWINGS_SITE}/api/content/media-in-use`, { cache: 'no-store' })
-      .then(response => (response.ok ? response.json() : null))
+    loadMediaInUse(accessToken)
       .then(data => { if (data?.paths) setInUse({ paths: new Set(data.paths), complete: data.complete !== false }); })
       .catch(() => {});
   }, [isSunwings, accessToken]);

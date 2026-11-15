@@ -8,7 +8,7 @@ import MediaPickerModal from '../../features/social-automation/components/MediaP
 import { PROMOTIONS_DEFAULTS } from './promotionsDefaults';
 import PhotoPositionField from './PhotoPositionField';
 import { shrinkImage } from '../../features/media/MediaAdmin';
-import { loadServicePosts } from './sunwingsPostStore';
+import { loadLocationPosts, loadServicePosts } from './sunwingsPostStore';
 import '../../features/settings/settings.css';
 import '../../features/work-posts/workPosts.css';
 import './promotionsAdmin.css';
@@ -240,7 +240,7 @@ const SECTIONS = [
     intro: 'The banner on each Hamilton & Niagara town page (/hamilton-niagara/<town>). Blank fields use that town’s Location Post. The list comes from your Location Posts in the Hamilton, Niagara and Halton regions.',
     groupsFrom: 'hnTowns',
     fields: [
-      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank to use the town’s Location Post photo.' },
+      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank for the default: the van on an Ontario road.' },
       POSITION_FIELD,
       { name: 'eyebrow', label: 'Small tag above the headline' },
       { name: 'heading', label: 'Headline (white)', hint: 'Blank = “<Town> movers”.' },
@@ -483,6 +483,16 @@ export default function PromotionsAdmin() {
       .finally(() => setBusy(false));
     loadServicePosts(accessToken)
       .then(posts => setServicePhotos(current => ({ ...Object.fromEntries((posts || []).filter(post => post.slug && post.bannerImage).map(post => [post.slug, post.bannerImage])), ...current })))
+      .catch(() => {});
+    // Hamilton & Niagara towns, straight from Location Posts (doesn't depend on the website).
+    const HN_REGIONS = ['Hamilton Region', 'Niagara Region', 'Halton Region'];
+    loadLocationPosts(accessToken)
+      .then(posts => {
+        const towns = (posts || []).filter(post => post.slug && HN_REGIONS.includes(post.region));
+        setDynamicGroups(current => ({ ...current, hnTowns: towns.map(town => [town.slug, `${town.title}${town.region ? ` · ${town.region.replace(' Region', '')}` : ''}`]) }));
+        // Town pages default to the van-on-an-Ontario-road photo.
+        setServicePhotos(current => ({ ...Object.fromEntries(towns.map(town => [town.slug, 'https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794048719650-moving-van-on-an-ontario-road.webp'])), ...current }));
+      })
       .catch(() => {});
     // The photo each banner really shows on the live site (same rules as the site itself).
     fetch(`${SITE_URL}/api/content/banner-photos`, { cache: 'no-store' })

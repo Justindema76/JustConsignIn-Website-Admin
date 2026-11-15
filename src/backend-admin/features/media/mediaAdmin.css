@@ -43,3 +43,6 @@
 .media-picker-close{position:sticky;top:0;float:right;z-index:6;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid #e3e9f2;background:#fff;cursor:pointer}
 .media-use-btn{width:100%;justify-content:center;margin-top:8px}
 @media (max-width:600px){.media-picker-full{width:100vw;max-height:100vh;height:100vh;border-radius:0;padding:12px}}
+
+/* Show the whole photo in the Media grid and picker (no cropping) */
+.site-admin-media-image img{object-fit:contain!important;background:#eef1f5}

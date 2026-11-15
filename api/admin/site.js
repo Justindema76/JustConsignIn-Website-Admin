@@ -4,7 +4,7 @@ import { requireSiteAccess, requireWebsiteOwner } from '../_lib/websiteAdmin.js'
 // Only these resources are open to site collaborators (not just the owner).
 // Everything else here (pages, block styles, header/footer, settings, etc.)
 // stays owner-only.
-const COLLABORATOR_RESOURCES = new Set(['social', 'media']);
+const COLLABORATOR_RESOURCES = new Set(['social', 'media', 'media-in-use']);
 
 const MEDIA_BUCKETS = [
   { bucket: 'site-assets', mediaType: 'image', protectedAsset: true },
@@ -135,6 +135,34 @@ async function listMediaBucket(accessToken, { bucket, mediaType, protectedAsset 
       protectedAsset,
     };
     });
+}
+
+// Photos the Sunwings website uses from its own code (defaults/fallbacks). Keep in step with the
+// site's lib/contentDefaults.js, lib/hamiltonNiagara.js, lib/longDistancePhotos.js and the logos.
+const SUNWINGS_CODE_MEDIA = ["blog-images/sunwings/1792805164536-image.png", "blog-images/sunwings/1792805662384-cargo-van-driveway1.webp", "blog-images/sunwings/1794048719650-moving-van-on-an-ontario-road.webp", "blog-images/sunwings/1794157095250-IMG_9732.jpeg", "blog-images/sunwings/1794157095452-IMG_9724.jpeg", "blog-images/sunwings/1794228549975-IMG_4836.jpeg", "blog-images/sunwings/1794229390663-IMG_8141.jpeg", "blog-images/sunwings/1794707943328-Q.E.W.-Highway-Exit-Panorama.png", "site-assets/sunwings/1791151104850-Sunwings-Transport-Logo.png", "site-assets/sunwings/1791331979339-packing-protecting.webp", "site-assets/sunwings/1791334339517-SUNWING-site-logo.png", "site-assets/sunwings/1791336064197-furniture-delivery.jpeg", "site-assets/sunwings/1791340265388-long-distance.jpg", "site-assets/sunwings/1791340345360-warehouse.png", "site-assets/sunwings/1792805704389-happy-couple-move-.jpg"];
+const MEDIA_PATH_RE = /\/storage\/v1\/(?:object|render\/image)\/public\/([a-z0-9-]+)\/([^"'?\s)\\]+)/gi;
+
+// Every stored file the Sunwings site uses: all settings, pages, posts (drafts too) and banners,
+// read straight from the database, plus the photos in the site's code.
+async function sunwingsMediaInUse() {
+  const sources = [
+    'sunwings_site_settings?site_key=eq.sunwings&select=value',
+    'site_settings?site_key=eq.sunwings&select=value',
+    'site_pages?site_key=eq.sunwings&select=content',
+    'sunwings_services?site_key=eq.sunwings&select=*',
+    'sunwings_locations?site_key=eq.sunwings&select=*',
+    'blog_posts?site_key=eq.sunwings&select=*',
+    'code_studio_banners?site_key=eq.sunwings&select=*',
+  ];
+  const texts = await Promise.all(sources.map(async path => {
+    const response = await supabaseRest(path, { method: 'GET' }).catch(() => null);
+    return response?.ok ? response.text() : '';
+  }));
+  const paths = new Set(SUNWINGS_CODE_MEDIA);
+  for (const match of texts.join('\n').matchAll(MEDIA_PATH_RE)) {
+    try { paths.add(`${match[1]}/${decodeURIComponent(match[2])}`); } catch { paths.add(`${match[1]}/${match[2]}`); }
+  }
+  return { paths: [...paths].sort(), complete: texts.every(Boolean) };
 }
 
 // Who uploaded each Sunwings media file: { "bucket/path": { by: "Marius (partner)", at } }.
@@ -436,6 +464,11 @@ export default async function handler(req, res) {
         media.forEach(item => { item.uploadedBy = uploads[`${item.bucket}/${item.path}`]?.by || ''; });
       }
       return res.status(200).json({ media });
+    }
+
+    if (req.method === 'GET' && resource === 'media-in-use') {
+      if (siteKey !== 'sunwings') return res.status(200).json({ paths: [], complete: false });
+      return res.status(200).json(await sunwingsMediaInUse());
     }
 
     // Records who uploaded a file (called by the admin right after every upload).
