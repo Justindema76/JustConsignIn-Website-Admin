@@ -45,6 +45,7 @@ export default {
         { to: '/admin/sunwings/promotions?tab=hero_slides&open=0', label: 'Homepage banner', icon: 'sparkles', ownerOnly: true },
         { to: '/admin/sunwings/promotions', label: 'All banners & pop-up', icon: 'sparkles', ownerOnly: true },
         { to: '/admin/sunwings/promotions?tab=hn_content', label: 'Hamilton & Niagara', icon: 'map', ownerOnly: true },
+        { to: '/admin/sunwings/promotions?tab=route_banners', label: 'Route page banners', icon: 'truck', ownerOnly: true },
         { to: '/admin/sunwings/banner-studio', label: 'Banner Studio', icon: 'image', ownerOnly: true },
         { to: '/admin/sunwings/blocks', label: 'Block Library', icon: 'library', ownerOnly: true },
         { to: '/admin/sunwings/styles', label: 'Global Styles', icon: 'palette', ownerOnly: true },

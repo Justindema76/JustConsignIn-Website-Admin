@@ -209,6 +209,30 @@ const SECTIONS = [
     ],
   },
   {
+    key: 'route_banners',
+    title: 'Route pages',
+    intro: 'The banner on each long-distance route page (e.g. Hamilton → Toronto). Each route uses it on both the main site (/long-distance/…) and the Hamilton & Niagara section (Routes). Blank fields keep the page’s own text and the moving-truck photo.',
+    groups: [
+      ['long-distance', 'Long-Distance main page (/long-distance)'],
+      ['hamilton-to-toronto', 'Hamilton → Toronto'],
+      ['toronto-to-hamilton', 'Toronto → Hamilton'],
+      ['stoney-creek-to-toronto', 'Stoney Creek → Toronto'],
+      ['hamilton-to-mississauga', 'Hamilton → Mississauga'],
+      ['st-catharines-to-toronto', 'St. Catharines → Toronto'],
+      ['toronto-to-st-catharines', 'Toronto → St. Catharines'],
+      ['niagara-falls-to-toronto', 'Niagara Falls → Toronto'],
+      ['toronto-to-niagara-falls', 'Toronto → Niagara Falls'],
+    ],
+    fields: [
+      { name: 'image', label: 'Banner photo', type: 'image', hint: 'Leave blank for the default photo.' },
+      POSITION_FIELD,
+      { name: 'eyebrow', label: 'Small tag above the headline', hint: 'Blank = “Long-distance moving · From → To”.' },
+      { name: 'heading', label: 'Headline (white)', hint: 'Blank = “From to To Movers”.' },
+      { name: 'accent', label: 'Second line (orange)' },
+      { name: 'text', label: 'Subtitle', type: 'textarea', hint: 'Blank = the route’s own intro.' },
+    ],
+  },
+  {
     key: 'hn_content',
     title: 'Hamilton & Niagara',
     intro: 'Your Hamilton & Niagara section (/hamilton-niagara): its banners, photos, service boxes and questions, plus the Long-Distance Moving card on the main site’s service lists. Town pages use their Location Post (Location Posts).',
@@ -257,7 +281,7 @@ const SECTIONS = [
       ]],
       ['furniture-delivery', 'Furniture Delivery page', HN_SERVICE_FIELDS],
       ['commercial-transport', 'Commercial Transport page', HN_SERVICE_FIELDS],
-      ['routes', 'Route pages (e.g. Grimsby → Toronto)', [
+      ['routes', 'Route pages: default photo for all routes (each route can have its own under Route page banners)', [
         { name: 'image', label: 'Banner photo for every route page', type: 'image', hint: 'Leave blank for the moving-truck photo.' },
         POSITION_FIELD,
       ]],
@@ -454,6 +478,7 @@ export default function PromotionsAdmin() {
           ...current,
           ...Object.fromEntries(Object.entries(data.services || {}).map(([key, url]) => [key, full(url)])),
           ...Object.fromEntries(Object.entries(data.pages || {}).map(([key, url]) => [key, full(url)])),
+          ...Object.fromEntries(Object.entries(data.routes || {}).map(([key, url]) => [key, full(url)])),
           // The first slide shows the Home page photo when it has none of its own.
           ...(data.slides?.[0] ? { __home: full(data.slides[0]) } : {}),
         }));

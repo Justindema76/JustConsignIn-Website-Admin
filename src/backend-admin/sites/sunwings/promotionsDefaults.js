@@ -400,5 +400,16 @@ export const PROMOTIONS_DEFAULTS = {
       "linkText": "Learn more →",
       "url": "/hamilton-niagara/long-distance"
     }
+  },
+  "route_banners": {
+    "long-distance": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "hamilton-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "toronto-to-hamilton": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "stoney-creek-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "hamilton-to-mississauga": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "st-catharines-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "toronto-to-st-catharines": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "niagara-falls-to-toronto": {"image":"","eyebrow":"","heading":"","accent":"","text":""},
+    "toronto-to-niagara-falls": {"image":"","eyebrow":"","heading":"","accent":"","text":""}
   }
 };
