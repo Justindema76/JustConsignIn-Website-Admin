@@ -143,26 +143,73 @@ const SUNWINGS_CODE_MEDIA = ["blog-images/sunwings/1792805164536-image.png", "bl
 const MEDIA_PATH_RE = /\/storage\/v1\/(?:object|render\/image)\/public\/([a-z0-9-]+)\/([^"'?\s)\\]+)/gi;
 
 // Every stored file the Sunwings site uses: all settings, pages, posts (drafts too) and banners,
-// read straight from the database, plus the photos in the site's code.
+// read straight from the database, plus the photos in the site's code. Also says WHERE each file
+// is used ("Pricing banner", "Moving Tip: …"), shown on each photo in Admin › Media.
+const SETTING_LABELS = {
+  hero_slides: 'Homepage banner', page_banners: 'Page banner', service_banners: 'Service banner',
+  route_banners: 'Route banner', hn_town_banners: 'H&N town banner', hn_content: 'Hamilton & Niagara',
+  promo_popup: 'Pop-up', snow_page: 'Snow page', pricing_panel: 'Pricing', referral_partners: 'Store partners',
+};
+const BANNER_SETTINGS = new Set(['hero_slides', 'page_banners', 'service_banners', 'route_banners', 'hn_town_banners']);
+// Photos the site's code uses when nothing is picked in the admin.
+const SUNWINGS_CODE_LABELS = {
+  'blog-images/sunwings/1794048719650-moving-van-on-an-ontario-road.webp': 'Default banner: H&N town pages',
+  'blog-images/sunwings/1794707943328-Q.E.W.-Highway-Exit-Panorama.png': 'Default banner: long-distance & route pages',
+  'blog-images/sunwings/1792805662384-cargo-van-driveway1.webp': 'Default banner: Services page',
+  'site-assets/sunwings/1791151104850-Sunwings-Transport-Logo.png': 'Site logo',
+  'site-assets/sunwings/1791334339517-SUNWING-site-logo.png': 'Site logo',
+};
+const MEDIA_KEY = match => { try { return `${match[1]}/${decodeURIComponent(match[2])}`; } catch { return `${match[1]}/${match[2]}`; } };
+const titleCase = text => String(text || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
 async function sunwingsMediaInUse() {
-  const sources = [
-    'sunwings_site_settings?site_key=eq.sunwings&select=value',
-    'site_settings?site_key=eq.sunwings&select=value',
-    'site_pages?site_key=eq.sunwings&select=content',
-    'sunwings_services?site_key=eq.sunwings&select=*',
-    'sunwings_locations?site_key=eq.sunwings&select=*',
-    'blog_posts?site_key=eq.sunwings&select=*',
-    'code_studio_banners?site_key=eq.sunwings&select=*',
-  ];
-  const texts = await Promise.all(sources.map(async path => {
+  const read = async path => {
     const response = await supabaseRest(path, { method: 'GET' }).catch(() => null);
-    return response?.ok ? response.text() : '';
-  }));
-  const paths = new Set(SUNWINGS_CODE_MEDIA);
-  for (const match of texts.join('\n').matchAll(MEDIA_PATH_RE)) {
-    try { paths.add(`${match[1]}/${decodeURIComponent(match[2])}`); } catch { paths.add(`${match[1]}/${match[2]}`); }
+    return response?.ok ? response.json().catch(() => null) : null;
+  };
+  const [settings, oldSettings, pages, services, locations, posts, studio] = await Promise.all([
+    read('sunwings_site_settings?site_key=eq.sunwings&select=key,value'),
+    read('site_settings?site_key=eq.sunwings&select=value'),
+    read('site_pages?site_key=eq.sunwings&select=*'),
+    read('sunwings_services?site_key=eq.sunwings&select=*'),
+    read('sunwings_locations?site_key=eq.sunwings&select=*'),
+    read('blog_posts?site_key=eq.sunwings&select=*'),
+    read('code_studio_banners?site_key=eq.sunwings&select=*'),
+  ]);
+  const uses = {};
+  const banners = new Set();
+  const add = (text, label, banner = false) => {
+    for (const match of String(text || '').matchAll(MEDIA_PATH_RE)) {
+      const key = MEDIA_KEY(match);
+      (uses[key] ||= new Set()).add(label);
+      if (banner) banners.add(key);
+    }
+  };
+  for (const [key, label] of Object.entries(SUNWINGS_CODE_LABELS)) { (uses[key] ||= new Set()).add(label); if (label.startsWith('Default banner')) banners.add(key); }
+  for (const key of SUNWINGS_CODE_MEDIA) if (!uses[key]) (uses[key] ||= new Set()).add('Built into the site');
+  for (const row of settings || []) {
+    const base = SETTING_LABELS[row.key] || 'Website settings';
+    let value = row.value;
+    try { value = JSON.parse(row.value); } catch { /* plain text */ }
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      for (const [part, inner] of Object.entries(value)) add(JSON.stringify(inner), `${base}: ${titleCase(part)}`, BANNER_SETTINGS.has(row.key));
+    } else if (Array.isArray(value)) {
+      value.forEach((inner, i) => add(JSON.stringify(inner), row.key === 'hero_slides' ? `${base} slide ${i + 1}` : base, BANNER_SETTINGS.has(row.key)));
+    } else add(row.value, base);
   }
-  return { paths: [...paths].sort(), complete: texts.every(Boolean) };
+  for (const row of oldSettings || []) add(JSON.stringify(row), 'Website settings');
+  for (const row of pages || []) add(JSON.stringify(row), `Page: ${titleCase(row.page_id || row.slug || row.id)}`);
+  for (const row of services || []) { add(row.banner_image, `Service banner: ${row.title || row.slug}`, true); add(JSON.stringify({ ...row, banner_image: '' }), `Service: ${row.title || row.slug}`); }
+  for (const row of locations || []) { add(row.banner_image, `Location banner: ${row.title || row.slug}`, true); add(JSON.stringify({ ...row, banner_image: '' }), `Location: ${row.title || row.slug}`); }
+  for (const row of posts || []) add(JSON.stringify(row), `Moving Tip: ${row.title || row.slug}`);
+  for (const row of studio || []) add(JSON.stringify(row), `Banner Studio: ${row.name || row.title || 'banner'}`, true);
+  const complete = [settings, oldSettings, pages, services, locations, posts, studio].every(Boolean);
+  return {
+    paths: Object.keys(uses).sort(),
+    uses: Object.fromEntries(Object.entries(uses).map(([key, set]) => [key, [...set].slice(0, 12)])),
+    banners: [...banners],
+    complete,
+  };
 }
 
 // Who uploaded each Sunwings media file: { "bucket/path": { by: "Marius (partner)", at } }.

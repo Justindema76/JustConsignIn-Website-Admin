@@ -72,11 +72,15 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
       .then(settings => { try { setFolders(JSON.parse(settings?.media_folders || '{}') || {}); } catch { setFolders({}); } })
       .catch(() => {});
     loadMediaInUse(accessToken)
-      .then(data => { if (data?.paths) setInUse({ paths: new Set(data.paths), complete: data.complete !== false }); })
+      .then(data => { if (data?.paths) setInUse({ paths: new Set(data.paths), uses: data.uses || {}, banners: new Set(data.banners || []), complete: data.complete !== false }); })
       .catch(() => {});
   }, [isSunwings, accessToken]);
 
-  const folderOf = item => folders[`${item.bucket}/${item.path}`] || guessFolder(item);
+  // A photo used in any banner counts as a Banner (unless you moved it to another folder yourself).
+  const isBanner = item => Boolean(inUse?.banners?.has(`${item.bucket}/${item.path}`));
+  const folderOf = item => folders[`${item.bucket}/${item.path}`] || (isBanner(item) ? 'Banners' : guessFolder(item));
+  // Where the photo is used on the site, e.g. "Page banner: Pricing", "Moving Tip: …".
+  const usesOf = item => inUse?.uses?.[`${item.bucket}/${item.path}`] || [];
   const usedOf = item => (inUse ? inUse.paths.has(`${item.bucket}/${item.path}`) : null);
 
   const totals = useMemo(() => {
@@ -87,15 +91,16 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
 
   const counts = useMemo(() => {
     const result = {};
-    items.forEach(item => { const f = folderOf(item); result[f] = (result[f] || 0) + 1; });
+    items.forEach(item => { const f = folderOf(item); result[f] = (result[f] || 0) + 1; if (f !== 'Banners' && isBanner(item)) result.Banners = (result.Banners || 0) + 1; });
     return result;
   }, [items, folders]);
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    let list = !term ? items : items.filter(item => `${item.name || ''} ${item.url || ''} ${item.mediaType || ''} ${item.bucket || ''}`.toLowerCase().includes(term));
+    let list = !term ? items : items.filter(item => `${item.name || ''} ${item.url || ''} ${item.mediaType || ''} ${item.bucket || ''} ${usesOf(item).join(' ')}`.toLowerCase().includes(term));
     if (pickTypes) list = list.filter(item => pickTypes.includes(item.mediaType || 'image'));
     if (folder === 'unused') list = list.filter(item => !item.protectedAsset && usedOf(item) === false);
+    else if (folder === 'Banners') list = list.filter(item => folderOf(item) === 'Banners' || isBanner(item));
     else if (folder !== 'all') list = list.filter(item => folderOf(item) === folder);
     const by = {
       newest: (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
@@ -246,6 +251,7 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
           <div className="site-admin-media-copy">
             <strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong>
             <small>{type === 'video' ? <><Video size={12}/> Video</> : type === 'audio' ? <><Music2 size={12}/> Music</> : <><Image size={12}/> Image</>}{isOwner ? <> · <b className={sizeOf(item) > 1024 * 1024 ? 'media-big' : ''}>{formatBytes(sizeOf(item))}</b></> : null}{item.createdAt ? ` · ${new Date(item.createdAt).toLocaleDateString()}` : ''}</small>
+            {usesOf(item).length ? <div className="media-uses"><b>Used in:</b> {usesOf(item).join(' · ')}</div> : null}
             {isSunwings ? <small className="media-by">{item.uploadedBy ? `Uploaded by ${item.uploadedBy}` : 'Uploader not recorded (older file)'}</small> : null}
             {isSunwings ? <select className="media-folder-select" value={folderOf(item)} onChange={event => moveTo([item], event.target.value)} aria-label="Folder">{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select> : null}
             {onPick ? null : <div className="site-admin-media-url-row">
