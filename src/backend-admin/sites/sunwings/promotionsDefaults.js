@@ -304,6 +304,7 @@ export const PROMOTIONS_DEFAULTS = {
   },
   "hn_content": {
     "theme": {
+      "scheme": "blackgold",
       "badge": "Hamilton & Niagara",
       "topbarLine": "Hamilton & Niagara moving and transport",
       "accent": "",

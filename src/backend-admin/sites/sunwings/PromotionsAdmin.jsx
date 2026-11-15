@@ -214,14 +214,15 @@ const SECTIONS = [
     intro: 'Your Hamilton & Niagara section (/hamilton-niagara): its banners, photos, service boxes and questions, plus the Long-Distance Moving card on the main site’s service lists. Town pages use their Location Post (Location Posts).',
     groups: [
       ['theme', 'Look & colours (whole section)', [
+        { name: 'scheme', label: 'Colour scheme', type: 'select', options: [['blackgold', 'Hamilton black & gold (no blue anywhere)'], ['main', 'Same as the main site (orange & navy)']], hint: 'Black & gold: black top bar, white header, gold buttons, black text and footer. The colours below change single parts on top of the scheme.' },
         { name: 'badge', label: 'Label next to the logo', hint: 'Leave blank to hide it.' },
         { name: 'topbarLine', label: 'Top bar text' },
-        { name: 'accent', label: 'Orange (buttons, orange headline line, label)', type: 'color', fallback: '#F7931E' },
-        { name: 'accent2', label: 'Second orange (button and label fade)', type: 'color', fallback: '#FDB833' },
-        { name: 'accentInk', label: 'Text on orange buttons', type: 'color', fallback: '#1b1300' },
-        { name: 'navy', label: 'Dark blue (dark sections, headings)', type: 'color', fallback: '#0B2545' },
+        { name: 'accent', label: 'Buttons, headline second line, label', type: 'color', fallback: '#F7931E' },
+        { name: 'accent2', label: 'Button and label fade', type: 'color', fallback: '#FDB833' },
+        { name: 'accentInk', label: 'Text on buttons', type: 'color', fallback: '#1b1300' },
+        { name: 'navy', label: 'Dark colour (dark sections, footer, headings)', type: 'color', fallback: '#0B2545' },
         { name: 'topbar', label: 'Top bar background', type: 'color', fallback: '#0B2545' },
-        { name: 'topbarInk', label: 'Top bar text', type: 'color', fallback: '#CFE0F5', hint: 'Blank = light blue text with an orange first part, like the main site.' },
+        { name: 'topbarInk', label: 'Top bar text', type: 'color', fallback: '#CFE0F5', hint: 'Blank = the colour scheme’s top bar text.' },
         { name: 'header', label: 'Header background', type: 'color', fallback: '#FFFFFF' },
         { name: 'blue', label: 'Links', type: 'color', fallback: '#1F5FA8' },
       ]],
@@ -347,9 +348,9 @@ function Field({ field, value, onChange, onPickMedia, item, groupKey, onItemChan
     const shown = /^#[0-9a-f]{6}$/i.test(value || '') ? value : (field.fallback || '#000000');
     return <label>{label}<span className="promo-color">
       <input type="color" value={shown} onChange={event => onChange(event.target.value)}/>
-      <input value={value || ''} placeholder={`Main site colour (${field.fallback})`} onChange={event => onChange(event.target.value.trim())}/>
-      {value ? <button className="site-admin-btn secondary small" type="button" onClick={() => onChange('')}>Use main site colour</button> : null}
-    </span>{hint || <small>Blank = same as the main site.</small>}</label>;
+      <input value={value || ''} placeholder="Blank = colour scheme" onChange={event => onChange(event.target.value.trim())}/>
+      {value ? <button className="site-admin-btn secondary small" type="button" onClick={() => onChange('')}>Clear</button> : null}
+    </span>{hint || <small>Blank = the colour scheme’s colour.</small>}</label>;
   }
   if (field.type === 'image') {
     return <div className="promo-field">{label}<ImageField value={value} onChange={onChange} onPickMedia={onPickMedia}/>{hint}</div>;
