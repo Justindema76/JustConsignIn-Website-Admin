@@ -32,6 +32,7 @@ import SunwingsAnalytics from '../features/analytics/SunwingsAnalytics';
 import SunwingsSettingsAdmin from '../sites/sunwings/SunwingsSettingsAdmin';
 import PromotionsAdmin from '../sites/sunwings/PromotionsAdmin';
 import CommissionAdmin from '../sites/sunwings/CommissionAdmin';
+import StorePartnersAdmin from '../sites/sunwings/StorePartnersAdmin';
 import PartnerJobsAdmin from '../sites/sunwings/PartnerJobsAdmin';
 import JobCalendarAdmin from '../sites/sunwings/JobCalendarAdmin';
 import IntegrationsAdmin from '../sites/sunwings/IntegrationsAdmin';
@@ -130,6 +131,7 @@ export default function AdminApp() {
         <Route path="/admin/sunwings/banner-studio" element={only(SUNWINGS, <BannerStudio studio={sunwingsCodeStudio} />)} />
         <Route path="/admin/sunwings/banner-studio/:id" element={only(SUNWINGS, <BannerStudioEditor studio={sunwingsCodeStudio} />)} />
         <Route path="/admin/sunwings/commission" element={only(SUNWINGS, <CommissionAdmin />)} />
+        <Route path="/admin/sunwings/store-partners" element={only(SUNWINGS, <StorePartnersAdmin />)} />
         <Route path="/admin/sunwings/jobs" element={only(SUNWINGS, <PartnerJobsAdmin />)} />
         <Route path="/admin/sunwings/integrations" element={only(SUNWINGS, <IntegrationsAdmin />)} />
         <Route path="/admin/sunwings/team" element={only(SUNWINGS, <TeamAdmin />)} />

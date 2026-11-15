@@ -1,0 +1,34 @@
+/* Admin › Store partners */
+.sp-signups h2,.sp-add h2{display:flex;align-items:center;gap:8px;font-size:16px;margin:0 0 12px}
+.sp-signup{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #eef1f5}
+.sp-signup div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sp-signup span{color:#5b6b82;font-size:13px}
+.sp-form{display:grid;grid-template-columns:2fr 1.3fr 1.2fr 1.6fr auto;gap:10px;align-items:end}
+.sp-form label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:700}
+.sp-add small{display:block;margin-top:8px;color:#5b6b82}
+.sp-empty{color:#5b6b82;margin:0}
+.sp-list{display:flex;flex-direction:column}
+.sp-row{display:grid;grid-template-columns:76px 1fr auto auto;gap:16px;align-items:center;padding:14px 0;border-top:1px solid #eef1f5}
+.sp-row:first-child{border-top:0}
+.sp-row.off{opacity:.55}
+.sp-qr{width:76px;height:76px;border:1px solid #e3e9f2;border-radius:10px;background:#fff}
+.sp-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sp-main b{font-size:15px}
+.sp-main span{color:#5b6b82;font-size:13px}
+.sp-link{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;border:0;background:#f2f5f9;border-radius:8px;padding:4px 8px;font:600 12px system-ui;color:#1f5fa8;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-stats{display:flex;gap:18px}
+.sp-stats div{display:flex;flex-direction:column;align-items:center;min-width:54px}
+.sp-stats b{font-size:17px}
+.sp-stats span{font-size:11.5px;color:#5b6b82}
+.sp-actions{display:flex;align-items:center;gap:8px}
+.sp-toggle{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700}
+@media (max-width:860px){
+  .sp-form{grid-template-columns:1fr 1fr}
+  .sp-row{grid-template-columns:64px 1fr;gap:10px 12px}
+  .sp-qr{width:64px;height:64px}
+  .sp-stats,.sp-actions{grid-column:1 / -1}
+  .sp-stats{justify-content:space-around}
+  .sp-actions{flex-wrap:wrap}
+}
+@media (max-width:480px){.sp-form{grid-template-columns:1fr}.sp-signup{flex-direction:column;align-items:flex-start}}
+.sp-signups,.sp-add{margin-bottom:16px}

@@ -22,6 +22,7 @@ export default {
         { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
         { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
         { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
+        { to: '/admin/sunwings/store-partners', label: 'Store partners', icon: 'handshake', ownerOnly: true },
         // Only partners (Marius) see this; they see nothing else.
         { to: '/admin/sunwings/jobs', label: 'Jobs from Justin', icon: 'truck', partnerOnly: true },
       ],

@@ -32,6 +32,7 @@ const ALLOWED_KEYS = new Set([
   'snow_pricing',
   'snow_page',
   'hn_content',
+  'referral_partners',
 ]);
 
 export default async function handler(req, res) {
