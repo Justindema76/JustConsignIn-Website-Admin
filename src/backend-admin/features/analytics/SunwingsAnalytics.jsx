@@ -4,7 +4,11 @@ import { ExternalLink, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { adminFetch, parseJsonResponse } from '../../services/apiClient';
 import { loadSunwingsQuotes } from '../../sites/sunwings/sunwingsAdminService';
+import { isBranchCredit } from '../../sites/sunwings/branch';
 import './analytics.css';
+
+// Which part of the site to show: everything, the main site, or the Hamilton & Niagara section.
+const AREAS = [['all', 'All'], ['main', 'Toronto & GTA'], ['hn', 'Hamilton & Niagara']];
 
 // Sunwings Analytics: traffic and phone clicks from Google Analytics (GA4),
 // quote requests and bookings from the admin's own records.
@@ -21,8 +25,8 @@ const shortDate = iso => new Date(`${iso}T12:00:00`).toLocaleDateString('en-CA',
 const validDate = value => value && !Number.isNaN(new Date(value).getTime());
 const requestType = item => item.request_type === 'quick_quote' ? 'Quick quote' : item.request_type === 'contact' ? 'Contact' : 'Full quote';
 
-async function loadGoogleAnalytics(accessToken, days) {
-  return parseJsonResponse(await adminFetch(`/api/admin/sunwings/google-analytics?days=${days}`, {}, accessToken), 'Unable to load Google Analytics.');
+async function loadGoogleAnalytics(accessToken, days, area = 'all') {
+  return parseJsonResponse(await adminFetch(`/api/admin/sunwings/google-analytics?days=${days}${area === 'all' ? '' : `&area=${area}`}`, {}, accessToken), 'Unable to load Google Analytics.');
 }
 
 function Delta({ now, before, invert = false }) {
@@ -100,7 +104,9 @@ function Split({ items, empty }) {
   </>;
 }
 
-export function AnalyticsView({ ga, requests, days, setDays, loading, error, onRefresh }) {
+export function AnalyticsView({ ga, requests: allRequests, days, setDays, area = 'all', setArea, loading, error, onRefresh }) {
+  // Quote requests from Hamilton & Niagara pages (or ads/visits there) vs the rest.
+  const requests = useMemo(() => (area === 'all' ? allRequests : (allRequests || []).filter(item => isBranchCredit(item) === (area === 'hn'))), [allRequests, area]);
   const connected = Boolean(ga?.connected);
   const cur = ga?.current || {};
   const prev = connected ? ga.previous || {} : {};
@@ -129,6 +135,9 @@ export function AnalyticsView({ ga, requests, days, setDays, loading, error, onR
       <div className="an-tools">
         <div className="an-periods" role="tablist" aria-label="Period">
           {PERIODS.map(([value, label]) => <button key={value} type="button" className={days === value ? 'on' : ''} onClick={() => setDays(value)}>{label}</button>)}
+        </div>
+        <div className="an-periods an-areas">
+          {setArea ? AREAS.map(([value, label]) => <button key={value} type="button" className={area === value ? 'on' : ''} onClick={() => setArea(value)}>{label}</button>) : null}
         </div>
         <button className="site-admin-btn secondary" type="button" onClick={onRefresh} disabled={loading}><RefreshCw size={15}/> {loading ? 'Loading…' : 'Refresh'}</button>
         <a className="site-admin-btn secondary" href={GA_LINK} target="_blank" rel="noreferrer"><ExternalLink size={15}/> Google Analytics</a>
@@ -226,6 +235,7 @@ export default function SunwingsAnalytics() {
   const [requests, setRequests] = useState([]);
   const [ga, setGa] = useState(null);
   const [days, setDays] = useState(30);
+  const [area, setArea] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -233,12 +243,12 @@ export default function SunwingsAnalytics() {
     if (!accessToken) return;
     setLoading(true);
     setError('');
-    const [quotes, google] = await Promise.allSettled([loadSunwingsQuotes(accessToken), loadGoogleAnalytics(accessToken, days)]);
+    const [quotes, google] = await Promise.allSettled([loadSunwingsQuotes(accessToken), loadGoogleAnalytics(accessToken, days, area)]);
     if (quotes.status === 'fulfilled') setRequests(quotes.value); else setError(quotes.reason?.message || 'Unable to load quote requests.');
     setGa(google.status === 'fulfilled' ? google.value : { connected: false, reason: google.reason?.message });
     setLoading(false);
-  }, [accessToken, days]);
+  }, [accessToken, days, area]);
   useEffect(() => { refresh(); }, [refresh]);
 
-  return <AnalyticsView ga={ga} requests={requests} days={days} setDays={setDays} loading={loading} error={error} onRefresh={refresh}/>;
+  return <AnalyticsView ga={ga} requests={requests} days={days} setDays={setDays} area={area} setArea={setArea} loading={loading} error={error} onRefresh={refresh}/>;
 }

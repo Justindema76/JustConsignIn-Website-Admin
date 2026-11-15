@@ -110,6 +110,15 @@ export default async function handler(req, res) {
   const current = { startDate: `${days - 1}daysAgo`, endDate: 'today', name: 'current' };
   const previous = { startDate: `${days * 2 - 1}daysAgo`, endDate: `${days}daysAgo`, name: 'previous' };
   const both = [current, previous];
+  // ?area=hn: only Hamilton & Niagara pages (/hamilton-niagara…); ?area=main: every other page.
+  const area = ['hn', 'main'].includes(req.query?.area) ? req.query.area : 'all';
+  const hnPages = { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'BEGINS_WITH', value: '/hamilton-niagara' } } };
+  const areaFilter = area === 'hn' ? hnPages : area === 'main' ? { notExpression: hnPages } : null;
+  const inArea = request => {
+    if (!areaFilter) return request;
+    const own = request.dimensionFilter;
+    return { ...request, dimensionFilter: own ? { andGroup: { expressions: [own, areaFilter] } } : areaFilter };
+  };
   const now = [current];
   const top = (dimension, metric, limit = 10, extra = {}) => ({
     dateRanges: now, dimensions: [{ name: dimension }], metrics: [{ name: metric }],
@@ -125,14 +134,14 @@ export default async function handler(req, res) {
         { dateRanges: now, dimensions: [{ name: 'date' }], metrics: [{ name: 'activeUsers' }, { name: 'screenPageViews' }], orderBys: [{ dimension: { dimensionName: 'date' } }], limit: 400 },
         { dateRanges: now, dimensions: [{ name: 'date' }], metrics: [{ name: 'eventCount' }], dimensionFilter: eventFilter(['phone_click']), limit: 400 },
         top('sessionDefaultChannelGroup', 'sessions', 8),
-      ]),
+      ].map(inArea)),
       batch(cfg.propertyId, token, [
         { ...top('pagePath', 'screenPageViews', 10), metrics: [{ name: 'screenPageViews' }, { name: 'activeUsers' }] },
         top('sessionSourceMedium', 'sessions', 8),
         top('pagePath', 'eventCount', 10, { dimensionFilter: eventFilter(['phone_click']) }),
         top('deviceCategory', 'activeUsers', 5),
         top('city', 'activeUsers', 8),
-      ]),
+      ].map(inArea)),
     ]);
 
     const totalRows = byRange(totals);
@@ -147,6 +156,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       connected: true,
       days,
+      area,
       current: { ...pick(totalRows.current), phoneClicks: nowEvents.phone_click || 0, formLeads: nowEvents.generate_lead || 0, emailClicks: nowEvents.email_click || 0 },
       previous: { ...pick(totalRows.previous), phoneClicks: prevEvents.phone_click || 0, formLeads: prevEvents.generate_lead || 0, emailClicks: prevEvents.email_click || 0 },
       daily: rows(trend).map(row => ({ date: isoDate(row.dims[0]), visitors: row.values[0], pageViews: row.values[1], phoneClicks: phoneByDay[row.dims[0]] || 0 })),
