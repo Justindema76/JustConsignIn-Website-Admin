@@ -52,7 +52,7 @@ function PhotoBox({ view, image, position, size, onChange }) {
   // Width (as % of the box) at which the photo just fills the box; zoom multiplies it.
   const coverWidth = ratio ? Math.max(100, (ratio / BOX_RATIO) * 100) : 100;
   const savedWidth = /^([\d.]+)%/.exec(size || '')?.[1];
-  const zoom = savedWidth ? clamp(round((Number(savedWidth) / coverWidth) * 100), 100, 300) : 100;
+  const zoom = savedWidth ? clamp(round((Number(savedWidth) / coverWidth) * 100), 50, 300) : 100;
   const photoWidth = (coverWidth * zoom) / 100;
   const photoHeight = ratio ? (photoWidth / ratio) * BOX_RATIO : 100; // as % of the box height
   const spareX = photoWidth - 100; // how far the photo can move, in % of the box
@@ -64,7 +64,8 @@ function PhotoBox({ view, image, position, size, onChange }) {
     const z = next.zoom ?? zoom;
     onChange({
       [posKey]: x === DEFAULT.x && y === DEFAULT.y ? '' : `${x}% ${y}%`,
-      [sizeKey]: z > 100 ? `${(coverWidth * z / 100).toFixed(1)}% auto` : '',
+      // Under 100% the whole photo shrinks inside the box (the banner colour shows around it).
+      [sizeKey]: z !== 100 ? `${(coverWidth * z / 100).toFixed(1)}% auto` : '',
     });
   };
 
@@ -80,13 +81,13 @@ function PhotoBox({ view, image, position, size, onChange }) {
     const dy = ((event.clientY - drag.current.startY) / box.height) * 100;
     // Dragging the photo right shows more of its left side, so the position goes down.
     set({
-      x: spareX > 0.5 ? drag.current.x - (dx / spareX) * 100 : pos.x,
-      y: spareY > 0.5 ? drag.current.y - (dy / spareY) * 100 : pos.y,
+      x: Math.abs(spareX) > 0.5 ? drag.current.x - (dx / spareX) * 100 : pos.x,
+      y: Math.abs(spareY) > 0.5 ? drag.current.y - (dy / spareY) * 100 : pos.y,
     });
   };
   const onPointerUp = () => { drag.current = null; };
 
-  const bgSize = zoom > 100 ? `${photoWidth}% auto` : 'cover';
+  const bgSize = zoom !== 100 ? `${photoWidth}% auto` : 'cover';
 
   const phone = view.posKey === VIEWS.phone.posKey;
   return <div className={`phone-photo ${phone ? 'is-phone' : 'is-desktop'}`}>
@@ -106,9 +107,9 @@ function PhotoBox({ view, image, position, size, onChange }) {
       {phone ? <div className="phone-photo-text"><b/><b/><b/></div> : null}
     </div>
     <div className="phone-photo-controls">
-            <label>Up / down <input type="range" min="0" max="100" value={pos.y} onChange={event => set({ y: Number(event.target.value) })} disabled={!image || spareY <= 0.5}/><output>{round(pos.y)}%</output></label>
-      <label>Left / right <input type="range" min="0" max="100" value={pos.x} onChange={event => set({ x: Number(event.target.value) })} disabled={!image || spareX <= 0.5}/><output>{round(pos.x)}%</output></label>
-      <label>Zoom <input type="range" min="100" max="300" step="5" value={zoom} onChange={event => set({ zoom: Number(event.target.value) })} disabled={!image}/><output>{zoom}%</output></label>
+            <label>Up / down <input type="range" min="0" max="100" value={pos.y} onChange={event => set({ y: Number(event.target.value) })} disabled={!image || Math.abs(spareY) <= 0.5}/><output>{round(pos.y)}%</output></label>
+      <label>Left / right <input type="range" min="0" max="100" value={pos.x} onChange={event => set({ x: Number(event.target.value) })} disabled={!image || Math.abs(spareX) <= 0.5}/><output>{round(pos.x)}%</output></label>
+      <label>Zoom <input type="range" min="50" max="300" step="5" value={zoom} onChange={event => set({ zoom: Number(event.target.value) })} disabled={!image}/><output>{zoom}%</output></label>
       <button type="button" className="site-admin-btn secondary small" onClick={() => onChange({ [posKey]: '', [sizeKey]: '' })}><RotateCcw size={13}/> Reset</button>
     </div>
   </div>;
