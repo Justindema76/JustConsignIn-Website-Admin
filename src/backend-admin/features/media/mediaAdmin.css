@@ -46,3 +46,12 @@
 
 /* Show the whole photo in the Media grid and picker (no cropping) */
 .site-admin-media-image img{object-fit:contain!important;background:#eef1f5}
+
+/* Click a thumbnail to see the photo big (also inside "Choose from Media"). */
+.media-zoom{position:absolute;right:8px;bottom:8px;width:32px;height:32px;display:grid;place-items:center;border:0;border-radius:8px;background:rgba(17,24,39,.72);color:#fff;cursor:pointer}
+.media-viewer{position:fixed;inset:0;z-index:2000;background:rgba(10,14,22,.82);display:grid;place-items:center;padding:24px}
+.media-viewer-card{position:relative;max-width:min(1100px,94vw);max-height:92vh;display:flex;flex-direction:column;background:#111;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.media-viewer-card img{display:block;max-width:100%;max-height:calc(92vh - 64px);object-fit:contain;background:#111}
+.media-viewer-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#fff}
+.media-viewer-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:13px}
+.media-viewer-close{position:absolute;top:10px;right:10px;width:38px;height:38px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.92);cursor:pointer}

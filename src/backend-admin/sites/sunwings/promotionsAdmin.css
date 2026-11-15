@@ -54,3 +54,4 @@
 .promo-color{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .promo-color input[type=color]{width:44px;height:36px;padding:2px;border-radius:8px;cursor:pointer;flex:none}
 .promo-color input:not([type=color]){flex:1;min-width:160px}
+.photo-position-phone-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;font-size:13.5px}

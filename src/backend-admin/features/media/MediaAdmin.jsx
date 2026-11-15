@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, CheckSquare, Copy, ExternalLink, FolderInput, HardDrive, Image, Music2, Square, Trash2, Upload, Video, WandSparkles } from 'lucide-react';
+import { Check, CheckSquare, Copy, ExternalLink, FolderInput, HardDrive, Image, Maximize2, Music2, Square, Trash2, Upload, Video, WandSparkles, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteAdminMedia, getAdminSiteKey, loadAdminMedia, loadMediaInUse, uploadBlogImage, uploadSocialAudio, uploadSocialVideo } from '../../services/siteAdminService';
@@ -43,6 +43,8 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
   const [q, setQ] = useState('');
   const [sort, setSort] = useState('newest');
   const [folder, setFolder] = useState('all');
+  // The photo opened big (click a thumbnail).
+  const [viewing, setViewing] = useState(null);
   const [folders, setFolders] = useState({});
   const [inUse, setInUse] = useState(null);
   const [selected, setSelected] = useState(() => new Set());
@@ -236,7 +238,10 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
               ? <video src={item.url} controls playsInline preload="metadata"/>
               : type === 'audio'
                 ? <div style={{ width: '100%', padding: 18, display: 'grid', gap: 12, justifyItems: 'center' }}><Music2 size={28}/><audio controls preload="metadata" src={item.url} style={{ width: '100%' }}/></div>
-                : <img src={previewUrl(item)} alt={item.name || 'Uploaded media'} loading="lazy" decoding="async" onClick={onPick ? () => onPick(item) : undefined} style={onPick ? { cursor: 'pointer' } : undefined}/>}
+                : <>
+                  <img src={previewUrl(item)} alt={item.name || 'Uploaded media'} loading="lazy" decoding="async" onClick={() => setViewing(item)} style={{ cursor: 'zoom-in' }}/>
+                  <button type="button" className="media-zoom" onClick={() => setViewing(item)} aria-label="View big"><Maximize2 size={15}/></button>
+                </>}
           </div>
           <div className="site-admin-media-copy">
             <strong title={item.name}>{item.name || (type === 'audio' ? 'Music' : type === 'video' ? 'Video' : 'Image')}</strong>
@@ -266,6 +271,17 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
           </div>
         </div>;
       })}
+      {viewing ? <div className="media-viewer" role="dialog" aria-label="Photo" onClick={() => setViewing(null)}>
+        <div className="media-viewer-card" onClick={event => event.stopPropagation()}>
+          <button type="button" className="media-viewer-close" onClick={() => setViewing(null)} aria-label="Close"><X size={20}/></button>
+          <img src={viewing.url} alt={viewing.name || ''}/>
+          <div className="media-viewer-bar">
+            <span title={viewing.name}>{viewing.name}</span>
+            {onPick ? <button type="button" className="site-admin-btn" onClick={() => { const item = viewing; setViewing(null); onPick(item); }}><Check size={15}/> Use this image</button>
+              : <a className="site-admin-btn secondary" href={viewing.url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open full size</a>}
+          </div>
+        </div>
+      </div> : null}
       {!busy && !filtered.length && <div className="site-admin-card site-admin-empty large"><Image size={30}/><h2>No media found</h2><p>{folder === 'unused' ? 'Everything here is used on the live site.' : 'Upload an image, MP4 video or audio file and it will appear here for reuse.'}</p></div>}
     </div>
   </>;

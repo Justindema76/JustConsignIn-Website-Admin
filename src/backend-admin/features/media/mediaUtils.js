@@ -26,6 +26,7 @@ export function guessFolder(item) {
 // Small preview instead of the full-size original (Supabase image resizing).
 export function previewUrl(item) {
   if ((item.mediaType || 'image') !== 'image' || !/\/storage\/v1\/object\/public\//.test(item.url || '') || /\.gif$/i.test(item.url)) return item.url;
-  return `${item.url.replace('/object/public/', '/render/image/public/')}?width=480&quality=70`;
+  // resize=contain: the whole photo, shrunk (the default crops it to a narrow strip).
+  return `${item.url.replace('/object/public/', '/render/image/public/')}?width=480&height=480&resize=contain&quality=70`;
 }
 

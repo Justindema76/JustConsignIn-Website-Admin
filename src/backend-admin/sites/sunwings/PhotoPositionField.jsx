@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { Image as ImageIcon, RotateCcw, X } from 'lucide-react';
+import MediaPickerModal from '../../features/social-automation/components/MediaPickerModal';
 
 // Banner photo position, like Code Studio's picture controls, for desktop and for phones.
 // Desktop: the photo fills the whole banner (about 2:1 on a laptop). Phones: a full-width 5:4 box
@@ -117,13 +118,22 @@ function PhotoBox({ view, image, position, size, onChange }) {
 
 // Both views side by side. `item` holds the four saved values; `onChange` gets the changed ones.
 // phoneRatio: 3/2 for slider slides (homepage), 5/4 for single page banners.
+// Phones can show a different photo (saved as mobileImage); blank = the same photo as desktop.
 export default function PhotoPositionField({ image, item = {}, onChange, phoneRatio = 5 / 4 }) {
+  const [picking, setPicking] = useState(false);
+  const phoneImage = item.mobileImage || image;
   return <div className="photo-position">
     <p className="photo-position-help">Drag a photo, or use its sliders, to choose what shows. Desktop and phones are set separately.</p>
+    <div className="photo-position-phone-pick">
+      <b>Phone photo:</b> {item.mobileImage ? 'its own photo' : 'same as desktop'}
+      <button type="button" className="site-admin-btn secondary small" onClick={() => setPicking(true)}><ImageIcon size={13}/> {item.mobileImage ? 'Change phone photo' : 'Use a different photo on phones'}</button>
+      {item.mobileImage ? <button type="button" className="site-admin-btn secondary small" onClick={() => onChange({ mobileImage: '', mobilePosition: '', mobileSize: '' })}><X size={13}/> Same as desktop</button> : null}
+    </div>
     <div className="photo-position-views">
       {[VIEWS.desktop, VIEWS.phone].map(view => (
-        <PhotoBox key={view.posKey} view={view === VIEWS.phone ? { ...view, ratio: phoneRatio } : view} image={image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
+        <PhotoBox key={view.posKey} view={view === VIEWS.phone ? { ...view, ratio: phoneRatio } : view} image={view === VIEWS.phone ? phoneImage : image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
       ))}
     </div>
+    {picking ? <MediaPickerModal types={['image']} onClose={() => setPicking(false)} onSelect={picked => { setPicking(false); onChange({ mobileImage: picked.url, mobilePosition: '', mobileSize: '' }); }}/> : null}
   </div>;
 }
