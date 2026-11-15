@@ -306,6 +306,7 @@ export const PROMOTIONS_DEFAULTS = {
     "theme": {
       "scheme": "blackgold",
       "badge": "Hamilton & Niagara",
+      "backLabel": "← Main site",
       "topbarLine": "Hamilton & Niagara moving and transport",
       "accent": "",
       "accent2": "",
