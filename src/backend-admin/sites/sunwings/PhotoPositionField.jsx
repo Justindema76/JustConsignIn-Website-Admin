@@ -14,6 +14,14 @@ export const VIEWS = {
 
 const WORDS = { left: 0, top: 0, center: 50, right: 100, bottom: 100 };
 
+// The live desktop banner is always 720px tall and as wide as the screen, so its shape depends on
+// the screen (1.4:1 on a small laptop, 2:1 at 1440, 2.7:1 at 1920). Preview it at this computer's
+// screen width so what you see here is what you see on the site.
+export function desktopRatio() {
+  const width = typeof window !== 'undefined' ? (window.screen?.width || window.innerWidth || 1440) : 1440;
+  return Math.min(2.8, Math.max(1.4, width / 720));
+}
+
 // Reads saved values, including the older word presets like "center top" or "70% center".
 export function parsePosition(value, DEFAULT = { x: 50, y: 50 }) {
   const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
@@ -93,7 +101,7 @@ function PhotoBox({ view, image, position, size, onChange }) {
   const phone = view.posKey === VIEWS.phone.posKey;
   return <div className={`phone-photo ${phone ? 'is-phone' : 'is-desktop'}`}>
     <h4>{view.label}</h4>
-    <div className="phone-photo-frame" style={phone ? { '--phone-ratio': view.ratio } : undefined}>
+    <div className="phone-photo-frame" style={{ '--phone-ratio': view.ratio }}>
       <div className="phone-photo-bar"/>
       <div
         ref={boxRef}
@@ -123,7 +131,7 @@ export default function PhotoPositionField({ image, item = {}, onChange, phoneRa
   const [picking, setPicking] = useState(false);
   const phoneImage = item.mobileImage || image;
   return <div className="photo-position">
-    <p className="photo-position-help">Drag a photo, or use its sliders, to choose what shows. Desktop and phones are set separately.</p>
+    <p className="photo-position-help">Drag a photo, or use its sliders, to choose what shows. Desktop and phones are set separately. The desktop box is the shape of the banner on this screen; zoom under 100% to fit more of the photo.</p>
     <div className="photo-position-phone-pick">
       <b>Phone photo:</b> {item.mobileImage ? 'its own photo' : 'same as desktop'}
       <button type="button" className="site-admin-btn secondary small" onClick={() => setPicking(true)}><ImageIcon size={13}/> {item.mobileImage ? 'Change phone photo' : 'Use a different photo on phones'}</button>
@@ -131,7 +139,7 @@ export default function PhotoPositionField({ image, item = {}, onChange, phoneRa
     </div>
     <div className="photo-position-views">
       {[VIEWS.desktop, VIEWS.phone].map(view => (
-        <PhotoBox key={view.posKey} view={view === VIEWS.phone ? { ...view, ratio: phoneRatio } : view} image={view === VIEWS.phone ? phoneImage : image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
+        <PhotoBox key={view.posKey} view={view === VIEWS.phone ? { ...view, ratio: phoneRatio } : { ...view, ratio: desktopRatio() }} image={view === VIEWS.phone ? phoneImage : image} position={item[view.posKey]} size={item[view.sizeKey]} onChange={onChange}/>
       ))}
     </div>
     {picking ? <MediaPickerModal types={['image']} onClose={() => setPicking(false)} onSelect={picked => { setPicking(false); onChange({ mobileImage: picked.url, mobilePosition: '', mobileSize: '' }); }}/> : null}
