@@ -176,6 +176,42 @@ function callbackCookies(token, siteKey, secure) {
   ];
 }
 
+function brandListTool(tools = []) {
+  const names = tools.map(tool => tool?.name).filter(Boolean);
+  return names.find(name => /^get_?brands$/i.test(name))
+    || names.find(name => /brands/i.test(name) && /(get|list)/i.test(name))
+    || names.find(name => /brand/i.test(name) && /(get|list)/i.test(name) && !/(post|stat|metric|report)/i.test(name));
+}
+
+function defaultArgs(tool = {}) {
+  const schema = tool.inputSchema || {};
+  const args = {};
+  for (const key of schema.required || []) {
+    const prop = schema.properties?.[key] || {};
+    if (Array.isArray(prop.enum) && prop.enum.length) args[key] = prop.enum.includes('active') ? 'active' : prop.enum[0];
+    else if (/state|status/i.test(key)) args[key] = 'active';
+    else if (prop.type === 'boolean') args[key] = false;
+    else if (prop.type === 'number' || prop.type === 'integer') args[key] = 0;
+    else args[key] = '';
+  }
+  return args;
+}
+
+function parseBrands(text) {
+  let data = null;
+  try { data = JSON.parse(text); } catch { return []; }
+  const list = Array.isArray(data) ? data : (data?.data || data?.brands || data?.items || data?.result || []);
+  if (!Array.isArray(list)) return [];
+  return list.map(item => {
+    const id = item?.id ?? item?.blogId ?? item?.blog_id ?? item?.brandId;
+    if (id === undefined || id === null || id === '') return null;
+    const name = item?.label || item?.name || item?.title || item?.brandName || `Brand ${id}`;
+    const networks = ['facebook', 'instagram', 'tiktok', 'youtube', 'linkedin', 'twitter', 'threads', 'pinterest', 'bluesky']
+      .filter(key => item?.[key] || item?.[`${key}Account`] || item?.[`${key}PageName`]);
+    return { id: String(id), name: String(name), networks };
+  }).filter(Boolean);
+}
+
 export default async function handler(req, res) {
   if (!['GET', 'POST', 'DELETE'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const siteKey = siteKeyFromRequest(req);
@@ -289,6 +325,25 @@ export default async function handler(req, res) {
         metadata: { ...(row?.metadata || {}), oauth_state: null }, connected_at: null, updated_at: new Date().toISOString(),
       });
       return res.status(200).json({ integration: publicIntegration(saved, siteKey) });
+    }
+
+    if (action === 'metricool-brands') {
+      const row = await readIntegration(user.accessToken, siteKey);
+      if (!row?.connected) return res.status(400).json({ error: 'Connect Metricool first.' });
+      let credentials = row.credentials || {};
+      if (!credentials.accessToken) return res.status(400).json({ error: 'Metricool authorization is incomplete. Reconnect Metricool.' });
+      if (credentials.expiresAt && credentials.expiresAt < Date.now() + 60000 && credentials.refreshToken) {
+        credentials = await refreshMetricoolOAuth(credentials);
+        await saveCredentials(user.accessToken, siteKey, row, credentials);
+      }
+      const { tools } = await getMetricoolTools(credentials.accessToken);
+      const name = brandListTool(tools);
+      if (!name) return res.status(502).json({ error: 'Metricool did not offer a brand list.' });
+      const tool = tools.find(item => item.name === name) || {};
+      const result = await callMetricoolTool(credentials.accessToken, name, defaultArgs(tool));
+      const brands = parseBrands(metricoolToolText(result));
+      if (!brands.length) return res.status(502).json({ error: 'No brands came back from Metricool.' });
+      return res.status(200).json({ brands });
     }
 
     if (action === 'metricool-test') {

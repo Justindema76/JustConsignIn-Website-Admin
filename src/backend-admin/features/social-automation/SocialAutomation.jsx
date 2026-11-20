@@ -13,6 +13,7 @@ import {
   saveSocialCampaign,
   sendCampaignToMetricool,
   saveMetricoolBrand,
+  loadMetricoolBrands,
   startMetricoolConnection,
   testMetricoolConnection,
 } from '../../services/socialAutomationService';
@@ -55,6 +56,7 @@ export default function SocialAutomation() {
   const [metricoolBrandId, setMetricoolBrandId] = useState('');
   const [personalBrandId, setPersonalBrandId] = useState('');
   const [postAs, setPostAs] = useState('business');
+  const [brandChoices, setBrandChoices] = useState(null);
 
   const refresh = async () => {
     if (!accessToken) return;
@@ -216,10 +218,23 @@ export default function SocialAutomation() {
     }
   };
 
-  const savePersonalBrandId = async () => {
+  const showBrandChoices = async () => {
     setBusy(true); setError(''); setMessage('');
     try {
-      const result = await saveMetricoolBrand(accessToken, personalBrandId, 'personal');
+      const result = await loadMetricoolBrands(accessToken);
+      setBrandChoices(result.brands || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const savePersonalBrandId = async (value = personalBrandId) => {
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const result = await saveMetricoolBrand(accessToken, value, 'personal');
+      setBrandChoices(null);
       setIntegration(result.integration || null);
       setPersonalBrandId(result.integration?.personalBrandId || '');
       setMessage(result.integration?.personalBrandId ? 'Your personal Metricool brand is saved.' : 'Your personal Metricool brand was removed.');
@@ -308,18 +323,19 @@ export default function SocialAutomation() {
       </div>
     </div>
 
-    <div className="social-connect-card site-admin-card">
-      <div><div className={`social-connection-dot ${integration?.connected && integration?.personalBrandId ? 'ok' : ''}`}/><div><strong>Your personal accounts</strong><small>{integration?.personalBrandId ? `Brand ${integration.personalBrandId} · posts can go out as you too` : 'Paste the brand ID of your own Metricool brand'}</small></div></div>
+    <div className="social-connect-card site-admin-card" style={{ flexWrap: 'wrap' }}>
+      <div><div className={`social-connection-dot ${integration?.connected && integration?.personalBrandId ? 'ok' : ''}`}/><div><strong>Your personal accounts</strong><small>{integration?.personalBrandId ? `Linked (brand ${integration.personalBrandId}) · posts can go out as you too` : 'Link your own Metricool brand'}</small></div></div>
       <div className="site-admin-actions">
-        <input
-          className="social-brand-id-input"
-          value={personalBrandId}
-          onChange={event => setPersonalBrandId(event.target.value)}
-          placeholder="Your Metricool brand ID"
-          aria-label="Your personal Metricool brand ID"
-        />
-        <button className="site-admin-btn secondary small" type="button" onClick={savePersonalBrandId} disabled={busy || (!personalBrandId.trim() && !integration?.personalBrandId)}>Save</button>
+        <button className="site-admin-btn small" type="button" onClick={showBrandChoices} disabled={busy || !integration?.connected}>{busy ? <Loader2 className="spin" size={14}/> : <Link2 size={14}/>} {integration?.personalBrandId ? 'Change' : 'Link my accounts'}</button>
+        {integration?.personalBrandId && <button className="site-admin-btn secondary small" type="button" onClick={() => savePersonalBrandId('')} disabled={busy}>Unlink</button>}
       </div>
+      {brandChoices && <div className="site-admin-actions" style={{ flexBasis: '100%', flexWrap: 'wrap', marginTop: 10 }}>
+        <small style={{ flexBasis: '100%' }}>Tap your brand:</small>
+        {brandChoices.map(brand => <button key={brand.id} className="site-admin-btn secondary small" type="button" disabled={busy} onClick={() => savePersonalBrandId(brand.id)}>
+          {brand.name}{brand.networks?.length ? ` · ${brand.networks.join(', ')}` : ''}
+        </button>)}
+        <button className="site-admin-btn secondary small" type="button" onClick={() => setBrandChoices(null)}>Cancel</button>
+      </div>}
     </div>
 
     <CampaignList campaigns={campaigns} loading={loading} busy={busy} onDelete={removeCampaign} basePath={socialBasePath}/>
