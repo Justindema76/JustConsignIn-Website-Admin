@@ -87,6 +87,7 @@ function publicIntegration(row, siteKey) {
     accountLabel: row?.account_label || SITE_CONFIG[siteKey]?.label || siteKey,
     userId: row?.external_user_id || '',
     brandId: row?.external_brand_id || '',
+    personalBrandId: row?.metadata?.personal_brand_id || '',
     connectedAt: row?.connected_at || '',
     updatedAt: row?.updated_at || '',
     metadata: row?.metadata || {},
@@ -240,8 +241,28 @@ export default async function handler(req, res) {
 
     if (action === 'metricool-brand') {
       const brandId = String(req.body?.brandId || '').trim().slice(0, 100);
-      if (!brandId) return res.status(400).json({ error: 'Enter the Metricool brand ID.' });
+      const personal = req.body?.which === 'personal';
+      if (!brandId && !personal) return res.status(400).json({ error: 'Enter the Metricool brand ID.' });
       const row = await readIntegration(user.accessToken, siteKey);
+      if (personal) {
+        const metadata = { ...(row?.metadata || {}), timezone: 'America/Toronto' };
+        if (brandId) metadata.personal_brand_id = brandId; else delete metadata.personal_brand_id;
+        const saved = await writeIntegration(user.accessToken, siteKey, {
+          provider: 'metricool',
+          connected: Boolean(row?.connected),
+          account_label: row?.account_label || site.label,
+          external_user_id: row?.external_user_id || '',
+          external_brand_id: row?.external_brand_id || '',
+          credentials: row?.credentials || {},
+          secret_ciphertext: row?.secret_ciphertext || '',
+          secret_iv: row?.secret_iv || '',
+          secret_tag: row?.secret_tag || '',
+          metadata,
+          connected_at: row?.connected_at || null,
+          updated_at: new Date().toISOString(),
+        });
+        return res.status(200).json({ integration: publicIntegration(saved, siteKey) });
+      }
       const saved = await writeIntegration(user.accessToken, siteKey, {
         provider: 'metricool',
         connected: Boolean(row?.connected),
@@ -300,12 +321,22 @@ export default async function handler(req, res) {
       const { tools } = await getMetricoolTools(credentials.accessToken);
       const createTool = toolName(tools);
       if (!createTool) throw new Error('Metricool scheduling tool was not found');
-      const brandId = String(row.external_brand_id || '').trim();
-      if (!brandId) return res.status(400).json({ error: `Connect/configure the Metricool brand for ${site.label} before publishing.` });
+      const postAs = ['business', 'personal', 'both'].includes(req.body?.postAs) ? req.body.postAs : 'business';
+      const businessBrand = String(row.external_brand_id || '').trim();
+      const personalBrand = String(row.metadata?.personal_brand_id || '').trim();
+      const brands = [];
+      if (postAs !== 'personal') {
+        if (!businessBrand) return res.status(400).json({ error: `Connect/configure the Metricool brand for ${site.label} before publishing.` });
+        brands.push({ id: businessBrand, label: site.label });
+      }
+      if (postAs !== 'business') {
+        if (!personalBrand) return res.status(400).json({ error: 'Save your personal Metricool brand ID first.' });
+        brands.push({ id: personalBrand, label: 'Justin (personal)' });
+      }
       const results = [];
       const errors = [];
 
-      for (const network of campaign.platforms) {
+      for (const { id: brandId, label: brandLabel } of brands) for (const network of campaign.platforms) {
         try {
           validateForNetwork(campaign, network);
           const info = networkInfo(campaign, network, siteKey);
@@ -320,8 +351,8 @@ export default async function handler(req, res) {
           const text = metricoolToolText(result);
           let parsed = null;
           try { parsed = text ? JSON.parse(text) : null; } catch {}
-          results.push({ network, tool: createTool, response: parsed || text || result });
-        } catch (error) { errors.push({ network, error: error.message || String(error) }); }
+          results.push({ network: network, brand: brandLabel, tool: createTool, response: parsed || text || result });
+        } catch (error) { errors.push({ network: brands.length > 1 ? `${brandLabel} ${network}` : network, brand: brandLabel, error: error.message || String(error) }); }
       }
 
       const status = results.length ? (campaign.auto_publish ? 'active' : 'scheduled') : 'failed';

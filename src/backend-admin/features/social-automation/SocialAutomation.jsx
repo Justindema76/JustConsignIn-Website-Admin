@@ -53,6 +53,8 @@ export default function SocialAutomation() {
   const [error, setError] = useState('');
   const [activePreview, setActivePreview] = useState('instagram');
   const [metricoolBrandId, setMetricoolBrandId] = useState('');
+  const [personalBrandId, setPersonalBrandId] = useState('');
+  const [postAs, setPostAs] = useState('business');
 
   const refresh = async () => {
     if (!accessToken) return;
@@ -67,6 +69,7 @@ export default function SocialAutomation() {
       setCampaigns(nextCampaigns);
       setIntegration(social.integration || null);
       setMetricoolBrandId(social.integration?.brandId || '');
+      setPersonalBrandId(social.integration?.personalBrandId || '');
       setMedia(items || []);
       if (editing) {
         const found = nextCampaigns.find(item => item.id === id);
@@ -160,7 +163,7 @@ export default function SocialAutomation() {
       const saved = await saveSocialCampaign(accessToken, prepared);
       setCampaign(saved);
       if (id === 'new') navigate(`${socialBasePath}/${saved.id}`, { replace: true });
-      const result = await sendCampaignToMetricool(accessToken, saved.id);
+      const result = await sendCampaignToMetricool(accessToken, saved.id, integration?.personalBrandId ? postAs : 'business');
       setCampaign(result.campaign);
       setMessage(result.errors?.length
         ? `Sent with warnings: ${result.errors.map(item => item.error).join(' | ')}`
@@ -206,6 +209,20 @@ export default function SocialAutomation() {
       setIntegration(result.integration || null);
       setMetricoolBrandId(result.integration?.brandId || metricoolBrandId);
       setMessage(`Metricool brand saved for ${siteName}.`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const savePersonalBrandId = async () => {
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const result = await saveMetricoolBrand(accessToken, personalBrandId, 'personal');
+      setIntegration(result.integration || null);
+      setPersonalBrandId(result.integration?.personalBrandId || '');
+      setMessage(result.integration?.personalBrandId ? 'Your personal Metricool brand is saved.' : 'Your personal Metricool brand was removed.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -291,6 +308,20 @@ export default function SocialAutomation() {
       </div>
     </div>
 
+    <div className="social-connect-card site-admin-card">
+      <div><div className={`social-connection-dot ${integration?.connected && integration?.personalBrandId ? 'ok' : ''}`}/><div><strong>Your personal accounts</strong><small>{integration?.personalBrandId ? `Brand ${integration.personalBrandId} · posts can go out as you too` : 'Paste the brand ID of your own Metricool brand'}</small></div></div>
+      <div className="site-admin-actions">
+        <input
+          className="social-brand-id-input"
+          value={personalBrandId}
+          onChange={event => setPersonalBrandId(event.target.value)}
+          placeholder="Your Metricool brand ID"
+          aria-label="Your personal Metricool brand ID"
+        />
+        <button className="site-admin-btn secondary small" type="button" onClick={savePersonalBrandId} disabled={busy || (!personalBrandId.trim() && !integration?.personalBrandId)}>Save</button>
+      </div>
+    </div>
+
     <CampaignList campaigns={campaigns} loading={loading} busy={busy} onDelete={removeCampaign} basePath={socialBasePath}/>
   </>;
 
@@ -314,6 +345,11 @@ export default function SocialAutomation() {
       <section className="site-admin-card social-editor">
         <label className="social-field"><span>Campaign / topic</span><input value={campaign.title} onChange={e => setField('title', e.target.value)} placeholder={campaignPlaceholder}/></label>
         <div className="social-field"><span>Publish to</span><NetworkSelector value={campaign.platforms} onChange={platforms => setField('platforms', platforms)}/></div>
+        {integration?.personalBrandId && <label className="social-field"><span>Post as</span><select value={postAs} onChange={e => setPostAs(e.target.value)}>
+          <option value="business">{siteName} only</option>
+          <option value="personal">Me (personal) only</option>
+          <option value="both">Both</option>
+        </select></label>}
 
         <CampaignMediaEditor
           campaign={campaign}
