@@ -27,7 +27,7 @@ export default function JobPhotosField({ html, onChange, accessToken, place = ''
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const set = next => onChange(writeJobPhotos(html, next));
-  const add = (url, alt = '') => { if (url && !photos.some(p => p.url === url)) set([...photos, { url, alt: alt || `Sunwings Transport job${place ? ` in ${place}` : ''}` }]); };
+  const add = (url, alt = '') => { if (url && !photos.some(p => p.url === url)) set([...photos, { url, alt: alt || 'Sunwings Transport job photo' }]); };
 
   const upload = async event => {
     const files = [...(event.target.files || [])];
@@ -38,7 +38,7 @@ export default function JobPhotosField({ html, onChange, accessToken, place = ''
       let next = photos;
       for (const file of files) {
         const url = await uploadSunwingsImage(accessToken, file);
-        if (url) next = [...next, { url, alt: `Sunwings Transport job${place ? ` in ${place}` : ''}` }];
+        if (url) next = [...next, { url, alt: 'Sunwings Transport job photo' }];
       }
       set(next);
     } catch (err) { setError(err.message || 'Upload failed.'); } finally { setBusy(false); }
