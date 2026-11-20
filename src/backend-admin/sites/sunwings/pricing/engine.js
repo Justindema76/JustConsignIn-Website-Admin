@@ -12,9 +12,10 @@ export const PRICING_VERSION = 'sunwings-pricing-1';
 export const DEFAULT_PRICING_SETTINGS = {
   version: PRICING_VERSION,
   taxRate: 0.13, // Ontario HST
-  // Justin's commission on the full pre-tax quote. 'flat': one rate (the brief uses 20%).
-  // 'tiered': the admin's current rule, 10% on jobs up to C$800 and 20% over.
-  commission: { mode: 'flat', rate: 0.2, threshold: 800, lowRate: 0.1, highRate: 0.2, eligibleServices: [] },
+  // Justin's commission on the full pre-tax quote, editable in Admin › Price calculator › Rates.
+  // 'tiered' (Justin's choice, same as the Commission page): 10% on jobs up to C$800, 20% over.
+  // 'flat': one rate (the brief uses 20%). Every service pays it unless listed in excludedServices.
+  commission: { mode: 'tiered', rate: 0.2, threshold: 800, lowRate: 0.1, highRate: 0.2, excludedServices: [] },
   contributionPerHour: { low: 50, high: 75 }, // owner-driven target per dispatch hour, after direct costs
   serviceMinimums: { default: 150 }, // retained minimum (before commission). C$150 pending confirmation.
   dispatchBase: { label: '', address: '' },
@@ -121,7 +122,7 @@ export function priceWithCommission(args, commission = {}) {
 //        rentalFuel, crew: [{ role, hours?, hourly?, flat? }], extras: { tolls, parking, supplies, equipment },
 //        helpAtBothEnds, helperCrewReduction }
 export function estimateJob(job, settings = DEFAULT_PRICING_SETTINGS) {
-  const eligible = (settings.commission?.eligibleServices || []).includes(job.service);
+  const eligible = !(settings.commission?.excludedServices || []).includes(job.service);
   const commission = eligible ? settings.commission : { mode: 'flat', rate: 0 };
   const minimum = num(settings.serviceMinimums?.[job.service]) ?? num(settings.serviceMinimums?.default) ?? 0;
   const extras = sum(Object.values(job.extras || {}).map(value => num(value) || 0));

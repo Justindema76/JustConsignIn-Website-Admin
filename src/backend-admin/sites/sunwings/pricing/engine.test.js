@@ -50,7 +50,7 @@ const ready = {
   ...DEFAULT_PRICING_SETTINGS,
   van: { name: 'Transit 150', costPerKm: 0.5, fuelIncluded: true },
   crew: { driverHourly: 25, helperHourly: 22, minimumPaidHours: 3 },
-  commission: { rate: 0.2, eligibleServices: ['furniture-delivery'] },
+  commission: { mode: 'flat', rate: 0.2, excludedServices: [] },
 };
 
 test('Low and high range for a full van job, with minimum shift and commission', () => {
@@ -81,4 +81,15 @@ test('Tiered commission (admin rule): 10% up to C$800, 20% over', () => {
   const big = priceWithCommission({ dispatchHours: 8, directCost: 500, contributionPerHour: 60 }, tiered);
   assert.equal(big.commissionRate, 0.2);
   assert.equal(big.price, 1225); // 980 ÷ 0.8
+});
+
+test('Default commission is the tiered rule, and an excluded service pays none', () => {
+  assert.equal(DEFAULT_PRICING_SETTINGS.commission.mode, 'tiered');
+  const settings = { ...ready, commission: { ...DEFAULT_PRICING_SETTINGS.commission, excludedServices: ['junk-removal'] } };
+  const job = { hours: { low: 2.5, high: 2.5 }, km: { low: 0, high: 0 }, vehicle: 'van', crew: [], extras: { supplies: 116.5 } };
+  const paying = estimateJob({ ...job, service: 'furniture-delivery' }, settings);
+  assert.equal(paying.low.commissionRate, 0.1); // C$296.12 is under C$800
+  const excluded = estimateJob({ ...job, service: 'junk-removal' }, settings);
+  assert.equal(excluded.low.commissionRate, 0);
+  assert.equal(excluded.commissionEligible, false);
 });

@@ -288,7 +288,7 @@ export default function PricingAdmin() {
         <div className="pricing-services">
           <span>Services that pay commission</span>
           {serviceOptions.map(item => <label key={item.slug}>
-            <input type="checkbox" checked={settings.commission.eligibleServices.includes(item.slug)} onChange={event => update(['commission', 'eligibleServices'], event.target.checked ? [...settings.commission.eligibleServices, item.slug] : settings.commission.eligibleServices.filter(slug => slug !== item.slug))}/>
+            <input type="checkbox" checked={!(settings.commission.excludedServices || []).includes(item.slug)} onChange={event => update(['commission', 'excludedServices'], event.target.checked ? (settings.commission.excludedServices || []).filter(slug => slug !== item.slug) : [...(settings.commission.excludedServices || []), item.slug])}/>
             {item.title}
           </label>)}
         </div>
