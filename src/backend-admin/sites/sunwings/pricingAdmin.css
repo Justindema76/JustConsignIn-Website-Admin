@@ -51,3 +51,24 @@
 .pricing-rental{display:grid;grid-template-columns:1.4fr repeat(5,minmax(80px,1fr)) auto;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
 .pricing-rental small{grid-column:1/-2;color:#64748b}
 @media (max-width:900px){.pricing-grid,.pricing-rates,.pricing-pair{grid-template-columns:1fr}.pricing-rental{grid-template-columns:1fr 1fr}}
+
+/* Tabs 1 · Rates / 2 · Price a job / 3 · Check a price, cards and help text */
+.pricing-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 10px}
+.pricing-tabs button{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #dfe3e8;border-radius:12px;background:#fff;font:inherit;text-align:left;cursor:pointer;color:#0f172a;transition:border-color .15s,box-shadow .15s}
+.pricing-tabs button:hover{border-color:var(--sw-orange,#fb690a)}
+.pricing-tabs button.active{border-color:var(--sw-orange,#fb690a);box-shadow:0 0 0 3px rgba(251,105,10,.16);background:var(--dashboard-accent-wash,#fff1e6)}
+.pricing-tabs b{display:block;font-size:15px}
+.pricing-tabs small{display:block;font-size:12px;color:#64748b;margin-top:2px}
+.pricing-tab-n{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:#eef2f6;color:#475569;font-weight:800;font-size:14px}
+.pricing-tabs button.active .pricing-tab-n{background:var(--sw-orange,#fb690a);color:#fff}
+.pricing-howto{margin:0 0 16px;padding:11px 14px;border-radius:10px;background:#f6f9fc;border:1px solid #dce5ef;color:#475569;font-size:13.5px;line-height:1.5}
+.pricing-card{padding:20px}
+.pricing-form h3{font-size:16px;padding-bottom:10px;border-bottom:1px solid #eef1f4}
+.pricing-empty{display:grid;justify-items:center;gap:8px;text-align:center;padding:40px 24px;color:#64748b}
+.pricing-empty svg{color:var(--sw-orange,#fb690a)}
+.pricing-empty b{color:#0f172a;font-size:16px}
+.pricing-empty span{max-width:380px;line-height:1.5;font-size:13.5px}
+.pricing-admin .site-admin-btn.secondary{width:max-content}
+.pricing-banner{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.pricing-check-card dl{margin-top:6px}
+@media (max-width:760px){.pricing-tabs{grid-template-columns:1fr}}
