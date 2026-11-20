@@ -57,6 +57,12 @@ function buildTodo(rows, now, isOwner) {
       why: `Sent to you ${ago(now - Date.parse(row.forwarded_at || row.created_at))}.`,
       cta: 'Price it', to: quoteLink,
     });
+    // Justin: jobs sent to Marius that he still hasn't priced.
+    if (isOwner && !job.contact && ['forwarded', 'reviewing', 'needs_quote'].includes(row.status) && row.partner_price == null) reasons.push({
+      rank: 1, tag: ['amber', 'Waiting on Marius'],
+      why: `Sent to Marius ${ago(now - Date.parse(row.forwarded_at || row.created_at))}. He hasn't given a price yet.`,
+      cta: 'Open', to: quoteLink,
+    });
     if (isOwner && row.partner_update_unseen) reasons.push({
       rank: 1, tag: ['blue', 'Marius updated'],
       why: row.partner_note || 'New price or status from Marius.',
