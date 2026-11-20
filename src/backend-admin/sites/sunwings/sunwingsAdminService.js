@@ -184,3 +184,17 @@ export async function addInvestment(accessToken, investment) {
 export async function deleteInvestment(accessToken, id) {
   await parseJsonResponse(await adminFetch(`/api/admin/sunwings/investments?id=${encodeURIComponent(id)}`, { method: 'DELETE' }, accessToken), 'Unable to delete investment.');
 }
+
+// Price calculator settings (private; see api/admin/sunwings/pricing.js).
+export async function loadPricingSettings(accessToken) {
+  const payload = await parseJsonResponse(await adminFetch('/api/admin/sunwings/pricing', {}, accessToken), 'Unable to load price settings.');
+  return { settings: payload.settings || null, updatedAt: payload.updated_at || null };
+}
+
+export async function savePricingSettings(accessToken, settings) {
+  return parseJsonResponse(await adminFetch('/api/admin/sunwings/pricing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ settings }),
+  }, accessToken), 'Unable to save price settings.');
+}

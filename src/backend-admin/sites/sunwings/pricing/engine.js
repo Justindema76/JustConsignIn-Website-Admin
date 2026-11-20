@@ -12,7 +12,9 @@ export const PRICING_VERSION = 'sunwings-pricing-1';
 export const DEFAULT_PRICING_SETTINGS = {
   version: PRICING_VERSION,
   taxRate: 0.13, // Ontario HST
-  commission: { rate: 0.2, eligibleServices: [] }, // 20% of the full pre-tax quote on eligible jobs
+  // Justin's commission on the full pre-tax quote. 'flat': one rate (the brief uses 20%).
+  // 'tiered': the admin's current rule, 10% on jobs up to C$800 and 20% over.
+  commission: { mode: 'flat', rate: 0.2, threshold: 800, lowRate: 0.1, highRate: 0.2, eligibleServices: [] },
   contributionPerHour: { low: 50, high: 75 }, // owner-driven target per dispatch hour, after direct costs
   serviceMinimums: { default: 150 }, // retained minimum (before commission). C$150 pending confirmation.
   dispatchBase: { label: '', address: '' },
@@ -85,7 +87,7 @@ export function priceScenario({ dispatchHours, directCost, contributionPerHour, 
   return {
     needsReview: false, missing: [],
     dispatchHours, directCost: roundCents(directCost), requiredContribution, requiredAmount,
-    price, commission, retained, contribution, tax, totalWithTax: roundCents(price + tax),
+    price, commissionRate, commission, retained, contribution, tax, totalWithTax: roundCents(price + tax),
     // Recheck after rounding (brief: "recheck the retained minimum and contribution after commission").
     meetsMinimum: retained + 0.005 >= (num(minimum) || 0),
     meetsContribution: contribution + 0.005 >= requiredContribution,
@@ -105,12 +107,22 @@ export function checkPrice({ price, dispatchHours, contributionPerHour, commissi
   };
 }
 
+// Price with commission, where the rate may depend on the price itself (tiered rule):
+// try the lower rate; if that price is over the threshold, the higher rate applies.
+export function priceWithCommission(args, commission = {}) {
+  if (commission.mode !== 'tiered') return priceScenario({ ...args, commissionRate: num(commission.rate) || 0 });
+  const low = priceScenario({ ...args, commissionRate: num(commission.lowRate) || 0 });
+  if (low.price === null || low.price <= (num(commission.threshold) ?? Infinity)) return low;
+  return priceScenario({ ...args, commissionRate: num(commission.highRate) || 0 });
+}
+
 // A whole job, low and high (brief: "use approved low and high cost and time assumptions").
 // job: { service, hours: {low, high}, km: {low, high}, vehicle: 'van'|'rental', rentalId, rentalMiles: {low,high},
 //        rentalFuel, crew: [{ role, hours?, hourly?, flat? }], extras: { tolls, parking, supplies, equipment },
 //        helpAtBothEnds, helperCrewReduction }
 export function estimateJob(job, settings = DEFAULT_PRICING_SETTINGS) {
-  const commissionRate = (settings.commission?.eligibleServices || []).includes(job.service) ? num(settings.commission?.rate) || 0 : 0;
+  const eligible = (settings.commission?.eligibleServices || []).includes(job.service);
+  const commission = eligible ? settings.commission : { mode: 'flat', rate: 0 };
   const minimum = num(settings.serviceMinimums?.[job.service]) ?? num(settings.serviceMinimums?.default) ?? 0;
   const extras = sum(Object.values(job.extras || {}).map(value => num(value) || 0));
 
@@ -139,7 +151,7 @@ export function estimateJob(job, settings = DEFAULT_PRICING_SETTINGS) {
     if (missing.length) return { needsReview: true, missing: [...new Set(missing)], price: null };
     const directCost = roundCents(vehicle.cost + crewPaid.cost + extras);
     return {
-      ...priceScenario({ dispatchHours: hours, directCost, contributionPerHour: num(settings.contributionPerHour?.[end]), minimum, commissionRate, taxRate: num(settings.taxRate) ?? 0.13 }),
+      ...priceWithCommission({ dispatchHours: hours, directCost, contributionPerHour: num(settings.contributionPerHour?.[end]), minimum, taxRate: num(settings.taxRate) ?? 0.13 }, commission),
       breakdown: { vehicle: vehicle.cost, crew: crewPaid.cost, extras },
     };
   };
@@ -162,7 +174,7 @@ export function estimateJob(job, settings = DEFAULT_PRICING_SETTINGS) {
   }
   return {
     version: settings.version || PRICING_VERSION,
-    service: job.service, commissionRate, minimum,
+    service: job.service, commissionEligible: eligible, minimum,
     low, high, helpAndSave,
     needsReview: Boolean(low.needsReview || high.needsReview),
     missing: [...new Set([...(low.missing || []), ...(high.missing || [])])],

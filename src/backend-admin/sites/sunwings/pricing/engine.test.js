@@ -1,7 +1,7 @@
 // The brief's acceptance tests (section 06). Run: node --test src/backend-admin/sites/sunwings/pricing/
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_PRICING_SETTINGS, checkPrice, estimateJob, priceScenario, rentalCost } from './engine.js';
+import { DEFAULT_PRICING_SETTINGS, checkPrice, estimateJob, priceScenario, priceWithCommission, rentalCost } from './engine.js';
 
 test('Local van with commission: 2.5 h, C$116.50 direct, C$60/h → C$333.13 before tax', () => {
   const r = priceScenario({ dispatchHours: 2.5, directCost: 116.5, contributionPerHour: 60, commissionRate: 0.2 });
@@ -71,4 +71,14 @@ test('Help & Save only when help is confirmed at both ends', () => {
   // the helper's paid hours drop out: 22 × 3 = 66 (low) and 22 × 4 = 88 (high), ÷ 0.8
   assert.equal(r.helpAndSave.savings.low, 82.5);
   assert.equal(r.helpAndSave.savings.high, 110);
+});
+
+test('Tiered commission (admin rule): 10% up to C$800, 20% over', () => {
+  const tiered = { mode: 'tiered', threshold: 800, lowRate: 0.1, highRate: 0.2 };
+  const small = priceWithCommission({ dispatchHours: 2.5, directCost: 116.5, contributionPerHour: 60 }, tiered);
+  assert.equal(small.commissionRate, 0.1);
+  assert.equal(small.price, 296.12); // 266.50 ÷ 0.9, rounded up
+  const big = priceWithCommission({ dispatchHours: 8, directCost: 500, contributionPerHour: 60 }, tiered);
+  assert.equal(big.commissionRate, 0.2);
+  assert.equal(big.price, 1225); // 980 ÷ 0.8
 });

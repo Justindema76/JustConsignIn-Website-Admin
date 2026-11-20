@@ -1,0 +1,53 @@
+/* Admin › Price calculator (PricingAdmin.jsx) */
+.pricing-admin .site-admin-page-head h1{display:flex;align-items:center;gap:10px}
+.pricing-admin .site-admin-muted{color:#64748b;margin:4px 0 0;max-width:720px}
+.pricing-missing{display:flex;gap:8px;align-items:center;background:#fff7ed;border:1px solid #fdba74;color:#7c2d12}
+.pricing-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.pricing-rates{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.pricing-wide{grid-column:1/-1}
+.pricing-form{display:grid;gap:14px}
+.pricing-form h3{margin:0;font-size:17px}
+.pricing-field{display:grid;gap:5px;font-size:13px;font-weight:700;color:#0f172a}
+.pricing-field small{font-weight:500;color:#64748b}
+.pricing-field select,.pricing-field>input{width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-weight:500;background:#fff}
+.pricing-input{display:flex;align-items:center;border:1px solid #cbd5e1;border-radius:10px;background:#fff;overflow:hidden}
+.pricing-input input{flex:1;min-width:0;padding:9px 11px;border:0;font:inherit;font-weight:500;outline:none}
+.pricing-input em{padding:0 10px;font-style:normal;color:#64748b;font-weight:600}
+.pricing-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.pricing-range{display:grid;gap:5px;font-size:13px;font-weight:700}
+.pricing-range>div{display:flex;align-items:center;gap:8px}
+.pricing-range input{width:100%;min-width:0;padding:9px 11px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-weight:500}
+.pricing-range b,.pricing-range em{font-weight:600;font-style:normal;color:#64748b}
+.pricing-toggle{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;font-weight:600}
+.pricing-toggle label,.pricing-check{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
+.pricing-crew{display:grid;gap:8px;font-size:13px;font-weight:700}
+.pricing-crew-row{display:grid;grid-template-columns:120px 1fr auto;gap:8px}
+.pricing-crew-row select,.pricing-crew-row input{padding:9px 11px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-weight:500;min-width:0}
+.pricing-admin .site-admin-icon-btn{display:grid;place-items:center;width:38px;height:38px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;cursor:pointer;color:#475569}
+.pricing-results{display:grid;gap:14px}
+.pricing-empty{color:#64748b}
+.pricing-banner{padding:14px 18px;border-radius:14px;background:#0B2545;color:#fff;font-size:16px}
+.pricing-banner b{color:#FDB833;font-size:20px}
+.pricing-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pricing-result{padding:16px;border:1px solid #e2e8f0;border-radius:14px;background:#fff}
+.pricing-result h4{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+.pricing-price{font-size:26px;font-weight:800;color:#0B2545;margin-bottom:10px}
+.pricing-price small{font-size:13px;font-weight:600;color:#64748b}
+.pricing-result dl,.pricing-check-out{margin:0;display:grid}
+.pricing-result dl>div,.pricing-check-out>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid #f1f5f9;font-size:13px}
+.pricing-result dt,.pricing-check-out dt{color:#475569}
+.pricing-result dd,.pricing-check-out dd{margin:0;font-weight:600}
+.pricing-result .strong,.pricing-check-out .strong{font-weight:800}
+.pricing-result .strong dt,.pricing-check-out .strong dt{color:#0f172a;font-weight:700}
+.pricing-result.review{background:#fff7ed;border-color:#fdba74}
+.pricing-result.review p,.pricing-warn{display:flex;gap:6px;align-items:flex-start;margin:0;color:#9a3412;font-size:13px;font-weight:600}
+.pricing-save h4{margin:0 0 4px}
+.pricing-save p{margin:0}
+.pricing-check-out .bad dd{color:#b91c1c}
+.pricing-check-out .good dd{color:#15803d}
+.pricing-check-card{max-width:760px}
+.pricing-services{display:grid;gap:6px;font-size:13px;font-weight:700}
+.pricing-services label{display:flex;align-items:center;gap:7px;font-weight:500;font-size:14px}
+.pricing-rental{display:grid;grid-template-columns:1.4fr repeat(5,minmax(80px,1fr)) auto;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.pricing-rental small{grid-column:1/-2;color:#64748b}
+@media (max-width:900px){.pricing-grid,.pricing-rates,.pricing-pair{grid-template-columns:1fr}.pricing-rental{grid-template-columns:1fr 1fr}}
