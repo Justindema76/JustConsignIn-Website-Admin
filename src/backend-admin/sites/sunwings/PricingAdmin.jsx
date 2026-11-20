@@ -232,7 +232,7 @@ export default function PricingAdmin() {
         <div className="pricing-two">
           {['tolls', 'parking', 'supplies', 'equipment'].map(key => <NumberField key={key} label={key[0].toUpperCase() + key.slice(1)} value={job.extras[key]} onChange={value => setJob({ ...job, extras: { ...job.extras, [key]: value ?? '' } })} suffix="$"/>)}
         </div>
-        <label className="pricing-check"><input type="checkbox" checked={job.helpAtBothEnds} onChange={event => setJob({ ...job, helpAtBothEnds: event.target.checked })}/> Customer has people to help load <b>and</b> unload (shows a cheaper “Help &amp; Save” price)</label>
+        <label className="pricing-check"><input type="checkbox" checked={job.helpAtBothEnds} onChange={event => setJob({ ...job, helpAtBothEnds: event.target.checked })}/> <span>Customer has people to help load <b>and</b> unload (shows a cheaper “Help &amp; Save” price)</span></label>
       </section>
 
       <section className="pricing-results">
@@ -256,12 +256,12 @@ export default function PricingAdmin() {
 
     {tab === 'check' ? <section className="site-admin-card pricing-card pricing-form pricing-check-card">
       <h3>Is this price high enough?</h3>
-      <p className="site-admin-muted">E.g. Marius’s Grimsby → Toronto quote: C$475, about 5 dispatch hours. Shows what’s left after commission and the most the job can cost before it’s underpriced.</p>
+      <p className="site-admin-muted">Example: Marius’s Grimsby → Toronto quote, $475 for about 5 hours. You’ll see what’s left after commission and the most the job can cost before the price is too low. Leave “Target per hour” blank to use {settings.contributionPerHour.low ?? 50}.</p>
       <div className="pricing-two">
         <NumberField label="Price before tax" value={check.price} onChange={value => setCheck({ ...check, price: value ?? '' })} suffix="$"/>
-        <NumberField label="Hours for the whole trip" value={check.hours} onChange={value => setCheck({ ...check, hours: value ?? '' })} suffix="h"/>
-        <NumberField label="Marius’s target per hour" value={check.target} onChange={value => setCheck({ ...check, target: value ?? '' })} suffix="$/h" hint={`Blank = ${settings.contributionPerHour.low ?? '?'} (low target)`}/>
-        <NumberField label="What the job costs (if known)" value={check.direct} onChange={value => setCheck({ ...check, direct: value ?? '' })} suffix="$"/>
+        <NumberField label="Trip hours" value={check.hours} onChange={value => setCheck({ ...check, hours: value ?? '' })} suffix="h"/>
+        <NumberField label="Target per hour" value={check.target} onChange={value => setCheck({ ...check, target: value ?? '' })} suffix="$/h"/>
+        <NumberField label="Job costs (optional)" value={check.direct} onChange={value => setCheck({ ...check, direct: value ?? '' })} suffix="$"/>
       </div>
       {checked ? <dl className="pricing-check-out">
         <div><dt>Your commission</dt><dd>{Math.round((checked.rate || 0) * 100)}%</dd></div>
@@ -276,11 +276,12 @@ export default function PricingAdmin() {
       <section className="site-admin-card pricing-card pricing-form">
         <h3>Profit target &amp; commission</h3>
         <div className="pricing-two">
-          <NumberField label="Marius’s target per hour (low)" value={settings.contributionPerHour.low} onChange={value => update(['contributionPerHour', 'low'], value)} suffix="$/h" hint="What Marius wants to make per hour of a job, after costs. His brief says $50–75."/>
-          <NumberField label="Marius’s target per hour (high)" value={settings.contributionPerHour.high} onChange={value => update(['contributionPerHour', 'high'], value)} suffix="$/h"/>
-          <NumberField label="Smallest job: least Sunwings keeps" value={settings.serviceMinimums.default} onChange={value => update(['serviceMinimums', 'default'], value)} suffix="$" hint="Before your commission. His brief says $150 (to confirm with Marius)."/>
+          <NumberField label="Target per hour, low" value={settings.contributionPerHour.low} onChange={value => update(['contributionPerHour', 'low'], value)} suffix="$/h"/>
+          <NumberField label="Target per hour, high" value={settings.contributionPerHour.high} onChange={value => update(['contributionPerHour', 'high'], value)} suffix="$/h"/>
+          <NumberField label="Minimum per job" value={settings.serviceMinimums.default} onChange={value => update(['serviceMinimums', 'default'], value)} suffix="$"/>
           <NumberField label="Sales tax (HST)" value={pct(settings.taxRate)} onChange={value => update(['taxRate'], value === null ? null : value / 100)} suffix="%"/>
         </div>
+        <p className="pricing-note"><b>Target per hour:</b> what Marius wants to make per hour of a job, after costs (his brief: $50–75). <b>Minimum per job:</b> the least Sunwings keeps on a small job, before your commission (his brief: $150, to confirm).</p>
         <div className="pricing-toggle">
           <label><input type="radio" checked={settings.commission.mode !== 'tiered'} onChange={() => update(['commission', 'mode'], 'flat')}/> Flat commission</label>
           <label><input type="radio" checked={settings.commission.mode === 'tiered'} onChange={() => update(['commission', 'mode'], 'tiered')}/> 10% up to $800, 20% over (current admin rule)</label>
@@ -303,12 +304,12 @@ export default function PricingAdmin() {
 
       <section className="site-admin-card pricing-card pricing-form">
         <h3>Van, crew &amp; where jobs start</h3>
-        <div className="pricing-two">
+        <div className="pricing-two is-3">
           <label className="pricing-field"><span>Van</span><input value={settings.van.name} onChange={event => update(['van', 'name'], event.target.value)}/></label>
           <NumberField label="Van cost per km" value={settings.van.costPerKm} onChange={value => update(['van', 'costPerKm'], value)} suffix="$/km"/>
           <NumberField label="Driver pay, all in" value={settings.crew.driverHourly} onChange={value => update(['crew', 'driverHourly'], value)} suffix="$/h"/>
           <NumberField label="Helper pay, all in" value={settings.crew.helperHourly} onChange={value => update(['crew', 'helperHourly'], value)} suffix="$/h"/>
-          <NumberField label="Least hours paid per worker" value={settings.crew.minimumPaidHours} onChange={value => update(['crew', 'minimumPaidHours'], value)} suffix="h"/>
+          <NumberField label="Least hours paid" value={settings.crew.minimumPaidHours} onChange={value => update(['crew', 'minimumPaidHours'], value)} suffix="h"/>
         </div>
         <label className="pricing-check"><input type="checkbox" checked={settings.van.fuelIncluded !== false} onChange={event => update(['van', 'fuelIncluded'], event.target.checked)}/> Cost per km already includes fuel</label>
         {settings.van.fuelIncluded === false ? <NumberField label="Fuel per km" value={settings.van.fuelPerKm} onChange={value => update(['van', 'fuelPerKm'], value)} suffix="$/km"/> : null}
