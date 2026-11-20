@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ShowOnField from './ShowOnField';
+import JobPhotosField from './JobPhotosField';
+import './sunwingsPages.css';
 import { CheckCircle2, ExternalLink, Library, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AdminAuthContext';
@@ -320,6 +322,7 @@ export default function SunwingsPostEditor({ type }) {
         <div className="site-admin-card work-post-panel">
           <div className="work-post-panel-head"><div><span>3</span><div><h2>Page content</h2><p>Unique copy for this {type}; do not reuse thin location text.</p></div></div></div>
           <label>Opening paragraph<textarea rows="5" value={draft.intro} onChange={event => update('intro', event.target.value)}/></label>
+          {type === 'location' ? <JobPhotosField html={draft.bodyHtml} onChange={value => update('bodyHtml', value)} accessToken={accessToken} place={draft.title}/> : null}
           <label>Main content HTML<textarea rows="12" value={draft.bodyHtml} onChange={event => update('bodyHtml', event.target.value)} placeholder="<h2>...</h2>"/></label>
 
           {type === 'service' && <>

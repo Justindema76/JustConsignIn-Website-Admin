@@ -192,3 +192,16 @@
 .hn-seo-card .hn-seo-edit input,.hn-seo-card .hn-seo-edit textarea{width:100%;box-sizing:border-box;font:500 14px/1.4 inherit;font-family:inherit;padding:10px 12px;border:1px solid #ddd3c4;border-radius:10px;background:#fff}
 .hn-seo-card .sunwings-pages-row{grid-template-columns:minmax(150px,1fr) minmax(160px,1.1fr) minmax(200px,1.6fr) 110px minmax(260px,auto)}
 .hn-seo-card .site-admin-actions{flex-wrap:wrap;gap:6px}
+
+/* Location Post › Job photos */
+.job-photos-field{display:grid;gap:10px;margin:6px 0 18px;padding:14px;border:1px solid #e3e7ee;border-radius:14px;background:#fafbfd}
+.job-photos-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}
+.job-photos-head b{display:flex;align-items:center;gap:6px;font-size:14px}
+.job-photos-head small{display:block;color:#5b6475;font-size:12.5px;max-width:520px;margin-top:3px}
+.job-photos-actions{display:flex;gap:8px;flex-wrap:wrap}
+.job-photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.job-photo{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#eef1f5}
+.job-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.job-photo span{position:absolute;left:6px;top:6px;background:rgba(17,24,39,.75);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px}
+.job-photo button{position:absolute;right:6px;top:6px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;cursor:pointer}
+.job-photos-empty{margin:0;color:#5b6475;font-size:13px}
