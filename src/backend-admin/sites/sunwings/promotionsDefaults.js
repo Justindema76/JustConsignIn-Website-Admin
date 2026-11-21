@@ -384,7 +384,7 @@ export const PROMOTIONS_DEFAULTS = {
       "heading": "Long-distance moving",
       "accent": "Hamilton & Niagara ↔ Toronto.",
       "text": "Full home moves between Hamilton, Burlington, Grimsby, St. Catharines, Niagara Falls and Toronto, Mississauga and the GTA. Planned around access at both ends, quoted in writing before you book.",
-      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794229390663-IMG_8141.jpeg",
+      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794780070381-grimsby-toronto-moving-van.jpg",
       "sendList": [
         "Pickup and delivery cities and addresses, and your moving date.",
         "Home size or item list, with photos of large or awkward pieces.",
@@ -573,7 +573,7 @@ export const PROMOTIONS_DEFAULTS = {
       "enabled": true,
       "title": "Long-Distance Moving",
       "text": "Moving between Hamilton, Niagara and Toronto or the GTA? One crew loads, drives and unloads, with a written quote before you book.",
-      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794229390663-IMG_8141.jpeg",
+      "image": "https://nowsajdmbpxvlvrhopjg.supabase.co/storage/v1/object/public/blog-images/sunwings/1794780070381-grimsby-toronto-moving-van.jpg",
       "linkText": "Learn more →",
       "url": "/hamilton-niagara/long-distance"
     }
