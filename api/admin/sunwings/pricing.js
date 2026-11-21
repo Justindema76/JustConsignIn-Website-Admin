@@ -26,6 +26,16 @@ export default async function handler(req, res) {
     }
     const settings = req.body?.settings;
     if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return res.status(400).json({ error: 'Settings are missing.' });
+    // Only the owner can change the commission: anyone else's save keeps the saved commission.
+    if (owner.role !== 'owner') {
+      const saved = await parseSupabase(
+        await supabaseUserRest(owner.accessToken, `sunwings_integrations?site_key=eq.${SITE_KEY}&provider=eq.pricing&select=config`, { method: 'GET' }),
+        'Unable to load price settings.',
+      );
+      const current = saved?.[0]?.config || {};
+      if (current.commission) settings.commission = current.commission;
+      else delete settings.commission;
+    }
     const text = JSON.stringify(settings);
     if (text.length > 50000) return res.status(400).json({ error: 'Settings are too large.' });
     const row = { site_key: SITE_KEY, provider: 'pricing', config: settings, secrets: {}, enabled: true, updated_at: new Date().toISOString() };

@@ -9,8 +9,8 @@ export default {
     { to: '/admin', label: 'Home', icon: 'home', end: true, partner: true },
     { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
     { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
-    { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
-    { to: '/admin/sunwings/analytics', label: 'Analytics', icon: 'chart', ownerOnly: true },
+    { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase' },
+    { to: '/admin/sunwings/analytics', label: 'Analytics', icon: 'chart' },
     { to: '/admin/sunwings/jobs', label: 'My jobs', icon: 'truck', partnerOnly: true },
   ],
   navGroups: [
@@ -21,8 +21,9 @@ export default {
         // partner: true = Marius sees these too (only the jobs Justin sent him).
         { to: '/admin/sunwings/quotes', label: 'Quotes', icon: 'inbox', partner: true },
         { to: '/admin/sunwings/calendar', label: 'Jobs', icon: 'calendar', partner: true },
-        { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase', ownerOnly: true },
-        { to: '/admin/sunwings/pricing', label: 'Price calculator', icon: 'calculator', ownerOnly: true },
+        // Team members (Marius) see Commission read-only and the calculator without the commission %.
+        { to: '/admin/sunwings/commission', label: 'Commission', icon: 'briefcase' },
+        { to: '/admin/sunwings/pricing', label: 'Price calculator', icon: 'calculator' },
         { to: '/admin/sunwings/store-partners', label: 'Store partners', icon: 'handshake', ownerOnly: true },
         // Only partners (Marius) see this; they see nothing else.
         { to: '/admin/sunwings/jobs', label: 'Jobs from Justin', icon: 'truck', partnerOnly: true },
@@ -68,7 +69,7 @@ export default {
       label: 'Settings',
       items: [
         { to: '/admin/sunwings/settings', label: 'Website Settings', icon: 'settings', ownerOnly: true },
-        { to: '/admin/sunwings/integrations', label: 'Integrations', icon: 'plug' },
+        { to: '/admin/sunwings/integrations', label: 'Integrations', icon: 'plug', ownerOnly: true },
         { to: '/admin/sunwings/team', label: 'Team', icon: 'users', ownerOnly: true },
       ],
     },

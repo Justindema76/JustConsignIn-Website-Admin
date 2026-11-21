@@ -21,7 +21,9 @@ function today() {
 }
 
 export default function CommissionAdmin() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  // Team members (Marius) see what they owe, read-only: no investments, no access tab, no Mark paid.
+  const isOwner = user?.role === 'owner' || !user?.role || String(user?.email || '').trim().toLowerCase() === 'justindema76@gmail.com';
   const [tab, setTab] = useState('jobs');
   const [quotes, setQuotes] = useState([]);
   const [investments, setInvestments] = useState([]);
@@ -36,7 +38,7 @@ export default function CommissionAdmin() {
   async function refresh() {
     if (!accessToken) return;
     setLoading(true); setError('');
-    const [q, i, p] = await Promise.allSettled([loadSunwingsQuotes(accessToken), loadInvestments(accessToken), loadPartners(accessToken)]);
+    const [q, i, p] = await Promise.allSettled([loadSunwingsQuotes(accessToken), isOwner ? loadInvestments(accessToken) : Promise.resolve([]), isOwner ? loadPartners(accessToken) : Promise.resolve([])]);
     if (q.status === 'fulfilled') setQuotes(q.value);
     if (i.status === 'fulfilled') setInvestments(i.value);
     if (p.status === 'fulfilled') setPartners(p.value);
@@ -120,8 +122,8 @@ export default function CommissionAdmin() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Money</p>
-        <h1>Commission &amp; Investment</h1>
-        <p>What Marius owes you, what he’s paid, and what you’ve put into Sunwings. Commission is 10% on jobs up to $800 and 20% on jobs over $800.</p>
+        <h1>{isOwner ? <>Commission &amp; Investment</> : 'Commission owed to Justin'}</h1>
+        <p>{isOwner ? 'What Marius owes you, what he’s paid, and what you’ve put into Sunwings.' : 'Justin’s commission on the jobs he sent you: what’s owed, what’s coming and what’s been paid.'} Commission is 10% on jobs up to $800 and 20% on jobs over $800.</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>
@@ -129,16 +131,18 @@ export default function CommissionAdmin() {
     {message && <div className="site-admin-alert success"><CheckCircle2 size={16}/>{message}</div>}
 
     <div className="money-stats">
-      <div className="money-stat attention"><span>Owed to me</span><b>{money(sum(owedJobs))}</b><small>{owedJobs.length} completed job{owedJobs.length === 1 ? '' : 's'}</small></div>
+      <div className="money-stat attention"><span>{isOwner ? 'Owed to me' : 'Owed to Justin'}</span><b>{money(sum(owedJobs))}</b><small>{owedJobs.length} completed job{owedJobs.length === 1 ? '' : 's'}</small></div>
       <div className="money-stat"><span>Coming</span><b>{money(sum(pendingJobs))}</b><small>jobs not finished yet</small></div>
-      <div className="money-stat"><span>Paid to me</span><b>{money(sum(paidJobs))}</b><small>all time</small></div>
+      <div className="money-stat"><span>{isOwner ? 'Paid to me' : 'Paid to Justin'}</span><b>{money(sum(paidJobs))}</b><small>all time</small></div>
       <div className="money-stat"><span>This month</span><b>{money(earnedThisMonth)}</b><small>completed jobs</small></div>
-      <div className="money-stat"><span>I’ve invested</span><b>{money(invested)}</b><small>flyers, ads, etc.</small></div>
-      <div className="money-stat"><span>Net so far</span><b>{money(sum(paidJobs) - invested)}</b><small>paid − invested</small></div>
+      {isOwner ? <>
+        <div className="money-stat"><span>I’ve invested</span><b>{money(invested)}</b><small>flyers, ads, etc.</small></div>
+        <div className="money-stat"><span>Net so far</span><b>{money(sum(paidJobs) - invested)}</b><small>paid − invested</small></div>
+      </> : null}
     </div>
 
     <div className="settings-tabs" role="tablist">
-      {[['jobs', 'Commission by job'], ['branch', 'Hamilton & Niagara'], ['investments', 'My investment'], ['partner', 'Marius’s access']].map(([key, label]) => (
+      {[['jobs', 'Commission by job'], ['branch', 'Hamilton & Niagara'], ...(isOwner ? [['investments', 'My investment'], ['partner', 'Marius’s access']] : [])].map(([key, label]) => (
         <button key={key} type="button" role="tab" aria-selected={tab === key} className={`settings-tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>{label}</button>
       ))}
     </div>
@@ -163,7 +167,7 @@ export default function CommissionAdmin() {
             <td className="m-status">{request.commission_status === 'paid'
               ? <span className="job-chip paid">Paid{request.commission_paid_at ? ` ${request.commission_paid_at}` : ''}</span>
               : request.status === 'complete' ? <span className="job-chip attention">Owed</span> : <span className="job-chip muted">Coming</span>}</td>
-            <td className="m-action">{request.commission_status !== 'paid' && request.status === 'complete' ? <button className="site-admin-btn small" type="button" onClick={() => markPaid(request)}>Mark paid</button> : null}</td>
+            <td className="m-action">{isOwner && request.commission_status !== 'paid' && request.status === 'complete' ? <button className="site-admin-btn small" type="button" onClick={() => markPaid(request)}>Mark paid</button> : null}</td>
           </tr>)}</tbody>
         </table></div>}
     </section>}
@@ -210,7 +214,7 @@ export default function CommissionAdmin() {
       </> : null}
     </section>}
 
-    {tab === 'investments' && <section className="site-admin-card money-panel">
+    {isOwner && tab === 'investments' && <section className="site-admin-card money-panel">
       <h2>My investment in Sunwings</h2>
       <div className="money-form">
         <label>Date<input type="date" value={inv.spentOn} onChange={event => setInv({ ...inv, spentOn: event.target.value })}/></label>
@@ -228,7 +232,7 @@ export default function CommissionAdmin() {
       </table></div> : <p className="job-hint">Nothing logged yet.</p>}
     </section>}
 
-    {tab === 'partner' && <section className="site-admin-card money-panel">
+    {isOwner && tab === 'partner' && <section className="site-admin-card money-panel">
       <h2>Marius’s access</h2>
       <p className="job-hint">Add Marius’s Google email. He signs in to this admin with Google and sees only “Jobs from Justin”: the jobs you send him, with the customer’s phone and email hidden unless you share them. Don’t also add him under Team, or he’ll see everything.</p>
       <div className="money-form">

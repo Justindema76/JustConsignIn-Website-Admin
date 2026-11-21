@@ -42,6 +42,14 @@ export default function AdminLayout() {
       .map(group => ({ ...group, items: group.items.filter(keep) }))
       .filter(group => group.items.length > 0);
   }, [siteConfig.navGroups, user]);
+  // Pages marked ownerOnly are blocked for everyone else, not just hidden from the menu.
+  const ownerPageBlocked = useMemo(() => {
+    if (isOwnerUser(user)) return false;
+    const blocked = [...siteConfig.navGroups.flatMap(group => group.items), ...(siteConfig.mobileTabs || [])]
+      .filter(item => item.ownerOnly)
+      .map(item => item.to.split('?')[0]);
+    return blocked.some(path => location.pathname === path || location.pathname.startsWith(`${path}/`));
+  }, [siteConfig, user, location.pathname]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState(() => {
     const config = getSiteConfig(getAdminSiteKey());
@@ -231,7 +239,7 @@ export default function AdminLayout() {
           </div>
         </div>
       </header>
-      <main className={`site-admin-main ${/\/pages\/[^/]+$|\/global\/(header|footer)$/.test(location.pathname) ? 'site-admin-main-wide' : ''}`}><Outlet /></main>
+      <main className={`site-admin-main ${/\/pages\/[^/]+$|\/global\/(header|footer)$/.test(location.pathname) ? 'site-admin-main-wide' : ''}`}>{ownerPageBlocked ? <section className="site-admin-card" style={{ maxWidth: 560 }}><h1>Owner only</h1><p>This page is only available to the site owner.</p><Link className="site-admin-btn" to="/admin">Back to Home</Link></section> : <Outlet />}</main>
       {siteConfig.mobileTabs ? <nav className="site-admin-tabbar" aria-label="Quick actions">
         {siteConfig.mobileTabs.filter(item => (user?.role === 'partner' ? item.partnerOnly || item.partner : !item.partnerOnly && (isOwnerUser(user) || !item.ownerOnly))).map(item => {
           const Icon = item.icon === 'home' ? Home : getSiteIcon(item.icon);

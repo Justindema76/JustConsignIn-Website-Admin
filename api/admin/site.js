@@ -545,6 +545,13 @@ export default async function handler(req, res) {
         return res.status(409).json({ error: 'Website page assets are protected. Replace the image on the page instead of deleting the stored asset.' });
       }
       if (!objectPath || objectPath.includes('..')) return res.status(400).json({ error: 'Invalid media path' });
+      // Only the owner deletes media, and never a file the live Sunwings site is using.
+      if (user.role !== 'owner') return res.status(403).json({ error: 'Only the site owner can delete media.' });
+      if (siteKey === 'sunwings' || objectPath.startsWith('sunwings/')) {
+        const inUse = await sunwingsMediaInUse();
+        if (!inUse.complete) return res.status(503).json({ error: 'Couldn’t check where this file is used. Try again in a minute.' });
+        if (inUse.paths.includes(`${bucket}/${objectPath}`)) return res.status(409).json({ error: 'This file is used on the live site. Replace it on the page first, then delete it.' });
+      }
 
       const encodedPath = objectPath.split('/').map(encodeURIComponent).join('/');
       const response = await supabaseUserStorage(user.accessToken, `object/${encodeURIComponent(bucket)}/${encodedPath}`, {

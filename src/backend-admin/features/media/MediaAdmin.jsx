@@ -132,12 +132,17 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
     window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
   };
 
+  // Only the owner deletes, and never a file the live site is using (it would show as a broken image).
   const deleteMany = async list => {
-    const deletable = list.filter(item => !item.protectedAsset);
-    if (!deletable.length) return;
-    const used = deletable.filter(item => usedOf(item));
+    if (!isOwner) return;
+    const skipped = list.filter(item => !item.protectedAsset && usedOf(item));
+    const deletable = list.filter(item => !item.protectedAsset && !usedOf(item));
+    if (!deletable.length) {
+      if (skipped.length) setError(`${skipped.length === 1 ? 'That file is' : 'Those files are'} used on the live site, so ${skipped.length === 1 ? 'it' : 'they'} can’t be deleted. Replace ${skipped.length === 1 ? 'it' : 'them'} on the page first.`);
+      return;
+    }
     const size = deletable.reduce((sum, item) => sum + sizeOf(item), 0);
-    const warning = used.length ? `\n\nWARNING: ${used.length} of these ${used.length === 1 ? 'is' : 'are'} used on the live site and will show as broken images.` : '';
+    const warning = skipped.length ? `\n\n${skipped.length} file${skipped.length === 1 ? ' is' : 's are'} used on the live site and will be kept.` : '';
     const label = deletable.length === 1 ? `"${deletable[0].name}"` : `${deletable.length} files`;
     if (!window.confirm(`Permanently delete ${label}${isOwner ? ` (${formatBytes(size)})` : ''}? This can't be undone.${warning}`)) return;
     setError(''); setNotice('');
@@ -226,7 +231,7 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
     {selectedItems.length && !onPick ? <div className="media-bulk">
       <b>{selectedItems.length} selected{isOwner ? ` · ${formatBytes(selectedItems.reduce((sum, item) => sum + sizeOf(item), 0))}` : ''}</b>
       {isSunwings ? <label><FolderInput size={14}/><select value="" onChange={event => moveTo(selectedItems, event.target.value)}><option value="">Move to folder…</option>{FOLDERS.map(name => <option key={name} value={name}>{name}</option>)}</select></label> : null}
-      <button type="button" className="site-admin-btn secondary small danger" onClick={() => deleteMany(selectedItems)}><Trash2 size={14}/> Delete selected</button>
+      {isOwner ? <button type="button" className="site-admin-btn secondary small danger" onClick={() => deleteMany(selectedItems)}><Trash2 size={14}/> Delete selected</button> : null}
       <button type="button" className="site-admin-btn secondary small" onClick={() => setSelected(new Set())}>Clear</button>
     </div> : null}
 
@@ -264,15 +269,15 @@ export default function MediaAdmin({ onPick = null, pickTypes = null }) {
                 {copiedKey === key ? 'Copied' : 'Copy URL'}
               </button>
               <a className="site-admin-media-action" href={item.url} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open</a>
-              <button
+              {isOwner ? <button
                 type="button"
                 className="site-admin-media-action danger"
                 onClick={() => deleteMany([item])}
-                disabled={item.protectedAsset || deletingKey === key}
-                title={item.protectedAsset ? 'Website page assets are protected from deletion.' : ''}
+                disabled={item.protectedAsset || usedOf(item) || deletingKey === key}
+                title={item.protectedAsset ? 'Website page assets are protected from deletion.' : usedOf(item) ? 'Used on the live site, so it can’t be deleted.' : ''}
               >
-                <Trash2 size={14}/> {item.protectedAsset ? 'Protected' : deletingKey === key ? 'Deleting…' : 'Delete'}
-              </button>
+                <Trash2 size={14}/> {item.protectedAsset ? 'Protected' : usedOf(item) ? 'In use' : deletingKey === key ? 'Deleting…' : 'Delete'}
+              </button> : null}
             </div>}
           </div>
         </div>;

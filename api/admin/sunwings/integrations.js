@@ -59,6 +59,8 @@ export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   const owner = await requireSiteAccess(req, res, SITE_KEY);
   if (!owner) return;
+  // Integrations hold API keys and tokens: owner only.
+  if (owner.role !== 'owner') return res.status(403).json({ error: 'Only the site owner can open Integrations.' });
 
   try {
     if (req.method === 'GET') {

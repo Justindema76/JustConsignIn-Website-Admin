@@ -90,7 +90,9 @@ function Scenario({ title, result }) {
 }
 
 export default function PricingAdmin() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  // Only Justin can change the commission settings; everyone else sees them locked.
+  const isOwner = user?.role === 'owner' || !user?.role || String(user?.email || '').trim().toLowerCase() === 'justindema76@gmail.com';
   const [tab, setTab] = useState('rates');
   const [settings, setSettings] = useState(() => merge(null));
   const [services, setServices] = useState([]);
@@ -282,6 +284,8 @@ export default function PricingAdmin() {
           <NumberField label="Sales tax (HST)" value={pct(settings.taxRate)} onChange={value => update(['taxRate'], value === null ? null : value / 100)} suffix="%"/>
         </div>
         <p className="pricing-note"><b>Target per hour:</b> what Marius wants to make per hour of a job, after costs (his brief: $50–75). <b>Minimum per job:</b> the least Sunwings keeps on a small job, before your commission (his brief: $150, to confirm).</p>
+        {!isOwner ? <p className="pricing-note"><b>Commission is set by Justin</b> and can’t be changed here.</p> : null}
+        <fieldset disabled={!isOwner} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, opacity: isOwner ? 1 : 0.6 }}>
         <div className="pricing-toggle">
           <label><input type="radio" checked={settings.commission.mode !== 'tiered'} onChange={() => update(['commission', 'mode'], 'flat')}/> Flat commission</label>
           <label><input type="radio" checked={settings.commission.mode === 'tiered'} onChange={() => update(['commission', 'mode'], 'tiered')}/> 10% up to $800, 20% over (current admin rule)</label>
@@ -300,6 +304,7 @@ export default function PricingAdmin() {
             {item.title}
           </label>)}
         </div>
+        </fieldset>
       </section>
 
       <section className="site-admin-card pricing-card pricing-form">
