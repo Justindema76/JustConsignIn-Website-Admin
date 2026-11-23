@@ -209,9 +209,14 @@ export async function checkInbox({ force = false } = {}) {
   const client = new ImapFlow({
     host: process.env.SUNWINGS_IMAP_HOST || settings.smtp_host, port: Number(process.env.SUNWINGS_IMAP_PORT || 993), secure: true,
     auth: { user: settings.smtp_username, pass: settings.smtp_password }, logger: false,
+    connectionTimeout: 8000, greetingTimeout: 8000, socketTimeout: 20000,
   });
+  // Without this, a dropped mailbox connection crashes the whole request.
+  let failure = null;
+  client.on('error', error => { failure = error; console.error('[sunwings] inbox connection error', error?.message); });
   let saved = 0;
   await client.connect();
+  if (failure) throw failure;
   const lock = await client.getMailboxLock('INBOX');
   try {
     const since = new Date(Date.now() - 4 * 86400000);
