@@ -65,10 +65,23 @@ function Range({ label, value, onChange, suffix }) {
   </div>;
 }
 
+// Missing-rate names from the price engine, in plain words.
+const RATE_WORDS = {
+  'van cost per km': 'van cost per km',
+  'van fuel per km': 'van fuel per km',
+  'driver hourly cost': 'driver pay',
+  'helper hourly cost': 'helper pay',
+  'crew hourly cost': 'crew pay',
+  'rental base charge or per-mile rate': 'this rental’s base and per-mile price',
+  'rental truck rates': 'this rental’s prices',
+  'contribution target per hour': 'target per hour',
+};
+
 function Scenario({ title, result }) {
   if (!result) return null;
   if (result.needsReview || result.price === null) {
-    return <div className="pricing-result review"><h4>{title}</h4><p><AlertTriangle size={16}/> No price yet. Missing: {(result.missing || []).join(', ') || 'information'}. Fill these in under 1 · Rates.</p></div>;
+    const rates = (result.missing || []).filter(item => item !== 'dispatch hours').map(item => RATE_WORDS[item] || item);
+    return <div className="pricing-result review"><h4>{title}</h4><p><AlertTriangle size={16}/> No price yet. Missing in 1 · Rates: {rates.join(', ') || 'a rate'}.</p></div>;
   }
   return <div className="pricing-result">
     <h4>{title}</h4>
@@ -145,6 +158,16 @@ export default function PricingAdmin() {
     return estimateJob(asJob, settings);
   }, [job, settings]);
 
+  // What the job form still needs before a price makes sense (shown instead of red errors).
+  const blank = value => value === '' || value === null || value === undefined;
+  const jobStillNeeds = [
+    (blank(job.hours.low) || blank(job.hours.high)) && 'how long the trip is (low and high)',
+    job.vehicle === 'van' && (blank(job.km.low) || blank(job.km.high)) && 'how far the van drives (low and high)',
+    job.vehicle === 'rental' && !job.rentalId && 'which rental truck',
+    job.vehicle === 'rental' && (blank(job.rentalMiles.low) || blank(job.rentalMiles.high)) && 'rental truck miles (low and high)',
+    !job.crew.length && 'who goes',
+  ].filter(Boolean);
+
   const checked = useMemo(() => {
     const price = toNumber(check.price);
     const hours = toNumber(check.hours);
@@ -202,7 +225,7 @@ export default function PricingAdmin() {
         <Range label="How long is the whole trip? (leaving base until back at base)" value={job.hours} onChange={hours => setJob({ ...job, hours })} suffix="h"/>
         <div className="pricing-toggle">
           <label><input type="radio" checked={job.vehicle === 'van'} onChange={() => setJob({ ...job, vehicle: 'van' })}/> {settings.van.name || 'Van'}</label>
-          <label><input type="radio" checked={job.vehicle === 'rental'} onChange={() => setJob({ ...job, vehicle: 'rental' })}/> Rental truck</label>
+          <label><input type="radio" checked={job.vehicle === 'rental'} onChange={() => setJob({ ...job, vehicle: 'rental', rentalId: job.rentalId || settings.rentals[0]?.id || '' })}/> Rental truck</label>
         </div>
         {job.vehicle === 'van'
           ? <Range label="How far does the van drive in total?" value={job.km} onChange={km => setJob({ ...job, km })} suffix="km"/>
@@ -238,7 +261,11 @@ export default function PricingAdmin() {
       </section>
 
       <section className="pricing-results">
-        {!estimate ? <div className="site-admin-card pricing-card pricing-empty"><Calculator size={28}/><b>The price to quote shows here</b><span>Pick a service on the left and fill in the trip. You’ll get a low and a high price, with what it costs, what Marius makes and your commission.</span></div> : <>
+        {!estimate || jobStillNeeds.length ? <div className="site-admin-card pricing-card pricing-empty"><Calculator size={28}/><b>The price to quote shows here</b>
+          {estimate && jobStillNeeds.length
+            ? <span>Still to fill in on the left: <b>{jobStillNeeds.join(', ')}</b>.</span>
+            : <span>Pick a service on the left and fill in the trip. You’ll get a low and a high price, with what it costs, what Marius makes and your commission.</span>}
+        </div> : <>
           {estimate.low.price !== null && estimate.high.price !== null
             ? <div className="pricing-banner">Price range <b>{money(estimate.low.price)} – {money(estimate.high.price)}</b> before tax{estimate.commissionEligible ? '' : ' · no commission on this service'}</div>
             : null}
