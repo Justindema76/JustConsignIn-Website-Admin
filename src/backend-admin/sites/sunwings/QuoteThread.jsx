@@ -16,6 +16,13 @@ const when = value => {
     : date.toLocaleString('en-CA', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 };
 
+// Hide the quoted earlier email under a customer reply ("On ... wrote:" and below).
+function replyText(body) {
+  const lines = String(body || '').split('\n');
+  const cut = lines.findIndex((line, i) => (/^On\s/i.test(line.trim()) && /wrote:\s*$/i.test(lines.slice(i, i + 3).join(' ').trim())) || /^>/.test(line));
+  return (cut > 0 ? lines.slice(0, cut) : lines).join('\n').trim();
+}
+
 const LABEL = { email_out: 'Email to customer', email_in: 'Customer replied', note: 'Note', quote: 'Quote sent', system: '' };
 
 function Bubble({ item }) {
@@ -30,7 +37,7 @@ function Bubble({ item }) {
       {item.meta?.includes ? <p className="qt-quote-inc">{item.meta.includes}</p> : null}
     </div> : <>
       {item.subject && item.kind !== 'note' ? <p className="qt-subject">{item.subject}</p> : null}
-      <p className="qt-body">{item.body}</p>
+      <p className="qt-body">{item.kind === 'email_in' ? replyText(item.body) : item.body}</p>
       {item.meta?.attachments?.length ? <p className="qt-att">📎 {item.meta.attachments.join(', ')}</p> : null}
     </>}
   </div>;

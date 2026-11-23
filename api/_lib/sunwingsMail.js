@@ -191,9 +191,11 @@ export async function notifyDispatch(quoteId) {
 // ---- Reading customer replies from the mailbox -------------------------------------------
 
 // Drop the quoted earlier email ("On Mon, ... wrote:") so only the new reply is saved.
-function replyOnly(text) {
+export function replyOnly(text) {
   const lines = String(text || '').replace(/\r/g, '').split('\n');
-  const cut = lines.findIndex(line => /^On .+wrote:\s*$/i.test(line.trim()) || /^-{2,}\s*Original Message/i.test(line.trim()) || /^From:\s.+/i.test(line.trim()) || /^>/.test(line));
+  // "On Sun, Nov 22 ... <x@y.com> wrote:" — Gmail often wraps it over 2-3 lines.
+  const onWrote = i => /^On\s/i.test(lines[i].trim()) && /wrote:\s*$/i.test(lines.slice(i, i + 3).join(' ').trim());
+  const cut = lines.findIndex((line, i) => onWrote(i) || /^-{2,}\s*Original Message/i.test(line.trim()) || /^From:\s.+/i.test(line.trim()) || /^>/.test(line));
   return (cut > 0 ? lines.slice(0, cut) : lines).join('\n').trim().slice(0, 8000);
 }
 
