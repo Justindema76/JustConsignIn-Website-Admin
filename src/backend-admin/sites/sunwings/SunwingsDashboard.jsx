@@ -73,6 +73,11 @@ function buildTodo(rows, now, isOwner) {
       cta: 'Open', to: quoteLink,
     });
     // Justin: jobs with Marius that have no quote yet. Flags it when Marius has gone quiet for a day.
+    if (isOwner && job.contact && row.forwarded_at && !CLOSED.has(row.status) && row.last_message_by !== 'Marius' && !row.partner_updated_at) reasons.push({
+      rank: 1, tag: Math.floor(quiet / 86400000) >= 1 ? ['red', `No contact from Marius ${Math.floor(quiet / 86400000)}d`] : ['amber', 'Waiting on Marius'],
+      why: `Contact message sent to Marius ${sinceSent}. No contact with the customer logged yet.`,
+      cta: 'Open', to: quoteLink,
+    });
     if (isOwner && !job.contact && ['forwarded', 'reviewing', 'needs_quote', 'marius_working'].includes(row.status) && row.partner_price == null) {
       const days = Math.floor(quiet / 86400000);
       reasons.push(row.status === 'marius_working'
@@ -100,6 +105,24 @@ function buildTodo(rows, now, isOwner) {
     items.push({ job, ...reasons[0], more: reasons.slice(1).map(item => item.tag) });
   }
   return items.sort((a, b) => a.rank - b.rank || Date.parse(a.job.row.created_at) - Date.parse(b.job.row.created_at));
+}
+
+const STATUS_WORDS = { new: 'New', reviewing: 'Reviewing', forwarded: 'Sent to Marius', marius_working: 'Marius getting details', priced: 'Priced', needs_quote: 'Needs quote', contacted: 'Contacted', quote_sent: 'Quote sent', accepted: 'Accepted', booked: 'Booked' };
+const stamp = value => (value ? new Date(value).toLocaleString('en-CA', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '');
+
+// One line per step so Justin sees where every request stands without opening it.
+function timeline(row) {
+  const steps = [{ on: true, text: `Came in ${stamp(row.created_at)}` }];
+  steps.push(row.forwarded_at ? { on: true, text: `Sent to Marius ${stamp(row.forwarded_at)}` } : { on: false, warn: true, text: 'Not sent to Marius' });
+  if (row.forwarded_at) {
+    const mariusTouched = row.last_message_by === 'Marius' || row.partner_updated_at;
+    steps.push(mariusTouched
+      ? { on: true, text: `Marius ${row.last_message_by === 'Marius' ? 'contacted customer' : 'updated'} ${stamp(row.last_message_by === 'Marius' ? row.last_message_at : row.partner_updated_at)}` }
+      : { on: false, warn: true, text: 'Marius: no contact logged' });
+  }
+  if (row.customer_replied_at) steps.push({ on: true, hot: row.customer_reply_unseen, text: `Customer replied ${stamp(row.customer_replied_at)}` });
+  if (row.quote_amount != null && ['quote_sent', 'accepted', 'booked'].includes(row.status)) steps.push({ on: true, text: `Quote ${money(row.quote_amount)} sent` });
+  return steps;
 }
 
 export default function SunwingsDashboard({ quick = [], sections = [] }) {
@@ -131,6 +154,8 @@ export default function SunwingsDashboard({ quick = [], sections = [] }) {
   const owed = rows.filter(row => row.status === 'complete' && row.commission_status !== 'paid' && row.commission_status !== 'none')
     .reduce((sum, row) => sum + commissionFor(row).amount, 0);
   const urgent = todo.filter(item => item.rank <= 1).length;
+  const open = rows.filter(row => !CLOSED.has(row.status) && !['accepted', 'booked'].includes(row.status))
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
   const visible = showAll ? todo : todo.slice(0, 8);
 
   const hour = new Date().getHours();
@@ -168,6 +193,22 @@ export default function SunwingsDashboard({ quick = [], sections = [] }) {
           {todo.length > 8 ? <button type="button" className="swd-more" onClick={() => setShowAll(value => !value)}>{showAll ? 'Show fewer' : `Show all ${todo.length}`}</button> : null}
         </>}
     </section>
+
+    {isOwner ? <section className="swd-card swd-all">
+      <div className="swd-card-head">
+        <h2>Every open request</h2>
+        <span>{loading ? '' : `${open.length} open · quotes and contact messages`}</span>
+      </div>
+      {loading ? <p className="swd-empty">Loading…</p> : !open.length ? <p className="swd-empty">No open requests.</p>
+        : open.map(row => <button type="button" key={row.id} className="swd-req" onClick={() => navigate(`/admin/sunwings/quotes?id=${encodeURIComponent(row.id)}`)}>
+          <span className="swd-req-top">
+            <b>{row.name || 'No name'}</b>
+            <span className="swd-req-type">{row.request_type === 'contact' ? 'Contact message' : row.service || 'Quote'}</span>
+            <span className="swd-req-status">{STATUS_WORDS[row.status] || row.status}</span>
+          </span>
+          <span className="swd-req-steps">{timeline(row).map(step => <span key={step.text} className={`swd-step${step.on ? ' on' : ''}${step.warn ? ' warn' : ''}${step.hot ? ' hot' : ''}`}>{step.text}</span>)}</span>
+        </button>)}
+    </section> : null}
 
     <div className="swd-grid">
       <section className="swd-card">
