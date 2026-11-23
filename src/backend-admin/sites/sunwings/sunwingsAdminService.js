@@ -198,3 +198,28 @@ export async function savePricingSettings(accessToken, settings) {
     body: JSON.stringify({ settings }),
   }, accessToken), 'Unable to save price settings.');
 }
+
+// The back-and-forth on a job: emails, customer replies, notes and quotes.
+export async function loadQuoteMessages(accessToken, id) {
+  return parseJsonResponse(
+    await adminFetch(`/api/admin/sunwings/quote-messages?id=${encodeURIComponent(id)}`, { method: 'GET' }, accessToken),
+    'Unable to load the conversation.',
+  );
+}
+
+// action: 'note' | 'email' | 'quote'. Returns { messages, request }.
+export async function postQuoteMessage(accessToken, body) {
+  return parseJsonResponse(
+    await adminFetch('/api/admin/sunwings/quote-messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }, accessToken),
+    'Nothing was sent.',
+  );
+}
+
+// Checks the Sunwings mailbox for new customer replies (Home uses this).
+export async function checkQuoteReplies(accessToken) {
+  return parseJsonResponse(await adminFetch('/api/admin/sunwings/quote-messages', { method: 'GET' }, accessToken), 'Unable to check for replies.');
+}

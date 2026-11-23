@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { deleteSunwingsQuote, loadSunwingsQuotes, updateSunwingsQuote } from './sunwingsAdminService';
 import { autoCommissionRate, commissionFor, money } from './commission';
 import { BranchChip } from './BranchChip';
+import QuoteThread from './QuoteThread';
 import '../../styles/serviceRequests.css';
 import './sunwingsJobs.css';
 import './quoteRequests.css';
@@ -13,6 +14,7 @@ const STATUS_OPTIONS = [
   ['new', 'New'],
   ['reviewing', 'Reviewing'],
   ['forwarded', 'Sent to Marius'],
+  ['marius_working', 'Marius getting details'],
   ['priced', 'Priced by Marius'],
   ['needs_quote', 'Needs Quote'],
   ['contacted', 'Contacted'],
@@ -28,6 +30,7 @@ const STATUS_OPTIONS = [
 const JOB_STEPS = [
   ['new', 'New', 'Came in'],
   ['forwarded', 'Sent to Marius', 'Forwarded'],
+  ['marius_working', 'Getting details', 'Marius & customer'],
   ['priced', 'Priced', 'Marius gave a price'],
   ['quote_sent', 'Quote sent', 'Customer has price'],
   ['booked', 'Booked', 'Date set'],
@@ -80,7 +83,7 @@ function JobFlags({ row }) {
 }
 
 // Quotes = still waiting for the customer to say yes. Jobs = accepted or booked. Closed = done or dead.
-const QUOTE_STATUSES = new Set(['new', 'reviewing', 'forwarded', 'priced', 'needs_quote', 'contacted', 'quote_sent']);
+const QUOTE_STATUSES = new Set(['new', 'reviewing', 'forwarded', 'marius_working', 'priced', 'needs_quote', 'contacted', 'quote_sent']);
 const JOB_STATUSES = new Set(['accepted', 'booked']);
 const CLOSED_STATUSES = new Set(['complete', 'declined', 'cancelled']);
 
@@ -426,7 +429,7 @@ export default function QuoteRequestsAdmin() {
               <span className="qr-who"><b>{request.name}</b><small>{request.email || request.phone}</small></span>
               <span className="qr-job"><b>{request.request_type === 'contact' ? 'Contact message' : (request.service || 'Not specified')}</b><small>{requestTypeLabel(request.request_type)}</small></span>
               <span className="qr-route">{request.request_type === 'contact' ? '—' : routeSummary(request)}<JobFlags row={request}/>{isOwner ? <BranchChip row={request}/> : null}</span>
-              <span className="qr-status"><span className={`qr-pill ${request.status || 'new'}`}>{statusLabel(request.status)}</span></span>
+              <span className="qr-status"><span className={`qr-pill ${request.status || 'new'}`}>{statusLabel(request.status)}</span>{isOwner && request.customer_reply_unseen ? <span className="qr-replied">Customer replied</span> : null}</span>
               <span className="qr-price num">{price == null ? '—' : money(price)}</span>
               <span className="qr-date">{shortDate(request.created_at)}</span>
               <ChevronRight className="qr-chev" size={18}/>
@@ -458,7 +461,7 @@ export default function QuoteRequestsAdmin() {
           {error && <div className="site-admin-alert error">{error}</div>}
 
           <div className="service-request-quick-actions">
-            {selected.email && <a className="site-admin-btn" href={`mailto:${selected.email}`}><Mail size={14}/> Email Customer</a>}
+            {selected.email && <button className="site-admin-btn" type="button" onClick={() => document.getElementById('quote-conversation')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}><Mail size={14}/> Email Customer</button>}
             {selected.phone && <a className="site-admin-btn secondary" href={`tel:${selected.phone}`}><Phone size={14}/> Call Customer</a>}
             {selected.request_type !== 'contact' && <a className="site-admin-btn secondary" href={externalQuoteMailto(selected)}><Mail size={14}/> Email job details</a>}
           </div>
@@ -479,6 +482,11 @@ export default function QuoteRequestsAdmin() {
             </div>
             <p className="job-hint">Click a step to move the job there (skipping is fine), then Save changes at the bottom.</p>
           </section>
+
+          <div id="quote-conversation">
+            <QuoteThread key={selected.id} accessToken={accessToken} request={selected} isOwner={isOwner}
+              onUpdated={updated => setRequests(rows => rows.map(row => row.id === updated.id ? { ...row, ...updated } : row))}/>
+          </div>
 
           {!isOwner && hasWorkflow && selected.request_type !== 'contact' && <section className="service-request-drawer-section">
             <p className="site-admin-eyebrow">Your price</p>
@@ -557,7 +565,7 @@ export default function QuoteRequestsAdmin() {
               <label><span>Quote #</span><input value={draftQuoteNumber} onChange={event => setDraftQuoteNumber(event.target.value)} placeholder="Optional"/></label>
               <label><span>Due</span><input type="datetime-local" value={draftNextActionDueAt} onChange={event => setDraftNextActionDueAt(event.target.value)}/></label>
             </div>
-            <div className="job-fields one">
+            <div className="job-fields one job-notes">
               <label><span>Next action</span><input value={draftNextAction} onChange={event => setDraftNextAction(event.target.value)} placeholder="Call customer, send quote…"/></label>
               {isOwner && <label><span>Private notes</span><textarea rows="4" value={draftNotes} onChange={event => setDraftNotes(event.target.value)} placeholder="Quote notes, follow-up, requirements…"/></label>}
             </div>

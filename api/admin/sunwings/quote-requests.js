@@ -2,6 +2,7 @@ import { requireSiteAccess } from '../../_lib/websiteAdmin.js';
 import { airtableConfigured, makeConfigured, readMariusUpdates, sendJobToMake, stepFromJobStatus } from '../../_lib/sunwingsMarius.js';
 import { supabaseUserRest } from '../../_lib/supabase.js';
 import { withPhotoUrls } from '../../_lib/sunwingsPhotos.js';
+import { notifyDispatch } from '../../_lib/sunwingsMail.js';
 import { parseSupabase, SITE_KEY } from './_lib/content.js';
 
 const BASE_FIELDS = [
@@ -28,6 +29,8 @@ const SCHEDULED_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCH
 // Added by migration 20261112 (follow-ups): thank-you email, follow-ups sent, automatic reminder.
 const FOLLOW_UP_FIELDS = ['customer_ack_sent_at', 'customer_ack_error', 'follow_up_count', 'last_follow_up_at', 'auto_nudge_sent_at'];
 const FOLLOW_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCHEDULE_FIELDS, ...FOLLOW_UP_FIELDS].join(',');
+// Added by migration 20261122 (quote conversation): customer replies and last message.
+const MESSAGE_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS, ...SCHEDULE_FIELDS, ...FOLLOW_UP_FIELDS, 'customer_replied_at', 'customer_reply_unseen', 'last_message_at', 'last_message_by'].join(',');
 const ALL_FIELDS = [...BASE_FIELDS, ...NEW_FIELDS, ...PHOTO_FIELDS].join(',');
 const FIELDS = [...BASE_FIELDS, ...NEW_FIELDS].join(',');
 const OLD_FIELDS = BASE_FIELDS.join(',');
@@ -36,7 +39,7 @@ const OLD_FIELDS = BASE_FIELDS.join(',');
 // (Postgres error 42703), run it again with only the original fields.
 async function withFieldFallback(token, buildPath, options) {
   let response;
-  for (const fields of [FOLLOW_FIELDS, SCHEDULED_FIELDS, ALL_FIELDS, FIELDS, OLD_FIELDS]) {
+  for (const fields of [MESSAGE_FIELDS, FOLLOW_FIELDS, SCHEDULED_FIELDS, ALL_FIELDS, FIELDS, OLD_FIELDS]) {
     response = await supabaseUserRest(token, buildPath(fields), options);
     if (response.status !== 400) return response;
     const text = await response.clone().text().catch(() => '');
@@ -49,7 +52,7 @@ async function withFieldFallback(token, buildPath, options) {
 // statuses. Save the closest one and remember the real step in last_activity, so the
 // admin still shows the right step. Once the migration runs, real statuses save directly.
 const LEGACY_STATUS = {
-  new: 'new', reviewing: 'contacted', forwarded: 'contacted', priced: 'contacted', needs_quote: 'contacted', contacted: 'contacted',
+  new: 'new', reviewing: 'contacted', forwarded: 'contacted', marius_working: 'contacted', priced: 'contacted', needs_quote: 'contacted', contacted: 'contacted',
   quote_sent: 'quoted', accepted: 'quoted', booked: 'quoted', quoted: 'quoted',
   complete: 'closed', declined: 'closed', cancelled: 'closed', closed: 'closed',
 };
@@ -63,7 +66,7 @@ function withRealStatus(row) {
 }
 
 const STATUSES = new Set([
-  'new','reviewing','forwarded','priced','needs_quote','contacted','quote_sent',
+  'new','reviewing','forwarded','marius_working','priced','needs_quote','contacted','quote_sent',
   'accepted','booked','complete','declined','cancelled'
 ]);
 const COMMISSION_STATUSES = new Set(['owed','paid','none']);
@@ -310,6 +313,8 @@ export default async function handler(req, res) {
     const rows = await parseSupabase(response, 'Unable to update Sunwings quote request.');
     const row = Array.isArray(rows) ? rows[0] || null : rows;
     if (!row) return res.status(404).json({ error: 'That job is not available.' });
+    // Sent to Marius: email his dispatch inbox and note it in the job's conversation.
+    if (body.forward === true) await notifyDispatch(row.id);
     const [withPhotos] = await withPhotoUrls([row]);
     return res.status(200).json({ request: forViewer(withRealStatus(withPhotos), isOwner) });
   } catch (error) {

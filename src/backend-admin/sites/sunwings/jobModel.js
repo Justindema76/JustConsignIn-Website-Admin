@@ -6,7 +6,7 @@ export const DEFAULT_HOURS = 3;
 // Where a request sits in the booking flow. Declined/cancelled jobs and contact
 // messages are left off the calendar.
 export const STAGE_OF = {
-  new: 'new', reviewing: 'new', forwarded: 'new', priced: 'new', needs_quote: 'new', contacted: 'new',
+  new: 'new', reviewing: 'new', forwarded: 'new', marius_working: 'new', priced: 'new', needs_quote: 'new', contacted: 'new',
   quote_sent: 'quoted', accepted: 'accepted', booked: 'booked', complete: 'complete',
 };
 

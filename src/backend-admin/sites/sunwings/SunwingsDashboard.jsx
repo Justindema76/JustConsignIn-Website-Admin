@@ -51,18 +51,36 @@ function buildTodo(rows, now, isOwner) {
       why: job.contact ? `Contact message ${ago(now - Date.parse(row.created_at))}.` : due.text,
       cta: canEmail ? 'Reply' : 'Open', to: canEmail ? calLink(true) : quoteLink,
     });
-    // Marius: jobs Justin sent that still need his price.
-    if (!isOwner && ['forwarded', 'reviewing', 'needs_quote'].includes(row.status) && row.partner_price == null) reasons.push({
-      rank: 1, tag: ['amber', 'Needs your price'],
-      why: `Sent to you ${ago(now - Date.parse(row.forwarded_at || row.created_at))}.`,
-      cta: 'Price it', to: quoteLink,
+    const sinceSent = ago(now - Date.parse(row.forwarded_at || row.created_at));
+    const lastWord = row.last_message_at ? Date.parse(row.last_message_at) : 0;
+    const quiet = now - Math.max(lastWord, Date.parse(row.partner_updated_at || 0) || 0, Date.parse(row.forwarded_at || row.created_at));
+    // A customer wrote back. Most urgent: someone is waiting.
+    if (row.customer_reply_unseen) reasons.push({
+      rank: 0, tag: ['green', 'Customer replied'],
+      why: `${row.name || 'The customer'} answered ${ago(now - Date.parse(row.customer_replied_at || row.last_message_at || row.updated_at))}. Read it in the conversation.`,
+      cta: 'Read', to: quoteLink,
     });
-    // Justin: jobs sent to Marius that he still hasn't priced.
-    if (isOwner && !job.contact && ['forwarded', 'reviewing', 'needs_quote'].includes(row.status) && row.partner_price == null) reasons.push({
-      rank: 1, tag: ['amber', 'Waiting on Marius'],
-      why: `Sent to Marius ${ago(now - Date.parse(row.forwarded_at || row.created_at))}. He hasn't given a price yet.`,
+    // Justin: new quotes he hasn't sent to Marius yet.
+    if (isOwner && !job.contact && ['new', 'reviewing', 'contacted'].includes(row.status) && !row.forwarded_at) reasons.push({
+      rank: 1, tag: ['red', 'Needs quoting'],
+      why: `Came in ${ago(now - Date.parse(row.created_at))}. Not sent to Marius yet.`,
       cta: 'Open', to: quoteLink,
     });
+    // Marius: jobs Justin sent that still need his price.
+    if (!isOwner && ['forwarded', 'reviewing', 'needs_quote', 'marius_working'].includes(row.status) && row.partner_price == null) reasons.push({
+      rank: 1, tag: ['amber', row.status === 'marius_working' ? 'Send your quote' : 'Needs your price'],
+      why: row.status === 'marius_working' ? `You're getting details. Send the quote from the job when ready.` : `Sent to you ${sinceSent}. Message the customer or send your quote.`,
+      cta: 'Open', to: quoteLink,
+    });
+    // Justin: jobs with Marius that have no quote yet. Flags it when Marius has gone quiet for a day.
+    if (isOwner && !job.contact && ['forwarded', 'reviewing', 'needs_quote', 'marius_working'].includes(row.status) && row.partner_price == null) {
+      const days = Math.floor(quiet / 86400000);
+      reasons.push(row.status === 'marius_working'
+        ? { rank: days >= 1 ? 1 : 3, tag: days >= 1 ? ['red', `Marius quiet ${days}d`] : ['amber', 'Marius getting details'],
+            why: `Marius is talking to the customer.${row.last_message_at ? ` Last message ${ago(now - lastWord)} (${row.last_message_by}).` : ''} No quote yet.`, cta: 'Open', to: quoteLink }
+        : { rank: 1, tag: days >= 1 ? ['red', `No reply from Marius ${days}d`] : ['amber', 'Waiting on Marius'],
+            why: `Sent to Marius ${sinceSent}. He hasn't contacted the customer or given a price yet.`, cta: 'Open', to: quoteLink });
+    }
     if (isOwner && row.partner_update_unseen) reasons.push({
       rank: 1, tag: ['blue', 'Marius updated'],
       why: row.partner_note || 'New price or status from Marius.',

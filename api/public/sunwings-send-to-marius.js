@@ -1,6 +1,7 @@
 import { supabaseAnon, supabaseUrl } from '../_lib/supabase.js';
 import { rateLimit } from '../_lib/rateLimit.js';
 import { sendJobToMake } from '../_lib/sunwingsMarius.js';
+import { notifyDispatch } from '../_lib/sunwingsMail.js';
 
 // Opened from the "Send to Marius" button in the new-quote email.
 // GET shows a confirm page (so email link scanners can't send jobs by themselves);
@@ -69,6 +70,7 @@ export default async function handler(req, res) {
 
     await sendJobToMake(job);
     await rpc('sunwings_mark_sent_by_token', { p_id: id, p_token: token });
+    await notifyDispatch(id);
     return page(res, 200, 'Sent to Marius', `${summary(job)}<p class="ok">✓ Done. Marius has the job with all the customer’s details.</p><p class="muted">Recorded in Website Admin → Quote Requests. You can close this page.</p>`);
   } catch (error) {
     console.error('[sunwings] send to marius failed', error);
