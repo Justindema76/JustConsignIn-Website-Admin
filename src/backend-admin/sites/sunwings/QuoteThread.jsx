@@ -71,10 +71,10 @@ export default function QuoteThread({ accessToken, request, isOwner, onUpdated }
   const end = useRef(null);
   const isContact = request.request_type === 'contact';
 
-  async function load() {
+  async function load(force = false) {
     setLoading(true); setError('');
     try {
-      const data = await loadQuoteMessages(accessToken, request.id);
+      const data = await loadQuoteMessages(accessToken, request.id, force);
       setItems(data.messages || []);
       if (data.request) onUpdated?.(data.request);
       if (data.inbox?.error && isOwner) setError(`Couldn’t check for new replies: ${data.inbox.error}`);
@@ -99,7 +99,7 @@ export default function QuoteThread({ accessToken, request, isOwner, onUpdated }
   return <section className="service-request-drawer-section qt">
     <div className="qt-head">
       <p className="site-admin-eyebrow"><MessageSquare size={14}/> Conversation</p>
-      <button type="button" className="qt-icon" onClick={load} disabled={loading} aria-label="Check for new replies"><RefreshCw size={15}/></button>
+      <button type="button" className="qt-icon" onClick={() => load(true)} disabled={loading} aria-label="Check for new replies"><RefreshCw size={15}/></button>
     </div>
     <p className="qt-hint">{isOwner ? 'Every email, reply, note and quote on this job. Marius sees this too.' : 'Message the customer and send your quote from here. Justin sees everything on this job.'}</p>
 

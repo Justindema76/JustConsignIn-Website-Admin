@@ -214,20 +214,22 @@ export async function checkInbox({ force = false } = {}) {
   // Without this, a dropped mailbox connection crashes the whole request.
   let failure = null;
   client.on('error', error => { failure = error; console.error('[sunwings] inbox connection error', error?.message); });
-  let saved = 0;
+  let saved = 0, scanned = 0;
+  const skipped = [];
   await client.connect();
   if (failure) throw failure;
   const lock = await client.getMailboxLock('INBOX');
   try {
     const since = new Date(Date.now() - 4 * 86400000);
     for await (const msg of client.fetch({ since }, { source: true, envelope: true }, { uid: false })) {
+      scanned += 1;
       const mail = await simpleParser(msg.source);
       const from = clean(mail.from?.value?.[0]?.address, 320).toLowerCase();
       if (!from || own.has(from)) continue;
       const messageId = clean(mail.messageId, 500);
       if (!messageId) continue;
       const quoteId = await matchQuote(mail, from);
-      if (!quoteId) continue;
+      if (!quoteId) { skipped.push(`${from}: ${clean(mail.subject, 80)}`); continue; }
       const row = await saveMessage(quoteId, {
         kind: 'email_in', author: 'Customer', subject: clean(mail.subject, 300), body: replyOnly(mail.text || ''),
         from_email: from, to_email: clean(mail.to?.value?.[0]?.address, 320), email_message_id: messageId,
@@ -244,7 +246,8 @@ export async function checkInbox({ force = false } = {}) {
     lock.release();
     await client.logout().catch(() => {});
   }
-  return { saved };
+  console.log('[sunwings] inbox checked', JSON.stringify({ mailbox: settings.smtp_username, host: process.env.SUNWINGS_IMAP_HOST || settings.smtp_host, scanned, saved, unmatched: skipped.slice(0, 10) }));
+  return { saved, scanned };
 }
 
 async function matchQuote(mail, from) {

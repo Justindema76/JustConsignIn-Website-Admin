@@ -200,9 +200,9 @@ export async function savePricingSettings(accessToken, settings) {
 }
 
 // The back-and-forth on a job: emails, customer replies, notes and quotes.
-export async function loadQuoteMessages(accessToken, id) {
+export async function loadQuoteMessages(accessToken, id, force = false) {
   return parseJsonResponse(
-    await adminFetch(`/api/admin/sunwings/quote-messages?id=${encodeURIComponent(id)}`, { method: 'GET' }, accessToken),
+    await adminFetch(`/api/admin/sunwings/quote-messages?id=${encodeURIComponent(id)}${force ? '&check=now' : ''}`, { method: 'GET' }, accessToken),
     'Unable to load the conversation.',
   );
 }
