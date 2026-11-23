@@ -46,6 +46,7 @@ create index if not exists sunwings_quote_messages_ref_idx on public.sunwings_qu
 -- Only Website Admin's server reads and writes messages (it checks who may see each job).
 alter table public.sunwings_quote_messages enable row level security;
 revoke all on public.sunwings_quote_messages from anon, authenticated;
+grant select, insert, update, delete on public.sunwings_quote_messages to service_role;
 
 commit;
 
