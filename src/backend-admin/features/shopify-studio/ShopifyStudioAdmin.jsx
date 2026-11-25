@@ -34,14 +34,35 @@ const DEFAULTS = {
   priceCustomApp: '',
   heroImages: {},
   demoImages: { hero: {}, products: {} },
+  demoText: {},
+  demoDepts: [],
+  demoProducts: [],
 };
 
-// Demo store (justindematteis.com/shopify-studio/demo-store) products. Blank = drawn picture.
+// Demo store (justindematteis.com/shopify-studio/demo-store): wording, departments and products.
+// Blank = the built-in Starlite Home & Gift text/picture.
+const DEMO_TEXT = [
+  ['storeName', 'Store name', 'Starlite'], ['storeTag', 'Under the name', 'Home & Gift'],
+  ['announcement', 'Top bar', 'Free shipping on orders over $75 · Gift wrap on every order'],
+  ['nav1', 'Menu link 1', 'Kitchen'], ['nav2', 'Menu link 2', 'Gifts'], ['nav3', 'Menu link 3', 'Sale'],
+  ['heroKicker', 'Banner small line', 'Fresh from the counter'], ['heroTitle', 'Banner heading', 'Kitchen classics, made to last'],
+  ['heroText', 'Banner text', 'Diner mugs, malt glasses and table radios, picked by hand and shipped from our little shop on Main Street.'],
+  ['heroBtn1', 'Banner button 1', 'Shop the kitchen'], ['heroBtn2', 'Banner button 2', 'Gift ideas'],
+  ['deptTitle', 'Departments heading', 'Shop by department'], ['bestTitle', 'Best sellers heading', 'Best sellers this week'],
+  ['collectionKicker', 'Collection small line', 'The counter collection'], ['collectionTitle', 'Collection name', 'Kitchen & Diner'],
+  ['collectionText', 'Collection text', 'Everything for a kitchen with a little chrome and a lot of personality. 24 products.'],
+];
+const DEMO_DEPTS = ['Kitchen', 'Glassware', 'Radios', 'Music', 'Linens'];
 const DEMO_PRODUCTS = [
-  ['radio', 'Chrome Table Radio'], ['mug', 'Diner Counter Mug'], ['glass', 'Malt Shop Glasses'],
-  ['clock', 'Vinyl Record Wall Clock'], ['apron', 'Cherry Print Apron'], ['lunch', 'Tin Lunch Box'],
-  ['soda', 'Glass Soda Bottles'], ['towel', 'Checkerboard Tea Towel'], ['plate', 'Blue Plate Special Dish'],
-  ['jukebox', 'Music (category picture)'],
+  { t: 'Chrome Table Radio', v: 'Starlite Originals', p: '$89.00', was: '$109.00', b: 'New' },
+  { t: 'Diner Counter Mug, Set of 2', v: 'Main Street Pottery', p: '$28.00' },
+  { t: 'Malt Shop Glasses, Set of 4', v: 'Starlite Originals', p: '$34.00' },
+  { t: 'Vinyl Record Wall Clock', v: 'Spin Shop', p: '$42.00' },
+  { t: 'Cherry Print Apron', v: 'Starlite Originals', p: '$22.00', was: '$28.00', b: 'Sale' },
+  { t: 'Tin Lunch Box', v: 'Lunch Club', p: '$24.00', b: 'New' },
+  { t: 'Glass Soda Bottles, Set of 3', v: 'Pop & Co.', p: '$16.00' },
+  { t: 'Checkerboard Tea Towel', v: 'Starlite Originals', p: '$14.00' },
+  { t: 'Blue Plate Special Dish', v: 'Main Street Pottery', p: '$19.00' },
 ];
 
 // Built-in hero pictures on the website (used when a box is left blank).
@@ -116,6 +137,19 @@ export default function ShopifyStudioAdmin() {
       {url && <button type="button" className="site-admin-btn secondary" onClick={() => onUrl('')}>Use built-in</button>}
     </span>
   </label>;
+
+  const setList = (listKey, index, field, value) => setValues(current => {
+    const list = [...(current[listKey] || [])];
+    list[index] = { ...(list[index] || {}), [field]: value };
+    return { ...current, [listKey]: list };
+  });
+  async function uploadList(listKey, index, file) {
+    if (!file) return;
+    setError(''); setUploading(`${listKey}-${index}`);
+    try { setList(listKey, index, 'img', await uploadSiteImage(accessToken, file)); setMessage('Picture uploaded. Click Save to put it on the website.'); }
+    catch (err) { setError(err.message); }
+    finally { setUploading(''); }
+  }
 
   async function save(event) {
     event.preventDefault();
@@ -198,11 +232,38 @@ export default function ShopifyStudioAdmin() {
         </div>
 
         <div className="email-settings-divider" />
-        <div className="email-settings-section-head compact"><div><h2>Demo store pictures</h2><p>The clickable demo store (<a href={`${SITE}/shopify-studio/demo-store`} target="_blank" rel="noreferrer">open it</a>). Banner picture per era, and real photos for each product (same in every era). Leave blank to keep the built-in look.</p></div></div>
+        <div className="email-settings-section-head compact"><div><h2>Demo store banners</h2><p>The clickable demo store (<a href={`${SITE}/shopify-studio/demo-store`} target="_blank" rel="noreferrer">open it</a>). Banner picture per era. Leave blank to keep the built-in look.</p></div></div>
         <div className="email-settings-fields">
           {ERAS.map(([era, label]) => picField(`demo-hero-${era}`, `${label} · Banner`, demoValue('hero', era), url => setDemo('hero', era, url), file => uploadDemo('hero', era, file), true))}
-          {DEMO_PRODUCTS.map(([key, label]) => picField(`demo-products-${key}`, label, demoValue('products', key), url => setDemo('products', key, url), file => uploadDemo('products', key, file)))}
         </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Demo store wording</h2><p>Turn the demo into any kind of shop (records, clothing, toys…). Same in every era. Blank = built-in text.</p></div></div>
+        <div className="email-settings-fields">
+          {DEMO_TEXT.map(([key, label, fallback]) => <label key={key} className={fallback.length > 40 ? 'wide' : ''}>{label}
+            <input value={values.demoText?.[key] || ''} placeholder={fallback} onChange={e => set('demoText', { ...(values.demoText || {}), [key]: e.target.value })} />
+          </label>)}
+        </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Demo store departments</h2><p>The round tiles under “Shop by department”.</p></div></div>
+        <div className="email-settings-fields">
+          {DEMO_DEPTS.map((fallback, i) => <div key={i} style={{ display: 'contents' }}>
+            <label>Department {i + 1} name<input value={values.demoDepts?.[i]?.label || ''} placeholder={fallback} onChange={e => setList('demoDepts', i, 'label', e.target.value)} /></label>
+            {picField(`demoDepts-${i}`, `Department ${i + 1} picture`, values.demoDepts?.[i]?.img || '', url => setList('demoDepts', i, 'img', url), file => uploadList('demoDepts', i, file))}
+          </div>)}
+        </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Demo store products</h2><p>Product 1 is also the product page. Badge: New, Sale or blank.</p></div></div>
+        {DEMO_PRODUCTS.map((fallback, i) => <div key={i} className="email-settings-fields" style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
+          <label className="wide"><b>Product {i + 1}</b><input value={values.demoProducts?.[i]?.t || ''} placeholder={fallback.t} onChange={e => setList('demoProducts', i, 't', e.target.value)} /></label>
+          <label>Brand<input value={values.demoProducts?.[i]?.v || ''} placeholder={fallback.v} onChange={e => setList('demoProducts', i, 'v', e.target.value)} /></label>
+          <label>Price<input value={values.demoProducts?.[i]?.p || ''} placeholder={fallback.p} onChange={e => setList('demoProducts', i, 'p', e.target.value)} /></label>
+          <label>Was price<input value={values.demoProducts?.[i]?.was || ''} placeholder={fallback.was || 'blank = no sale'} onChange={e => setList('demoProducts', i, 'was', e.target.value)} /></label>
+          <label>Badge<input value={values.demoProducts?.[i]?.b || ''} placeholder={fallback.b || 'blank = none'} onChange={e => setList('demoProducts', i, 'b', e.target.value)} /></label>
+          {picField(`demoProducts-${i}`, 'Photo', values.demoProducts?.[i]?.img || '', url => setList('demoProducts', i, 'img', url), file => uploadList('demoProducts', i, file))}
+        </div>)}
       </div>
 
       <aside className="email-settings-side">
