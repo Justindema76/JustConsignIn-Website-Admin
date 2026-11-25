@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, ExternalLink, Save } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Save, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
-import { loadAdminGlobalSection, saveAdminGlobalSection } from '../../services/siteAdminService';
+import { loadAdminGlobalSection, saveAdminGlobalSection, uploadSiteImage } from '../../services/siteAdminService';
 import '../settings/settings.css';
 
 // Settings for justindematteis.com/shopify-studio (the era-themed Shopify landing page and the
@@ -32,7 +32,21 @@ const DEFAULTS = {
   priceTuneUp: '',
   priceRedesign: '',
   priceCustomApp: '',
+  heroImages: {},
 };
+
+// Built-in hero pictures on the website (used when a box is left blank).
+const HERO_BUILT_IN = {
+  '50s': { desktop: 'bag-50s.webp', phone: 'hero-phone-50s.webp' },
+  '60s': { desktop: 'bag-60s-v1.webp', phone: 'hero-phone-60s.webp' },
+  '70s': { desktop: 'bag-70s-v1.webp', phone: 'hero-phone-70s.webp' },
+  '80s': { desktop: 'bag-80s-v1.webp', phone: 'hero-phone-80s.webp' },
+  '80s-memphis': { desktop: 'bag-80s-memphis-v1.webp', phone: 'hero-phone-80s-memphis.webp' },
+  '90s': { desktop: 'bag-90s-v1.webp', phone: 'hero-phone-90s.webp' },
+  '2000s': { desktop: 'bag-2000s-v1.webp', phone: 'hero-phone-2000s.webp' },
+  '2010s': { desktop: 'bag-2010s-v1.webp', phone: '' },
+};
+const builtIn = (era, kind) => (HERO_BUILT_IN[era]?.[kind] ? `${SITE}/shopify-studio/img/${HERO_BUILT_IN[era][kind]}` : '');
 
 export default function ShopifyStudioAdmin() {
   const { accessToken } = useAuth();
@@ -55,6 +69,20 @@ export default function ShopifyStudioAdmin() {
     if (enabled.has(key)) enabled.delete(key); else enabled.add(key);
     return { ...current, enabledEras: ERAS.map(([k]) => k).filter(k => enabled.has(k)) };
   });
+
+  const heroValue = (era, kind) => values.heroImages?.[era]?.[kind] || '';
+  const setHero = (era, kind, url) => setValues(current => ({
+    ...current,
+    heroImages: { ...(current.heroImages || {}), [era]: { ...(current.heroImages?.[era] || {}), [kind]: url } },
+  }));
+  const [uploading, setUploading] = useState('');
+  async function uploadHero(era, kind, file) {
+    if (!file) return;
+    setError(''); setUploading(`${era}-${kind}`);
+    try { setHero(era, kind, await uploadSiteImage(accessToken, file)); setMessage('Picture uploaded. Click Save to put it on the website.'); }
+    catch (err) { setError(err.message); }
+    finally { setUploading(''); }
+  }
 
   async function save(event) {
     event.preventDefault();
@@ -115,6 +143,25 @@ export default function ShopifyStudioAdmin() {
           <label>Custom Store Redesign price (from $)<input value={values.priceRedesign || ''} placeholder="e.g. 4,500" onChange={e => set('priceRedesign', e.target.value)} /></label>
           <label>Custom App or Feature price (from $)<input value={values.priceCustomApp || ''} placeholder="e.g. 1,200" onChange={e => set('priceCustomApp', e.target.value)} /></label>
           <label>Spots left this month<input value={values.spotsLeft || ''} placeholder="e.g. 2" onChange={e => set('spotsLeft', e.target.value)} /></label>
+        </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Hero pictures</h2><p>The big picture at the top of each era. Desktop is the wide one; Phone is the 3x4 one shown under the text on phones. Upload a new one or paste a link. Leave blank to use the built-in picture.</p></div></div>
+        <div className="email-settings-fields">
+          {ERAS.map(([era, label]) => ['desktop', 'phone'].map(kind => {
+            const current = heroValue(era, kind) || builtIn(era, kind);
+            return <label key={`${era}-${kind}`}>{label} · {kind === 'desktop' ? 'Desktop' : 'Phone (3x4)'}
+              {current ? <img src={current} alt="" style={{ width: kind === 'desktop' ? 160 : 72, height: 96, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', display: 'block', margin: '6px 0' }} /> : <small style={{ display: 'block', margin: '6px 0' }}>No picture</small>}
+              <input value={heroValue(era, kind)} placeholder="Built-in picture" onChange={e => setHero(era, kind, e.target.value)} />
+              <span style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                <span className="site-admin-btn secondary" style={{ position: 'relative', overflow: 'hidden' }}>
+                  <Upload size={14} /> {uploading === `${era}-${kind}` ? 'Uploading…' : 'Upload'}
+                  <input type="file" accept="image/*" style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={e => { uploadHero(era, kind, e.target.files?.[0]); e.target.value = ''; }} />
+                </span>
+                {heroValue(era, kind) && <button type="button" className="site-admin-btn secondary" onClick={() => setHero(era, kind, '')}>Use built-in</button>}
+              </span>
+            </label>;
+          }))}
         </div>
       </div>
 
