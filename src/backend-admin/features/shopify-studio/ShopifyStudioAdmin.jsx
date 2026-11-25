@@ -33,7 +33,16 @@ const DEFAULTS = {
   priceRedesign: '',
   priceCustomApp: '',
   heroImages: {},
+  demoImages: { hero: {}, products: {} },
 };
+
+// Demo store (justindematteis.com/shopify-studio/demo-store) products. Blank = drawn picture.
+const DEMO_PRODUCTS = [
+  ['radio', 'Chrome Table Radio'], ['mug', 'Diner Counter Mug'], ['glass', 'Malt Shop Glasses'],
+  ['clock', 'Vinyl Record Wall Clock'], ['apron', 'Cherry Print Apron'], ['lunch', 'Tin Lunch Box'],
+  ['soda', 'Glass Soda Bottles'], ['towel', 'Checkerboard Tea Towel'], ['plate', 'Blue Plate Special Dish'],
+  ['jukebox', 'Music (category picture)'],
+];
 
 // Built-in hero pictures on the website (used when a box is left blank).
 const HERO_BUILT_IN = {
@@ -83,6 +92,30 @@ export default function ShopifyStudioAdmin() {
     catch (err) { setError(err.message); }
     finally { setUploading(''); }
   }
+
+  const demoValue = (group, key) => values.demoImages?.[group]?.[key] || '';
+  const setDemo = (group, key, url) => setValues(current => ({
+    ...current,
+    demoImages: { ...(current.demoImages || {}), [group]: { ...(current.demoImages?.[group] || {}), [key]: url } },
+  }));
+  async function uploadDemo(group, key, file) {
+    if (!file) return;
+    setError(''); setUploading(`demo-${group}-${key}`);
+    try { setDemo(group, key, await uploadSiteImage(accessToken, file)); setMessage('Picture uploaded. Click Save to put it on the website.'); }
+    catch (err) { setError(err.message); }
+    finally { setUploading(''); }
+  }
+  const picField = (id, label, url, onUrl, onFile, wide) => <label key={id}>{label}
+    {url ? <img src={url} alt="" style={{ width: wide ? 160 : 96, height: 96, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', display: 'block', margin: '6px 0' }} /> : <small style={{ display: 'block', margin: '6px 0' }}>Using the built-in picture</small>}
+    <input value={url} placeholder="Built-in picture" onChange={e => onUrl(e.target.value)} />
+    <span style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+      <span className="site-admin-btn secondary" style={{ position: 'relative', overflow: 'hidden' }}>
+        <Upload size={14} /> {uploading === id ? 'Uploading…' : 'Upload'}
+        <input type="file" accept="image/*" style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={e => { onFile(e.target.files?.[0]); e.target.value = ''; }} />
+      </span>
+      {url && <button type="button" className="site-admin-btn secondary" onClick={() => onUrl('')}>Use built-in</button>}
+    </span>
+  </label>;
 
   async function save(event) {
     event.preventDefault();
@@ -162,6 +195,13 @@ export default function ShopifyStudioAdmin() {
               </span>
             </label>;
           }))}
+        </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Demo store pictures</h2><p>The clickable demo store (<a href={`${SITE}/shopify-studio/demo-store`} target="_blank" rel="noreferrer">open it</a>). Banner picture per era, and real photos for each product (same in every era). Leave blank to keep the built-in look.</p></div></div>
+        <div className="email-settings-fields">
+          {ERAS.map(([era, label]) => picField(`demo-hero-${era}`, `${label} · Banner`, demoValue('hero', era), url => setDemo('hero', era, url), file => uploadDemo('hero', era, file), true))}
+          {DEMO_PRODUCTS.map(([key, label]) => picField(`demo-products-${key}`, label, demoValue('products', key), url => setDemo('products', key, url), file => uploadDemo('products', key, file)))}
         </div>
       </div>
 
