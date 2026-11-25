@@ -35,6 +35,7 @@ export default {
       id: 'website',
       label: 'Website',
       items: [
+        { to: '/admin/shopify-studio', label: 'Shopify Studio', icon: 'sparkles' },
         { to: '/admin/website/pages', label: 'Pages', icon: 'panels' },
         { to: '/admin/website/blocks', label: 'Block Library', icon: 'library' },
         { to: '/admin/website/styles', label: 'Global Styles', icon: 'palette' },
@@ -86,6 +87,7 @@ export default {
         title: 'Website',
         copy: 'Pages, reusable blocks and global website controls.',
         items: [
+          { to: '/admin/shopify-studio', icon: 'sparkles', title: 'Shopify Studio', copy: 'Eras, prices and spots for the Shopify Studio page.' },
           { to: '/admin/website/pages', icon: 'panels', title: 'Pages', copy: 'Open and edit public pages.' },
           { to: '/admin/website/blocks', icon: 'library', title: 'Block Library', copy: 'See reusable page-builder blocks.' },
           { to: '/admin/website/styles', icon: 'palette', title: 'Global Styles', copy: 'Control colours, typography, spacing, cards and buttons.' },

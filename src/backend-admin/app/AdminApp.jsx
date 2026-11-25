@@ -25,6 +25,7 @@ import SocialAutomation from '../features/social-automation/SocialAutomation';
 import VideosAdmin from '../features/videos/VideosAdmin';
 import WorkPostsAdmin from '../features/work-posts/WorkPostsAdmin';
 import AiPostsAdmin from '../features/ai-posts/AiPostsAdmin';
+import ShopifyStudioAdmin from '../features/shopify-studio/ShopifyStudioAdmin';
 import ServicePostsAdmin from '../sites/sunwings/ServicePostsAdmin';
 import LocationPostsAdmin from '../sites/sunwings/LocationPostsAdmin';
 import QuoteRequestsAdmin from '../sites/sunwings/QuoteRequestsAdmin';
@@ -86,6 +87,7 @@ export default function AdminApp() {
         <Route path="/admin/hiring-contacts" element={only(JUSTIN, <HiringContactsAdmin />)} />
         <Route path="/admin/business-outreach" element={only(JUSTIN, <BusinessOutreachAdmin />)} />
         <Route path="/admin/departments" element={only(JUSTIN, <DepartmentsAdmin />)} />
+        <Route path="/admin/shopify-studio" element={only(JUSTIN, <ShopifyStudioAdmin />)} />
 
         <Route path="/admin/blog" element={only(STANDARD_SITES, <BlogAdmin />)} />
         <Route path="/admin/blog/:id" element={only(STANDARD_SITES, <BlogAdmin />)} />
