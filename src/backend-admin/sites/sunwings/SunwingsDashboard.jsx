@@ -33,7 +33,7 @@ function buildTodo(rows, now, isOwner) {
       if (job) items.push({
         job, rank: 4, tag: ['green', 'Ask for review'], more: [],
         why: `Job done${row.status_changed_at ? ` ${ago(now - Date.parse(row.status_changed_at))}` : ''}. Send the Google review request.`,
-        cta: 'Ask for review', to: `/admin/sunwings/calendar?job=${encodeURIComponent(job.id)}&email=1`,
+        cta: 'Ask for review', to: `/admin/sunwings/quotes?id=${encodeURIComponent(job.id)}`,
       });
       continue;
     }
