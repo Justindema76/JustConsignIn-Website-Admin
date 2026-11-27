@@ -58,6 +58,10 @@ function socialValue(body = {}) {
   return Object.fromEntries(keys.map(key => [key, {
     url: String(input?.[key]?.url || '').trim(),
     enabled: input?.[key]?.enabled !== false,
+    // Which parts of the website show this icon, e.g. { main: true, 'shopify-studio': false }.
+    sections: Object.fromEntries(Object.entries(input?.[key]?.sections || {})
+      .filter(([section]) => /^[a-z0-9-]{1,40}$/.test(section))
+      .map(([section, on]) => [section, on === true])),
   }]));
 }
 

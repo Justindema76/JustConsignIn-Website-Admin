@@ -7,6 +7,15 @@ export const SOCIAL_NETWORKS = [
   { key: 'tiktok', label: 'TikTok', icon: 'https://www.justconsignin.com/images/brand/social-media-icons/ticktok-logo.png' },
 ];
 
+// Parts of each website that can show their own social icons (Social Links page).
+// The first section is the main site; icons with no choice saved show there only.
+export const SOCIAL_SECTIONS = {
+  justindematteis: [
+    { key: 'main', label: 'Main site' },
+    { key: 'shopify-studio', label: 'Shopify Studio' },
+  ],
+};
+
 export const FALLBACK_VIDEOS = [
   { id: 'seed-video-1', title: 'JustConsignIn Shopify Product Overview', youtubeUrl: 'https://youtu.be/xt9ltPjKP5g', youtubeId: 'xt9ltPjKP5g', description: '', placement: 'homepage', sortOrder: 1, status: 'active', contentType: 'video', playlistName: 'JustConsignIn' },
   { id: 'seed-video-2', title: 'JustConsignIn Consignment Demo', youtubeUrl: 'https://youtu.be/j1LmKY_OY0Y', youtubeId: 'j1LmKY_OY0Y', description: '', placement: 'homepage', sortOrder: 2, status: 'active', contentType: 'video', playlistName: 'JustConsignIn' },

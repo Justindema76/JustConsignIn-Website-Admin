@@ -429,6 +429,9 @@ export default function ServiceRequestsAdmin() {
               <div><dt>Budget</dt><dd>{budgetLabel(selected.budget_range)}</dd></div>
               <div><dt>Timeline</dt><dd>{timelineLabel(selected.timeline)}</dd></div>
               <div><dt>Source</dt><dd>{sourceLabel(selected)}</dd></div>
+              {selected.metadata?.reference && <div><dt>Reference</dt><dd>{selected.metadata.reference}</dd></div>}
+              {(selected.metadata?.customer_confirmation_sent_at || selected.metadata?.customer_confirmation_error) && <div><dt>Customer confirmation</dt><dd>{selected.metadata.customer_confirmation_sent_at ? `Sent ${new Date(selected.metadata.customer_confirmation_sent_at).toLocaleString()}` : `Failed: ${selected.metadata.customer_confirmation_error}`}</dd></div>}
+              <div><dt>Notification to you</dt><dd>{selected.email_notified_at ? `Sent ${new Date(selected.email_notified_at).toLocaleString()}` : selected.email_notification_error ? `Failed: ${selected.email_notification_error}` : 'Not sent'}</dd></div>
             </dl>
           </section>
 

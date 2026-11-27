@@ -640,6 +640,74 @@ async function submitHiringContact(body: any) {
   });
 }
 
+// ---- Shopify Studio: confirmation email to the customer -------------------------------------
+// Sent for free store review and quote requests from justindematteis.com/shopify-studio.
+// Wording comes from Website Admin → Shopify Studio (site_settings "global_shopify-studio").
+// It confirms receipt only: it never says a quote is accepted, a price guaranteed or a project booked.
+function studioRequestKind(record: any) {
+  const message = clean(record?.message, 6000);
+  if (message.startsWith('Free store review request')) return 'review';
+  if (message.startsWith('Quote request')) return 'quote';
+  return '';
+}
+
+async function studioSettings() {
+  const { data } = await admin.from('site_settings').select('value')
+    .eq('site_key', 'justindematteis').eq('key', 'global_shopify-studio').maybeSingle();
+  return (data?.value && typeof data.value === 'object') ? data.value : {};
+}
+
+function studioReference(id: string) {
+  return `SS-${clean(id, 80).replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+}
+
+function studioConfirmationMessage(record: any, kind: string, studio: any, settings: any) {
+  const biz = studio.business || {};
+  const emails = studio.emails || {};
+  const name = clean(biz.name, 120) || 'Shopify Studio';
+  const owner = clean(biz.owner, 120) || 'Justin DeMatteis';
+  const tagline = clean(biz.tagline, 200) || 'Canadian-owned. Ontario-based. Built around your business.';
+  const place = `${clean(biz.city, 80) || 'Hamilton'}, ${clean(biz.region, 80) || 'Ontario'}, ${clean(biz.country, 80) || 'Canada'}`;
+  const ref = studioReference(record.id);
+  const first = clean(record.name, 120).split(/\s+/)[0] || 'there';
+  const isQuote = kind === 'quote';
+  const when = clean(isQuote ? biz.quoteResponse : biz.reviewResponse, 80) || (isQuote ? 'within 2 business days' : 'within 48 hours');
+  const fill = (text: string) => text.replaceAll('{name}', first).replaceAll('{reference}', ref).replaceAll('{response}', when).replaceAll('{business}', name);
+  const subject = fill(clean(isQuote ? emails.quoteSubject : emails.reviewSubject, 200)
+    || (isQuote ? 'We received your quote request ({reference})' : 'We received your free store review request ({reference})'));
+  const intro = fill(clean(isQuote ? emails.quoteIntro : emails.reviewIntro, 2000)
+    || (isQuote
+      ? 'Thanks for reaching out, {name}. Your quote request is in. I\'ll review what you need and reply {response} with questions or a written quote. Nothing is booked or charged until you approve a proposal.'
+      : 'Thanks, {name}. Your free store review request is in. I\'ll go through your store and send your review {response}. It\'s complimentary, with no obligation.'));
+  const signature = clean(emails.signature, 1000) || `${owner}\n${name} · ${place}`;
+  const summary = clean(record.message, 3000).replace(/^(Free store review request|Quote request)\.?\s*/, '').replace(/\nSeen on:.*$/s, '').trim();
+  const site = 'https://www.justindematteis.com/shopify-studio';
+  const text = [
+    `${subject}`, '', intro, '',
+    `Reference: ${ref}`, '', 'What you sent:', summary || '(no details)', '',
+    'To add anything, just reply to this email.', '', signature, '', tagline, site,
+  ].join('\n');
+  const html = `<div style="font-family:Arial,sans-serif;background:#f7f3ea;padding:24px;color:#16181d"><div style="max-width:620px;margin:0 auto;background:#fff;border:2px solid #16181d"><div style="background:#16181d;color:#fff;padding:20px 24px"><div style="font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#95bf47">${escapeHtml(name)}</div><h1 style="margin:6px 0 0;font-size:22px">${escapeHtml(isQuote ? 'Quote request received' : 'Free store review request received')}</h1></div><div style="padding:22px 24px;line-height:1.6;font-size:15px"><p style="margin:0 0 14px">${escapeHtml(intro)}</p><p style="margin:0 0 14px;padding:10px 14px;background:#f1f6e8;border-left:4px solid #95bf47"><b>Reference:</b> ${escapeHtml(ref)}</p><p style="margin:0 0 6px;font-weight:700">What you sent</p><div style="white-space:pre-wrap;background:#f7f3ea;padding:12px 14px;font-size:14px">${escapeHtml(summary || '(no details)')}</div><p style="margin:16px 0 0">To add anything, just reply to this email.</p><p style="margin:16px 0 0;white-space:pre-wrap">${escapeHtml(signature)}</p></div><div style="border-top:2px solid #16181d;padding:14px 24px;font-size:12px;color:#5b6070">${escapeHtml(tagline)} · <a href="${site}" style="color:#5e8e3e">${site.replace('https://', '')}</a></div></div></div>`;
+  const owners = recipientsFor(settings, 'service_request').to;
+  return { from: fromAddress(settings), to: record.email, replyTo: owners[0] || settings.smtp_from_email, subject, text, html };
+}
+
+async function sendStudioConfirmation(record: any, settings: any) {
+  const kind = studioRequestKind(record);
+  if (!kind || !validEmail(clean(record.email, 254))) return;
+  const studio = await studioSettings().catch(() => ({}));
+  if (studio.emails?.confirmations === false) return;
+  const meta = (record.metadata && typeof record.metadata === 'object') ? record.metadata : {};
+  try {
+    await transportFor(settings).sendMail(studioConfirmationMessage(record, kind, studio, settings));
+    await admin.from('service_requests').update({ metadata: { ...meta, reference: studioReference(record.id), customer_confirmation_sent_at: new Date().toISOString() } }).eq('id', record.id);
+  } catch (error) {
+    const message = clean(error instanceof Error ? error.message : error, 500) || 'Confirmation email failed.';
+    await admin.from('service_requests').update({ metadata: { ...meta, reference: studioReference(record.id), customer_confirmation_error: message } }).eq('id', record.id);
+    console.error('Studio confirmation email failed', message);
+  }
+}
+
 async function submitServiceRequest(body: any) {
   const name = clean(body.name, 120);
   const email = clean(body.email, 254).toLowerCase();
@@ -691,7 +759,7 @@ async function submitServiceRequest(body: any) {
   const { data: saved, error: insertError } = await admin
     .from('service_requests')
     .insert(record)
-    .select('id,site_key,name,email,phone,company,website,requested_service,budget_range,timeline,message,status,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,ai_confidence,ai_provider,ai_model,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,notification_token,email_notified_at')
+    .select('id,site_key,name,email,phone,company,website,requested_service,budget_range,timeline,message,status,routed_queue,ai_primary_service,ai_secondary_services,ai_priority,ai_summary,ai_confidence,ai_provider,ai_model,source_path,referrer,utm_source,utm_medium,utm_campaign,utm_content,utm_term,notification_token,email_notified_at,metadata')
     .single();
 
   if (insertError || !saved) {
@@ -709,6 +777,7 @@ async function submitServiceRequest(body: any) {
 
     const settings = await loadSettings('justindematteis');
     await transportFor(settings).sendMail(serviceRequestMessage(saved, settings));
+    await sendStudioConfirmation(saved, settings);
 
     await admin.from('service_requests')
       .update({ email_notified_at: new Date().toISOString(), email_notification_error: null })

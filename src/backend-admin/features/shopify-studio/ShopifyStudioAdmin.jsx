@@ -6,6 +6,7 @@ import { loadAdminGlobalSection, saveAdminGlobalSection, uploadSiteImage } from 
 import '../settings/settings.css';
 import PricingEditor from './PricingEditor';
 import DemoColorsEditor from './DemoColorsEditor';
+import BusinessSeoEditor from './BusinessSeoEditor';
 import './pricingEditor.css';
 
 // Settings for justindematteis.com/shopify-studio (the era-themed Shopify landing page and the
@@ -205,6 +206,9 @@ export default function ShopifyStudioAdmin() {
             <input value={values.switcherLabel || ''} placeholder="Try another decade" onChange={e => set('switcherLabel', e.target.value)} />
           </label>
         </div>
+
+        <div className="email-settings-divider" />
+        <BusinessSeoEditor values={values} set={set} eras={ERAS} site={SITE} />
 
         <div className="email-settings-divider" />
         <div className="email-settings-section-head compact"><div><h2>Pricing</h2><p>Every service, package, price, table and condition on the pricing page.</p></div></div>

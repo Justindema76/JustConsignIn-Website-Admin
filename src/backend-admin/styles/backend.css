@@ -123,3 +123,7 @@ html,body,#root{min-height:100%;margin:0}body{background:#f5f6f8}
   padding-left:20px;
   padding-right:20px;
 }
+
+/* Social Links: which website sections show each icon */
+.site-admin-social-sections{grid-column:2/-1;display:flex;gap:18px;flex-wrap:wrap;margin-top:-4px}
+.site-admin-social-sections .site-admin-switch span{color:#50565c;font-weight:700}
