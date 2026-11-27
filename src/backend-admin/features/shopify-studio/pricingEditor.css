@@ -1,0 +1,27 @@
+.pricing-ed{display:grid;gap:8px}
+.pricing-ed-intro{font-size:14px;color:#5b6070;margin:0 0 6px}
+.pricing-ed-section{border:1px solid #d9dce3;border-radius:10px;background:#fff}
+.pricing-ed-toggle{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:none;border:0;padding:12px 14px;cursor:pointer;font:inherit}
+.pricing-ed-toggle b{font-size:15px}
+.pricing-ed-toggle span{font-size:12.5px;color:#6b7080}
+.pricing-ed-body{padding:4px 14px 14px;display:grid;gap:10px}
+.pricing-ed-card{border:1px solid #e3e6ec;border-radius:8px;padding:12px;display:grid;gap:8px;background:#fafbfc}
+.pricing-ed label{display:grid;gap:4px;font-size:12.5px;font-weight:600;color:#3d4250}
+.pricing-ed input,.pricing-ed textarea{font:inherit;font-size:14px;font-weight:400;padding:8px 10px;border:1px solid #cfd3db;border-radius:6px;background:#fff;width:100%;box-sizing:border-box}
+.pricing-ed textarea{line-height:1.45;resize:vertical}
+.pricing-ed-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.pricing-ed-row>label{flex:0 1 160px}
+.pricing-ed-row>label.grow{flex:1 1 220px}
+.pricing-ed-line{border-bottom:1px solid #eef0f3;padding-bottom:8px}
+.pricing-ed-check{display:flex!important;flex-direction:row!important;align-items:center;gap:6px;flex:0 0 auto!important;padding-bottom:8px}
+.pricing-ed-check input{width:auto}
+.pricing-ed-actions{display:flex;gap:6px}
+.pricing-ed-actions button,.pricing-ed-add,.pricing-ed-reset{font:inherit;font-size:13px;padding:6px 10px;border:1px solid #cfd3db;border-radius:6px;background:#fff;cursor:pointer}
+.pricing-ed-actions button.danger{color:#b4322c;border-color:#e7b9b6}
+.pricing-ed-add{justify-self:start;font-weight:600}
+.pricing-ed-reset{justify-self:start;margin-top:6px;color:#6b7080}
+.pricing-ed-pick{font-size:14px!important}
+.pricing-ed-pick select{font:inherit;font-size:15px;padding:9px 10px;border:1px solid #cfd3db;border-radius:6px;background:#fff}
+.pricing-ed select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cfd3db;border-radius:6px;background:#fff}
+.pricing-ed-h{font-size:15px;margin:14px 0 2px}
+.pricing-ed>textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cfd3db;border-radius:6px;width:100%;box-sizing:border-box}

@@ -1,0 +1,2042 @@
+{
+ "groups": [
+  {
+   "name": "Build",
+   "services": [
+    "new",
+    "redesign",
+    "migration",
+    "apps"
+   ]
+  },
+  {
+   "name": "Improve",
+   "services": [
+    "backend",
+    "design",
+    "config"
+   ]
+  },
+  {
+   "name": "Grow",
+   "services": [
+    "seo",
+    "email",
+    "social",
+    "care"
+   ]
+  },
+  {
+   "name": "Support",
+   "services": [
+    "consulting",
+    "hourly",
+    "terms"
+   ]
+  }
+ ],
+ "disclaimer": "All package pricing assumes customer-supplied content, imagery and product information. Additional content creation, image preparation and services outside the stated allowances are separately quoted.",
+ "services": [
+  {
+   "id": "new",
+   "name": "New Store Launch",
+   "intro": "For businesses opening an online store. Every tier is a complete store, from setup to launch day.",
+   "cards": [
+    {
+     "id": "launch",
+     "tag": "Tier 1",
+     "name": "Shopify Launch",
+     "price": "3,500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For startups and small independent retailers launching their first online store.",
+     "highlights": "Professional theme customization\nUp to 5 content pages & 5 collections\n5 product listings set up\nPayments, shipping & tax configured\n30-day bug warranty",
+     "items": "# Website design\nProfessional theme customization\nBrand colours and typography\nCustom homepage layout\nProduct and collection page templates\nMobile, tablet and desktop optimization\nHeader, footer and navigation\nUp to 5 content pages\nUp to 5 collection structures\n1 desktop and mobile banner set\n# Store configuration\nShopify account setup\nDomain connection\nShopify Payments configuration\nBasic shipping and tax settings\nContact form\nStore policy pages using supplied content\n# Product setup\n5 basic product listings using supplied images and descriptions\n# Launch and support\nWebsite functionality testing\n2 rounds of design revisions\n1 hour of Shopify training\n30-day development bug warranty",
+     "eta": "Estimated delivery: 2–4 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "professional",
+     "tag": "Tier 2",
+     "name": "Shopify Professional",
+     "price": "6,500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For established independent retailers requiring a more comprehensive e-commerce storefront.",
+     "highlights": "Custom-designed homepage\nMega menu, search & filtering\nUp to 10 pages & 15 collections\nGA4, Search Console & technical SEO\n60-day bug warranty",
+     "items": "# Website design\nAdvanced theme customization\nCustom-designed homepage\nUp to 5 custom theme sections\nCustomized product and collection templates\nAdvanced navigation and mega menu\nProduct search and filtering\nUp to 10 content pages\nUp to 15 collection structures\n3 desktop and mobile banner sets\nMobile, tablet and desktop optimization\n# Store configuration\nComplete standard Shopify account setup\nDomain and payment configuration\nTax and shipping configuration\nLocal delivery and pickup settings\nConfiguration of up to 3 standard Shopify apps\nBasic inventory and location setup\nDiscount and promotional rules\n# Product setup\n10 basic product listings using supplied images and descriptions\n# Analytics and technical SEO\nGoogle Analytics 4\nGoogle Search Console\nSitemap submission\nBasic technical SEO configuration\nWebsite performance testing\n# Launch and support\nComplete functionality testing\n3 rounds of design revisions\n2 hours of Shopify training\n60-day development bug warranty",
+     "eta": "Estimated delivery: 4–6 weeks",
+     "recommended": true,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "advanced",
+     "tag": "Tier 3",
+     "name": "Shopify Advanced",
+     "price": "10,000+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For growing retailers requiring advanced functionality, custom development and complex business operations.",
+     "highlights": "Fully customized storefront\nCustom Liquid, CSS & JavaScript\nUp to 15 pages & 25 collections\nPOS, multiple locations & 5 apps\n90-day bug warranty",
+     "items": "# Website design\nFully customized storefront experience\nAdvanced Liquid, CSS and JavaScript development\nUp to 10 custom theme sections\nMultiple product page layouts\nAdvanced collection and brand landing pages\nCustom navigation and mega menu\nAdvanced product search and filtering\nUp to 15 content pages\nUp to 25 collection structures\n5 desktop and mobile banner sets\nMobile, tablet and desktop optimization\n# Store configuration\nComplete Shopify account setup\nAdvanced shipping and delivery configuration\nMultiple inventory locations\nShopify POS configuration for one location\nConfiguration of up to 5 standard Shopify apps\nProduct metafield architecture\nAdvanced discount configuration\n# Product setup\n15 basic product listings using supplied images and descriptions\n# Analytics and technical SEO\nGoogle Analytics 4\nGoogle Search Console\nEnhanced conversion tracking\nTechnical SEO implementation\nStructured data review\nWebsite performance optimization\nCross-device and browser testing\n# Launch and support\nComplete functionality testing\n3 rounds of design revisions\n4 hours of Shopify training\n90-day development bug warranty",
+     "eta": "Estimated delivery: 6–10 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    }
+   ],
+   "compare": {
+    "cols": [
+     "Launch",
+     "Professional",
+     "Advanced"
+    ],
+    "rows": [
+     [
+      "Starting price",
+      "$3,500",
+      "$6,500",
+      "$10,000"
+     ],
+     [
+      "Content pages",
+      "5",
+      "10",
+      "15"
+     ],
+     [
+      "Collection structures",
+      "5",
+      "15",
+      "25"
+     ],
+     [
+      "Basic product listings",
+      "5",
+      "10",
+      "15"
+     ],
+     [
+      "Banner sets",
+      "1",
+      "3",
+      "5"
+     ],
+     [
+      "Custom theme sections",
+      "—",
+      "5",
+      "10"
+     ],
+     [
+      "Mobile optimization",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Advanced mega menu",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Advanced filtering",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Standard app configuration",
+      "—",
+      "3",
+      "5"
+     ],
+     [
+      "Local delivery and pickup",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Advanced shipping",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Shopify POS",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Google Analytics",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Technical SEO",
+      "—",
+      "Basic",
+      "Advanced"
+     ],
+     [
+      "Conversion tracking",
+      "—",
+      "—",
+      "Enhanced"
+     ],
+     [
+      "Design revisions",
+      "2",
+      "3",
+      "3"
+     ],
+     [
+      "Training",
+      "1 hr",
+      "2 hrs",
+      "4 hrs"
+     ],
+     [
+      "Bug warranty",
+      "30 days",
+      "60 days",
+      "90 days"
+     ]
+    ]
+   },
+   "tables": [],
+   "notes": []
+  },
+  {
+   "id": "redesign",
+   "name": "Store Redesign",
+   "intro": "For businesses that already have a Shopify store, products, customers and order history. Everything you have stays.",
+   "cards": [
+    {
+     "id": "refresh",
+     "tag": "Tier 1",
+     "name": "Storefront Refresh",
+     "price": "2,500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For retailers who want to modernize their existing storefront without rebuilding the entire website.",
+     "highlights": "Homepage redesign\nUpdated colours & typography\nHeader, footer & navigation improvements\n2 banner sets\n30-day bug warranty",
+     "items": "# Assessment\nExisting storefront assessment\nMobile usability review\nIdentification of visual and navigation issues\n# Website design\nHomepage redesign\nUpdated brand colours and typography\nHeader and footer improvements\nExisting navigation improvements\n2 desktop and mobile banner sets\nMobile, tablet and desktop layout improvements\nExisting theme and store architecture retained\n# Launch and support\nWebsite functionality testing\n2 rounds of design revisions\n30-day development bug warranty",
+     "eta": "Estimated delivery: 2–3 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "redesign",
+     "tag": "Tier 2",
+     "name": "Complete Store Redesign",
+     "price": "5,000",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For established retailers who need a completely redesigned shopping experience while retaining their existing Shopify business.",
+     "highlights": "Complete homepage redevelopment\nProduct & collection templates redesigned\nMega menu, search & filtering\nSEO preserved, redirects reviewed\n60-day bug warranty",
+     "items": "# Assessment\nComprehensive storefront audit\nMobile usability assessment\nExisting navigation and collection review\nExisting app functionality review\n# Website design\nNew storefront visual identity using existing branding\nComplete homepage redevelopment\nProduct page template redesign\nCollection page template redesign\nAdvanced navigation and mega menu\nProduct search and filtering improvements\nUp to 5 existing content pages redesigned\n3 desktop and mobile banner sets\nMobile-first shopping experience\n# Technical improvements\nExisting SEO preservation\nURL and redirect review\nExisting app compatibility testing\nWebsite performance assessment\nExisting analytics verification\n# Launch and support\nCross-device functionality testing\n3 rounds of design revisions\n2 hours of Shopify training\n60-day development bug warranty",
+     "eta": "Estimated delivery: 4–6 weeks",
+     "recommended": true,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "transformation",
+     "tag": "Tier 3",
+     "name": "Complete Store Transformation",
+     "price": "9,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For established retailers requiring a complete redevelopment of their online shopping experience, store architecture and functionality.",
+     "highlights": "Fully custom storefront development\nUp to 10 custom theme sections\nCollection & metafield restructuring\nTechnical SEO & conversion tracking\n90-day bug warranty",
+     "items": "# Assessment and strategy\nComprehensive e-commerce audit\nCompetitor storefront assessment\nCustomer shopping journey review\nStore architecture assessment\nConversion improvement strategy\n# Website design and development\nComplete custom storefront redevelopment\nAdvanced Liquid, CSS and JavaScript development\nUp to 10 custom theme sections\nCustom homepage design\nMultiple product page templates\nAdvanced collection page layouts\nCustom brand landing page templates\nAdvanced mega menu and navigation\nAdvanced product search and filtering\nUp to 10 existing content pages redesigned\n5 desktop and mobile banner sets\nMobile, tablet and desktop optimization\n# Store architecture and functionality\nCollection architecture restructuring\nProduct metafield architecture\nExisting app integration review\nCustom merchandising features\nCustomer shopping experience improvements\nExisting inventory and operational configuration review\n# Technical SEO and analytics\nTechnical SEO improvements\nStructured data review and corrections\nURL redirect management\nGoogle Analytics 4 configuration\nGoogle Search Console configuration\nEnhanced conversion tracking\nWebsite performance optimization\n# Launch and support\nComprehensive cross-device and browser testing\n3 rounds of design revisions\n4 hours of Shopify training\n90-day development bug warranty",
+     "eta": "Estimated delivery: 6–10 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    }
+   ],
+   "compare": {
+    "cols": [
+     "Refresh",
+     "Redesign",
+     "Transformation"
+    ],
+    "rows": [
+     [
+      "Starting price",
+      "$2,500",
+      "$5,000",
+      "$9,500"
+     ],
+     [
+      "Storefront assessment",
+      "Basic",
+      "Full",
+      "Advanced"
+     ],
+     [
+      "Homepage redesign",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Header and footer",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Banner sets",
+      "2",
+      "3",
+      "5"
+     ],
+     [
+      "Content pages redesigned",
+      "—",
+      "5",
+      "10"
+     ],
+     [
+      "Product template redesign",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Collection template redesign",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Custom theme sections",
+      "—",
+      "—",
+      "Up to 10"
+     ],
+     [
+      "Mobile optimization",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Mega menu",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Search and filtering",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Brand landing page templates",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Collection restructuring",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Metafield architecture",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "App compatibility review",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Competitor assessment",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "SEO preservation",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Technical SEO implementation",
+      "—",
+      "—",
+      "Yes"
+     ]
+    ]
+   },
+   "tables": [],
+   "notes": [
+    {
+     "title": "Important scope conditions",
+     "text": "Redesigning a product page template is not the same as redesigning every individual product listing. Restructuring collection architecture does not include manually recategorizing thousands of products.\nExisting products, customer records and order history are retained. Paid themes, app subscriptions, photography, original copywriting and catalogue-wide corrections are additional.\nFor example, a retailer with 7,000 products does not receive 7,000 individually optimized product listings as part of a $9,500 transformation."
+    }
+   ]
+  },
+  {
+   "id": "migration",
+   "name": "Store Migration",
+   "intro": "Moving to Shopify from Wix, Square, WooCommerce, Etsy or another platform.",
+   "cards": [
+    {
+     "id": "basic-migration",
+     "tag": "Tier 1",
+     "name": "Basic Migration",
+     "price": "1,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Smaller catalogues moving to Shopify.",
+     "highlights": "Up to 100 product records\nStandard product data transfer\nImage transfer where supported\nBasic collection mapping\nMigration testing",
+     "items": "# Included\nMigration assessment\nUp to 100 product records\nStandard product data transfer\nExisting image transfer where supported\nBasic collection mapping\nProduct data verification\nMigration testing",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "pro-migration",
+     "tag": "Tier 2",
+     "name": "Professional Migration",
+     "price": "3,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Established stores with customers and SEO to protect.",
+     "highlights": "Up to 500 product records\nProduct & variant mapping\nCustomer data where supported\nURL mapping & redirects\nData verification & testing",
+     "items": "# Included\nComprehensive migration assessment\nUp to 500 product records\nProduct and variant mapping\nCustomer data migration where supported\nCollection mapping\nExisting image transfer\nURL mapping and redirects\nData verification and testing",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "adv-migration",
+     "tag": "Tier 3",
+     "name": "Advanced Migration",
+     "price": "7,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Large catalogues with order history.",
+     "highlights": "Up to 2,000 product records\nCustomer & order history migration\nMetafield & collection mapping\nSEO redirect strategy\nLaunch coordination",
+     "items": "# Included\nComplete migration strategy\nUp to 2,000 product records\nAdvanced product and variant mapping\nCustomer data migration\nHistorical order migration where supported\nMetafield mapping\nCollection architecture mapping\nSEO redirect strategy\nMigration validation\nLaunch coordination",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    }
+   ],
+   "tables": [],
+   "notes": [
+    {
+     "title": "Conditions",
+     "text": "Migration prices assume accessible, usable and exportable source data. Data cleanup, missing information, incompatible records, complex variants and custom migration scripts may require additional charges.\nStorefront development is not included. Migration and new store development can be purchased together."
+    }
+   ]
+  },
+  {
+   "id": "apps",
+   "name": "Custom Apps & Integrations",
+   "intro": "When Shopify can’t do it, I build it: shipping rules, discount logic, consignment, integrations. Starting prices, quoted after an approved scope.",
+   "cards": [
+    {
+     "id": "automation",
+     "tag": "Automation",
+     "name": "Business Workflow Automation",
+     "price": "1,000+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Take repetitive jobs off your plate.",
+     "highlights": "Workflow assessment\nShopify Flow or supported tools\nAutomated notifications & tasks\nTesting & documentation",
+     "items": "# Included\nBusiness workflow assessment\nShopify Flow or supported automation tools\nAutomated notifications and administrative tasks\nProduct and order processing workflows\nTesting and implementation\nWorkflow documentation",
+     "eta": "",
+     "recommended": false,
+     "quote": true,
+     "priceType": "from"
+    },
+    {
+     "id": "integration",
+     "tag": "Integration",
+     "name": "Custom Shopify Integration",
+     "price": "2,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Make your systems talk to each other.",
+     "highlights": "Third-party API connectivity\nData synchronization\nError handling & logging\nTesting & documentation",
+     "items": "# Included\nIntegration requirements assessment\nThird-party API connectivity\nData synchronization\nExternal business system connectivity\nError handling and logging\nTesting and implementation\nTechnical documentation",
+     "eta": "",
+     "recommended": false,
+     "quote": true,
+     "priceType": "from"
+    },
+    {
+     "id": "custom-app",
+     "tag": "Application",
+     "name": "Custom Shopify Application",
+     "price": "7,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "An app made for how you sell.",
+     "highlights": "Custom app interface\nShopify API integration\nBusiness-specific functionality\nTesting & deployment",
+     "items": "# Included\nApplication requirements and planning\nCustom application interface\nShopify API integration\nAuthentication and permissions\nDatabase configuration where required\nBusiness-specific functionality\nApplication testing and deployment\nTechnical documentation",
+     "eta": "",
+     "recommended": true,
+     "quote": true,
+     "priceType": "from"
+    },
+    {
+     "id": "business-solution",
+     "tag": "Solution",
+     "name": "Custom Business Solution",
+     "price": "15,000+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Bigger systems for bigger needs.",
+     "highlights": "Custom software architecture\nAdmin dashboards & databases\nMultiple system integrations\nStaff training",
+     "items": "# Included\nComplete business requirements assessment\nCustom software architecture\nAdministrative dashboards\nAdvanced database systems\nMultiple system integrations\nBusiness process automation\nReporting and analytics\nDeployment and staff training\nTechnical documentation",
+     "eta": "",
+     "recommended": false,
+     "quote": true,
+     "priceType": "from"
+    }
+   ],
+   "tables": [],
+   "notes": [
+    {
+     "title": "Conditions",
+     "text": "Complex applications can exceed $50,000 depending on requirements.\nHosting, database subscriptions, external APIs, ongoing maintenance and third-party services are additional.\nCustom development requires an approved scope before a formal quotation is issued."
+    }
+   ]
+  },
+  {
+   "id": "backend",
+   "name": "Product & Backend Optimization",
+   "intro": "A store can look great and still be a mess behind the scenes. For disorganized catalogues, inconsistent images, missing SEO, wrong collections and messy settings.",
+   "cards": [
+    {
+     "id": "cleanup",
+     "tag": "Tier 1",
+     "name": "Store Cleanup Essentials",
+     "price": "1,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For smaller retailers needing to clean up and organize their existing Shopify store.",
+     "highlights": "Backend & catalogue audit\nUp to 25 products cleaned up\nUp to 5 collections fixed\nTags, types & vendors corrected\n1 hour of training",
+     "items": "# Backend assessment\nShopify backend audit\nProduct catalogue assessment\nCollection and category review\nProduct tagging review\nInstalled app assessment\nIdentification of duplicate and incomplete product records\n# Product cleanup — up to 25 products\nProduct title corrections\nExisting description formatting\nProduct type and vendor corrections\nProduct tag cleanup\nCollection assignments\nSKU and barcode verification against supplied data\nExisting image arrangement\nProduct publishing status review\n# Backend organization\nCleanup of up to 5 existing collections\nAutomated collection rule corrections\nNavigation link corrections\nUnused app identification\nBasic inventory settings review\n# Completion\nSummary of completed work\nRecommendations for further improvements\n1 hour of Shopify training",
+     "eta": "Estimated delivery: 1–2 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "catalogue",
+     "tag": "Tier 2",
+     "name": "Professional Catalogue Optimization",
+     "price": "4,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For established retailers with inconsistent product information, poorly organized collections and underperforming product listings.",
+     "highlights": "Up to 50 products optimized\nSEO titles, meta & alt text\nUp to 15 collections restructured\nFilters, shipping & discount fixes\n30-day warranty",
+     "items": "# Backend assessment\nComprehensive Shopify backend audit\nProduct data quality assessment\nCollection architecture review\nInventory configuration review\nApp and subscription assessment\nShipping and discount configuration review\n# Product optimization — up to 50 products\nProduct title optimization\nOptimization of supplied product descriptions\nProduct SEO titles\nMeta descriptions\nSEO-friendly URLs and redirects where required\nImage alt text\nResizing and compression of up to 3 existing images per product\nProduct type and vendor standardization\nProduct tagging and categorization\nSKU and barcode verification against supplied data\nStandard metafield population\nProduct variant review\nProduct publishing verification\n# Backend organization\nCleanup and restructuring of up to 15 collections\nAutomated collection rules\nProduct filtering configuration\nProduct taxonomy standardization\nNavigation and collection link corrections\nInventory location review\nShipping profile corrections\nDiscount rule corrections\nRemoval of approved unused apps\n# Completion\nCompleted work report\nProduct management recommendations\n2 hours of staff training\n30-day warranty on configuration changes",
+     "eta": "Estimated delivery: 3–5 weeks",
+     "recommended": true,
+     "quote": false,
+     "priceType": "from"
+    },
+    {
+     "id": "backend-transformation",
+     "tag": "Tier 3",
+     "name": "Complete Backend Transformation",
+     "price": "10,000+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "For established retailers with large catalogues, complex inventory requirements and significant backend inefficiencies.",
+     "highlights": "Up to 100 products optimized\nKeyword research & product SEO\nUp to 25 collections restructured\nUp to 3 Shopify Flow automations\n60-day warranty",
+     "items": "# Comprehensive business assessment\nComplete Shopify backend audit\nCatalogue data analysis\nProduct information architecture\nInventory and fulfilment workflow assessment\nShipping and delivery assessment\nApp dependency and subscription review\nBusiness automation opportunities\nTechnical SEO assessment\n# Product optimization — up to 100 products\nProduct and keyword research\nOptimized product titles\nProfessional optimization of supplied product descriptions\nIndividual product SEO\nSEO titles and meta descriptions\nURL optimization and redirects\nImage alt text\nResizing and compression of up to 3 existing images per product\nProduct categorization and tagging\nVendor and brand standardization\nProduct metafield population\nVariant structure corrections\nSKU and barcode verification\nInventory data verification against supplied records\nProduct publishing and quality assurance\n# Advanced backend restructuring\nRestructuring of up to 25 collections\nAutomated collection architecture\nCustom product metafield architecture\nAdvanced product filtering\nProduct taxonomy restructuring\nBrand organization\nInventory location configuration\nShipping profile restructuring\nLocal delivery and pickup configuration\nDiscount and promotional rule restructuring\nShopify POS configuration review\nUp to 3 standard Shopify Flow automations\nApproved redundant app removal\nBackend workflow improvements\n# Completion\nComprehensive completed work report\nBackend management documentation\nStandardized product entry procedures\n4 hours of staff training\n60-day warranty on configuration changes",
+     "eta": "Estimated delivery: 6–10 weeks",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    }
+   ],
+   "compare": {
+    "cols": [
+     "Essentials",
+     "Professional",
+     "Transformation"
+    ],
+    "rows": [
+     [
+      "Starting price",
+      "$1,500",
+      "$4,500",
+      "$10,000"
+     ],
+     [
+      "Products included",
+      "25",
+      "50",
+      "100"
+     ],
+     [
+      "Collections included",
+      "5",
+      "15",
+      "25"
+     ],
+     [
+      "Backend audit",
+      "Basic",
+      "Full",
+      "Advanced"
+     ],
+     [
+      "Product title corrections",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Description formatting",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Description optimization (supplied)",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Keyword research",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Individual product SEO",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Image resizing and compression",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Image alt text",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Product tagging",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "SKU verification",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Automated collections",
+      "Basic",
+      "Advanced",
+      "Advanced"
+     ],
+     [
+      "Product metafields",
+      "—",
+      "Standard",
+      "Custom"
+     ],
+     [
+      "Product filtering",
+      "—",
+      "Yes",
+      "Advanced"
+     ],
+     [
+      "Shipping configuration",
+      "—",
+      "Corrections",
+      "Restructuring"
+     ],
+     [
+      "Discount configuration",
+      "—",
+      "Corrections",
+      "Restructuring"
+     ],
+     [
+      "Business automation",
+      "—",
+      "—",
+      "3 workflows"
+     ],
+     [
+      "Staff training",
+      "1 hr",
+      "2 hrs",
+      "4 hrs"
+     ]
+    ]
+   },
+   "tables": [
+    {
+     "title": "Individual product services",
+     "col": "From",
+     "rows": [
+      {
+       "name": "Basic product cleanup",
+       "note": "",
+       "price": "$25/product",
+       "popular": true
+      },
+      {
+       "name": "Professional product optimization",
+       "note": "",
+       "price": "$85/product",
+       "popular": false
+      },
+      {
+       "name": "Premium product reconstruction",
+       "note": "",
+       "price": "$150/product",
+       "popular": false
+      },
+      {
+       "name": "New product entry",
+       "note": "",
+       "price": "$25/product",
+       "popular": true
+      },
+      {
+       "name": "Product title optimization",
+       "note": "",
+       "price": "$15/product",
+       "popular": false
+      },
+      {
+       "name": "Product description formatting",
+       "note": "",
+       "price": "$20/product",
+       "popular": false
+      },
+      {
+       "name": "Individual product SEO",
+       "note": "",
+       "price": "$45/product",
+       "popular": true
+      },
+      {
+       "name": "Product tagging and categorization",
+       "note": "",
+       "price": "$10/product",
+       "popular": false
+      },
+      {
+       "name": "Product variant correction",
+       "note": "",
+       "price": "$15/variant",
+       "popular": false
+      },
+      {
+       "name": "Metafield population",
+       "note": "",
+       "price": "$5/field",
+       "popular": false
+      },
+      {
+       "name": "SKU and barcode correction",
+       "note": "",
+       "price": "$10/product",
+       "popular": false
+      },
+      {
+       "name": "Product duplicate reconciliation",
+       "note": "",
+       "price": "From $25/product",
+       "popular": false
+      }
+     ]
+    },
+    {
+     "title": "Individual backend services",
+     "col": "From",
+     "rows": [
+      {
+       "name": "Shopify backend audit",
+       "note": "",
+       "price": "$500",
+       "popular": true
+      },
+      {
+       "name": "Comprehensive catalogue audit",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "name": "Complete operational audit",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      },
+      {
+       "name": "Standard collection creation",
+       "note": "",
+       "price": "$75",
+       "popular": false
+      },
+      {
+       "name": "Automated collection creation",
+       "note": "",
+       "price": "$125",
+       "popular": false
+      },
+      {
+       "name": "Optimized collection with SEO and copy",
+       "note": "",
+       "price": "$200",
+       "popular": false
+      },
+      {
+       "name": "Product taxonomy configuration",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "name": "Product filtering configuration",
+       "note": "",
+       "price": "$500",
+       "popular": true
+      },
+      {
+       "name": "Custom metafield architecture",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "name": "Navigation restructuring",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "name": "Mega menu development",
+       "note": "",
+       "price": "$750",
+       "popular": true
+      },
+      {
+       "name": "Bulk product data cleanup",
+       "note": "",
+       "price": "$100/hour",
+       "popular": false
+      },
+      {
+       "name": "CSV preparation and correction",
+       "note": "",
+       "price": "$350",
+       "popular": false
+      },
+      {
+       "name": "Automated product import",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "name": "Inventory reconciliation",
+       "note": "",
+       "price": "$100/hour",
+       "popular": false
+      },
+      {
+       "name": "Inventory location configuration",
+       "note": "",
+       "price": "$250/location",
+       "popular": false
+      },
+      {
+       "name": "Shipping profile configuration",
+       "note": "",
+       "price": "$350",
+       "popular": false
+      },
+      {
+       "name": "Advanced shipping configuration",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "name": "Local delivery and pickup configuration",
+       "note": "",
+       "price": "$350",
+       "popular": false
+      },
+      {
+       "name": "Discount rule configuration",
+       "note": "",
+       "price": "$150",
+       "popular": false
+      },
+      {
+       "name": "Advanced promotional rules",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "name": "Shopify app audit",
+       "note": "",
+       "price": "$350",
+       "popular": false
+      },
+      {
+       "name": "Standard app configuration",
+       "note": "",
+       "price": "$150",
+       "popular": false
+      },
+      {
+       "name": "Advanced app configuration",
+       "note": "",
+       "price": "$350",
+       "popular": false
+      },
+      {
+       "name": "Shopify Flow automation",
+       "note": "",
+       "price": "$250/workflow",
+       "popular": false
+      },
+      {
+       "name": "Custom business automation",
+       "note": "",
+       "price": "$1,000",
+       "popular": false
+      },
+      {
+       "name": "Shopify POS configuration",
+       "note": "",
+       "price": "$750/location",
+       "popular": false
+      },
+      {
+       "name": "Custom backend development",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      }
+     ]
+    },
+    {
+     "title": "Large catalogue cleanup (automated)",
+     "col": "From",
+     "rows": [
+      {
+       "name": "Up to 250 products",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "name": "251–500 products",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      },
+      {
+       "name": "501–1,000 products",
+       "note": "",
+       "price": "$2,500",
+       "popular": false
+      },
+      {
+       "name": "1,001–2,500 products",
+       "note": "",
+       "price": "$4,500",
+       "popular": false
+      },
+      {
+       "name": "2,501–5,000 products",
+       "note": "",
+       "price": "$7,500",
+       "popular": false
+      },
+      {
+       "name": "5,001–10,000 products",
+       "note": "",
+       "price": "$12,500",
+       "popular": false
+      },
+      {
+       "name": "Over 10,000 products",
+       "note": "",
+       "price": "Custom quote",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Large catalogues",
+     "text": "Starting prices for rule-based bulk processing, subject to data quality, complexity, testing and verification. They do not include individual product research, copywriting, SEO or image editing. Large catalogue projects always need an assessment before a fixed price."
+    },
+    {
+     "title": "Important scope conditions",
+     "text": "Product counts refer to individual Shopify product records. Complex variant structures may incur additional charges.\nProduct image optimization does not include background removal, restoration or lifestyle image creation unless explicitly purchased.\nInventory reconciliation does not include physically counting merchandise.\nCustomers must supply accurate product specifications, prices, costs and inventory information.\nExisting data should be exported or backed up where supported before major changes.\nDestructive changes and product deletions require customer approval.\nPaid applications and third-party subscriptions are additional.\nStorefront redesign and custom application development are separate services.\nOptimization of supplied information is included; creating missing information is additional."
+    }
+   ]
+  },
+  {
+   "id": "design",
+   "name": "Graphic Design & Imagery",
+   "intro": "Product images, banners and campaign graphics, made from your supplied photos and branding.",
+   "cards": [
+    {
+     "id": "image-essentials",
+     "tag": "Package",
+     "name": "Product Image Essentials",
+     "price": "350",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Clean, consistent product photos.",
+     "highlights": "Up to 10 supplied images\nCropping, resizing & background removal\nColour & lighting corrections\nOne revision round",
+     "items": "# Included\nUp to 10 supplied product images\nCropping and resizing\nBasic background removal\nColour and lighting corrections\nConsistent image dimensions\nWeb-ready export\nOne revision round",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "pro-imagery",
+     "tag": "Package",
+     "name": "Professional Product Imagery",
+     "price": "750",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Store-ready product presentation.",
+     "highlights": "Up to 15 supplied images\nBackground removal & enhancement\nUp to 3 AI lifestyle images\nTwo revision rounds",
+     "items": "# Included\nUp to 15 supplied product images\nBackground removal\nImage enhancement\nConsistent visual presentation\nUp to 3 AI-assisted lifestyle images\nWeb-ready export\nTwo revision rounds",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "seasonal",
+     "tag": "Package",
+     "name": "Seasonal Creative Campaign",
+     "price": "1,000",
+     "unit": "",
+     "billing": "one-time",
+     "who": "A full promo, ready to launch.",
+     "highlights": "2 desktop & mobile banner sets\n4 social media graphics\n1 email campaign graphic\nTwo revision rounds",
+     "items": "# Included\nCampaign visual direction\n2 desktop and mobile banner sets\n4 social media graphics\n1 email campaign graphic\nConsistent promotional branding\nTwo revision rounds",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "fixed"
+    }
+   ],
+   "tables": [
+    {
+     "title": "Individual design services",
+     "col": "From",
+     "rows": [
+      {
+       "id": "img-resize",
+       "name": "Image resizing and cropping",
+       "note": "",
+       "price": "$15/image",
+       "popular": false
+      },
+      {
+       "id": "bg-remove",
+       "name": "Background removal",
+       "note": "",
+       "price": "$25/image",
+       "popular": true
+      },
+      {
+       "id": "img-enhance",
+       "name": "Image enhancement",
+       "note": "",
+       "price": "$35/image",
+       "popular": false
+      },
+      {
+       "id": "img-restore",
+       "name": "Advanced image restoration",
+       "note": "",
+       "price": "$65/image",
+       "popular": false
+      },
+      {
+       "id": "ai-lifestyle",
+       "name": "AI-assisted lifestyle image",
+       "note": "",
+       "price": "$100/image",
+       "popular": false
+      },
+      {
+       "id": "promo-graphic",
+       "name": "Promotional graphic",
+       "note": "",
+       "price": "$125",
+       "popular": false
+      },
+      {
+       "id": "web-banner",
+       "name": "Website banner",
+       "note": "",
+       "price": "$175",
+       "popular": false
+      },
+      {
+       "id": "banner-set",
+       "name": "Desktop and mobile banner set",
+       "note": "",
+       "price": "$250",
+       "popular": true
+      },
+      {
+       "id": "email-graphic",
+       "name": "Email campaign graphic",
+       "note": "",
+       "price": "$125",
+       "popular": false
+      },
+      {
+       "id": "social-graphic",
+       "name": "Social media graphic",
+       "note": "",
+       "price": "$100",
+       "popular": false
+      },
+      {
+       "id": "social-cover",
+       "name": "Social media cover image",
+       "note": "",
+       "price": "$150",
+       "popular": false
+      },
+      {
+       "id": "logo",
+       "name": "Logo and brand identity",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      },
+      {
+       "id": "photography",
+       "name": "Product photography",
+       "note": "",
+       "price": "Custom quote",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Conditions",
+     "text": "All packages require supplied source imagery, branding and promotional information. Photography, stock image licensing and original copywriting are additional."
+    }
+   ]
+  },
+  {
+   "id": "config",
+   "name": "Store Configuration & Analytics",
+   "intro": "Standalone setup for stores that don’t need a full website build.",
+   "cards": [],
+   "tables": [
+    {
+     "title": "Configuration & analytics",
+     "col": "From",
+     "rows": [
+      {
+       "id": "account-essentials",
+       "name": "Shopify Account Essentials",
+       "note": "Domain, payments, tax, basic shipping, business settings and notifications",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "id": "retail-ops",
+       "name": "Retail Operations Configuration",
+       "note": "Inventory locations, local delivery, pickup, shipping profiles, discounts",
+       "price": "$2,000",
+       "popular": true
+      },
+      {
+       "id": "adv-retail-ops",
+       "name": "Advanced Retail Operations",
+       "note": "Complex inventory, advanced shipping rules, fulfilment workflows, automation",
+       "price": "$4,000",
+       "popular": false
+      },
+      {
+       "id": "analytics-essentials",
+       "name": "Analytics Essentials",
+       "note": "GA4, Google Search Console and tracking verification",
+       "price": "$500",
+       "popular": true
+      },
+      {
+       "id": "ecom-tracking",
+       "name": "E-commerce Tracking",
+       "note": "Enhanced e-commerce events, conversion tracking and validation",
+       "price": "$1,250",
+       "popular": false
+      },
+      {
+       "id": "adv-analytics",
+       "name": "Advanced Analytics & Reporting",
+       "note": "Custom reporting, multi-platform tracking, dashboards within agreed scope",
+       "price": "$2,500",
+       "popular": false
+      },
+      {
+       "id": "pos",
+       "name": "Shopify POS configuration",
+       "note": "",
+       "price": "$750/location",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "seo",
+   "name": "SEO & Search Visibility",
+   "intro": "Getting found on Google, from a one-time audit to ongoing monthly SEO.",
+   "cards": [
+    {
+     "id": "seo-audit",
+     "tag": "Assessment",
+     "name": "SEO Audit",
+     "price": "500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Know exactly what’s holding you back.",
+     "highlights": "Technical SEO review\nIndexing & sitemap check\nMetadata & structured data review\nPrioritized recommendations report",
+     "items": "# Assessment\nWebsite technical SEO review\nSearch engine indexing assessment\nSitemap and robots.txt review\nMetadata assessment\nBroken link identification\nMobile performance review\nStructured data assessment\nSample product and collection assessment\nPrioritized recommendations report\n# Note\nAssessment only. Implementation is separately priced.",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "seo-foundation",
+     "tag": "Package",
+     "name": "SEO Foundation",
+     "price": "1,500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "The technical basics, done right.",
+     "highlights": "Search Console & GA4 configured\nIndexing & redirect fixes\nHomepage + 5 pages, 5 collections, 10 products\nCompleted work report",
+     "items": "# Technical configuration\nGoogle Search Console configuration\nGoogle Analytics 4 configuration\nSitemap submission\nIndexing issue corrections\nBasic structured data corrections\nBroken link and redirect corrections\n# On-page optimization\nHomepage SEO optimization\nUp to 5 content pages\nUp to 5 collection pages\nUp to 10 product listings\nMetadata optimization\nImage alt text using supplied information\n# Reporting\nInitial performance baseline\nCompleted work report\nOngoing recommendations",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "seo-pro",
+     "tag": "Package",
+     "name": "SEO Professional",
+     "price": "3,000",
+     "unit": "",
+     "billing": "one-time",
+     "who": "A full search strategy and implementation.",
+     "highlights": "Keyword & competitor research\nAdvanced structured data & internal links\nHomepage + 10 pages, 10 collections, 25 products\n90-day SEO recommendations",
+     "items": "# Strategy and assessment\nComprehensive SEO audit\nKeyword research\nCompetitor assessment\nSearch visibility strategy\n# Technical implementation\nEverything in SEO Foundation’s technical configuration\nAdvanced structured data improvements\nInternal linking improvements\nDuplicate content assessment\nWebsite performance improvements within agreed scope\n# On-page optimization\nHomepage SEO optimization\nUp to 10 content pages\nUp to 10 collection pages\nUp to 25 product listings\n# Reporting\nSearch performance baseline\nCompleted work report\n90-day SEO recommendations",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "fixed"
+    }
+   ],
+   "tables": [
+    {
+     "title": "Monthly SEO",
+     "col": "From",
+     "rows": [
+      {
+       "id": "seo-essentials",
+       "name": "SEO Essentials",
+       "note": "5 hours",
+       "price": "$750/month",
+       "popular": false
+      },
+      {
+       "id": "seo-growth",
+       "name": "SEO Growth",
+       "note": "10 hours",
+       "price": "$1,500/month",
+       "popular": true
+      },
+      {
+       "id": "seo-advanced",
+       "name": "SEO Advanced",
+       "note": "22 hours",
+       "price": "$3,000/month",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Monthly SEO",
+     "text": "Monthly services can include search performance monitoring, technical corrections, keyword tracking, metadata improvements, collection optimization, internal linking and competitor analysis within the purchased hours.\nOriginal articles, product research, new page copywriting and paid link placements are not included. No guaranteed search rankings."
+    }
+   ],
+   "compare": {
+    "cols": [
+     "Audit",
+     "Foundation",
+     "Professional"
+    ],
+    "rows": [
+     [
+      "Price",
+      "$500",
+      "$1,500",
+      "$3,000"
+     ],
+     [
+      "Type",
+      "Assessment only",
+      "Assessment + implementation",
+      "Strategy + implementation"
+     ],
+     [
+      "Technical SEO review",
+      "Yes",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Prioritized recommendations",
+      "Yes",
+      "Yes",
+      "90-day plan"
+     ],
+     [
+      "Search Console & GA4 setup",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Indexing & redirect fixes",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Structured data",
+      "Review",
+      "Basic corrections",
+      "Advanced improvements"
+     ],
+     [
+      "Keyword research",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Competitor assessment",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Internal linking improvements",
+      "—",
+      "—",
+      "Yes"
+     ],
+     [
+      "Homepage optimization",
+      "—",
+      "Yes",
+      "Yes"
+     ],
+     [
+      "Content pages optimized",
+      "—",
+      "5",
+      "10"
+     ],
+     [
+      "Collection pages optimized",
+      "—",
+      "5",
+      "10"
+     ],
+     [
+      "Product listings optimized",
+      "—",
+      "10",
+      "25"
+     ],
+     [
+      "Reporting",
+      "Recommendations report",
+      "Baseline + work report",
+      "Baseline + work report"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "email",
+   "name": "Email Marketing",
+   "intro": "Email setup, automations and monthly campaigns that bring customers back.",
+   "cards": [
+    {
+     "id": "email-launch",
+     "tag": "Setup",
+     "name": "Email Marketing Launch",
+     "price": "1,000",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Get your list and first automation running.",
+     "highlights": "Platform setup & Shopify integration\nSignup form & customer list\n1 branded template\n1 welcome automation",
+     "items": "# Included\nEmail marketing platform configuration\nShopify integration\nSending domain authentication assistance\nSubscriber signup form\nCustomer list configuration\n1 branded email template\n1 welcome automation\nTesting and staff training",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "email-pro",
+     "tag": "Setup",
+     "name": "Email Marketing Professional",
+     "price": "2,500",
+     "unit": "",
+     "billing": "one-time",
+     "who": "The automations that make money.",
+     "highlights": "Customer segmentation\nUp to 3 branded templates\nWelcome, abandoned checkout & post-purchase\nCampaign reporting",
+     "items": "# Included\nEverything in Email Marketing Launch\nCustomer segmentation\nUp to 3 branded email templates\nWelcome automation\nAbandoned checkout automation\nPost-purchase automation\nBasic campaign reporting\nTesting and optimization",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "fixed"
+    },
+    {
+     "id": "email-advanced",
+     "tag": "Setup",
+     "name": "Advanced Email Marketing",
+     "price": "4,500+",
+     "unit": "",
+     "billing": "one-time",
+     "who": "Full lifecycle email for growing stores.",
+     "highlights": "Lifecycle segmentation\nUp to 5 templates & 6 flows\nRepeat purchase & win-back campaigns\nAdvanced reporting",
+     "items": "# Included\nAdvanced Shopify integration\nCustomer lifecycle segmentation\nUp to 5 branded email templates\nUp to 6 automated email flows\nCustomer retention strategy\nRepeat purchase automation\nWin-back campaigns\nAdvanced reporting configuration\nStaff training",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "from"
+    }
+   ],
+   "tables": [
+    {
+     "title": "Monthly email management",
+     "col": "From",
+     "rows": [
+      {
+       "id": "email-essentials",
+       "name": "Email Essentials",
+       "note": "2 campaigns",
+       "price": "$750/month",
+       "popular": false
+      },
+      {
+       "id": "email-growth",
+       "name": "Email Growth",
+       "note": "4 campaigns",
+       "price": "$1,500/month",
+       "popular": true
+      },
+      {
+       "id": "email-advanced-mo",
+       "name": "Email Advanced",
+       "note": "8 campaigns",
+       "price": "$2,500/month",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Conditions",
+     "text": "Each automation includes up to three emails unless otherwise specified.\nMonthly management includes campaign assembly, scheduling, supplied content formatting, testing and reporting. Advanced graphic creation and original copywriting are additional.\nPlatform subscriptions and email sending charges are additional. Customer consent and applicable email marketing compliance requirements must be respected."
+    }
+   ]
+  },
+  {
+   "id": "social",
+   "name": "Social Media & Advertising",
+   "intro": "Monthly social media management, plus ad account setup and management.",
+   "cards": [
+    {
+     "id": "social-essentials",
+     "tag": "Monthly",
+     "name": "Social Essentials",
+     "price": "750",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "A steady, professional presence.",
+     "highlights": "Up to 8 posts a month\nUp to 2 platforms\nScheduling & captions\nMonthly summary",
+     "items": "# Included\nUp to 8 unique posts per month\nUp to 2 social platforms\nContent scheduling\nCaption preparation using supplied information\nBasic graphic formatting\nMonthly performance summary",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "social-growth",
+     "tag": "Monthly",
+     "name": "Social Growth",
+     "price": "1,500",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Planned content that sells.",
+     "highlights": "Up to 16 posts a month\nUp to 3 platforms\nMonthly content calendar\nPromo campaign coordination",
+     "items": "# Included\nUp to 16 unique posts per month\nUp to 3 social platforms\nMonthly content calendar\nCaption preparation\nPromotional campaign coordination\nBasic branded graphics\nMonthly performance reporting",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "social-advanced",
+     "tag": "Monthly",
+     "name": "Social Advanced",
+     "price": "2,500",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Full social for busy brands.",
+     "highlights": "Up to 24 posts a month\nUp to 4 platforms\nShort-form video editing\nMonthly strategy review",
+     "items": "# Included\nUp to 24 unique posts per month\nUp to 4 social platforms\nAdvanced content calendar\nPromotional campaign planning\nBranded graphic preparation\nShort-form editing of supplied video footage\nCompetitor content assessment\nMonthly strategy review\nPerformance reporting",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    }
+   ],
+   "tables": [
+    {
+     "title": "Paid advertising",
+     "col": "From",
+     "rows": [
+      {
+       "id": "google-ads",
+       "name": "Google Ads account and campaign setup",
+       "note": "",
+       "price": "$750",
+       "popular": true
+      },
+      {
+       "id": "meta-ads",
+       "name": "Meta Ads account and campaign setup",
+       "note": "",
+       "price": "$750",
+       "popular": true
+      },
+      {
+       "id": "merchant-center",
+       "name": "Google Merchant Center configuration",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "id": "meta-catalogue",
+       "name": "Meta product catalogue configuration",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "id": "conversion-tracking",
+       "name": "Conversion tracking configuration",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "id": "ads-management",
+       "name": "Monthly advertising management",
+       "note": "",
+       "price": "$750/platform",
+       "popular": false
+      },
+      {
+       "id": "multi-platform",
+       "name": "Advanced multi-platform management",
+       "note": "",
+       "price": "Custom quote",
+       "popular": false
+      },
+      {
+       "id": "ad-creative",
+       "name": "Advertising creative development",
+       "note": "",
+       "price": "Separately priced",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Conditions",
+     "text": "Customers supply photography, video footage, product information and promotional details. Original photography, video production and advanced creative services are separately priced.\nCross-posting the same creative to multiple platforms does not count as additional unique posts. Community management and customer service are not included.\nAdvertising spend is paid directly by the customer and is never included in management fees. No guaranteed sales or return on advertising spend."
+    }
+   ]
+  },
+  {
+   "id": "care",
+   "name": "Monthly Store Management",
+   "intro": "Your own Shopify developer, without hiring one. Paid monthly in advance.",
+   "cards": [
+    {
+     "id": "store-care",
+     "tag": "2 hours/month",
+     "name": "Store Care",
+     "price": "375",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Keep things running smoothly.",
+     "highlights": "Storefront monitoring\nMinor content & product fixes\nGeneral Shopify support\nMonthly activity summary",
+     "items": "# Included\nBasic storefront monitoring\nMinor content updates\nBasic product corrections\nNavigation corrections\nGeneral Shopify support\nMonthly activity summary",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "store-management",
+     "tag": "5 hours/month",
+     "name": "Store Management",
+     "price": "750",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Ongoing upkeep of your catalogue.",
+     "highlights": "Everything in Store Care\nCatalogue & collection updates\nPromo updates & simple graphics\nMonthly activity report",
+     "items": "# Included\nEverything in Store Care\nProduct catalogue maintenance\nCollection updates\nPromotional updates\nBasic graphic changes using supplied assets\nShopify app configuration assistance\nMonthly activity report",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "store-growth",
+     "tag": "10 hours/month",
+     "name": "Store Growth",
+     "price": "1,500",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Keep improving, every month.",
+     "highlights": "Everything in Store Management\nOngoing storefront improvements\nSEO maintenance & analytics review\nMonthly strategy discussion",
+     "items": "# Included\nEverything in Store Management\nOngoing storefront improvements\nProduct and collection optimization\nPromotional campaign implementation\nSEO maintenance\nAnalytics review\nBackend workflow improvements\nMonthly strategy discussion",
+     "eta": "",
+     "recommended": true,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "dedicated-partner",
+     "tag": "22 hours/month",
+     "name": "Dedicated Partner",
+     "price": "3,000",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Your part-time Shopify team.",
+     "highlights": "Everything in Store Growth\nCustom theme development\nCatalogue & backend management\nPriority scheduling",
+     "items": "# Included\nEverything in Store Growth\nAdvanced storefront improvements\nRegular catalogue management\nMarketing implementation assistance\nCustom theme development\nBackend configuration and optimization\nBusiness automation improvements\nPriority scheduling\nRegular performance reporting",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    },
+    {
+     "id": "managed-ops",
+     "tag": "40 hours/month",
+     "name": "Managed Operations",
+     "price": "5,500",
+     "unit": "/month",
+     "billing": "monthly",
+     "who": "Dedicated monthly development capacity.",
+     "highlights": "Everything in Dedicated Partner\nComprehensive store management\nAdvanced backend development\nRegular strategic planning",
+     "items": "# Included\nEverything in Dedicated Partner\nDedicated monthly development capacity\nComprehensive storefront management\nOngoing catalogue improvements\nMarketing and promotional implementation\nAdvanced backend development\nIntegration maintenance\nBusiness process improvements\nRegular strategic planning",
+     "eta": "",
+     "recommended": false,
+     "quote": false,
+     "priceType": "monthly"
+    }
+   ],
+   "tables": [],
+   "notes": [
+    {
+     "title": "Monthly package conditions",
+     "text": "All activities consume the included monthly hours. The service lists describe eligible work, not unlimited deliverables. Additional hours require approval and are charged at the applicable hourly rate. Unused hours do not roll over. Third-party costs and advertising budgets are additional."
+    }
+   ]
+  },
+  {
+   "id": "consulting",
+   "name": "Consulting, Training & Audits",
+   "intro": "Advice, training and audits, from a free first call to a full business review.",
+   "cards": [],
+   "tables": [
+    {
+     "title": "Consulting, training & audits",
+     "col": "From",
+     "rows": [
+      {
+       "id": "discovery",
+       "name": "Initial discovery consultation (20 minutes)",
+       "note": "",
+       "price": "Free",
+       "popular": true
+      },
+      {
+       "id": "shopify-consulting",
+       "name": "Shopify consulting",
+       "note": "",
+       "price": "$150/hour",
+       "popular": false
+      },
+      {
+       "id": "tech-consulting",
+       "name": "Business technology consulting",
+       "note": "",
+       "price": "$150/hour",
+       "popular": false
+      },
+      {
+       "id": "training",
+       "name": "Shopify staff training",
+       "note": "",
+       "price": "$125/hour",
+       "popular": false
+      },
+      {
+       "id": "dev-consult",
+       "name": "Custom development consultation",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      },
+      {
+       "id": "storefront-audit",
+       "name": "Storefront audit",
+       "note": "",
+       "price": "$350",
+       "popular": true
+      },
+      {
+       "id": "seo-audit-row",
+       "name": "SEO audit",
+       "note": "",
+       "price": "$500",
+       "popular": false
+      },
+      {
+       "id": "ux-audit",
+       "name": "Conversion and usability audit",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "id": "catalogue-audit",
+       "name": "Catalogue audit",
+       "note": "",
+       "price": "$750",
+       "popular": false
+      },
+      {
+       "id": "business-audit",
+       "name": "Complete e-commerce business audit",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      },
+      {
+       "id": "app-discovery",
+       "name": "Custom application discovery and planning",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "Free audit vs paid audits",
+     "text": "The free consultation is a discussion of requirements, not a comprehensive audit or free technical implementation.\nThe Free Audit offered on this site is a preliminary store review, separate from the paid audit services above."
+    }
+   ]
+  },
+  {
+   "id": "hourly",
+   "name": "Hourly Services",
+   "intro": "For work outside a package or quote.",
+   "cards": [],
+   "tables": [
+    {
+     "title": "Hourly rates",
+     "col": "Rate",
+     "rows": [
+      {
+       "id": "h-admin",
+       "name": "Product administration and data entry",
+       "note": "",
+       "price": "$100/hour",
+       "popular": false
+      },
+      {
+       "id": "h-catalogue",
+       "name": "Catalogue management",
+       "note": "",
+       "price": "$100/hour",
+       "popular": false
+      },
+      {
+       "id": "h-design",
+       "name": "Graphic design and image editing",
+       "note": "",
+       "price": "$125/hour",
+       "popular": false
+      },
+      {
+       "id": "h-content",
+       "name": "Content editing and copywriting",
+       "note": "",
+       "price": "$125/hour",
+       "popular": false
+      },
+      {
+       "id": "h-training",
+       "name": "Shopify training",
+       "note": "",
+       "price": "$125/hour",
+       "popular": false
+      },
+      {
+       "id": "h-dev",
+       "name": "Standard Shopify development",
+       "note": "",
+       "price": "$150/hour",
+       "popular": true
+      },
+      {
+       "id": "h-config",
+       "name": "Shopify configuration",
+       "note": "",
+       "price": "$150/hour",
+       "popular": false
+      },
+      {
+       "id": "h-seo",
+       "name": "SEO implementation",
+       "note": "",
+       "price": "$150/hour",
+       "popular": false
+      },
+      {
+       "id": "h-consult",
+       "name": "Business consulting",
+       "note": "",
+       "price": "$150/hour",
+       "popular": false
+      },
+      {
+       "id": "h-adv",
+       "name": "Advanced development",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      },
+      {
+       "id": "h-api",
+       "name": "API integrations",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      },
+      {
+       "id": "h-app",
+       "name": "Custom application development",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      },
+      {
+       "id": "h-script",
+       "name": "Automation and custom scripting",
+       "note": "",
+       "price": "$175/hour",
+       "popular": false
+      },
+      {
+       "id": "h-urgent",
+       "name": "Emergency and urgent support",
+       "note": "",
+       "price": "$225/hour",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": []
+  },
+  {
+   "id": "terms",
+   "name": "Customer Requirements & Terms",
+   "intro": "Applies to every package and service on this page.",
+   "cards": [],
+   "tables": [
+    {
+     "title": "Not included unless added (content & images)",
+     "col": "From",
+     "rows": [
+      {
+       "name": "Original product description writing",
+       "note": "",
+       "price": "$45/product",
+       "popular": false
+      },
+      {
+       "name": "Advanced product research and copywriting",
+       "note": "",
+       "price": "$75/product",
+       "popular": false
+      },
+      {
+       "name": "Original website content",
+       "note": "",
+       "price": "$250/page",
+       "popular": false
+      },
+      {
+       "name": "Image resizing and cropping",
+       "note": "",
+       "price": "$15/image",
+       "popular": false
+      },
+      {
+       "name": "Background removal",
+       "note": "",
+       "price": "$25/image",
+       "popular": false
+      },
+      {
+       "name": "Product image enhancement",
+       "note": "",
+       "price": "$35/image",
+       "popular": false
+      },
+      {
+       "name": "Advanced image restoration",
+       "note": "",
+       "price": "$65/image",
+       "popular": false
+      },
+      {
+       "name": "AI-assisted lifestyle imagery",
+       "note": "",
+       "price": "$100/image",
+       "popular": false
+      },
+      {
+       "name": "Stock image sourcing and licensing",
+       "note": "",
+       "price": "Quoted",
+       "popular": false
+      },
+      {
+       "name": "Product photography",
+       "note": "",
+       "price": "Quoted",
+       "popular": false
+      },
+      {
+       "name": "Logo and brand identity creation",
+       "note": "",
+       "price": "$1,500",
+       "popular": false
+      },
+      {
+       "name": "Translation services",
+       "note": "",
+       "price": "Quoted",
+       "popular": false
+      }
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "title": "You supply",
+     "text": "Product photographs and original image files\nProduct descriptions and specifications\nProduct titles, brand names and manufacturer information\nPricing, SKUs, barcodes and inventory quantities\nProduct dimensions, weights and shipping information\nCompany logos and existing brand assets\nWebsite content, including About Us and company information\nApproved shipping, return, privacy and other business policies\nPromotional content and relevant marketing information\nAny necessary translations",
+     "list": true
+    },
+    {
+     "title": "Customer-supplied content & materials",
+     "text": "All package pricing is based on the customer supplying accurate, complete and usable content, product information, photography and brand assets.\nWhere content or imagery optimization is included, services are limited to the editing, formatting and enhancement of customer-supplied materials within the specified package allowances.\nOriginal content creation, product research, photography, image generation, extensive image editing, missing product information and additional creative services are not included unless explicitly stated in the agreed project scope.\nIncomplete, inaccurate or unsuitable materials requiring additional preparation will be assessed and quoted separately before work proceeds.\nProject timelines begin once all required materials, account access and initial payments have been received.\nThe customer is responsible for the accuracy of supplied information and ensuring they have the necessary rights and permissions to use all supplied content and imagery.\nPackage prices are not reduced because the customer supplies the materials. Supplying the materials is a requirement of the advertised pricing, not an optional discount."
+    },
+    {
+     "title": "Pricing terms",
+     "text": "All prices are in Canadian dollars. Applicable taxes are additional.\nShopify subscriptions, premium themes, paid apps and third-party fees are additional.\nPackage allowances are maximum included quantities, not credits that can be exchanged for other services.\nDelivery times are estimates, beginning after receipt of required materials, access and initial payment.\nDevelopment warranties cover defects in delivered work, not ongoing maintenance or new requests.\nProjects: 50% deposit to start, 50% before launch or handover."
+    }
+   ]
+  }
+ ]
+}

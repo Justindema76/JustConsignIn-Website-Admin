@@ -4,6 +4,8 @@ import { CheckCircle2, ExternalLink, Save, Upload } from 'lucide-react';
 import { useAuth } from '../../auth/AdminAuthContext';
 import { loadAdminGlobalSection, saveAdminGlobalSection, uploadSiteImage } from '../../services/siteAdminService';
 import '../settings/settings.css';
+import PricingEditor from './PricingEditor';
+import './pricingEditor.css';
 
 // Settings for justindematteis.com/shopify-studio (the era-themed Shopify landing page and the
 // Jill & The Beanstalk case study). Saved as site_settings key "global_shopify-studio"; the site
@@ -204,12 +206,10 @@ export default function ShopifyStudioAdmin() {
         </div>
 
         <div className="email-settings-divider" />
-        <div className="email-settings-section-head compact"><div><h2>Packages &amp; availability</h2><p>Leave a price blank to show “Free quote”. Leave spots blank to hide the spots line.</p></div></div>
-        <div className="email-settings-fields">
-          <label>Store Tune-Up price (from $)<input value={values.priceTuneUp || ''} placeholder="e.g. 1,500" onChange={e => set('priceTuneUp', e.target.value)} /></label>
-          <label>Custom Store Redesign price (from $)<input value={values.priceRedesign || ''} placeholder="e.g. 4,500" onChange={e => set('priceRedesign', e.target.value)} /></label>
-          <label>Custom App or Feature price (from $)<input value={values.priceCustomApp || ''} placeholder="e.g. 1,200" onChange={e => set('priceCustomApp', e.target.value)} /></label>
-          <label>Spots left this month<input value={values.spotsLeft || ''} placeholder="e.g. 2" onChange={e => set('spotsLeft', e.target.value)} /></label>
+        <div className="email-settings-section-head compact"><div><h2>Pricing</h2><p>Every service, package, price, table and condition on the pricing page.</p></div></div>
+        <PricingEditor value={values.pricing} onChange={next => set('pricing', next)} />
+        <div className="email-settings-fields" style={{ marginTop: 14 }}>
+          <label>Spots left this month<input value={values.spotsLeft || ''} placeholder="blank = hide" onChange={e => set('spotsLeft', e.target.value)} /></label>
         </div>
 
         <div className="email-settings-divider" />
