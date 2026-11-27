@@ -32,3 +32,7 @@ using ((select auth.jwt()->>'email') = 'justindema76@gmail.com' and (select auth
 with check ((select auth.jwt()->>'email') = 'justindema76@gmail.com' and (select auth.jwt()->'app_metadata'->>'provider') = 'google');
 
 grant select, insert, update on public.studio_api_keys to authenticated;
+
+-- The studio-api function reads keys with the server role.
+grant select, update on public.studio_api_keys to service_role;
+grant select, insert, update on public.social_campaigns to service_role;
