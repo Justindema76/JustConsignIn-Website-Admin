@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { loadAdminGlobalSection, saveAdminGlobalSection, uploadSiteImage } from '../../services/siteAdminService';
 import '../settings/settings.css';
 import PricingEditor from './PricingEditor';
+import DemoColorsEditor from './DemoColorsEditor';
 import './pricingEditor.css';
 
 // Settings for justindematteis.com/shopify-studio (the era-themed Shopify landing page and the
@@ -236,6 +237,10 @@ export default function ShopifyStudioAdmin() {
         <div className="email-settings-fields">
           {ERAS.map(([era, label]) => picField(`demo-hero-${era}`, `${label} · Banner`, demoValue('hero', era), url => setDemo('hero', era, url), file => uploadDemo('hero', era, file), true))}
         </div>
+
+        <div className="email-settings-divider" />
+        <div className="email-settings-section-head compact"><div><h2>Demo store colours</h2><p>Every colour of the demo store, per decade. Change only what you want; the rest keeps the built-in look.</p></div></div>
+        <DemoColorsEditor value={values.demoColors} onChange={next => set('demoColors', next)} />
 
         <div className="email-settings-divider" />
         <div className="email-settings-section-head compact"><div><h2>Demo store wording</h2><p>Turn the demo into any kind of shop (records, clothing, toys…). Same in every era. Blank = built-in text.</p></div></div>
