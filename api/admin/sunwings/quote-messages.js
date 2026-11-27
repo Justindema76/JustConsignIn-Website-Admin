@@ -86,9 +86,11 @@ export default async function handler(req, res) {
       const text = clean(body.body, 8000);
       if (!text) return res.status(400).json({ error: 'Write a message first.' });
       const sent = await emailCustomer(quote, { subject: subject || `Your ${quote.service || 'Sunwings Transport'} request`, body: text, by });
-      await saveMessage(id, { kind: 'email_out', author: by, subject: subject || null, body: text, to_email: sent.to, from_email: sent.from, ref: sent.ref, email_message_id: sent.messageId });
+      const review = body.review === true;
+      await saveMessage(id, { kind: 'email_out', author: by, subject: subject || null, body: text, to_email: sent.to, from_email: sent.from, ref: sent.ref, email_message_id: sent.messageId, meta: review ? { review: true } : {} });
       await touchQuote(id, {
-        ...common, last_activity: `Email to customer from ${by}`,
+        ...common, last_activity: review ? `Google review request sent by ${by}` : `Email to customer from ${by}`,
+        ...(review ? { last_follow_up_at: now, follow_up_count: Number(quote.follow_up_count || 0) + 1 } : {}),
         ...(quote.contacted_at ? {} : { contacted_at: now }),
         ...(quote.status === 'new' && isOwner ? { status: 'contacted', status_changed_at: now } : {}),
       });
