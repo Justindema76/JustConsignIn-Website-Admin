@@ -180,6 +180,14 @@ export default function ShopifyStudioAdmin() {
       </div>
       <button className="site-admin-btn" type="submit" disabled={busy}><Save size={15} /> {busy ? 'Saving…' : 'Save'}</button>
     </div>
+    <div className="site-admin-note" style={{ marginBottom: 14 }}>
+      Shopify Studio marketing has its own section:{' '}
+      <a href="/admin/go?site=shopifystudio&to=/admin/content-calendar">Content Calendar</a> ·{' '}
+      <a href="/admin/go?site=shopifystudio&to=/admin/blog">Blog Posts</a> ·{' '}
+      <a href="/admin/go?site=shopifystudio&to=/admin/social-automation">Social Posts</a> ·{' '}
+      <a href="/admin/go?site=shopifystudio&to=/admin/studio-api">ChatGPT / API Access</a> ·{' '}
+      <Link to="/admin/service-requests">Free Reviews &amp; Quotes</Link>
+    </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success"><CheckCircle2 size={16} />{message}</div>}
 

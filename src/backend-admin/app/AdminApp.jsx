@@ -47,12 +47,16 @@ import RentrallyPackagesAdmin from '../sites/rentrally/PackagesAdmin';
 import RentrallyCategoriesAdmin from '../sites/rentrally/CategoriesAdmin';
 import RentrallyQuotesAdmin from '../sites/rentrally/QuoteRequestsAdmin';
 import RentrallySettingsAdmin from '../sites/rentrally/SettingsAdmin';
-import { getAdminSiteKey } from '../services/siteAdminService';
+import { getAdminSiteKey, setAdminSiteKey } from '../services/siteAdminService';
+import ContentCalendar from '../sites/shopifystudio/ContentCalendar';
+import StudioApiAdmin from '../sites/shopifystudio/StudioApiAdmin';
 
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
-const SOCIAL_SITES = ['justindematteis', 'justconsignin', 'rentrally'];
+const SOCIAL_SITES = ['justindematteis', 'justconsignin', 'rentrally', 'shopifystudio'];
+const STUDIO = ['shopifystudio'];
+const CONTENT_SITES = ['justindematteis', 'justconsignin', 'shopifystudio'];
 const SUNWINGS = ['sunwings'];
 const RENTRALLY = ['rentrally'];
 const PAGE_BUILDER_SITES = ['justindematteis', 'justconsignin', 'sunwings', 'rentrally'];
@@ -72,12 +76,24 @@ function GlobalSectionRoute() {
   return <GlobalBuilder />;
 }
 
+// /admin/go?site=justindematteis&to=/admin/shopify-studio — switch website and open a page in one click
+// (Shopify Studio's pages live on JustinDeMatteis.com, its marketing on the Shopify Studio site).
+function SwitchSite() {
+  const params = new URLSearchParams(window.location.search);
+  const site = String(params.get('site') || '').trim();
+  const to = String(params.get('to') || '/admin');
+  if (site) setAdminSiteKey(site);
+  window.location.replace(to.startsWith('/admin') ? to : '/admin');
+  return null;
+}
+
 export default function AdminApp() {
   return <Routes>
     <Route path="/admin-login" element={<AdminLogin />} />
     <Route element={<RequireAdmin />}>
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/go" element={<SwitchSite />} />
 
         <Route path="/admin/demo-requests" element={only(JCI, <DemoRequestsAdmin />)} />
         <Route path="/admin/beta-partners" element={only(JCI, <BetaApplicationsAdmin />)} />
@@ -89,16 +105,18 @@ export default function AdminApp() {
         <Route path="/admin/departments" element={only(JUSTIN, <DepartmentsAdmin />)} />
         <Route path="/admin/shopify-studio" element={only(JUSTIN, <ShopifyStudioAdmin />)} />
 
-        <Route path="/admin/blog" element={only(STANDARD_SITES, <BlogAdmin />)} />
-        <Route path="/admin/blog/:id" element={only(STANDARD_SITES, <BlogAdmin />)} />
+        <Route path="/admin/blog" element={only(CONTENT_SITES, <BlogAdmin />)} />
+        <Route path="/admin/blog/:id" element={only(CONTENT_SITES, <BlogAdmin />)} />
         <Route path="/admin/work-posts" element={only(JUSTIN, <WorkPostsAdmin />)} />
         <Route path="/admin/work-posts/:id" element={only(JUSTIN, <WorkPostsAdmin />)} />
         <Route path="/admin/ai-posts" element={only(JUSTIN, <AiPostsAdmin />)} />
         <Route path="/admin/ai-posts/:id" element={only(JUSTIN, <AiPostsAdmin />)} />
-        <Route path="/admin/videos" element={only(STANDARD_SITES, <VideosAdmin />)} />
-        <Route path="/admin/videos/:id" element={only(STANDARD_SITES, <VideosAdmin />)} />
+        <Route path="/admin/videos" element={only(CONTENT_SITES, <VideosAdmin />)} />
+        <Route path="/admin/videos/:id" element={only(CONTENT_SITES, <VideosAdmin />)} />
         <Route path="/admin/social" element={only(SOCIAL_SITES, <SocialAdmin />)} />
-        <Route path="/admin/media" element={only(STANDARD_SITES, <MediaAdmin />)} />
+        <Route path="/admin/media" element={only(CONTENT_SITES, <MediaAdmin />)} />
+        <Route path="/admin/content-calendar" element={only(STUDIO, <ContentCalendar />)} />
+        <Route path="/admin/studio-api" element={only(STUDIO, <StudioApiAdmin />)} />
         <Route path="/admin/social-image" element={only(JCI, <SocialImageStudio />)} />
         <Route path="/admin/social-automation" element={only(SOCIAL_SITES, <SocialAutomation />)} />
         <Route path="/admin/social-automation/:id" element={only(SOCIAL_SITES, <SocialAutomation />)} />

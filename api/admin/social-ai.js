@@ -47,6 +47,17 @@ const SITE_PROFILES = {
       'Do not mention suppliers or manufacturers. Use only prices or details visible in the supplied media or explicitly given in the user direction.',
     ],
   },
+  shopifystudio: {
+    label: 'Shopify Studio',
+    website: 'https://www.justindematteis.com/shopify-studio',
+    context: [
+      'Shopify Studio is Justin DeMatteis: a Canadian-owned, Ontario-based (Hamilton) Shopify designer and developer serving retailers across Canada.',
+      'Brand statement: Canadian-owned. Ontario-based. Built around your business. Main selling point: total customization, from storefront to backend.',
+      'Services: custom Shopify store design and development, redesigns, migrations, product and backend cleanup, custom Shopify apps and integrations, SEO, email marketing, social media, graphic design and monthly store care. All prices in CAD.',
+      'The decade designs (1950s to 2010s) are examples of range, not templates; the collection keeps growing. Real work: Jill & The Beanstalk (+90% online revenue) and the JustConsignIn consignment app.',
+      'Write in Canadian English. Use only verified facts and prices given in the direction. Free store review and pricing live at justindematteis.com/shopify-studio.',
+    ],
+  },
 };
 
 function siteKeyFromRequest(req) {

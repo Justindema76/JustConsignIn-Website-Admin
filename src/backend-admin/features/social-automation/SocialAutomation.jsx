@@ -37,6 +37,8 @@ export default function SocialAutomation() {
     ? 'Residential move, furniture delivery, warehouse job…'
     : siteKey === 'rentrally'
       ? 'Gorilla at a dealership sale, tent at a vendor market…'
+    : siteKey === 'shopifystudio'
+      ? '1970s design showcase, Shopify tip, case study result…'
     : siteKey === 'justindematteis'
       ? 'Website launch, SEO project, automation workflow…'
       : 'Create Shopify products from your phone';

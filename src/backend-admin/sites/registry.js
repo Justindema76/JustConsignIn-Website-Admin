@@ -2,12 +2,14 @@ import justin from './justindematteis/config';
 import justConsignIn from './justconsignin/config';
 import sunwings from './sunwings/config';
 import rentrally from './rentrally/config';
+import shopifyStudio from './shopifystudio/config';
 
 export const SITE_CONFIGS = Object.freeze({
   [justin.key]: justin,
   [justConsignIn.key]: justConsignIn,
   [sunwings.key]: sunwings,
   [rentrally.key]: rentrally,
+  [shopifyStudio.key]: shopifyStudio,
 });
 
 export function getSiteConfig(siteKey) {

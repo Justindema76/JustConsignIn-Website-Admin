@@ -10,6 +10,7 @@ const SITE_LABELS = {
   justindematteis: 'Justin DeMatteis',
   sunwings: 'Sunwings Transport',
   rentrally: 'Rent & Rally',
+  shopifystudio: 'Shopify Studio',
 };
 
 function cookieValue(req, name) {

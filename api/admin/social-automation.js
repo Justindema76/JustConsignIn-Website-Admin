@@ -21,6 +21,7 @@ const SITE_CONFIG = {
   justindematteis: { label: 'Justin DeMatteis', mediaAlt: 'Justin DeMatteis social media graphic' },
   sunwings: { label: 'Sunwings Transport', mediaAlt: 'Sunwings Transport social media graphic' },
   rentrally: { label: 'Rent & Rally', mediaAlt: 'Rent & Rally event and promo rentals' },
+  shopifystudio: { label: 'Shopify Studio', mediaAlt: 'Shopify Studio custom Shopify store design' },
 };
 
 function siteKeyFromRequest(req) {
@@ -143,7 +144,7 @@ function networkInfo(campaign, network, siteKey) {
   if (network === 'instagram') return { ...base, text: campaign.instagram_caption, instagramData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', collaborators: [], showReelOnFeed: true, isAiGenerated: false } };
   if (network === 'facebook') return { ...base, text: campaign.facebook_caption || campaign.instagram_caption, facebookData: { type: campaign.media_type === 'video' ? 'REEL' : 'POST', title: '' } };
   if (network === 'tiktok') return { ...base, text: campaign.tiktok_caption, tiktokData: { disableComment: false, disableDuet: false, disableStitch: false, privacyOption: 'PUBLIC_TO_EVERYONE', commercialContentThirdParty: false, commercialContentOwnBrand: true, title: campaign.title, autoAddMusic: false, photoCoverIndex: 0, isAigc: false } };
-  if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: campaign.youtube_format === 'short' ? 'short' : 'video', privacy: 'public', tags: siteKey === 'sunwings' ? ['Sunwings Transport', 'Moving', 'Delivery'] : siteKey === 'rentrally' ? ['Rent & Rally', 'Event Rentals', 'Inflatables', 'Air Dancers', 'Hamilton'] : siteKey === 'justindematteis' ? ['Justin DeMatteis', 'Web Development'] : ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
+  if (network === 'youtube') return { ...base, text: campaign.youtube_description, youtubeData: { title: campaign.youtube_title || campaign.title, type: campaign.youtube_format === 'short' ? 'short' : 'video', privacy: 'public', tags: siteKey === 'sunwings' ? ['Sunwings Transport', 'Moving', 'Delivery'] : siteKey === 'rentrally' ? ['Rent & Rally', 'Event Rentals', 'Inflatables', 'Air Dancers', 'Hamilton'] : siteKey === 'shopifystudio' ? ['Shopify Studio', 'Shopify', 'Ecommerce', 'Canada', 'Ontario'] : siteKey === 'justindematteis' ? ['Justin DeMatteis', 'Web Development'] : ['JustConsignIn', 'Shopify', 'Consignment'], madeForKids: false, isAiGeneratedContent: false } };
   return base;
 }
 

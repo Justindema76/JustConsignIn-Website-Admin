@@ -498,7 +498,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET' && resource === 'media') {
       const siteGroups = await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config, siteKey)));
-      const legacyGroups = siteKey === 'sunwings'
+      // Sunwings and Shopify Studio only see their own folder; older sites also see the shared root uploads.
+      const legacyGroups = (siteKey === 'sunwings' || siteKey === 'shopifystudio')
         ? []
         : await Promise.all(MEDIA_BUCKETS.map(config => listMediaBucket(user.accessToken, config)));
       const byKey = new Map();

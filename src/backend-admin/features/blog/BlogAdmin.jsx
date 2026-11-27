@@ -5,6 +5,13 @@ import { useAuth } from '../../auth/AdminAuthContext';
 import { BLOG_STATUS, createEmptyPost, deleteAdminBlogPost, loadAdminBlogPosts, saveAdminBlogPost, slugify } from './blogStore';
 import { getAdminSiteKey, loadAdminMedia, uploadBlogImage } from '../../services/siteAdminService';
 import ShowOnField from '../../sites/sunwings/ShowOnField';
+import STUDIO_PRICING from '../shopify-studio/pricingDefaults.json';
+
+const STUDIO_SERVICES = (STUDIO_PRICING.services || []).filter(s => s.id !== 'terms').map(s => [s.id, s.name]);
+const STUDIO_CATEGORIES = ['Shopify Tips', 'Design Showcase', 'Case Studies', 'Pricing & Planning', 'Backend & Apps', 'SEO & Marketing', 'Canadian Retail'];
+// datetime-local needs local "YYYY-MM-DDTHH:mm"
+const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); if (Number.isNaN(d.getTime())) return ''; const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+const isScheduled = post => post.status === 'published' && post.publishedAt && new Date(post.publishedAt) > new Date();
 
 function toTags(value) {
   return String(value || '').split(',').map(tag => tag.trim()).filter(Boolean);
@@ -13,7 +20,8 @@ function toTags(value) {
 export default function BlogAdmin() {
   const { user, accessToken } = useAuth();
   const siteKey = getAdminSiteKey();
-  const liveBaseUrl = siteKey === 'justindematteis'
+  const isStudio = siteKey === 'shopifystudio';
+  const liveBaseUrl = isStudio ? 'https://www.justindematteis.com/shopify-studio' : siteKey === 'justindematteis'
     ? 'https://www.justindematteis.com'
     : siteKey === 'sunwings'
       ? (import.meta.env.VITE_SUNWINGS_PREVIEW_URL || 'https://sunwingstransport.ca')
@@ -93,6 +101,28 @@ export default function BlogAdmin() {
   if (!isAdmin) return <Navigate to="/admin-login" replace state={{ from: blogAdminBase }} />;
 
   const update = (key, value) => setDraft(current => ({ ...current, [key]: value }));
+  const extras = draft.contentBlocks || {};
+  const setExtra = (key, value) => setDraft(current => ({ ...current, contentBlocks: { ...(current.contentBlocks || {}), [key]: value } }));
+  const toggleService = id => setExtra('relatedServices', (extras.relatedServices || []).includes(id) ? extras.relatedServices.filter(x => x !== id) : [...(extras.relatedServices || []), id]);
+
+  // Studio: turn the saved article into a social post draft (Social Posts → review, then schedule through Metricool).
+  const socialDraft = async () => {
+    if (!draft.id) return setError('Save the article first.');
+    setBusy(true); setError(''); setMessage('');
+    try {
+      const link = `${liveBaseUrl}/blog/${draft.slug}`;
+      const summary = draft.excerpt || draft.seoDescription || draft.title;
+      const caption = `${draft.title}\n\n${summary}\n\nRead it: ${link}\n\n#Shopify #ShopifyCanada #Ontario #Ecommerce`;
+      const response = await fetch(`/api/admin/social-automation?site=${encodeURIComponent(siteKey)}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ action: 'save', campaign: { title: `Blog: ${draft.title}`, status: 'draft', platforms: ['instagram', 'facebook'], instagramCaption: caption, facebookCaption: caption, mediaUrl: draft.featuredImage || '', mediaType: draft.featuredImage ? 'image' : 'none', aspectRatio: '1:1' } }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'Could not create the social draft.');
+      navigate(`/admin/social-automation/${payload.campaign?.id || ''}`);
+    } catch (err) { setError(err.message); }
+    finally { setBusy(false); }
+  };
 
   const save = async event => {
     event.preventDefault();
@@ -158,7 +188,9 @@ export default function BlogAdmin() {
           ? <label>Category<select value={draft.category || 'Guides'} onChange={event => update('category', event.target.value)}>
               {['Pricing','Guides','Delivery','Business'].map(category => <option value={category} key={category}>{category}</option>)}
             </select></label>
-          : <label>Category<input value={draft.category} onChange={event => update('category', event.target.value)}/></label>}
+          : isStudio
+            ? <label>Category<select value={draft.category || 'Shopify Tips'} onChange={event => update('category', event.target.value)}>{STUDIO_CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></label>
+            : <label>Category<input value={draft.category} onChange={event => update('category', event.target.value)}/></label>}
         <label>Tags<input value={(draft.tags || []).join(', ')} onChange={event => update('tags', toTags(event.target.value))} placeholder={isSunwings ? 'Toronto movers, condo moving, furniture delivery' : 'Shopify, POS, consignors'}/></label>
 
         <div className="site-admin-upload wide">
@@ -194,12 +226,21 @@ export default function BlogAdmin() {
           </div>
         </div>
 
+        {isStudio && <div className="wide" style={{ display: 'grid', gap: 10 }}>
+          <strong>Related services</strong><small>Shown under the article with links to their pricing.</small>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px' }}>{STUDIO_SERVICES.map(([sid, name]) => <label key={sid} className="site-admin-switch"><input type="checkbox" checked={(extras.relatedServices || []).includes(sid)} onChange={() => toggleService(sid)}/><span>{name}</span></label>)}</div>
+        </div>}
+        {isStudio && <label>Call-to-action button<input value={extras.ctaLabel || ''} onChange={e => setExtra('ctaLabel', e.target.value)} placeholder="Get a free store review"/></label>}
+        {isStudio && <label>Button link<input value={extras.ctaUrl || ''} onChange={e => setExtra('ctaUrl', e.target.value)} placeholder="/shopify-studio#audit"/></label>}
+        {isStudio && <label>Canonical URL<input value={extras.canonical || ''} onChange={e => setExtra('canonical', e.target.value)} placeholder="Automatic"/></label>}
+        {isStudio && <label>Social share image<input value={extras.ogImage || ''} onChange={e => setExtra('ogImage', e.target.value)} placeholder="Uses the featured image"/></label>}
         <label className="wide">SEO title<input value={draft.seoTitle} onChange={event => update('seoTitle', event.target.value)} placeholder="Leave blank to use the article title"/></label>
         <label className="wide">Meta description<textarea rows="3" value={draft.seoDescription} onChange={event => update('seoDescription', event.target.value)}/></label>
         <label className="wide">Article body<textarea rows="20" value={draft.body} onChange={event => update('body', event.target.value)} placeholder={isSunwings ? 'Write the article here. Use ## for main section headings, ### for subheadings, and - for bullet points.' : 'Write the article here. Separate paragraphs with a blank line.'}/>{isSunwings && <small>Sunwings turns ## headings into the article’s “On this page” table of contents automatically.</small>}</label>
       </form>
       <aside>
-        <div className="site-admin-card site-admin-side-card"><h2>Publishing</h2>{isSunwings && draft.id ? <ShowOnField kind="blog" slug={draft.slug}/> : null}<label>Status<select value={draft.status} onChange={event => update('status', event.target.value)}><option value={BLOG_STATUS.DRAFT}>Draft</option><option value={BLOG_STATUS.PUBLISHED}>Published</option></select></label>{draft.publishedAt && <p>Published {new Date(draft.publishedAt).toLocaleDateString()}</p>}</div>
+        <div className="site-admin-card site-admin-side-card"><h2>Publishing</h2>{isSunwings && draft.id ? <ShowOnField kind="blog" slug={draft.slug}/> : null}<label>Status<select value={draft.status} onChange={event => update('status', event.target.value)}><option value={BLOG_STATUS.DRAFT}>Draft</option><option value={BLOG_STATUS.PUBLISHED}>Published</option></select></label>{isStudio && <label>Publish date &amp; time<input type="datetime-local" value={toLocalInput(draft.publishedAt)} onChange={event => update('publishedAt', event.target.value ? new Date(event.target.value).toISOString() : '')}/><small>Set a future time and choose Published to schedule it. Blank = now.</small></label>}{draft.publishedAt && <p>{isScheduled(draft) ? 'Scheduled for' : 'Published'} {new Date(draft.publishedAt).toLocaleString()}</p>}{isStudio && draft.contentBlocks?.source === 'chatgpt' && <p><b>Drafted by ChatGPT</b> — review before publishing.</p>}</div>
+        {isStudio && draft.id && <div className="site-admin-card site-admin-side-card"><h2>Promote it</h2><p>Create a social post draft from this article (title, summary, link and image filled in). You review it in Social Posts before anything is scheduled.</p><button className="site-admin-btn secondary small" type="button" onClick={socialDraft} disabled={busy}>Create social draft</button></div>}
         <div className="site-admin-card site-admin-side-card"><h2>Live URL</h2><p>/blog/{draft.slug || 'article-slug'}</p>{draft.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${draft.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View Live</a>}</div>
         {draft.id && <div className="site-admin-card site-admin-side-card danger-zone"><h2>Danger Zone</h2><p>Delete this article permanently.</p><button className="site-admin-btn danger small" type="button" onClick={() => remove(draft)} disabled={busy}><Trash2 size={13}/> Delete Article</button></div>}
       </aside>
@@ -218,7 +259,7 @@ export default function BlogAdmin() {
       {busy && !posts.length ? <div className="site-admin-empty">Loading articles…</div> : filtered.map(post => <div className="site-admin-table-row blogs" key={post.id}>
         <div className="site-admin-blog-thumb">{post.featuredImage ? <img src={post.featuredImage} alt=""/> : <Image size={20}/>}</div>
         <div><strong>{post.title || 'Untitled article'}</strong><small>/blog/{post.slug || 'no-slug'}</small></div>
-        <span className={`site-admin-status ${post.status}`}>{post.status}</span>
+        <span className={`site-admin-status ${isScheduled(post) ? 'draft' : post.status}`}>{isScheduled(post) ? 'scheduled' : post.status}{post.contentBlocks?.source === 'chatgpt' ? ' · AI' : ''}</span>
         <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '—'}</span>
         <div className="site-admin-actions right"><Link className="site-admin-btn secondary small" to={`${blogAdminBase}/${post.id}`}>Edit</Link>{post.slug && <a className="site-admin-btn secondary small" href={`${liveBaseUrl}/blog/${post.slug}`} target="_blank" rel="noreferrer"><ExternalLink size={13}/> View</a>}<button className="site-admin-btn danger small" type="button" onClick={() => remove(post)} disabled={busy}><Trash2 size={13}/></button></div>
       </div>)}

@@ -80,8 +80,8 @@ export function slugify(value = '') {
 
 export function normalizeBlogPost(row = {}) {
   const siteKey = row.site_key || row.siteKey || getAdminSiteKey();
-  const defaultCategory = siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Guides' : 'Shopify Consignment';
-  const defaultAuthor = siteKey === 'justindematteis' ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn';
+  const defaultCategory = siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Guides' : siteKey === 'shopifystudio' ? 'Shopify Tips' : 'Shopify Consignment';
+  const defaultAuthor = (siteKey === 'justindematteis' || siteKey === 'shopifystudio') ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn';
   return {
     ...EMPTY_POST,
     id: row.id || '', title: row.title || '', slug: row.slug || '', excerpt: row.excerpt || '',
@@ -91,6 +91,7 @@ export function normalizeBlogPost(row = {}) {
     status: row.status === BLOG_STATUS.PUBLISHED ? BLOG_STATUS.PUBLISHED : BLOG_STATUS.DRAFT,
     authorName: row.author_name ?? row.authorName ?? defaultAuthor,
     publishedAt: row.published_at ?? row.publishedAt ?? '', createdAt: row.created_at ?? row.createdAt ?? '', updatedAt: row.updated_at ?? row.updatedAt ?? '',
+    contentBlocks: (row.content_blocks && !Array.isArray(row.content_blocks) && typeof row.content_blocks === 'object') ? row.content_blocks : (row.contentBlocks || null),
   };
 }
 
@@ -146,8 +147,8 @@ export function createEmptyPost(siteKey = getAdminSiteKey()) {
   return {
     ...EMPTY_POST,
     tags: [],
-    category: siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Guides' : 'Shopify Consignment',
-    authorName: siteKey === 'justindematteis' ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn',
+    category: siteKey === 'justindematteis' ? 'Development' : siteKey === 'sunwings' ? 'Guides' : siteKey === 'shopifystudio' ? 'Shopify Tips' : 'Shopify Consignment',
+    authorName: (siteKey === 'justindematteis' || siteKey === 'shopifystudio') ? 'Justin DeMatteis' : siteKey === 'sunwings' ? 'Sunwings Transport' : 'JustConsignIn',
   };
 }
 
