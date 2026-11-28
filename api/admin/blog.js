@@ -1,5 +1,6 @@
 import { supabaseUserRest } from '../_lib/supabase.js';
 import { requireSiteAccess } from '../_lib/websiteAdmin.js';
+import { rebuildStudioSite } from '../_lib/studioRebuild.js';
 
 const fields = 'site_key,id,slug,title,excerpt,seo_title,seo_description,category,tags,featured_image,body,status,author_name,published_at,created_at,updated_at,content_blocks';
 
@@ -72,6 +73,8 @@ export default async function handler(req, res) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.message || 'Unable to delete blog post');
       }
+      // Shopify Tips: rebuild the site so a removed tip leaves the sitemap.
+      if (siteKey === 'shopifystudio') await rebuildStudioSite('tip deleted');
       return res.status(200).json({ ok: true });
     }
 
@@ -80,6 +83,12 @@ export default async function handler(req, res) {
     if (!payload.slug) return res.status(400).json({ error: 'Slug is required' });
     const id = String(req.body?.id || '').trim();
     const path = id ? `blog_posts?${siteFilter}&id=eq.${encodeURIComponent(id)}` : 'blog_posts';
+    // Shopify Tips: was this tip already published? (Unpublishing also needs a rebuild.)
+    let wasPublished = false;
+    if (siteKey === 'shopifystudio' && id) {
+      const before = await supabaseUserRest(user.accessToken, `blog_posts?${siteFilter}&id=eq.${encodeURIComponent(id)}&select=status`, { method: 'GET' });
+      wasPublished = (await before.json().catch(() => []))?.[0]?.status === 'published';
+    }
     const response = await supabaseUserRest(user.accessToken, path, {
       method: id ? 'PATCH' : 'POST',
       headers: { Prefer: 'return=representation' },
@@ -87,7 +96,11 @@ export default async function handler(req, res) {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data?.message || 'Unable to save blog post');
-    return res.status(200).json({ post: Array.isArray(data) ? data[0] : data });
+    // Published (or unpublished) Shopify Tip: rebuild so its SEO page and sitemap entry are current.
+    // A tip scheduled for later is picked up by the hourly cron (api/cron/studio-rebuild.js) when it goes live.
+    let rebuild;
+    if (siteKey === 'shopifystudio' && (payload.status === 'published' || wasPublished)) rebuild = await rebuildStudioSite(`tip saved: ${payload.slug}`);
+    return res.status(200).json({ post: Array.isArray(data) ? data[0] : data, ...(rebuild ? { siteRebuild: rebuild.triggered } : {}) });
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Blog admin request failed' });
   }

@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/sunwings-follow-ups",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/studio-rebuild",
+      "schedule": "5 * * * *"
     }
   ]
 }
