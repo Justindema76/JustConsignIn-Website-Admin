@@ -51,7 +51,7 @@ function NewRequestsAlert({ leads }) {
     <span className="dashboard-new-count">{count}</span>
     <span>
       <strong>{count ? `New request${count === 1 ? '' : 's'} waiting` : 'No new requests'}</strong>
-      <small>{count ? 'Tap to open Quote Requests and reply.' : 'You’re all caught up.'}</small>
+      <small>{count ? `Tap to open ${leads.title || 'Quote Requests'} and reply.` : 'You’re all caught up.'}</small>
     </span>
     <span className="dashboard-link-arrow">›</span>
   </Link>;
