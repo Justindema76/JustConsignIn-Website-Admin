@@ -98,7 +98,7 @@ async function loadJustindematteisDashboard(accessToken) {
   const [blog, workPosts, serviceRequests] = await Promise.all([
     loadAdminBlogPosts(accessToken),
     loadAdminWorkPosts(accessToken),
-    loadServiceRequests(accessToken),
+    loadServiceRequests(accessToken, 'main'),
   ]);
   const newServiceRequests = serviceRequests.filter(item => item.status === 'new').length;
 
@@ -155,7 +155,34 @@ async function loadRentrallyDashboard() {
   };
 }
 
+// Shopify Studio: new free reviews/quotes from the Studio pages, and Shopify Tips.
+async function loadStudioDashboard(accessToken) {
+  const [tips, requests] = await Promise.all([loadAdminBlogPosts(accessToken), loadServiceRequests(accessToken, 'studio')]);
+  const fresh = requests.filter(item => item.status === 'new').length;
+  const live = tips.filter(item => item.status === 'published').length;
+  return {
+    metrics: [
+      { label: 'New Requests', value: fresh, note: fresh ? 'Needs a reply today' : 'All caught up', attention: fresh > 0 },
+      { label: 'Shopify Tips', value: live, note: `${live} published, ${tips.length - live} draft` },
+    ],
+    leads: {
+      title: 'Free Reviews & Quotes',
+      copy: 'Requests sent from the Shopify Studio pages.',
+      viewAllTo: '/admin/service-requests',
+      attentionCount: fresh,
+      items: requests.slice(0, 5).map(item => ({
+        id: item.id,
+        title: item.website || item.name || 'Unknown',
+        meta: /^\s*quote request/i.test(item.message || '') ? 'Quote request' : 'Free store review',
+        chip: humanizeStatus(item.status),
+        time: timeAgo(item.created_at),
+      })),
+    },
+  };
+}
+
 export async function loadDashboardData(siteKey, accessToken) {
+  if (siteKey === 'shopifystudio') return loadStudioDashboard(accessToken);
   if (siteKey === 'sunwings') return loadSunwingsDashboard(accessToken);
   if (siteKey === 'rentrally') return loadRentrallyDashboard(accessToken);
   if (siteKey === 'justconsignin') return loadJustconsigninDashboard(accessToken);

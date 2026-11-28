@@ -16,7 +16,7 @@ function isOwnerUser(user) {
 }
 
 function BoardStatus({ metrics }) {
-  if (!metrics) return null;
+  if (!metrics?.length) return null;
   return <section className="dispatch-strip">
     <div className="dispatch-metrics">
       {metrics.map(item => <div className={`dispatch-metric ${item.attention ? 'attention' : ''}`} key={item.label}>
