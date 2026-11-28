@@ -44,8 +44,12 @@ export function torontoIso(local) {
   if (!local) return '';
   const [date, time] = local.split('T');
   if (!date || !time) return '';
-  const probe = new Date(`${date}T${time}:00-04:00`);
-  return Number.isNaN(probe.getTime()) ? '' : probe.toISOString();
+  // Toronto is UTC-4 in summer and UTC-5 in winter: find the offset for this date and time.
+  const guess = new Date(`${date}T${time}:00Z`);
+  if (Number.isNaN(guess.getTime())) return '';
+  const shown = dateTimeLocal(guess.toISOString());
+  const drift = guess.getTime() - new Date(`${shown}:00Z`).getTime();
+  return new Date(guess.getTime() + drift).toISOString();
 }
 
 export function starterCopy(title, siteKey = 'justconsignin', siteName = '') {

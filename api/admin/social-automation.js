@@ -133,7 +133,9 @@ function toolName(tools = []) {
 function networkInfo(campaign, network, siteKey) {
   const site = SITE_CONFIG[siteKey] || SITE_CONFIG.justconsignin;
   const base = {
-    autoPublish: Boolean(campaign.auto_publish), draft: !campaign.auto_publish,
+    // Sent to Metricool = it posts by itself at publicationDate (now for "Publish right away", else the
+    // scheduled time). Sending as a Metricool draft meant scheduled posts never went out.
+    autoPublish: true, draft: false,
     descendants: [], firstCommentText: '', hasNotReadNotes: false,
     media: campaign.media_url ? [campaign.media_url] : [],
     mediaAltText: campaign.media_url ? [site.mediaAlt] : [],
