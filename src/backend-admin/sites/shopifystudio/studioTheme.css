@@ -1,0 +1,82 @@
+/*
+  Shopify Studio admin theme: dark green sidebar + green accent, so it never looks like the
+  blue JustinDeMatteis.com dashboard. Same layout as the Sunwings theme, only the colours differ.
+  Every rule is scoped under .site-admin-shell.site-shopifystudio.
+*/
+
+.site-admin-shell.site-shopifystudio{
+  --sw-dark:#0e2f24;--sw-dark-raised:#174634;--sw-orange:#22a05a;--sw-orange-dark:#167a43;
+  --dashboard-accent:#22a05a;--dashboard-accent-deep:#167a43;--dashboard-accent-wash:#e7f6ed;
+}
+
+.site-admin-shell.site-shopifystudio .site-admin-sidebar{background:var(--sw-dark);border-right:0}
+.site-admin-shell.site-shopifystudio .site-admin-brand{border-bottom:1px solid #1d4a39;color:#fff}
+.site-admin-shell.site-shopifystudio .site-admin-brand small{color:#9cc2b1}
+.site-admin-shell.site-shopifystudio .site-admin-brand-mark{background:var(--sw-orange);color:#111}
+
+.site-admin-shell.site-shopifystudio .site-admin-nav-label{color:#8fb8a5}
+.site-admin-shell.site-shopifystudio .site-admin-nav a{color:#cfe5da}
+.site-admin-shell.site-shopifystudio .site-admin-nav a:hover{background:var(--sw-dark-raised);color:#fff}
+.site-admin-shell.site-shopifystudio .site-admin-nav a.active{background:var(--sw-dark-raised);color:#fff;box-shadow:inset 3px 0 0 var(--sw-orange)}
+.site-admin-shell.site-shopifystudio .site-admin-dashboard-link{color:#cfe5da}
+.site-admin-shell.site-shopifystudio .site-admin-dashboard-link:hover{background:var(--sw-dark-raised);color:#fff}
+
+.site-admin-shell.site-shopifystudio .site-admin-nav-group{border-top:1px solid #1d4a39}
+.site-admin-shell.site-shopifystudio .site-admin-nav-group-toggle{color:#9cc2b1}
+.site-admin-shell.site-shopifystudio .site-admin-nav-group-toggle:hover,
+.site-admin-shell.site-shopifystudio .site-admin-nav-group-toggle.active-group{background:var(--sw-dark-raised);color:#fff}
+
+.site-admin-shell.site-shopifystudio .site-admin-sidebar-social{border-top:1px solid #1d4a39}
+.site-admin-shell.site-shopifystudio .site-admin-sidebar-social>small{color:#9cc2b1}
+.site-admin-shell.site-shopifystudio .site-admin-social-icons a,
+.site-admin-shell.site-shopifystudio .site-admin-social-icons span{background:var(--sw-dark-raised);border-color:#23553f}
+
+.site-admin-shell.site-shopifystudio .site-admin-eyebrow{color:var(--sw-orange)}
+.site-admin-shell.site-shopifystudio .site-admin-btn{background:var(--sw-orange);color:#fff}
+.site-admin-shell.site-shopifystudio .site-admin-btn:hover{background:var(--sw-orange-dark)}
+.site-admin-shell.site-shopifystudio .site-admin-btn.secondary{background:#fff;color:var(--sw-orange-dark);border-color:#bfe3cd}
+.site-admin-shell.site-shopifystudio .site-admin-btn.secondary:hover{background:#effaf3}
+.site-admin-shell.site-shopifystudio .site-admin-btn.danger{background:#b42318;color:#fff}
+.site-admin-shell.site-shopifystudio .site-admin-btn.danger:hover{background:#95190f}
+
+.site-admin-shell.site-shopifystudio .dashboard-quick-card:hover{border-color:#a9dcbd;box-shadow:0 9px 22px rgba(34,160,90,.14)}
+
+.site-admin-shell.site-shopifystudio .site-admin-dd-dot,
+.site-admin-shell.site-shopifystudio .site-admin-avatar{background:var(--sw-orange)}
+.site-admin-shell.site-shopifystudio .site-admin-dd-item:hover,
+.site-admin-shell.site-shopifystudio .site-admin-dd-item.active{background:#e7f6ed;color:var(--sw-orange-dark)}
+.site-admin-shell.site-shopifystudio .site-admin-dd-item:hover svg{color:var(--sw-orange-dark)}
+.site-admin-shell.site-shopifystudio .site-admin-dd-item.danger,
+.site-admin-shell.site-shopifystudio .site-admin-dd-item.danger:hover{background:#fff1f0;color:#b42318}
+.site-admin-shell.site-shopifystudio .site-admin-dd-item.danger svg{color:#b42318}
+
+/* Blue bits elsewhere on Studio pages turn green too. */
+.site-admin-shell.site-shopifystudio .site-admin-main a:not(.site-admin-btn):not(.dashboard-quick-card){color:var(--sw-orange-dark)}
+.site-admin-shell.site-shopifystudio .site-admin-status.published{background:#e7f6ed;color:#167a43}
+.site-admin-shell.site-shopifystudio input:focus,.site-admin-shell.site-shopifystudio select:focus,.site-admin-shell.site-shopifystudio textarea:focus{border-color:var(--sw-orange)!important;outline-color:var(--sw-orange)}
+.site-admin-shell.site-shopifystudio .settings-tab.active{color:var(--sw-orange-dark);border-color:var(--sw-orange)}
+
+@media(max-width:760px){
+  /* Phone menu: keep the dark sidebar (the shared mobile CSS forces it white, which made
+     the pale text and brand name unreadable). */
+  .site-admin-shell.site-shopifystudio .site-admin-sidebar{background:var(--sw-dark)!important;border-right:0!important;box-shadow:16px 0 40px rgba(0,0,0,.45)!important}
+  .site-admin-shell.site-shopifystudio .site-admin-mobile-nav-head{border-bottom-color:#1d4a39}
+  .site-admin-shell.site-shopifystudio .site-admin-mobile-nav-head .site-admin-brand,
+  .site-admin-shell.site-shopifystudio .site-admin-mobile-nav-head .site-admin-brand strong{color:#fff}
+  .site-admin-shell.site-shopifystudio .site-admin-mobile-close{background:var(--sw-dark-raised);color:#fff;border-color:#23553f}
+  .site-admin-shell.site-shopifystudio .site-admin-nav-group{border-top-color:#1d4a39}
+  .site-admin-shell.site-shopifystudio .site-admin-nav-group-toggle{background:transparent;border-color:transparent;color:#9cc2b1;text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+  .site-admin-shell.site-shopifystudio .site-admin-nav-group-toggle.active-group{background:var(--sw-dark-raised);border-color:#23553f;color:#fff}
+  .site-admin-shell.site-shopifystudio .site-admin-nav-group-links a{border-left-color:#1d4a39}
+  .site-admin-shell.site-shopifystudio .site-admin-nav a{color:#e2f0e9;font-size:15px}
+  .site-admin-shell.site-shopifystudio .site-admin-nav a.active{background:var(--sw-dark-raised);color:#fff;border-left-color:var(--sw-orange);box-shadow:none}
+  .site-admin-shell.site-shopifystudio .site-admin-mobile-menu{color:var(--sw-orange-dark);border-color:#bfe3cd}
+}
+
+.site-admin-shell.site-shopifystudio .site-admin-module-icon,
+.site-admin-shell.site-shopifystudio .site-admin-blog-thumb,
+.site-admin-shell.site-shopifystudio .site-admin-image-preview{background:#e7f6ed;color:#167a43}
+.site-admin-shell.site-shopifystudio .site-admin-note{background:#f1faf4;border-color:#cde9d8}
+.site-admin-shell.site-shopifystudio .site-admin-form input:focus,
+.site-admin-shell.site-shopifystudio .site-admin-form textarea:focus,
+.site-admin-shell.site-shopifystudio .site-admin-form select:focus{outline-color:#e7f6ed}

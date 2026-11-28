@@ -11,6 +11,10 @@ import {
   updateServiceRequest,
 } from './serviceRequests.service';
 import { loadDepartments } from '../departments/departments.service';
+import { getAdminSiteKey } from '../../services/siteAdminService';
+
+// The Shopify Studio dashboard shows only requests sent from the Studio pages; JustinDeMatteis.com shows the rest.
+const IS_STUDIO = () => getAdminSiteKey() === 'shopifystudio';
 
 const STATUS_OPTIONS = [
   ['new', 'New'],
@@ -121,7 +125,7 @@ export default function ServiceRequestsAdmin() {
     setError('');
     try {
       const [rows, departmentRows] = await Promise.all([
-        loadServiceRequests(accessToken),
+        loadServiceRequests(accessToken, IS_STUDIO() ? 'studio' : 'main'),
         loadDepartments(accessToken),
       ]);
       setRequests(rows);
@@ -300,9 +304,9 @@ export default function ServiceRequestsAdmin() {
   return <div className="service-request-page">
     <div className="site-admin-page-head">
       <div>
-        <p className="site-admin-eyebrow">Projects & Quotes</p>
-        <h1>Service Requests</h1>
-        <p>Track project enquiries from request through quote, follow-up, acceptance and delivery.</p>
+        <p className="site-admin-eyebrow">{IS_STUDIO() ? 'Shopify Studio' : 'Projects & Quotes'}</p>
+        <h1>{IS_STUDIO() ? 'Free Reviews & Quotes' : 'Service Requests'}</h1>
+        <p>{IS_STUDIO() ? 'Free store reviews and quotes sent from the Shopify Studio pages, from request through quote, follow-up and delivery.' : 'Track project enquiries from request through quote, follow-up, acceptance and delivery.'}</p>
       </div>
       <button className="site-admin-btn secondary" type="button" onClick={refresh} disabled={loading}><RefreshCw size={15}/> Refresh</button>
     </div>

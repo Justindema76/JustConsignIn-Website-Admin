@@ -15,6 +15,8 @@ import './pricingEditor.css';
 // page land in Service Requests as "Shopify / Ecommerce".
 
 const SITE = 'https://www.justindematteis.com';
+// The Studio pages are part of justindematteis.com, so their settings are stored on that website.
+const STORE_SITE = 'justindematteis';
 
 const ERAS = [
   ['50s', '1950s'],
@@ -91,7 +93,7 @@ export default function ShopifyStudioAdmin() {
 
   useEffect(() => {
     if (!accessToken) return;
-    loadAdminGlobalSection(accessToken, 'shopify-studio')
+    loadAdminGlobalSection(accessToken, 'shopify-studio', STORE_SITE)
       .then(({ value }) => setValues({ ...DEFAULTS, ...(value || {}) }))
       .catch(err => setError(err.message))
       .finally(() => setBusy(false));
@@ -162,7 +164,7 @@ export default function ShopifyStudioAdmin() {
     if (!values.enabledEras.includes(values.defaultEra)) { setError('The default era has to be one of the eras that are turned on.'); return; }
     setBusy(true);
     try {
-      await saveAdminGlobalSection(accessToken, 'shopify-studio', values);
+      await saveAdminGlobalSection(accessToken, 'shopify-studio', values, STORE_SITE);
       setMessage('Saved. The website picks this up on the next page load.');
     } catch (err) {
       setError(err.message);
@@ -175,18 +177,10 @@ export default function ShopifyStudioAdmin() {
     <div className="site-admin-page-head">
       <div>
         <p className="site-admin-eyebrow">Website</p>
-        <h1>Shopify Studio</h1>
-        <p>The Shopify store-building page and the Jill &amp; The Beanstalk case study. Every era says the same thing; only the look changes. Free store review requests arrive in <Link to="/admin/service-requests">Service Requests</Link> as Shopify / Ecommerce.</p>
+        <h1>Pages, Pricing &amp; SEO</h1>
+        <p>Everything on justindematteis.com/shopify-studio: designs, pricing, business details, SEO and the case study. Every design says the same thing; only the look changes. Free store reviews and quotes arrive in <Link to="/admin/service-requests">Free Reviews &amp; Quotes</Link>.</p>
       </div>
       <button className="site-admin-btn" type="submit" disabled={busy}><Save size={15} /> {busy ? 'Saving…' : 'Save'}</button>
-    </div>
-    <div className="site-admin-note" style={{ marginBottom: 14 }}>
-      Shopify Studio marketing has its own section:{' '}
-      <a href="/admin/go?site=shopifystudio&to=/admin/content-calendar">Content Calendar</a> ·{' '}
-      <a href="/admin/go?site=shopifystudio&to=/admin/blog">Blog Posts</a> ·{' '}
-      <a href="/admin/go?site=shopifystudio&to=/admin/social-automation">Social Posts</a> ·{' '}
-      <a href="/admin/go?site=shopifystudio&to=/admin/studio-api">ChatGPT / API Access</a> ·{' '}
-      <Link to="/admin/service-requests">Free Reviews &amp; Quotes</Link>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     {message && <div className="site-admin-alert success"><CheckCircle2 size={16} />{message}</div>}

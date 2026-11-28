@@ -101,8 +101,8 @@ export const serviceRequestAttachmentLimits = {
   maxTotalBytes: MAX_ATTACHMENT_TOTAL_BYTES,
 };
 
-export async function loadServiceRequests(accessToken) {
-  const payload = await parseResponse(await adminFetch('/api/admin/service-requests', {}, accessToken));
+export async function loadServiceRequests(accessToken, scope = '') {
+  const payload = await parseResponse(await adminFetch(`/api/admin/service-requests${scope ? `?scope=${scope}` : ''}`, {}, accessToken));
   return Array.isArray(payload.requests) ? payload.requests : [];
 }
 

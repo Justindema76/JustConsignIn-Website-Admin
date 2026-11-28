@@ -12,7 +12,6 @@ export const SOCIAL_NETWORKS = [
 export const SOCIAL_SECTIONS = {
   justindematteis: [
     { key: 'main', label: 'Main site' },
-    { key: 'shopify-studio', label: 'Shopify Studio' },
   ],
 };
 

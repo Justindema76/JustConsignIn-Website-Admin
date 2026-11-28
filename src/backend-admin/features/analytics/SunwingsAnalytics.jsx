@@ -38,7 +38,7 @@ function Delta({ now, before, invert = false }) {
   return <span className={`an-delta ${good ? 'up' : 'down'}`}>{change > 0 ? '▲' : '▼'} {Math.abs(change * 100).toFixed(0)}%</span>;
 }
 
-function Kpi({ label, value, now, before, note, lead }) {
+export function Kpi({ label, value, now, before, note, lead }) {
   return <div className={`an-kpi ${lead ? 'lead' : ''}`}>
     <span>{label}</span>
     <b>{value}</b>
@@ -46,12 +46,13 @@ function Kpi({ label, value, now, before, note, lead }) {
   </div>;
 }
 
-function TrafficChart({ daily }) {
+// Reused by the Shopify Studio Analytics page with its own bar series (leads instead of phone clicks).
+export function TrafficChart({ daily, barKey = 'phoneClicks', barLabel = 'phone clicks', lineColor = '#1f67b2', barColor = '#f97316' }) {
   const [hover, setHover] = useState(null);
   if (!daily?.length) return <p className="an-empty">No visits in this period yet.</p>;
   const W = 1000, H = 240, top = 10, bottom = 26;
   const maxV = Math.max(1, ...daily.map(d => d.visitors));
-  const maxP = Math.max(1, ...daily.map(d => d.phoneClicks));
+  const maxP = Math.max(1, ...daily.map(d => d[barKey] || 0));
   const step = W / daily.length;
   const x = i => i * step + step / 2;
   const y = v => top + (H - top - bottom) * (1 - v / maxV);
@@ -68,22 +69,22 @@ function TrafficChart({ daily }) {
 
   const point = hover !== null ? daily[hover] : null;
   return <div className="an-chart">
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" onMouseMove={move} onMouseLeave={() => setHover(null)} role="img" aria-label="Visitors and phone clicks per day">
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" onMouseMove={move} onMouseLeave={() => setHover(null)} role="img" aria-label={`Visitors and ${barLabel} per day`}>
       {[0.25, 0.5, 0.75, 1].map(f => <line key={f} x1="0" x2={W} y1={y(maxV * f)} y2={y(maxV * f)} stroke="#eef1f5" strokeWidth="1" vectorEffect="non-scaling-stroke"/>)}
-      {daily.map((d, i) => d.phoneClicks ? <rect key={`p${d.date}`} x={x(i) - barW / 2} width={barW} y={H - bottom - (H - top - bottom) * 0.4 * (d.phoneClicks / maxP)} height={(H - top - bottom) * 0.4 * (d.phoneClicks / maxP)} rx="2" fill="#f97316" opacity=".85"/> : null)}
-      <path d={area} fill="#1f67b2" opacity=".1"/>
-      <path d={line} fill="none" stroke="#1f67b2" strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinejoin="round"/>
+      {daily.map((d, i) => d[barKey] ? <rect key={`p${d.date}`} x={x(i) - barW / 2} width={barW} y={H - bottom - (H - top - bottom) * 0.4 * (d[barKey] / maxP)} height={(H - top - bottom) * 0.4 * (d[barKey] / maxP)} rx="2" fill={barColor} opacity=".85"/> : null)}
+      <path d={area} fill={lineColor} opacity=".1"/>
+      <path d={line} fill="none" stroke={lineColor} strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinejoin="round"/>
       {point ? <line x1={x(hover)} x2={x(hover)} y1={top} y2={H - bottom} stroke="#98a2b3" strokeDasharray="4 4" vectorEffect="non-scaling-stroke"/> : null}
       {daily.map((d, i) => i % labelEvery === 0 ? <text key={`l${d.date}`} x={x(i)} y={H - 6} textAnchor="middle" fontSize="12" fill="#667085" style={{ transform: 'none' }}>{shortDate(d.date)}</text> : null)}
     </svg>
     {point ? <div className="an-tip" style={{ left: `${((hover + 0.5) / daily.length) * 100}%` }}>
       <b>{shortDate(point.date)}</b>
-      {number(point.visitors)} visitors · {number(point.pageViews)} page views · {number(point.phoneClicks)} phone clicks
+      {number(point.visitors)} visitors · {number(point.pageViews)} page views · {number(point[barKey])} {barLabel}
     </div> : null}
   </div>;
 }
 
-function Bars({ items, label, value, color, empty }) {
+export function Bars({ items, label, value, color, empty }) {
   if (!items?.length) return <p className="an-empty">{empty}</p>;
   const max = Math.max(1, ...items.map(value));
   return <div className="an-bars">{items.map(item => <div className="an-bar-row" key={label(item)}>
@@ -92,7 +93,7 @@ function Bars({ items, label, value, color, empty }) {
   </div>)}</div>;
 }
 
-function Split({ items, empty }) {
+export function Split({ items, empty }) {
   const total = (items || []).reduce((sum, item) => sum + item.visitors, 0);
   if (!total) return <p className="an-empty">{empty}</p>;
   return <>

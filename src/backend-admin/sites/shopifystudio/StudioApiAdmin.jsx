@@ -9,9 +9,9 @@ const API_BASE = 'https://nowsajdmbpxvlvrhopjg.supabase.co/functions/v1/studio-a
 const CAN = [
   ['Read', 'Business details, brand rules and the design collection'],
   ['Read', 'Services, packages and prices (CAD) — always the current pricing'],
-  ['Read', 'Blog articles, social posts, the content calendar and Studio media'],
+  ['Read', 'Shopify Tips, social posts, the content calendar and Studio media'],
   ['Read', 'Lead and content counts (no names or emails)'],
-  ['Write', 'New blog and social drafts, and edits to anything still a draft'],
+  ['Write', 'New Shopify Tip and social drafts, and edits to anything still a draft'],
 ];
 const GPT_INSTRUCTIONS = `You are Shopify Studio — Marketing & Growth, the marketing department for Shopify Studio (Justin DeMatteis), a Canadian-owned, Ontario-based Shopify design and development business in Hamilton, Ontario, serving retailers across Canada.
 
@@ -19,7 +19,7 @@ Before creating any content, call getBrand, getServices and listPosts so you use
 
 Positioning (always): Canadian-owned. Ontario-based. Built around your business. Total customization from storefront to backend. The decade designs are examples of range, not templates — the collection is unlimited and growing. Every promotional social post clearly says we are Canadian and Ontario-based.
 
-Rules: Canadian English. Prices only from getServices, always in CAD. Verified facts only — no invented statistics, certifications, awards or client results. Real client work only (Jill & The Beanstalk, JustConsignIn). Blog articles are educational and search-driven, written for Canadian retailers, and end with a relevant call to action (free store review or the related service). The goal is attracting paying customers.
+Rules: Canadian English. Prices only from getServices, always in CAD. Verified facts only — no invented statistics, certifications, awards or client results. Real client work only (Jill & The Beanstalk, JustConsignIn). Blog articles are Shopify Tips: step-by-step how-to guides that answer what store owners search for ("how to …" in Shopify), written for Canadian retailers. Each one has a quick answer, numbered steps, a short FAQ, the related services, and ends with a call to action (free store review or the related service). The goal is attracting paying customers.
 
 Publishing: you create drafts only (createBlogDraft, createSocialDraft). Justin reviews and publishes everything in the admin. Never claim something is published. If a call fails, explain the error and fix the request rather than retrying blindly. Use updateBlogDraft / updateSocialDraft instead of creating duplicates.`;
 
@@ -103,7 +103,7 @@ export default function StudioApiAdmin() {
         <li>Authentication: <b>API Key</b>, Auth Type <b>Bearer</b>, paste a key from above.</li>
         <li>Schema: <b>Import from URL</b> and paste <code>{API_BASE}/openapi.json</code> <button className="site-admin-btn secondary small" type="button" onClick={() => copy(`${API_BASE}/openapi.json`, 'url')}><Copy size={12} /> {copied === 'url' ? 'Copied' : 'Copy'}</button></li>
         <li>Privacy policy URL: <code>https://www.justindematteis.com/shopify-studio/privacy</code></li>
-        <li>Test it: ask the GPT to “get the brand rules”, then “create a blog draft”. The draft shows up in Blog Posts and the Content Calendar marked “AI”.</li>
+        <li>Test it: ask the GPT to “get the brand rules”, then “create a blog draft”. The draft shows up in Shopify Tips and the Content Calendar marked “AI”.</li>
       </ol>
     </div>
   </>;

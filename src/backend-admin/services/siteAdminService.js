@@ -34,9 +34,9 @@ export function setAdminSiteKey(siteKey) {
   window.localStorage.setItem('justinnovate-admin-site', siteKey || DEFAULT_ADMIN_SITE_KEY);
 }
 
-function siteAdminUrl(url) {
+function siteAdminUrl(url, site) {
   const separator = url.includes('?') ? '&' : '?';
-  return `${url}${separator}site=${encodeURIComponent(getAdminSiteKey())}`;
+  return `${url}${separator}site=${encodeURIComponent(site || getAdminSiteKey())}`;
 }
 
 const parseResponse = response => parseJsonResponse(response, 'Website admin request failed');
@@ -319,17 +319,19 @@ export async function publishAdminSitePage(accessToken, page, content) {
 }
 
 
-export async function loadAdminGlobalSection(accessToken, key) {
+// `site` reads/writes another website's settings (Shopify Studio's page settings are stored on
+// justindematteis because the pages are part of that website, but are edited from the Studio dashboard).
+export async function loadAdminGlobalSection(accessToken, key, site) {
   const payload = await parseResponse(await adminFetch(
-    siteAdminUrl(`/api/admin/site?resource=global&key=${encodeURIComponent(key)}`),
+    siteAdminUrl(`/api/admin/site?resource=global&key=${encodeURIComponent(key)}`, site),
     {},
     accessToken,
   ));
   return { value: payload.value || null, updatedAt: payload.updatedAt || '' };
 }
 
-export async function saveAdminGlobalSection(accessToken, key, value) {
-  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=global'), {
+export async function saveAdminGlobalSection(accessToken, key, value, site) {
+  return parseResponse(await adminFetch(siteAdminUrl('/api/admin/site?resource=global', site), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ key, value }),

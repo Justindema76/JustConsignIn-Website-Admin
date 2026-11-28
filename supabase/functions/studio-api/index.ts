@@ -106,7 +106,8 @@ const postOut = (p: any, withBody = false) => ({
   status: p.status === 'published' ? (new Date(p.published_at) > new Date() ? 'scheduled' : 'published') : 'draft',
   publishedAt: p.published_at, updatedAt: p.updated_at, featuredImage: p.featured_image, seoTitle: p.seo_title, seoDescription: p.seo_description,
   relatedServices: p.content_blocks?.relatedServices || [], ctaLabel: p.content_blocks?.ctaLabel || '', ctaUrl: p.content_blocks?.ctaUrl || '',
-  draftedBy: p.content_blocks?.source || 'admin', url: `${STUDIO_URL}/blog/${p.slug}`, ...(withBody ? { body: p.body } : {}),
+  draftedBy: p.content_blocks?.source || 'admin', quickAnswer: p.content_blocks?.quickAnswer || '', faq: p.content_blocks?.faq || [],
+  url: `${STUDIO_URL}/tips/${p.slug}`, ...(withBody ? { body: p.body } : {}),
 });
 const SOCIAL_FIELDS = 'id,title,status,platforms,instagram_caption,facebook_caption,tiktok_caption,youtube_title,youtube_description,media_url,media_type,scheduled_at,auto_publish,last_error,updated_at';
 const socialOut = (c: any) => ({
@@ -156,6 +157,8 @@ function blogDraft(body: any, existing: any = null) {
       relatedServices: body.relatedServices !== undefined ? list(body.relatedServices, 8, 60) : (existing?.content_blocks?.relatedServices || []),
       ctaLabel: text(body.ctaLabel ?? existing?.content_blocks?.ctaLabel, 80),
       ctaUrl: text(body.ctaUrl ?? existing?.content_blocks?.ctaUrl, 300),
+      quickAnswer: text(body.quickAnswer ?? existing?.content_blocks?.quickAnswer, 600),
+      faq: Array.isArray(body.faq) ? body.faq.slice(0, 12).map((f: any) => ({ q: text(f?.q, 200), a: text(f?.a, 1000) })).filter((f: any) => f.q && f.a) : (existing?.content_blocks?.faq || []),
       source: 'chatgpt',
       suggestedPublishAt: text(body.suggestedPublishAt ?? existing?.content_blocks?.suggestedPublishAt, 40),
     },
@@ -220,9 +223,11 @@ function spec(base: string) {
   const idParam = [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }];
   const blogBody = { type: 'object', required: ['title', 'body'], properties: {
     title: { type: 'string' }, slug: { type: 'string', description: 'Optional; made from the title.' }, excerpt: { type: 'string', description: 'One or two sentences for the blog card.' },
-    body: { type: 'string', description: 'Article in plain text/Markdown. Use ## for headings.' }, category: { type: 'string', enum: ['Shopify Tips', 'Design Showcase', 'Case Studies', 'Pricing & Planning', 'Backend & Apps', 'SEO & Marketing', 'Canadian Retail'] },
+    body: { type: 'string', description: 'How-to guide in Markdown. Use ## for headings and 1. 2. 3. for the steps (shown as numbered steps).' }, category: { type: 'string', enum: ['Shopify Tips', 'Design Showcase', 'Case Studies', 'Pricing & Planning', 'Backend & Apps', 'SEO & Marketing', 'Canadian Retail'] },
     tags: { type: 'array', items: { type: 'string' } }, seoTitle: { type: 'string', description: '≤60 characters' }, seoDescription: { type: 'string', description: '≤160 characters' },
     featuredImage: { type: 'string', description: 'https URL, e.g. from GET /media' }, relatedServices: { type: 'array', items: { type: 'string' }, description: 'Service ids from GET /services' },
+    quickAnswer: { type: 'string', description: 'Two or three sentences that answer the search question straight away (shown at the top).' },
+    faq: { type: 'array', items: { type: 'object', properties: { q: { type: 'string' }, a: { type: 'string' } } }, description: 'Questions people ask, with short answers (shown at the bottom, marked up for Google).' },
     ctaLabel: { type: 'string' }, ctaUrl: { type: 'string' }, suggestedPublishAt: { type: 'string', format: 'date-time', description: 'A suggestion only; Justin sets the real date.' } } };
   const socialBody = { type: 'object', required: ['title', 'platforms'], properties: {
     title: { type: 'string', description: 'Internal name for the post' }, platforms: { type: 'array', items: { type: 'string', enum: ['instagram', 'facebook', 'tiktok', 'youtube'] } },
@@ -245,8 +250,8 @@ function spec(base: string) {
       '/calendar': { get: { operationId: 'getCalendar', summary: 'Upcoming and recent scheduled content (blog + social)', responses: ok } },
       '/media': { get: { operationId: 'listMedia', summary: 'Shopify Studio images and videos available to use', responses: ok } },
       '/analytics': { get: { operationId: 'getAnalytics', summary: 'Lead and content performance (no personal data)', parameters: [{ name: 'days', in: 'query', schema: { type: 'integer', default: 30, maximum: 365 } }], responses: ok } },
-      '/drafts/blog': { post: { operationId: 'createBlogDraft', summary: 'Create a blog article draft', requestBody: body(blogBody), responses: { '201': { description: 'Draft created' }, '409': { description: 'Duplicate' } } } },
-      '/drafts/blog/{id}': { patch: { operationId: 'updateBlogDraft', summary: 'Update an article that is still a draft', parameters: idParam, requestBody: body({ ...blogBody, required: [] }), responses: ok } },
+      '/drafts/blog': { post: { operationId: 'createBlogDraft', summary: 'Create a Shopify Tip (how-to guide) draft', requestBody: body(blogBody), responses: { '201': { description: 'Draft created' }, '409': { description: 'Duplicate' } } } },
+      '/drafts/blog/{id}': { patch: { operationId: 'updateBlogDraft', summary: 'Update a Shopify Tip that is still a draft', parameters: idParam, requestBody: body({ ...blogBody, required: [] }), responses: ok } },
       '/drafts/social': { post: { operationId: 'createSocialDraft', summary: 'Create a social post draft', requestBody: body(socialBody), responses: { '201': { description: 'Draft created' }, '409': { description: 'Duplicate' } } } },
       '/drafts/social/{id}': { patch: { operationId: 'updateSocialDraft', summary: 'Update a social post that is still a draft', parameters: idParam, requestBody: body({ ...socialBody, required: [] }), responses: ok } },
       '/drafts/{id}': { get: { operationId: 'getDraftStatus', summary: 'Status of any draft (approved, scheduled, published, failed)', parameters: idParam, responses: ok } },
@@ -293,7 +298,7 @@ Deno.serve(async req => {
           db.from('social_campaigns').select(SOCIAL_FIELDS).eq('site_key', SITE).gte('scheduled_at', from).lte('scheduled_at', to),
         ]);
         const items = [
-          ...(blogs.data || []).map(p => ({ type: 'blog', id: p.id, title: p.title, at: p.published_at, status: postOut(p).status, url: `${STUDIO_URL}/blog/${p.slug}` })),
+          ...(blogs.data || []).map(p => ({ type: 'blog', id: p.id, title: p.title, at: p.published_at, status: postOut(p).status, url: `${STUDIO_URL}/tips/${p.slug}` })),
           ...(social.data || []).map(c => ({ type: 'social', id: c.id, title: c.title, at: c.scheduled_at, status: c.status, platforms: c.platforms })),
         ].sort((a, b) => String(a.at).localeCompare(String(b.at)));
         return json({ from, to, items });

@@ -54,7 +54,7 @@ export default function ContentCalendar() {
   return <>
     <div className="site-admin-page-head">
       <div><p className="site-admin-eyebrow">Planning</p><h1>Content Calendar</h1><p>Every Shopify Studio article, social post and video in one schedule. Drafts (including anything ChatGPT writes) wait at the bottom until you approve them.</p></div>
-      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to="/admin/blog/new">New article</Link><Link className="site-admin-btn" to="/admin/social-automation/new">New social post</Link></div>
+      <div className="site-admin-actions"><Link className="site-admin-btn secondary" to="/admin/blog/new">New Shopify Tip</Link><Link className="site-admin-btn" to="/admin/social-automation/new">New social post</Link></div>
     </div>
     {error && <div className="site-admin-alert error">{error}</div>}
     <div className="site-admin-toolbar"><select value={kind} onChange={e => setKind(e.target.value)}><option value="all">Everything</option><option value="blog">Blog</option><option value="social">Social</option><option value="video">Video</option></select></div>

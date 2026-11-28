@@ -14,6 +14,7 @@ import { getAdminSiteKey, loadAdminSites, loadAdminSocial, setAdminSiteKey } fro
 import { getSiteConfig } from '../../sites/registry';
 import { getSiteIcon } from '../../sites/icons';
 import '../../sites/sunwings/sunwingsTheme.css';
+import '../../sites/shopifystudio/studioTheme.css';
 
 function isPathInGroup(pathname, group) {
   return group.items.some(item => pathname === item.to || pathname.startsWith(`${item.to}/`));

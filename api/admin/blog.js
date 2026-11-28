@@ -20,6 +20,8 @@ function cleanExtras(value) {
     canonical: text(value.canonical, 300),
     ogImage: text(value.ogImage, 500),
     source: text(value.source, 40),
+    quickAnswer: text(value.quickAnswer, 600),
+    faq: Array.isArray(value.faq) ? value.faq.map(f => ({ q: text(f?.q, 200), a: text(f?.a, 1000) })).filter(f => f.q || f.a).slice(0, 12) : [],
   };
 }
 

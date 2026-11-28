@@ -50,12 +50,14 @@ import RentrallySettingsAdmin from '../sites/rentrally/SettingsAdmin';
 import { getAdminSiteKey, setAdminSiteKey } from '../services/siteAdminService';
 import ContentCalendar from '../sites/shopifystudio/ContentCalendar';
 import StudioApiAdmin from '../sites/shopifystudio/StudioApiAdmin';
+import StudioAnalytics from '../sites/shopifystudio/StudioAnalytics';
 
 const JUSTIN = ['justindematteis'];
 const JCI = ['justconsignin'];
 const STANDARD_SITES = ['justindematteis', 'justconsignin'];
 const SOCIAL_SITES = ['justindematteis', 'justconsignin', 'rentrally', 'shopifystudio'];
 const STUDIO = ['shopifystudio'];
+const JUSTIN_AND_STUDIO = ['justindematteis', 'shopifystudio'];
 const CONTENT_SITES = ['justindematteis', 'justconsignin', 'shopifystudio'];
 const SUNWINGS = ['sunwings'];
 const RENTRALLY = ['rentrally'];
@@ -99,11 +101,11 @@ export default function AdminApp() {
         <Route path="/admin/beta-partners" element={only(JCI, <BetaApplicationsAdmin />)} />
         <Route path="/admin/outreach" element={only(JCI, <OutreachMap />)} />
 
-        <Route path="/admin/service-requests" element={only(JUSTIN, <ServiceRequestsAdmin />)} />
+        <Route path="/admin/service-requests" element={only(JUSTIN_AND_STUDIO, <ServiceRequestsAdmin key={getAdminSiteKey()} />)} />
         <Route path="/admin/hiring-contacts" element={only(JUSTIN, <HiringContactsAdmin />)} />
         <Route path="/admin/business-outreach" element={only(JUSTIN, <BusinessOutreachAdmin />)} />
-        <Route path="/admin/departments" element={only(JUSTIN, <DepartmentsAdmin />)} />
-        <Route path="/admin/shopify-studio" element={only(JUSTIN, <ShopifyStudioAdmin />)} />
+        <Route path="/admin/departments" element={only(JUSTIN_AND_STUDIO, <DepartmentsAdmin />)} />
+        <Route path="/admin/shopify-studio" element={only(STUDIO, <ShopifyStudioAdmin />)} />
 
         <Route path="/admin/blog" element={only(CONTENT_SITES, <BlogAdmin />)} />
         <Route path="/admin/blog/:id" element={only(CONTENT_SITES, <BlogAdmin />)} />
@@ -117,6 +119,7 @@ export default function AdminApp() {
         <Route path="/admin/media" element={only(CONTENT_SITES, <MediaAdmin />)} />
         <Route path="/admin/content-calendar" element={only(STUDIO, <ContentCalendar />)} />
         <Route path="/admin/studio-api" element={only(STUDIO, <StudioApiAdmin />)} />
+        <Route path="/admin/studio-analytics" element={only(STUDIO, <StudioAnalytics />)} />
         <Route path="/admin/social-image" element={only(JCI, <SocialImageStudio />)} />
         <Route path="/admin/social-automation" element={only(SOCIAL_SITES, <SocialAutomation />)} />
         <Route path="/admin/social-automation/:id" element={only(SOCIAL_SITES, <SocialAutomation />)} />

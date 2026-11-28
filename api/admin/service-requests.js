@@ -34,7 +34,12 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const query = `service_requests?site_key=eq.${encodeURIComponent(SITE_KEY)}&select=${encodeURIComponent(SELECT)}&order=created_at.desc&limit=500`;
+      // ?scope=studio → only requests sent from justindematteis.com/shopify-studio pages (Shopify Studio dashboard);
+      // ?scope=main → everything else (JustinDeMatteis.com dashboard). No scope → all.
+      const scope = clean(req.query?.scope, 10);
+      const scopeFilter = scope === 'studio' ? '&source_path=like./shopify-studio*'
+        : scope === 'main' ? `&or=${encodeURIComponent('(source_path.is.null,source_path.not.like./shopify-studio*)')}` : '';
+      const query = `service_requests?site_key=eq.${encodeURIComponent(SITE_KEY)}${scopeFilter}&select=${encodeURIComponent(SELECT)}&order=created_at.desc&limit=500`;
       const requests = await parseSupabase(await supabaseUserRest(owner.accessToken, query, { method: 'GET' }), 'Unable to load service requests.');
       return res.status(200).json({ requests: Array.isArray(requests) ? requests : [] });
     } catch (error) {
